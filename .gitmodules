@@ -1,0 +1,12 @@
+[submodule "lib/lib/fx-gltf"]
+	path = lib/lib/fx-gltf
+	url = https://github.com/jessey-git/fx-gltf.git
+[submodule "lib/lib/glm"]
+	path = lib/lib/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "lib/lib/json"]
+	path = lib/lib/json
+	url = https://github.com/nlohmann/json.git
+[submodule "lib/Binary-Reader"]
+	path = lib/Binary-Reader
+	url = https://github.com/Protinon/Binary-Reader.git

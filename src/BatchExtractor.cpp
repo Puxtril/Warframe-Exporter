@@ -7,19 +7,15 @@ BatchExtractor::BatchExtractor(PackageReader::PackageDir* package, const Ensmall
 	: m_package(package),
 	m_ensmalleningData(ensmalleningData),
 	m_pathManager(baseOutputPath),
-	m_enumMap(m_enumMap.getInstance())
+	m_enumMap(m_enumMap.getInstance()),
+	m_logger(spdlog::get("Warframe-Exporter"))
 {
 }
 
 void
-BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> packages, FileTypeInternal types, bool overwriteLogs, bool includePrivateLog)
+BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> packages, FileTypeInternal types)
 {
-	Logger logPrivate = Logger("", true);
-	if (includePrivateLog)
-		logPrivate = Logger(m_pathManager.getLogPrivateFilePath(), overwriteLogs);
-	Logger logPublic = Logger(m_pathManager.getLogPublicFilePath(), overwriteLogs);
-
-	this->validatePackages(packages, logPrivate);
+	this->validatePackages(packages);
 	for (const std::string& curPackageName : packages)
 	{
 		const PackageReader::CachePair* curPair = (*m_package)[curPackageName][PackageReader::PackageTrioType::H];
@@ -30,7 +26,10 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 			
 			CommonFileHeader header;
 			if (!tryReadHeader(rawData, header))
+			{
+				m_logger->debug("Common header error: " + curFile->getFullPath());
 				continue;
+			}
 
 			try
 			{
@@ -40,7 +39,10 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 
 				std::string outputPath = m_pathManager.getOutputFilePath(curFile->getFullPath(), extractor.outFileExt());
 				if (existingFileIdentical(curFile->getFullPath(), outputPath, curPair, curPackageName))
+				{
+					m_logger->info("Identical file time, skipping: " + curFile->getFullPath());
 					continue;
+				}
 
 				extractOrLog(
 					curFile->getFullPath(),
@@ -48,13 +50,13 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 					outputPath,
 					&rawData,
 					extractor,
-					header,
-					logPrivate,
-					logPublic
+					header
 				);
 			}
-			catch (std::out_of_range&)
+			// Files that don't match specified enums
+			catch (std::out_of_range& ex)
 			{
+				m_logger->debug("Skipping file type " + std::to_string(header.getEnum()) + ": " + curFile->getFullPath());
 				continue;
 			}
 		}
@@ -68,49 +70,34 @@ BatchExtractor::extractOrLog(
 	const std::string& outputPath,
 	BinaryReaderBuffered* hReader,
 	Extractor& extractor,
-	const CommonFileHeader& header,
-	Logger& logPrivate,
-	Logger& logPublic
+	const CommonFileHeader& header
 )
 {
 	BinaryReaderBuffered* bReader = nullptr;
 	BinaryReaderBuffered* fReader = nullptr;
+
 	try
 	{
 		bReader = getBodyReader(internalPath, packageName, PackageReader::PackageTrioType::B);
 		fReader = getBodyReader(internalPath, packageName, PackageReader::PackageTrioType::F);
 		
+		m_logger->info("Extracting " + internalPath);
 		extractor.extract(header, hReader, bReader, fReader, m_ensmalleningData, outputPath);
 		writeFileProperties(outputPath, internalPath, packageName);
-		std::cout << internalPath << std::endl;
 	}
 	catch (not_imeplemented_error& err)
 	{
-		std::string publicMsg = "Operation not implemented: " + internalPath;
-		std::string privateMsg = std::string(err.what()) + ": " + internalPath;
-
-		logPrivate.log(privateMsg, err.getDebugCount(), err.getDebugs());
-		logPublic.log(publicMsg);
-		std::cout << privateMsg << std::endl;
+		m_logger->debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
 	}
 	catch (unknown_format_error& err)
 	{
-		std::string publicMsg = "Unknown Format: " + internalPath;
-		std::string privateMsg = std::string(err.what()) + ": " + internalPath;
-
-		logPrivate.log(privateMsg, err.getDebugCount(), err.getDebugs());
-		logPublic.log(publicMsg);
-		std::cout << privateMsg << std::endl;
+		m_logger->debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
 	}
 	catch (std::exception& err)
 	{
-		std::string publicMsg = "Unknown Error: " + internalPath;
-		std::string privateMsg = std::string(err.what()) + ": " + internalPath;
-
-		logPrivate.log(privateMsg);
-		logPublic.log(publicMsg);
-		std::cout << privateMsg << std::endl;
+		m_logger->error(std::string(err.what()) + ": " + internalPath);
 	}
+
 	delete bReader;
 	delete fReader;
 }
@@ -132,7 +119,7 @@ BatchExtractor::existingFileIdentical(const std::string& internalPath, const std
 }
 
 void
-BatchExtractor::validatePackages(std::vector<std::string> packages, Logger& logger)
+BatchExtractor::validatePackages(std::vector<std::string> packages)
 {
 	for (auto& curPkgStr : packages)
 	{
@@ -142,7 +129,7 @@ BatchExtractor::validatePackages(std::vector<std::string> packages, Logger& logg
 		}
 		catch (std::exception&)
 		{
-			logger.log("Package does not exist: " + curPkgStr);
+			m_logger->error("Package does not exist: " + curPkgStr);
 			throw std::runtime_error("Package does not exist: " + curPkgStr);
 		}
 	}

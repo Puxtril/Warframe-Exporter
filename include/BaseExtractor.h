@@ -4,6 +4,8 @@
 #include "CommonHeader.h"
 #include "Ensmallening.hpp"
 #include "FileType.hpp"
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/fmt.h"
 
 #include <vector>
 #include <string>
@@ -13,7 +15,9 @@ namespace WarframeExporter
 	class Extractor
 	{
 	protected:
-		Extractor() = default;
+		std::shared_ptr<spdlog::logger> m_logger;
+
+		Extractor();
 
 		Extractor(const Extractor& other) = delete;
 		Extractor& operator=(const Extractor& other) = delete;

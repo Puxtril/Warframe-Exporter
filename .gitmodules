@@ -10,3 +10,6 @@
 [submodule "lib/Binary-Reader"]
 	path = lib/Binary-Reader
 	url = https://github.com/Protinon/Binary-Reader.git
+[submodule "lib/spdlog"]
+	path = lib/spdlog
+	url = https://github.com/gabime/spdlog.git

@@ -7,15 +7,15 @@ ExportDebugger::ExportDebugger(PackageReader::PackageDir* package, const Ensmall
 	: m_package(package),
 	m_pathManager(baseOutputPath),
 	m_ensmalleningData(ensmallData),
-	m_enumMap(m_enumMap.getInstance())
+	m_enumMap(m_enumMap.getInstance()),
+	m_logger(spdlog::get("Warframe-Exporter"))
 {
 }
 
 void
 ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std::string> packages, FileTypeInternal types)
 {
-	Logger loggerDebug = Logger(m_pathManager.getLogDebugFilePath(), true);
-	packages = this->validatePackages(internalBasePath, packages, loggerDebug);
+	this->validatePackages(internalBasePath, packages);
 
 	for (const std::string& curPackageName : packages)
 	{
@@ -47,8 +47,7 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 					curPackageName,
 					rawData,
 					extractor,
-					*header,
-					loggerDebug
+					*header
 				);
 				delete header;
 				delete rawData;	
@@ -64,10 +63,11 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 }
 
 void
-ExportDebugger::debugExtract(const std::string internalPath, const std::string& pkgName, BinaryReaderBuffered* hReader, Extractor& extractor, const CommonFileHeader& header, Logger& logDebug)
+ExportDebugger::debugExtract(const std::string internalPath, const std::string& pkgName, BinaryReaderBuffered* hReader, Extractor& extractor, const CommonFileHeader& header)
 {
 	BinaryReaderBuffered* bReader = nullptr;
 	BinaryReaderBuffered* fReader = nullptr;
+
 	try
 	{
 		bReader = getBodyReader(internalPath, pkgName, PackageReader::PackageTrioType::B);
@@ -76,25 +76,20 @@ ExportDebugger::debugExtract(const std::string internalPath, const std::string& 
 	}
 	catch (not_imeplemented_error& err)
 	{
-		std::string privateMsg = std::string(err.what()) + ": " + internalPath;
-		logDebug.log(privateMsg, err.getDebugCount(), err.getDebugs());
-		std::cout << privateMsg << std::endl;
+		m_logger->debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
 		writeAllDebugs(internalPath, hReader, bReader, fReader);
 	}
 	catch (unknown_format_error& err)
 	{
-		std::string privateMsg = std::string(err.what()) + ": " + internalPath;
-		logDebug.log(privateMsg, err.getDebugCount(), err.getDebugs());
-		std::cout << privateMsg << std::endl;
+		m_logger->debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
 		writeAllDebugs(internalPath, hReader, bReader, fReader);
 	}
 	catch (std::runtime_error& err)
 	{
-		std::string privateMsg = std::string(err.what()) + ": " + internalPath;
-		logDebug.log(privateMsg);
-		std::cout << privateMsg << std::endl;
+		m_logger->error(std::string(err.what()) + ": " + internalPath);
 		writeAllDebugs(internalPath, hReader, bReader, fReader);
 	}
+
 	delete bReader;
 	delete fReader;
 }
@@ -115,12 +110,17 @@ ExportDebugger::printEnumCounts(const std::string& package)
 		}
 		catch (DecompressionException&)
 		{
-			std::cout << "Decompress error: " << curFile->getFullPath() << std::endl;
+			m_logger->warn("Decompress error: " + curFile->getFullPath());
 			continue;
 		}
-		catch (LimitException&)
+		catch (LimitException& ex)
 		{
-			//std::cout << "Common Header Error [" << ex.what() << "] " << curFile->getFullPath() << std::endl;
+			m_logger->warn(std::string(ex.what()) + curFile->getFullPath());
+			continue;
+		}
+		catch (std::exception& ex)
+		{
+			m_logger->error(std::string(ex.what()) + ": " + curFile->getFullPath());
 			continue;
 		}
 	}
@@ -140,9 +140,9 @@ ExportDebugger::printEnumExamples(const std::string& package, uint32_t enumNum, 
 	int curFoundCount = 0;
 	for (const auto& curFile : *curPair)
 	{
-		BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
 		try
 		{
+			BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
 			CommonFileHeader header(rawData);
 		
 			if (header.getEnum() == enumNum)
@@ -158,8 +158,14 @@ ExportDebugger::printEnumExamples(const std::string& package, uint32_t enumNum, 
 			if (curPrintCount > printCount)
 				break;
 		}
-		catch (LimitException&)
+		catch (LimitException& ex)
 		{
+			m_logger->warn(std::string(ex.what()) + curFile->getFullPath());
+			continue;
+		}
+		catch (DecompressionException&)
+		{
+			m_logger->warn("Decompress error: " + curFile->getFullPath());
 			continue;
 		}
 	}
@@ -184,19 +190,21 @@ ExportDebugger::getBodyReader(const std::string& internalPath, const std::string
 	return reader;
 }
 
-std::vector<std::string>
-ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::string> packages, Logger& logger)
+void
+ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::string> packages)
 {
-	std::vector<std::string> validPackages;
 	for (auto& curPkgStr : packages)
 	{
-		const Entries::DirNode* foundDir = (*m_package)[curPkgStr][PackageReader::PackageTrioType::H]->getDirEntry(internalBasePath);
-		if (foundDir != nullptr)
-			validPackages.push_back(curPkgStr);
-		else
-			logger.log("Does not exist in " + curPkgStr + " :" + internalBasePath);
+		try
+		{
+			const PackageReader::CachePair* pair = (*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
+		}
+		catch (std::exception&)
+		{
+			m_logger->error("Package does not exist: " + curPkgStr);
+			throw std::runtime_error("Package does not exist: " + curPkgStr);
+		}
 	}
-	return validPackages;
 }
 
 void

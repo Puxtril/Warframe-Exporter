@@ -21,14 +21,9 @@ namespace WarframeExporter
 		std::string getOutputFilePath(const std::string& internalPath, const std::string& replaceExtension);
 		std::string getDebugOutputFilePath(const std::string& internalPath);
 		std::string getDebugOutputFilePath(const std::string& internalPath, const std::string& filePostfix);
-		std::string getLogPublicFilePath();
-		std::string getLogPrivateFilePath();
-		std::string getLogSkipFilePath();
-		std::string getLogDebugFilePath();
 
 	private:
 		std::string createOutputDebugPath();
-		std::string createLogDebugFilePath();
 		std::string internalToOSPath(std::string internalPath);
 	};
 }

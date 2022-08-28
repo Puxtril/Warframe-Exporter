@@ -17,6 +17,7 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
+
 	switch (header.getEnum())
 	{
 	case 269:
@@ -28,6 +29,7 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 		ModelReader96::readBody(headerExt, bReader, bodyExt);
 		break;
 	}
+	m_logger->debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", headerExt.getBoneTree().size(), headerExt.getWeightedBoneNames().size(), headerExt.getMeshInfos().size(), headerExt.getVertexCount(), headerExt.getFaceCount(), headerExt.getMorphCount(), headerExt.getPhysXMeshes().size()));
 
 	if (headerExt.getMeshInfos().size() == 0)
 		throw InvalidDataException("Mesh has zero MeshInfos");
@@ -35,6 +37,7 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
 	ModelConverter::convertToInternal(headerExt, bodyExt, header.getAttributes(), headerInt, bodyInt);
+	m_logger->debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.getModelScale().x, headerInt.getModelScale().y, headerInt.getModelScale().z));
 	
 	GltfModel outModel;
 	outModel.addModelData(headerInt, bodyInt);

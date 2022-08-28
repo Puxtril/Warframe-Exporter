@@ -13,10 +13,6 @@ ExportPathManager::ExportPathManager(std::string basePath)
 		std::filesystem::create_directory(exportPath);
 
 	m_debugOutputPath = createOutputDebugPath();
-	//if (!std::filesystem::is_directory(m_debugOutputPath) || !std::filesystem::exists(m_debugOutputPath))
-	//	std::filesystem::create_directory(m_debugOutputPath);
-
-	m_debugLogPath = createLogDebugFilePath();
 }
 
 std::string
@@ -58,36 +54,6 @@ ExportPathManager::getDebugOutputFilePath(const std::string& internalPath, const
 }
 
 std::string
-ExportPathManager::getLogPublicFilePath()
-{
-	std::filesystem::path newPath = std::filesystem::path(m_basePath);
-	newPath /= "ExtractPublic.log";
-	return newPath.string();
-}
-
-std::string
-ExportPathManager::getLogPrivateFilePath()
-{
-	std::filesystem::path newPath = std::filesystem::path(m_basePath);
-	newPath /= "ExtractPrivate.log";
-	return newPath.string();
-}
-
-std::string
-ExportPathManager::getLogSkipFilePath()
-{
-	std::filesystem::path newPath = std::filesystem::path(m_basePath);
-	newPath /= "ExtractSkip.log";
-	return newPath.string();
-}
-
-std::string
-ExportPathManager::getLogDebugFilePath()
-{
-	return m_debugLogPath;
-}
-
-std::string
 ExportPathManager::createOutputDebugPath()
 {
 	std::filesystem::path newPath = std::filesystem::path(m_basePath);
@@ -95,17 +61,6 @@ ExportPathManager::createOutputDebugPath()
 	while (std::filesystem::exists(newPath / ("Debug" + std::to_string(debugIndex))))
 		debugIndex++;
 	newPath /= ("Debug" + std::to_string(debugIndex));
-	return newPath.string();
-}
-
-std::string
-ExportPathManager::createLogDebugFilePath()
-{
-	std::filesystem::path newPath = std::filesystem::path(m_basePath);
-	int debugIndex = 1;
-	while (std::filesystem::exists(newPath / ("ExtractDebug" + std::to_string(debugIndex) + ".log")))
-		debugIndex++;
-	newPath /= ("ExtractDebug" + std::to_string(debugIndex) + ".log");
 	return newPath.string();
 }
 

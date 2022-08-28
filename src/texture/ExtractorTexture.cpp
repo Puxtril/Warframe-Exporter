@@ -10,15 +10,17 @@ ExtractorTexture::getInstance()
 }
 
 TextureHeaderInternal
-ExtractorTexture::readHeader(BinaryReaderBuffered* HfileReader, BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header)
+ExtractorTexture::readHeader(BinaryReaderBuffered* HfileReader, BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, std::shared_ptr<spdlog::logger>& logger)
 {
 	TextureHeaderExternal extHeader = TextureHeader::readHeader(HfileReader, ensmalleningData);
 	TextureHeaderInternal intHeader = TextureHeader::convertHeader(extHeader, FfileReader->getLength(), BfileReader->getLength());
+	logger->debug(spdlog::fmt_lib::format("Raw texture data: Resolution={}x{} Enum1={} Enum2={} Enum3={}", extHeader.getWidthBase(), extHeader.getHeightBase(), extHeader.getEnum1(), extHeader.getEnum2(), extHeader.getEnum3()));
+	logger->debug(spdlog::fmt_lib::format("Converted texture data: Resolution={}x{} Mip0Size={}", intHeader.getWidth(), intHeader.getHeight(), intHeader.getMip0Len()));
 	return intHeader;
 }
 
 TextureBodyInternal
-ExtractorTexture::readBody(BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, const TextureHeaderInternal& headerInternal)
+ExtractorTexture::readBody(BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, const TextureHeaderInternal& headerInternal, std::shared_ptr<spdlog::logger>& logger)
 {
 	BinaryReaderBuffered* bodyReader = FfileReader->getLength() > BfileReader->getLength() ? FfileReader : BfileReader;
 	return TextureBody::getBody(bodyReader, headerInternal, ensmalleningData);
@@ -47,14 +49,14 @@ ExtractorTexture::writeData(const std::string& outputFile, const TextureHeaderIn
 void
 ExtractorTexture::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, BinaryReaderBuffered* bReader, BinaryReaderBuffered* fReader, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
-	TextureHeaderInternal headerInt = readHeader(hReader, fReader, bReader, ensmalleningData, header);
-	TextureBodyInternal body = readBody(fReader, bReader, ensmalleningData, header, headerInt);
+	TextureHeaderInternal headerInt = readHeader(hReader, fReader, bReader, ensmalleningData, header, m_logger);
+	TextureBodyInternal body = readBody(fReader, bReader, ensmalleningData, header, headerInt, m_logger);
 	writeData(outputPath, headerInt, body, header);
 }
 
 void
 ExtractorTexture::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, BinaryReaderBuffered* bReader, BinaryReaderBuffered* fReader, const Ensmallening& ensmalleningData)
 {
-	TextureHeaderInternal headerInt = readHeader(hReader, fReader, bReader, ensmalleningData, header);
-	TextureBodyInternal body = readBody(fReader, bReader, ensmalleningData, header, headerInt);
+	TextureHeaderInternal headerInt = readHeader(hReader, fReader, bReader, ensmalleningData, header, m_logger);
+	TextureBodyInternal body = readBody(fReader, bReader, ensmalleningData, header, headerInt, m_logger);
 }

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "spdlog/spdlog.h"
 #include "BaseExtractor.h"
 #include "BinaryReaderExceptions.h"
 #include "BinaryReaderBuffered.h"
 #include "ExportPathManager.h"
 #include "PackageDir.h"
-#include "Logger.h"
 #include "ExporterExceptions.h"
 #include "FileTypeMap.hpp"
 
@@ -22,6 +22,7 @@ namespace WarframeExporter
 		ExportPathManager m_pathManager;
 		const Ensmallening m_ensmalleningData;
 		FileTypeMap m_enumMap;
+		std::shared_ptr<spdlog::logger> m_logger;
 
 	public:
 		ExportDebugger(PackageReader::PackageDir* package, const Ensmallening& ensmallData, std::string baseOutputPath);
@@ -32,9 +33,9 @@ namespace WarframeExporter
 		void printEnumExamples(const std::string& package, uint32_t enumNum, int printCount);
 
 	private:
-		std::vector<std::string> validatePackages(std::string internalBasePath, std::vector<std::string> packages, Logger& logger);
+		void validatePackages(std::string internalBasePath, std::vector<std::string> packages);
 		BinaryReaderBuffered* getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type);
-		void debugExtract(const std::string internalPath, const std::string& pkgName, BinaryReaderBuffered* hReader, Extractor& extractor, const CommonFileHeader& header, Logger& logDebug);
+		void debugExtract(const std::string internalPath, const std::string& pkgName, BinaryReaderBuffered* hReader, Extractor& extractor, const CommonFileHeader& header);
 		void writeAllDebugs(const std::string& internalPath, BinaryReaderBuffered* HReader, BinaryReaderBuffered* BReader, BinaryReaderBuffered* FReader);
 	};
 }

@@ -27,6 +27,36 @@ namespace WarframeExporter
 		TODO: Implement move constructors for rest of structs
 		*/
 
+		#ifndef VertexColor
+		struct VertexColorHeader
+		{
+		private:
+			uint32_t colorCount;
+			std::string modelPath;
+
+		public:
+			VertexColorHeader() : modelPath(), colorCount() {}
+
+			uint32_t getColorCount() const { return colorCount; }
+			const std::string& getModelPath() const { return modelPath; }
+
+			void setColorCount(uint32_t inData) { colorCount = inData; }
+			void setModelPath(std::string inData) { modelPath = inData; }
+		};
+
+		struct VertexColorBody
+		{
+		private:
+			std::vector<glm::u8vec4> colors;
+
+		public:
+			VertexColorBody() : colors() {}
+
+			const std::vector<glm::u8vec4>& getColors() const { return colors; }
+			void setColors(std::vector<glm::u8vec4>& inData) { colors = std::move(inData); }
+		};
+		#endif
+
 		#ifndef HeaderExternal
 
 		struct BoneTreeNodeExternal

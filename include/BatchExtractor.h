@@ -11,6 +11,7 @@
 #include "FileTypeMap.hpp"
 #include "FileProperties.h"
 #include "CacheReaderLimited.h"
+#include "model/VertexColor.h"
 
 #include <unordered_map>
 #include <chrono>
@@ -44,6 +45,7 @@ namespace WarframeExporter
 		// We only care about files that have a valid Common Header
 		bool tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& outHeader);
 
+		void indexVertexColors(PackageReader::Package* pkg);
 		void writeFileProperties(const std::string filePath, const std::string internalPath, const std::string& packageName);
 	};
 }

@@ -13,6 +13,7 @@ namespace WarframeExporter
 
 	enum class FileTypeExternal {
 		MODEL_STATIC_96 = 96,
+		VERTEX_COLOR = 110,
 		ANIMATION = 128,
 		TEXTURE_DIFFUSE_EMISSION_TINT = 163,
 		TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE = 164,

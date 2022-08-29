@@ -1,5 +1,4 @@
 #include "BatchExtractor.h"
-#include <filesystem>
 
 using namespace WarframeExporter;
 
@@ -21,6 +20,10 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 	for (const std::string& curPackageName : packages)
 	{
 		const PackageReader::CachePair* curPair = (*m_package)[curPackageName][PackageReader::PackageTrioType::H];
+		
+		if ((int)types & (int)FileTypeInternal::Model)
+			indexVertexColors(&(*m_package)[curPackageName]);
+
 		for (auto start = curPair->getIteratorRecursive(basePath), end = curPair->end(); start != end; ++start)
 		{
 			const Entries::FileNode* curFile = *start;
@@ -126,6 +129,18 @@ BatchExtractor::tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& o
 		return false;
 	}
 	return true;
+}
+
+void
+BatchExtractor::indexVertexColors(PackageReader::Package* pkg)
+{
+	// Trigger loading of package early
+	(*pkg)[PackageReader::PackageTrioType::B];
+
+	m_logger->info("Indexing Vertex Colors");
+	WarframeExporter::Model::VertexColorManager::getInstance().setPackage(pkg);
+	int colCount = WarframeExporter::Model::VertexColorManager::getInstance().indexColors();
+	m_logger->info(spdlog::fmt_lib::format("Found {} colors", colCount));
 }
 
 void

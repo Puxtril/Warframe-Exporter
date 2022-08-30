@@ -34,8 +34,13 @@ namespace WarframeExporter
 
 	private:
 		void validatePackages(std::string internalBasePath, std::vector<std::string> packages);
-		BinaryReaderBuffered* getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type);
-		void debugExtract(const std::string internalPath, const std::string& pkgName, BinaryReaderBuffered* hReader, Extractor& extractor, const CommonFileHeader& header);
-		void writeAllDebugs(const std::string& internalPath, BinaryReaderBuffered* HReader, BinaryReaderBuffered* BReader, BinaryReaderBuffered* FReader);
+		//BinaryReaderBuffered* getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type);
+		void debugExtract(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor& extractor);
+		void writeAllDebugs(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath);
+
+		// Only needed because this class iterates over every single file
+		// Some files do not have valid headers because they are encrypted or used a different layout
+		// We only care about files that have a valid Common Header
+		bool tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& outHeader);
 	};
 }

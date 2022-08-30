@@ -16,6 +16,8 @@ void
 BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> packages, FileTypeInternal types)
 {
 	this->validatePackages(packages);
+	PackageDirLimited pkgParam = PackageDirLimited(m_package);
+
 	for (const std::string& curPackageName : packages)
 	{
 		const PackageReader::CachePair* curPair = (*m_package)[curPackageName][PackageReader::PackageTrioType::H];
@@ -44,14 +46,7 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 					continue;
 				}
 
-				extractOrLog(
-					curFile->getFullPath(),
-					curPackageName,
-					outputPath,
-					&rawData,
-					extractor,
-					header
-				);
+				extractOrLog(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, outputPath,extractor);
 			}
 			// Files that don't match specified enums
 			catch (std::out_of_range& ex)
@@ -64,25 +59,12 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 }
 
 void
-BatchExtractor::extractOrLog(
-	const std::string internalPath,
-	const std::string& packageName,
-	const std::string& outputPath,
-	BinaryReaderBuffered* hReader,
-	Extractor& extractor,
-	const CommonFileHeader& header
-)
+BatchExtractor::extractOrLog(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, const std::string& outputPath, Extractor& extractor)
 {
-	BinaryReaderBuffered* bReader = nullptr;
-	BinaryReaderBuffered* fReader = nullptr;
-
 	try
 	{
-		bReader = getBodyReader(internalPath, packageName, PackageReader::PackageTrioType::B);
-		fReader = getBodyReader(internalPath, packageName, PackageReader::PackageTrioType::F);
-		
 		m_logger->info("Extracting " + internalPath);
-		extractor.extract(header, hReader, bReader, fReader, m_ensmalleningData, outputPath);
+		extractor.extract(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData, outputPath);
 		writeFileProperties(outputPath, internalPath, packageName);
 	}
 	catch (not_imeplemented_error& err)
@@ -97,9 +79,6 @@ BatchExtractor::extractOrLog(
 	{
 		m_logger->error(std::string(err.what()) + ": " + internalPath);
 	}
-
-	delete bReader;
-	delete fReader;
 }
 
 bool
@@ -133,25 +112,6 @@ BatchExtractor::validatePackages(std::vector<std::string> packages)
 			throw std::runtime_error("Package does not exist: " + curPkgStr);
 		}
 	}
-}
-
-BinaryReaderBuffered*
-BatchExtractor::getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type)
-{
-	const PackageReader::CachePair* pkg = (*m_package)[packageName][type];
-	if (pkg != nullptr)
-	{
-		try {
-			const Entries::FileNode* fileNode = pkg->getFileEntry(internalPath);
-			BinaryReaderBuffered* reader = new BinaryReaderBuffered(pkg->getDataAndDecompress(fileNode), fileNode->getLen());
-			return reader;
-		} catch (std::filesystem::filesystem_error&) {
-			BinaryReaderBuffered* reader = new BinaryReaderBuffered();
-			return reader;
-		}
-	}
-	BinaryReaderBuffered* reader = new BinaryReaderBuffered();
-	return reader;
 }
 
 bool

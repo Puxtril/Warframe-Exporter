@@ -10,8 +10,10 @@ ExtractorModel::getInstance()
 }
 
 void
-ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, BinaryReaderBuffered* bReader, BinaryReaderBuffered* fReader, const Ensmallening& ensmalleningData, const std::string& outputPath)
+ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
+	BinaryReaderBuffered* bReader = cacheDir.getFileReader(package, PackageReader::PackageTrioType::B, internalpath);
+
 	if (bReader->getLength() == 0)
 		throw InvalidDataException("Mesh has no body");
 
@@ -45,8 +47,9 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 }
 
 void
-ExtractorModel::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, BinaryReaderBuffered* bReader, BinaryReaderBuffered* fReader, const Ensmallening& ensmalleningData)
+ExtractorModel::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
 {
+	BinaryReaderBuffered* bReader = cacheDir.getFileReader(package, PackageReader::PackageTrioType::B, internalpath);
 	ModelHeaderExternal headerExt;
 
 	size_t pos = hReader->tell();

@@ -16,6 +16,7 @@ void
 ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std::string> packages, FileTypeInternal types)
 {
 	this->validatePackages(internalBasePath, packages);
+	PackageDirLimited pkgParam = PackageDirLimited(m_package);
 
 	for (const std::string& curPackageName : packages)
 	{
@@ -24,38 +25,24 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 		{
 			const Entries::FileNode* curFile = *start;
 			std::string fullFilePath = curFile->getFullPath();
-			BinaryReaderBuffered* rawData = new BinaryReaderBuffered(curPair->getDataAndDecompress(curFile), curFile->getLen());
+			BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
 			
-			CommonFileHeader* header = nullptr;
-			try 
+			CommonFileHeader header;
+			if (!tryReadHeader(rawData, header))
 			{
-				header = new CommonFileHeader(*rawData);
-			}
-			catch (LimitException&)
-			{
-				delete header;
+				m_logger->debug("Common header error: " + curFile->getFullPath());
 				continue;
 			}
 
 			try
 			{
-				Extractor& extractor = m_enumMap.getExtractor(static_cast<FileTypeExternal>(header->getEnum()));
+				Extractor& extractor = m_enumMap.getExtractor(static_cast<FileTypeExternal>(header.getEnum()));
 				if (((int)extractor.internalType() & (int)types) == 0)
 					continue;
-				debugExtract(
-					fullFilePath,
-					curPackageName,
-					rawData,
-					extractor,
-					*header
-				);
-				delete header;
-				delete rawData;	
+				debugExtract(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, extractor);
 			}
 			catch (std::out_of_range&)
 			{
-				delete header;
-				delete rawData;
 				continue;
 			}
 		}
@@ -63,35 +50,27 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 }
 
 void
-ExportDebugger::debugExtract(const std::string internalPath, const std::string& pkgName, BinaryReaderBuffered* hReader, Extractor& extractor, const CommonFileHeader& header)
+ExportDebugger::debugExtract(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor& extractor)
 {
-	BinaryReaderBuffered* bReader = nullptr;
-	BinaryReaderBuffered* fReader = nullptr;
-
 	try
 	{
-		bReader = getBodyReader(internalPath, pkgName, PackageReader::PackageTrioType::B);
-		fReader = getBodyReader(internalPath, pkgName, PackageReader::PackageTrioType::F);
-		extractor.extractDebug(header, hReader, bReader, fReader, m_ensmalleningData);
+		extractor.extractDebug(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData);
 	}
 	catch (not_imeplemented_error& err)
 	{
 		m_logger->debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
-		writeAllDebugs(internalPath, hReader, bReader, fReader);
+		writeAllDebugs(pkgParam, packageName, internalPath);
 	}
 	catch (unknown_format_error& err)
 	{
 		m_logger->debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
-		writeAllDebugs(internalPath, hReader, bReader, fReader);
+		writeAllDebugs(pkgParam, packageName, internalPath);
 	}
 	catch (std::runtime_error& err)
 	{
 		m_logger->error(std::string(err.what()) + ": " + internalPath);
-		writeAllDebugs(internalPath, hReader, bReader, fReader);
+		writeAllDebugs(pkgParam, packageName, internalPath);
 	}
-
-	delete bReader;
-	delete fReader;
 }
 
 void
@@ -171,25 +150,6 @@ ExportDebugger::printEnumExamples(const std::string& package, uint32_t enumNum, 
 	}
 }
 
-BinaryReaderBuffered*
-ExportDebugger::getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type)
-{
-	const PackageReader::CachePair* pkg = (*m_package)[packageName][type];
-	if (pkg != nullptr)
-	{
-		try {
-			const Entries::FileNode* fileNode = pkg->getFileEntry(internalPath);
-			BinaryReaderBuffered* reader = new BinaryReaderBuffered(pkg->getDataAndDecompress(fileNode), fileNode->getLen());
-			return reader;
-		} catch (std::filesystem::filesystem_error&) {
-			BinaryReaderBuffered* reader = new BinaryReaderBuffered();
-			return reader;
-		}
-	}
-	BinaryReaderBuffered* reader = new BinaryReaderBuffered();
-	return reader;
-}
-
 void
 ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::string> packages)
 {
@@ -208,8 +168,9 @@ ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::
 }
 
 void
-ExportDebugger::writeAllDebugs(const std::string& internalPath, BinaryReaderBuffered* HReader, BinaryReaderBuffered* BReader, BinaryReaderBuffered* FReader)
+ExportDebugger::writeAllDebugs(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath)
 {
+	BinaryReaderBuffered* HReader = pkgParam.getFileReader(packageName, PackageReader::PackageTrioType::H, internalPath);
 	if (HReader != nullptr)
 	{
 		std::string debugHPath = m_pathManager.getDebugOutputFilePath(internalPath, "_H");
@@ -219,6 +180,7 @@ ExportDebugger::writeAllDebugs(const std::string& internalPath, BinaryReaderBuff
 		out.write(HReader->getPtr(), HReader->getLength());
 		out.close();
 	}
+	BinaryReaderBuffered* BReader = pkgParam.getFileReader(packageName, PackageReader::PackageTrioType::B, internalPath);
 	if (BReader != nullptr)
 	{
 		std::string debugBPath = m_pathManager.getDebugOutputFilePath(internalPath, "_B");
@@ -228,6 +190,7 @@ ExportDebugger::writeAllDebugs(const std::string& internalPath, BinaryReaderBuff
 		out.write(BReader->getPtr(), BReader->getLength());
 		out.close();
 	}
+	BinaryReaderBuffered* FReader = pkgParam.getFileReader(packageName, PackageReader::PackageTrioType::F, internalPath);
 	if (FReader != nullptr)
 	{
 		std::string debugFPath = m_pathManager.getDebugOutputFilePath(internalPath, "_F");
@@ -237,4 +200,18 @@ ExportDebugger::writeAllDebugs(const std::string& internalPath, BinaryReaderBuff
 		out.write(FReader->getPtr(), FReader->getLength());
 		out.close();
 	}
+}
+
+bool
+ExportDebugger::tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& outHeader)
+{
+	try
+	{
+		outHeader = CommonFileHeader(rawData);
+	}
+	catch (LimitException&)
+	{
+		return false;
+	}
+	return true;
 }

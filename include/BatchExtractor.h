@@ -10,6 +10,7 @@
 #include "ExporterExceptions.h"
 #include "FileTypeMap.hpp"
 #include "FileProperties.h"
+#include "CacheReaderLimited.h"
 
 #include <unordered_map>
 #include <chrono>
@@ -32,11 +33,15 @@ namespace WarframeExporter
 		void batchExtract(std::string internalBasePath, std::vector<std::string> packages, FileTypeInternal types);
 
 	private:
-		void extractOrLog(const std::string internalPath, const std::string& packageName, const std::string& outputPath, BinaryReaderBuffered* rawData, Extractor& extractor, const CommonFileHeader& header);
+		void extractOrLog(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, const std::string& outputPath, Extractor& extractor);
 
 		bool existingFileIdentical(const std::string& internalPath, const std::string& outputPath, const PackageReader::CachePair* curPair, const std::string& packageName);
 		void validatePackages(std::vector<std::string> packages);
-		BinaryReaderBuffered* getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type);
+		//BinaryReaderBuffered* getBodyReader(const std::string& internalPath, const std::string& packageName, PackageReader::PackageTrioType type);
+
+		// Only needed because this class iterates over every single file
+		// Some files do not have valid headers because they are encrypted or used a different layout
+		// We only care about files that have a valid Common Header
 		bool tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& outHeader);
 
 		void writeFileProperties(const std::string filePath, const std::string internalPath, const std::string& packageName);

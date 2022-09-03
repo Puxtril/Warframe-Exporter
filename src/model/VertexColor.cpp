@@ -54,7 +54,7 @@ VertexColorManager::indexColors()
 		// /Lotus/Objects/Tenno/Ships/PlayerShip/Structural/OperatorChairRoom/AirlockTransitionWallAB.vc
 		try {
 			const Entries::FileNode* binaryNode = (*m_pkg)[PackageReader::PackageTrioType::B]->getFileEntry(modelPath);
-			m_vertexColorMap[binaryNode].push_back({colorCount, curFile});
+			m_vertexColorMap[modelPath].push_back({colorCount, binaryNode});
 		}
 		catch (std::exception& ex)
 		{
@@ -67,9 +67,9 @@ VertexColorManager::indexColors()
 }
 
 std::vector<VertexColorBody>
-VertexColorManager::getModelColors(const Entries::FileNode* modelNode)
+VertexColorManager::getModelColors(const std::string& modelPath)
 {
-	auto colorNodes = m_vertexColorMap[modelNode];
+	auto colorNodes = m_vertexColorMap[modelPath];
 
 	std::vector<VertexColorBody> readColors(colorNodes.size());
 	for (int x = 0; x < colorNodes.size(); x++)

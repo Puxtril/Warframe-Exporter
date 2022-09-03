@@ -52,9 +52,11 @@ namespace WarframeExporter
 		public:
 			VertexColorBody() : colors() {}
 
+			std::vector<glm::u8vec4>& getColorsPtr() { return colors; }
 			const std::vector<glm::u8vec4>& getColors() const { return colors; }
 			void setColors(std::vector<glm::u8vec4>& inData) { colors = std::move(inData); }
 		};
+		
 		#endif
 
 		#ifndef HeaderExternal
@@ -313,7 +315,7 @@ namespace WarframeExporter
 		private:
 			std::vector<uint16_t> indices;
 			std::vector<glm::vec3> positions;
-			std::vector<glm::u8vec4> colors;
+			std::vector<std::vector<glm::u8vec4>> colors;
 			std::vector<glm::vec2> UV1;
 			std::vector<glm::vec2> UV2;
 			std::vector<glm::u16vec4> boneIndices;
@@ -325,26 +327,32 @@ namespace WarframeExporter
 			static const size_t UVLen = 8;
 			static const size_t boneIndexLen = 8;
 			static const size_t boneWeightLen = 16;
-			static const uint32_t vertexSizeRigged = positionLen + colorLen + (UVLen*2) + boneIndexLen + boneWeightLen;
-			static const uint32_t vertexSizeStatic = positionLen + colorLen + (UVLen * 2);
 
 			ModelBodyInternal() = default;
 			ModelBodyInternal(const ModelBodyInternal& other) = delete;
 			ModelBodyInternal& operator=(const ModelBodyInternal& other) = delete;
 
-			//const std::vector<glm::mat4x4>& getRevserseBinds() const { return reverseBinds; }
+			int32_t vertexSizeRigged() const
+			{
+				return positionLen + (colorLen * colors.size()) + (UVLen * 2) + boneIndexLen + boneWeightLen;
+			}
+
+			int32_t vertexSizeStatic() const
+			{
+				return positionLen + (colorLen * colors.size()) + (UVLen * 2);
+			}
+
 			const std::vector<uint16_t>& getIndices() const { return indices; }
 			const std::vector<glm::vec3>& getPositions() const { return positions; }
-			const std::vector<glm::u8vec4>& getColors() const { return colors; }
+			const std::vector<std::vector<glm::u8vec4>>& getColors() const { return colors; }
 			const std::vector<glm::vec2>& getUV1() const { return UV1; }
 			const std::vector<glm::vec2>& getUV2() const { return UV2; }
 			const std::vector<glm::u16vec4>& getBoneIndices() const { return boneIndices; }
 			const std::vector<glm::vec4>& getBoneWeights() const { return boneWeights; }
 
-			//void setRevserseBinds(std::vector<glm::mat4x4>& inData) { reverseBinds = std::move(inData); }
 			void setIndices(std::vector<uint16_t>& inData) { indices = std::move(inData); }
 			void setPositions(std::vector<glm::vec3>& inData) { positions = std::move(inData); }
-			void setColors(std::vector<glm::u8vec4>& inData) { colors = std::move(inData); }
+			void setColors(std::vector<std::vector<glm::u8vec4>>& inData) { colors = std::move(inData); }
 			void setUV1(std::vector<glm::vec2>& inData) { UV1 = std::move(inData); }
 			void setUV2(std::vector<glm::vec2>& inData) { UV2 = std::move(inData); }
 			void setBoneWeights(std::vector<glm::vec4>& inData) { boneWeights = std::move(inData); }

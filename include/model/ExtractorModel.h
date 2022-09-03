@@ -8,6 +8,7 @@
 #include "ModelStructs.hpp"
 #include "types/ModelReader269.hpp"
 #include "types/ModelReader96.hpp"
+#include "model/VertexColor.h"
 
 #include <iostream>
 

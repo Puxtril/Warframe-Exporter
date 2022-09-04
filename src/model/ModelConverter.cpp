@@ -228,6 +228,10 @@ ModelConverter::extractMaterialNames(const std::string& attributes)
 void
 ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec3& outScale)
 {
+    outScale.x = 0.0;
+    outScale.y = 0.0;
+    outScale.z = 0.0;
+
     for (int i = 0; i < 3; i++)
     {
         for (MeshInfoExternal curMeshInfo : meshInfos)

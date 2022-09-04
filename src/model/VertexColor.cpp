@@ -53,7 +53,7 @@ VertexColorManager::indexColors()
 		// Which means the vertex color is useless...
 		// /Lotus/Objects/Tenno/Ships/PlayerShip/Structural/OperatorChairRoom/AirlockTransitionWallAB.vc
 		try {
-			const Entries::FileNode* binaryNode = (*m_pkg)[PackageReader::PackageTrioType::B]->getFileEntry(modelPath);
+			const Entries::FileNode* binaryNode = (*m_pkg)[PackageReader::PackageTrioType::B]->getFileEntry(curFile->getFullPath());
 			m_vertexColorMap[modelPath].push_back({colorCount, binaryNode});
 		}
 		catch (std::exception& ex)
@@ -90,7 +90,7 @@ VertexColorManager::readColor(const Entries::FileNode* colorEntry, uint32_t entr
 	
 	for (uint32_t x = 0; x < entryCount; x++)
 	{
-		rawData.readUInt8Array(&readColors[x].w, 4);
+		rawData.readUInt8Array(&readColors[x][0], 4);
 	}
 
 	outColor.setColors(readColors);

@@ -23,15 +23,14 @@ TextureHeader::readHeader(BinaryReaderBuffered* headerReader, const Ensmallening
 }
 
 TextureHeaderInternal
-TextureHeader::convertHeader(TextureHeaderExternal& headerExternal, size_t fFileSize, size_t bFileSize)
+TextureHeader::convertHeader(TextureHeaderExternal& headerExternal, size_t fileSize)
 {
 	TextureFormatExternal extFormat = static_cast<TextureFormatExternal>(headerExternal.getFormat());
 	TextureFormatBase* formatClass = formatClassFactory(extFormat);
 
-	size_t textureSize = std::max(fFileSize, bFileSize);
 	bool isCompressed = ddspp::is_compressed(formatClass->format());
 	int squareSize = ddspp::get_bits_per_pixel_or_block(formatClass->format()) / 8;
-	auto dimensions = getCorrectResolution(headerExternal.getWidthBase(), headerExternal.getHeightBase(), isCompressed, textureSize, squareSize);
+	auto dimensions = getCorrectResolution(headerExternal.getWidthBase(), headerExternal.getHeightBase(), isCompressed, fileSize, squareSize);
 	uint32_t mip0Len = getMip0Len(std::get<0>(dimensions), std::get<1>(dimensions), isCompressed, squareSize);
 
 	return TextureHeaderInternal(extFormat, formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions));

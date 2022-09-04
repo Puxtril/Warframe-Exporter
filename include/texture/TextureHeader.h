@@ -15,7 +15,7 @@ namespace WarframeExporter
 		{
 		public:
 			static TextureHeaderExternal readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData);
-			static TextureHeaderInternal convertHeader(TextureHeaderExternal& headerExternal, size_t fFileSize, size_t bFileSize);
+			static TextureHeaderInternal convertHeader(TextureHeaderExternal& headerExternal, size_t fileSize);
 
 		private:
 			static std::pair<uint16_t, uint16_t> getCorrectResolution(uint16_t baseWidth, uint16_t baseHeight, bool isCompressed, uint32_t textureLength, int blockSize);

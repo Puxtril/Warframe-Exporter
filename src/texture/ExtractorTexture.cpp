@@ -13,7 +13,8 @@ TextureHeaderInternal
 ExtractorTexture::readHeader(BinaryReaderBuffered* HfileReader, BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, std::shared_ptr<spdlog::logger>& logger)
 {
 	TextureHeaderExternal extHeader = TextureHeader::readHeader(HfileReader, ensmalleningData);
-	TextureHeaderInternal intHeader = TextureHeader::convertHeader(extHeader, FfileReader->getLength(), BfileReader->getLength());
+	size_t textureSize = FfileReader != nullptr ? FfileReader->getLength() : BfileReader->getLength();
+	TextureHeaderInternal intHeader = TextureHeader::convertHeader(extHeader, textureSize);
 	logger->debug(spdlog::fmt_lib::format("Raw texture data: Resolution={}x{} Enum1={} Enum2={} Enum3={}", extHeader.getWidthBase(), extHeader.getHeightBase(), extHeader.getEnum1(), extHeader.getEnum2(), extHeader.getEnum3()));
 	logger->debug(spdlog::fmt_lib::format("Converted texture data: Resolution={}x{} Mip0Size={}", intHeader.getWidth(), intHeader.getHeight(), intHeader.getMip0Len()));
 	return intHeader;
@@ -22,7 +23,7 @@ ExtractorTexture::readHeader(BinaryReaderBuffered* HfileReader, BinaryReaderBuff
 TextureBodyInternal
 ExtractorTexture::readBody(BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, const TextureHeaderInternal& headerInternal, std::shared_ptr<spdlog::logger>& logger)
 {
-	BinaryReaderBuffered* bodyReader = FfileReader->getLength() > BfileReader->getLength() ? FfileReader : BfileReader;
+	BinaryReaderBuffered* bodyReader = FfileReader != nullptr ? FfileReader : BfileReader;
 	return TextureBody::getBody(bodyReader, headerInternal, ensmalleningData);
 }
 

@@ -76,8 +76,7 @@ FileProperties::readFileTime(std::filesystem::path filePath)
 {
     struct stat result;
     stat(filePath.c_str(), &result);
-    struct timespec& modtime = result.st_mtim;
-    return modtime.tv_sec;
+    return result.st_mtime;
 }
 void
 FileProperties::writeFileTime(std::filesystem::path filePath, const struct utimbuf& time)

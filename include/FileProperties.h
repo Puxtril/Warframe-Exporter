@@ -14,7 +14,6 @@
 	#include <utime.h>
 	#include <sys/stat.h>
 	#include <sys/time.h>
-	#include <bits/types/struct_timespec.h>
 #endif
 
 class FileProperties

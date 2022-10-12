@@ -35,7 +35,7 @@ namespace WarframeExporter
 			std::string modelPath;
 
 		public:
-			VertexColorHeader() : modelPath(), colorCount() {}
+			VertexColorHeader() : colorCount(), modelPath() {}
 
 			uint32_t getColorCount() const { return colorCount; }
 			const std::string& getModelPath() const { return modelPath; }
@@ -322,11 +322,11 @@ namespace WarframeExporter
 			std::vector<glm::vec4> boneWeights;
 
 		public:
-			static const size_t positionLen = 12;
-			static const size_t colorLen = 4;
-			static const size_t UVLen = 8;
-			static const size_t boneIndexLen = 8;
-			static const size_t boneWeightLen = 16;
+			static const int positionLen = 12;
+			static const int colorLen = 4;
+			static const int UVLen = 8;
+			static const int boneIndexLen = 8;
+			static const int boneWeightLen = 16;
 
 			ModelBodyInternal() = default;
 			ModelBodyInternal(const ModelBodyInternal& other) = delete;
@@ -334,12 +334,12 @@ namespace WarframeExporter
 
 			int32_t vertexSizeRigged() const
 			{
-				return positionLen + (colorLen * colors.size()) + (UVLen * 2) + boneIndexLen + boneWeightLen;
+				return positionLen + (colorLen * static_cast<int>(colors.size())) + (UVLen * 2) + boneIndexLen + boneWeightLen;
 			}
 
 			int32_t vertexSizeStatic() const
 			{
-				return positionLen + (colorLen * colors.size()) + (UVLen * 2);
+				return positionLen + (colorLen * static_cast<int>(colors.size())) + (UVLen * 2);
 			}
 
 			const std::vector<uint16_t>& getIndices() const { return indices; }

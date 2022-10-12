@@ -84,7 +84,7 @@ GltfModel::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t
 		Node curNode;
 		curNode.mesh = meshes[x];
 		curNode.skin = skinIndex;
-		size_t curNodeIndex = m_document.nodes.size();
+		int curNodeIndex = static_cast<int>(m_document.nodes.size());
 		m_document.nodes.push_back(curNode);
 		scene.nodes.push_back(curNodeIndex);
 	}
@@ -99,8 +99,8 @@ GltfModel::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
 {
 	int32_t rootIndex = -1;
 	if (boneTree.size() > 0)
-		rootIndex = m_document.nodes.size();
-	for (size_t x = 0; x < boneTree.size(); x++)
+		rootIndex = static_cast<int32_t>(m_document.nodes.size());
+	for (uint16_t x = 0; x < static_cast<uint16_t>(boneTree.size()); x++)
 	{
 		Node boneNode;
 		boneNode.name = boneTree[x].getName();
@@ -118,16 +118,16 @@ int32_t
 GltfModel::createSkin(const std::vector<size_t>& weightedIndices, size_t totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
 {
 	Skin skin;
-	size_t skinIndex = m_document.skins.size();
+	int32_t skinIndex = static_cast<int32_t>(m_document.skins.size());
 	skin.name = skinName;
 	skin.skeleton = rootBoneIndex;
 	std::vector<bool> addedBones(totalBoneCount, false);
-	for (size_t x = 0; x < weightedIndices.size(); x++)
+	for (int x = 0; x < (int)weightedIndices.size(); x++)
 	{
-		skin.joints.push_back(weightedIndices[x] + rootBoneIndex);
+		skin.joints.push_back(static_cast<int>(weightedIndices[x]) + rootBoneIndex);
 		addedBones[weightedIndices[x]] = true;
 	}
-	for (size_t x = 0; x < totalBoneCount; x++)
+	for (int x = 0; x < (int)totalBoneCount; x++)
 	{
 		if (!addedBones[x])
 			skin.joints.push_back(x + rootBoneIndex);
@@ -146,23 +146,23 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 	checkAndFixBufferAllignment();
 
 	Buffer& buf = m_document.buffers[0];
-	size_t matSize = sizeof(boneTree[0].getReverseBind());
-	size_t byteLen = boneTree.size() * matSize;
-	size_t startOffset = buf.byteLength;
+	uint32_t matSize = static_cast<uint32_t>(sizeof(boneTree[0].getReverseBind()));
+	uint32_t byteLen = static_cast<uint32_t>(boneTree.size()) * matSize;
+	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
 	buf.byteLength += byteLen;
 	uint8_t* curPos = buf.data.data() + startOffset;
 
 	std::vector<bool> addedBones(boneTree.size(), false);
-	for (size_t x = 0; x < weightedIndices.size(); x++)
+	for (uint32_t x = 0; x < weightedIndices.size(); x++)
 	{
-		size_t boneTreeIndex = weightedIndices[x];
+		uint32_t boneTreeIndex = weightedIndices[x];
 		std::memcpy(curPos, glm::value_ptr(boneTree[boneTreeIndex].getReverseBind()), matSize);
 		curPos += matSize;
 		addedBones[boneTreeIndex] = true;
 	}
-	for (size_t x = 0; x < boneTree.size(); x++)
+	for (uint32_t x = 0; x < boneTree.size(); x++)
 	{
 		if (!addedBones[x])
 		{
@@ -172,7 +172,7 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 	}
 
 	BufferView bufView;
-	int32_t bufViewIndex = m_document.bufferViews.size();
+	int32_t bufViewIndex = static_cast<int32_t>(m_document.bufferViews.size());
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
@@ -180,7 +180,7 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 	m_document.bufferViews.push_back(bufView);
 
 	Accessor matAcc;
-	int32_t matAccIndex = m_document.accessors.size();
+	int32_t matAccIndex = static_cast<int32_t>(m_document.accessors.size());
 	matAcc.bufferView = bufViewIndex;
 	matAcc.byteOffset = 0;
 	matAcc.count = boneTree.size();
@@ -200,7 +200,7 @@ GltfModel::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attribut
 	for (size_t x = 0; x < meshInfos.size(); x++)
 	{
 		Accessor curAcc;
-		int32_t curAccIndex = m_document.accessors.size();
+		int32_t curAccIndex = static_cast<int32_t>(m_document.accessors.size());
 		curAcc.bufferView = indicesBuffViewIndex;
 		curAcc.byteOffset = meshInfos[x].getLODOffsets()[0] * 2;
 		curAcc.count = meshInfos[x].getLODCounts()[0];
@@ -215,7 +215,7 @@ GltfModel::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attribut
 		curPrim.attributes = attrs;
 
 		Mesh curMesh;
-		int32_t curMeshIndex = m_document.meshes.size();
+		int32_t curMeshIndex = static_cast<int32_t>(m_document.meshes.size());
 		curMesh.name = meshInfos[x].getName();
 		curMesh.primitives.push_back(curPrim);
 		m_document.meshes.push_back(curMesh);
@@ -229,13 +229,13 @@ GltfModel::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attribut
 int32_t
 GltfModel::findOrCreateMaterial(const std::string& materialName)
 {
-	for (size_t x = 0; x < m_document.materials.size(); x++)
+	for (int32_t x = 0; x < (int32_t)m_document.materials.size(); x++)
 	{
 		if (m_document.materials[x].name.compare(materialName) == 0)
 			return x;
 	}
 	
-	size_t matIndex = m_document.materials.size();
+	int32_t matIndex = static_cast<int32_t>(m_document.materials.size());
 	Material mat;
 	mat.name = materialName;
 	mat.doubleSided = true;
@@ -278,7 +278,7 @@ GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 	}
 	
 	BufferView bufView;
-	int32_t bufViewIndex = m_document.bufferViews.size();
+	int32_t bufViewIndex = static_cast<int32_t>(m_document.bufferViews.size());
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
@@ -289,7 +289,7 @@ GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 	size_t curByteOffset = 0;
 
 	Accessor posAcc;
-	int32_t posAccIndex = m_document.accessors.size();
+	int32_t posAccIndex = static_cast<int32_t>(m_document.accessors.size());
 	posAcc.bufferView = bufViewIndex;
 	posAcc.byteOffset = curByteOffset;
 	posAcc.count = vertCount;
@@ -304,7 +304,7 @@ GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 	for (size_t x = 0; x < body.getColors().size(); x++)
 	{
 		Accessor colAcc;
-		colAccIndices[x] = m_document.accessors.size();
+		colAccIndices[x] = static_cast<int32_t>(m_document.accessors.size());
 		colAcc.bufferView = bufViewIndex;
 		colAcc.byteOffset = curByteOffset;
 		colAcc.count = vertCount;

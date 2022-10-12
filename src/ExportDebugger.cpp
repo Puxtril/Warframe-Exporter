@@ -157,7 +157,7 @@ ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::
 	{
 		try
 		{
-			const PackageReader::CachePair* pair = (*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
+			(*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
 		}
 		catch (std::exception&)
 		{

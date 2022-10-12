@@ -72,7 +72,7 @@ VertexColorManager::getModelColors(const std::string& modelPath)
 	auto colorNodes = m_vertexColorMap[modelPath];
 
 	std::vector<VertexColorBody> readColors(colorNodes.size());
-	for (int x = 0; x < colorNodes.size(); x++)
+	for (int x = 0; x < (int)colorNodes.size(); x++)
 	{
 		readColor(colorNodes[x].colorNode, colorNodes[x].colorCount, readColors[x]);
 	}

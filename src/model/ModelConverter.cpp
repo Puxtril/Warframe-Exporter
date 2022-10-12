@@ -141,7 +141,7 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
 
     std::vector<std::vector<glm::u8vec4>> vertColors(1 + vColors.size());
     vertColors[0] = std::move(extBody.getColorPtr());
-    for (int x = 0; x < vColors.size(); x++)
+    for (int x = 0; x < (int)vColors.size(); x++)
         vertColors[x + 1] = std::move(vColors[x].getColorsPtr());
     outBody.setColors(vertColors);
 

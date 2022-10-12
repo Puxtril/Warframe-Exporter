@@ -52,7 +52,7 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 				extractOrLog(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, outputPath,extractor);
 			}
 			// Files that don't match specified enums
-			catch (std::out_of_range& ex)
+			catch (std::out_of_range&)
 			{
 				m_logger->debug("Skipping file type " + std::to_string(header.getEnum()) + ": " + curFile->getFullPath());
 				continue;
@@ -94,7 +94,8 @@ BatchExtractor::existingFileIdentical(const std::string& internalPath, const std
 		return false;
 
 	int64_t existingTime = FileProperties::readWinTimeMod(p);
-	if (internalNode->getTimeStamp() != existingTime)
+	// TODO: Update timestamp to int64_t
+	if ((int64_t)internalNode->getTimeStamp() != existingTime)
 		return false;
 
 	return true;
@@ -107,7 +108,7 @@ BatchExtractor::validatePackages(std::vector<std::string> packages)
 	{
 		try
 		{
-			const PackageReader::CachePair* pair = (*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
+			(*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
 		}
 		catch (std::exception&)
 		{

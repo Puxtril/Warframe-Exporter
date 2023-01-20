@@ -21,8 +21,8 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 	{
 		const PackageReader::CachePair* curPair = (*m_package)[curPackageName][PackageReader::PackageTrioType::H];
 		
-		if ((int)types & (int)FileTypeInternal::Model)
-			indexVertexColors(&(*m_package)[curPackageName]);
+		//if ((int)types & (int)FileTypeInternal::Model)
+		//	indexVertexColors(&(*m_package)[curPackageName]);
 
 		for (auto start = curPair->getIteratorRecursive(basePath), end = curPair->end(); start != end; ++start)
 		{

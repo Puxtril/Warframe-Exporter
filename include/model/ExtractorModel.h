@@ -7,6 +7,7 @@
 #include "BinaryReaderBuffered.h"
 #include "ModelStructs.hpp"
 #include "types/ModelReader269.hpp"
+#include "types/ModelReader272.hpp"
 #include "types/ModelReader96.hpp"
 #include "model/VertexColor.h"
 
@@ -35,7 +36,8 @@ namespace WarframeExporter
 			{
 				std::vector<FileTypeExternal> extTypes = {
 					FileTypeExternal::MODEL_STATIC_96,
-					FileTypeExternal::MODEL_RIGGED_269
+					FileTypeExternal::MODEL_RIGGED_269,
+					FileTypeExternal::MODEL_RIGGED_272
 				};
 				return extTypes;
 			}

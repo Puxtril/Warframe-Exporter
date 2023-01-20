@@ -26,6 +26,10 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 		ModelReader269::readHeader(hReader, ensmalleningData, header, headerExt);
 		ModelReader269::readBody(headerExt, bReader, bodyExt);
 		break;
+	case 272:
+		ModelReader272::readHeader(hReader, ensmalleningData, header, headerExt);
+		ModelReader272::readBody(headerExt, bReader, bodyExt);
+		break;
 	case 96:
 		ModelReader96::readHeader(hReader, ensmalleningData, header, headerExt);
 		ModelReader96::readBody(headerExt, bReader, bodyExt);
@@ -63,6 +67,12 @@ ExtractorModel::extractDebug(const CommonFileHeader& header, BinaryReaderBuffere
 		hReader->seek(pos, std::ios_base::beg);
 		ModelReader269::readHeader(hReader, ensmalleningData, header, headerExt);
 		ModelReader269::readBodyDebug(headerExt, bReader);
+		break;
+	case 272:
+		ModelReader272::readHeaderDebug(hReader, ensmalleningData, header);
+		hReader->seek(pos, std::ios_base::beg);
+		ModelReader272::readHeader(hReader, ensmalleningData, header, headerExt);
+		ModelReader272::readBodyDebug(headerExt, bReader);
 		break;
 	case 96:
 		ModelReader96::readHeaderDebug(hReader, ensmalleningData, header);

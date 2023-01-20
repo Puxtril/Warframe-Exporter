@@ -77,7 +77,8 @@ void
 ExportDebugger::printEnumCounts(const std::string& package)
 {
 	std::map<uint32_t, int> enumCounts;
-	
+	std::map<uint32_t, std::vector<std::string>> enumExamples;
+
 	const PackageReader::CachePair* curPair = (*m_package)[package][PackageReader::PackageTrioType::H];
 	for (const auto& curFile : *curPair)
 	{
@@ -86,6 +87,16 @@ ExportDebugger::printEnumCounts(const std::string& package)
 			BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
 			CommonFileHeader header(rawData);
 			enumCounts[header.getEnum()]++;
+			
+			if (enumExamples[header.getEnum()].size() < 10)
+				enumExamples[header.getEnum()].push_back(curFile->getFullPath());
+			
+			// Every 10 new files, replace an existing file
+			else if (enumCounts[header.getEnum()] % 10 == 0)
+			{
+				int newIndex = enumCounts[header.getEnum()] % 100 / 10;
+				enumExamples[header.getEnum()][newIndex] = curFile->getFullPath();
+			}
 		}
 		catch (DecompressionException&)
 		{
@@ -107,46 +118,8 @@ ExportDebugger::printEnumCounts(const std::string& package)
 	for (auto& x : enumCounts)
 	{
 		std::cout << x.first << ": " << x.second << std::endl;
-		printEnumExamples(package, x.first, 5);
-	}
-}
-
-void
-ExportDebugger::printEnumExamples(const std::string& package, uint32_t enumNum, int printCount)
-{
-	const PackageReader::CachePair* curPair = (*m_package)[package][PackageReader::PackageTrioType::H];
-	int curPrintCount = 0;
-	int curFoundCount = 0;
-	for (const auto& curFile : *curPair)
-	{
-		try
-		{
-			BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
-			CommonFileHeader header(rawData);
-		
-			if (header.getEnum() == enumNum)
-			{
-				if (curFoundCount % 5 != 0)
-				{
-					std::cout << "  " << curFile->getFullPath() << std::endl;
-					curPrintCount++;
-				}
-				curFoundCount++;
-			}
-
-			if (curPrintCount > printCount)
-				break;
-		}
-		catch (LimitException& ex)
-		{
-			m_logger->warn(std::string(ex.what()) + curFile->getFullPath());
-			continue;
-		}
-		catch (DecompressionException&)
-		{
-			m_logger->warn("Decompress error: " + curFile->getFullPath());
-			continue;
-		}
+		for (auto& str : enumExamples[x.first])
+			std::cout << "  " << str << std::endl;
 	}
 }
 

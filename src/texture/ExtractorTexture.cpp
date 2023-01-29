@@ -2,10 +2,10 @@
 
 using namespace WarframeExporter::Texture;
 
-ExtractorTexture&
+ExtractorTexture*
 ExtractorTexture::getInstance()
 {
-	static ExtractorTexture instance;
+	static ExtractorTexture* instance = new ExtractorTexture();
 	return instance;
 }
 

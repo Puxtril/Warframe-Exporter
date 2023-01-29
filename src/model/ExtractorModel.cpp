@@ -2,10 +2,10 @@
 
 using namespace WarframeExporter::Model;
 
-ExtractorModel&
+ExtractorModel*
 ExtractorModel::getInstance()
 {
-	static ExtractorModel instance;
+	static ExtractorModel* instance = new ExtractorModel();
 	return instance;
 }
 
@@ -40,12 +40,9 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 	if (headerExt.getMeshInfos().size() == 0)
 		throw InvalidDataException("Mesh has zero MeshInfos");
 
-	std::vector<VertexColorBody> vertexColors = VertexColorManager::getInstance().getModelColors(internalpath);
-	m_logger->debug(spdlog::fmt_lib::format("Found {} vertex colors", vertexColors.size()));
-
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
-	ModelConverter::convertToInternal(headerExt, bodyExt, header.getAttributes(), vertexColors, headerInt, bodyInt);
+	ModelConverter::convertToInternal(headerExt, bodyExt, header.getAttributes(), headerInt, bodyInt);
 	m_logger->debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.getModelScale().x, headerInt.getModelScale().y, headerInt.getModelScale().z));
 	
 	GltfModel outModel;

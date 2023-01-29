@@ -3,10 +3,9 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<VertexColorBody> vColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody)
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody)
 {
     ModelConverter::flipXAxis(extBody);
-    ModelConverter::overwriteColors(extBody.getColorPtr());
 
     if (extHeader.getBoneTree().size() > 1)
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, attributes, outHeader);
@@ -14,7 +13,7 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
 
     if (extHeader.getBoneTree().size() > 1)
         ModelConverter::convertInternalBodyRigged(extHeader, extBody, outBody, outHeader.getModelScale());
-    ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.getModelScale(), vColors);
+    ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.getModelScale());
 }
 
 void
@@ -126,7 +125,7 @@ ModelConverter::convertInternalBodyRigged(const ModelHeaderExternal& extHeader, 
 }
 
 void
-ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale, std::vector<VertexColorBody> vColors)
+ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale)
 {
     outBody.setIndices(extBody.getIndexPtr());
 
@@ -138,13 +137,6 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
         newPositions[x] = extBody.getPositions()[x] * modelScale;
     }
     outBody.setPositions(newPositions);
-
-    std::vector<std::vector<glm::u8vec4>> vertColors(1 + vColors.size());
-    vertColors[0] = std::move(extBody.getColorPtr());
-    for (int x = 0; x < (int)vColors.size(); x++)
-        vertColors[x + 1] = std::move(vColors[x].getColorsPtr());
-    outBody.setColors(vertColors);
-
     outBody.setUV1(extBody.getUV1Ptr());
     outBody.setUV2(extBody.getUV2Ptr());
     outBody.setBoneWeights(extBody.getBoneWeightsPtr());
@@ -172,17 +164,6 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
                 }
             }
         }
-    }
-}
-
-void
-ModelConverter::overwriteColors(std::vector<glm::u8vec4>& colors)
-{
-    for (auto& x : colors)
-    {
-        x.r = x.a;
-        x.g = x.a;
-        x.b = x.a;
     }
 }
 

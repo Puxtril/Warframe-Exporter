@@ -1,5 +1,4 @@
 #include "ExportDebugger.h"
-#include <filesystem>
 
 using namespace WarframeExporter;
 
@@ -7,13 +6,17 @@ ExportDebugger::ExportDebugger(PackageReader::PackageDir* package, const Ensmall
 	: m_package(package),
 	m_pathManager(baseOutputPath),
 	m_ensmalleningData(ensmallData),
-	m_enumMap(m_enumMap.getInstance()),
+	m_enumMapExtractor(),
 	m_logger(spdlog::get("Warframe-Exporter"))
 {
+	m_enumMapExtractor
+		.registerClass(Model::ExtractorModel::getInstance())
+		.registerClass(Texture::ExtractorTexture::getInstance())
+		.registerClass(Material::ExtractorMaterial::getInstance());
 }
 
 void
-ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std::string> packages, FileTypeInternal types)
+ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std::string> packages, ExtractorType types)
 {
 	this->validatePackages(internalBasePath, packages);
 	PackageDirLimited pkgParam = PackageDirLimited(m_package);
@@ -36,9 +39,10 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 
 			try
 			{
-				Extractor& extractor = m_enumMap.getExtractor(static_cast<FileTypeExternal>(header.getEnum()));
-				if (((int)extractor.internalType() & (int)types) == 0)
+				Extractor* extractor = m_enumMapExtractor[header.getEnum()];
+				if (((int)extractor->getExtractorType() & (int)types) == 0)
 					continue;
+				
 				debugExtract(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, extractor);
 			}
 			catch (std::out_of_range&)
@@ -50,11 +54,11 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 }
 
 void
-ExportDebugger::debugExtract(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor& extractor)
+ExportDebugger::debugExtract(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor* extractor)
 {
 	try
 	{
-		extractor.extractDebug(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData);
+		extractor->extractDebug(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData);
 	}
 	catch (not_imeplemented_error& err)
 	{

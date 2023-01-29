@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../BaseExtractor.h"
+#include "../Extractor.h"
 #include "../Ensmallening.hpp"
 #include "ModelConverter.h"
 #include "GltfExporter.h"
@@ -9,7 +9,6 @@
 #include "types/ModelReader269.hpp"
 #include "types/ModelReader272.hpp"
 #include "types/ModelReader96.hpp"
-#include "model/VertexColor.h"
 
 #include <iostream>
 
@@ -17,38 +16,50 @@ namespace WarframeExporter
 {
 	namespace Model
 	{
+		enum class ModelType
+		{
+			MODEL_STATIC_96 = 96,
+			MODEL_RIGGED_269 = 269,
+			MODEL_RIGGED_272 = 272
+		};
+
 		class ExtractorModel : public Extractor
 		{
 		public:
-			inline std::string outFileExt()
+			ExtractorModel() : Extractor() {}
+
+			ExtractorModel(const ExtractorModel&) = delete;
+			ExtractorModel operator=(const ExtractorModel&) = delete;
+
+			inline const std::string& getOutputExtension() const override
 			{
 				static std::string outFileExt = "glb";
 				return outFileExt;
 			}
 
-			inline std::string friendlyName()
+			inline const std::string& getFriendlyName() const override
 			{
-				static std::string friendlyName = "3DModel";
+				static std::string friendlyName = "3D Model";
 				return friendlyName;
 			}
 
-			inline std::vector<FileTypeExternal> externalTypes()
+			inline ExtractorType getExtractorType() const override
 			{
-				std::vector<FileTypeExternal> extTypes = {
-					FileTypeExternal::MODEL_STATIC_96,
-					FileTypeExternal::MODEL_RIGGED_269,
-					FileTypeExternal::MODEL_RIGGED_272
+				static ExtractorType type = ExtractorType::Model;
+				return type;
+			}
+
+			inline std::vector<int> getEnumMapKeys() const override
+			{
+				std::vector<int> extTypes = {
+					(int)ModelType::MODEL_STATIC_96,
+					(int)ModelType::MODEL_RIGGED_269,
+					(int)ModelType::MODEL_RIGGED_272
 				};
 				return extTypes;
 			}
 
-			inline FileTypeInternal internalType()
-			{
-				static FileTypeInternal type = FileTypeInternal::Model;
-				return type;
-			}
-
-			static ExtractorModel& getInstance();
+			static ExtractorModel* getInstance();
 
 			void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
 			void extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) override;

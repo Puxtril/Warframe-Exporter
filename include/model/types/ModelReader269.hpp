@@ -532,7 +532,6 @@ namespace WarframeExporter
 					bodyReader->seek(0x8, std::ios_base::cur);
 
 				outBody.getPosPtr().resize(extHeader.getVertexCount());
-				outBody.getColorPtr().resize(extHeader.getVertexCount());
 				outBody.getUV1Ptr().resize(extHeader.getVertexCount());
 				outBody.getUV2Ptr().resize(extHeader.getVertexCount());
 				outBody.getBoneIndicesPtr().resize(extHeader.getVertexCount());
@@ -544,11 +543,7 @@ namespace WarframeExporter
 					outBody.getPosPtr()[x][2] = bodyReader->readInt16() / 32767.0F;
 
 					bodyReader->seek(6, std::ios_base::cur); // Normals?
-
-					outBody.getColorPtr()[x][0] = bodyReader->readUInt8();
-					outBody.getColorPtr()[x][1] = bodyReader->readUInt8();
-					outBody.getColorPtr()[x][2] = bodyReader->readUInt8();
-					outBody.getColorPtr()[x][3] = bodyReader->readUInt8();
+					bodyReader->seek(4, std::ios::cur); // Vertex Colors?
 
 					outBody.getUV1Ptr()[x][0] = bodyReader->readHalf();
 					outBody.getUV1Ptr()[x][1] = bodyReader->readHalf();

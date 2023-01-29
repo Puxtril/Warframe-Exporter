@@ -2,10 +2,10 @@
 
 using namespace WarframeExporter::Material;
 
-ExtractorMaterial&
+ExtractorMaterial*
 ExtractorMaterial::getInstance()
 {
-	static ExtractorMaterial instance;
+	static ExtractorMaterial* instance = new ExtractorMaterial();
 	return instance;
 }
 

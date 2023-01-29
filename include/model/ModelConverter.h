@@ -22,7 +22,7 @@ namespace WarframeExporter
 		class ModelConverter
 		{
 		public:
-			static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<VertexColorBody> vColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody);
+			static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody);
 
 		private:
 			//static void convertToInternalHeader(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
@@ -31,9 +31,8 @@ namespace WarframeExporter
 			static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
 			static void convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
 			static void convertInternalBodyRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
-			static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale, std::vector<VertexColorBody> vColors);
+			static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
 
-			static void overwriteColors(std::vector<glm::u8vec4>& colors);
 			static void flipXAxis(ModelBodyExternal& extBody);
 			static std::vector<std::string> extractMaterialNames(const std::string& attributes);
 			static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec3& outScale);

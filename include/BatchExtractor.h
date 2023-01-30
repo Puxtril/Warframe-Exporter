@@ -9,12 +9,7 @@
 #include "ExporterExceptions.h"
 #include "FileProperties.h"
 #include "CacheReaderLimited.h"
-#include "Extractor.h"
-#include "EnumMap.h"
-
-#include "model/ExtractorModel.h"
-#include "texture/ExtractorTexture.h"
-#include "material/ExtractorMaterial.h"
+#include "EnumMapExtractor.h"
 
 #include <filesystem>
 
@@ -26,7 +21,6 @@ namespace WarframeExporter
 		PackageReader::PackageDir* m_package;
 		const Ensmallening m_ensmalleningData;
 		ExportPathManager m_pathManager;
-		EnumMap<Extractor> m_enumMapExtractor;
 		Logger& m_logger;
 
 	public:

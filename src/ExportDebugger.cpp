@@ -6,13 +6,8 @@ ExportDebugger::ExportDebugger(PackageReader::PackageDir* package, const Ensmall
 	: m_package(package),
 	m_pathManager(baseOutputPath),
 	m_ensmalleningData(ensmallData),
-	m_enumMapExtractor(),
 	m_logger(Logger::getInstance())
 {
-	m_enumMapExtractor
-		.registerClass(Model::ExtractorModel::getInstance())
-		.registerClass(Texture::ExtractorTexture::getInstance())
-		.registerClass(Material::ExtractorMaterial::getInstance());
 }
 
 void
@@ -39,7 +34,7 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 
 			try
 			{
-				Extractor* extractor = m_enumMapExtractor[header.getEnum()];
+				Extractor* extractor = g_enumMapExtractor[header.getEnum()];
 				if (((int)extractor->getExtractorType() & (int)types) == 0)
 					continue;
 				

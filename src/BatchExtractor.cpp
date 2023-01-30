@@ -6,13 +6,8 @@ BatchExtractor::BatchExtractor(PackageReader::PackageDir* package, const Ensmall
 	: m_package(package),
 	m_ensmalleningData(ensmalleningData),
 	m_pathManager(baseOutputPath),
-	m_enumMapExtractor(),
 	m_logger(Logger::getInstance())
 {
-	m_enumMapExtractor
-		.registerClass(Model::ExtractorModel::getInstance())
-		.registerClass(Texture::ExtractorTexture::getInstance())
-		.registerClass(Material::ExtractorMaterial::getInstance());
 }
 
 void
@@ -39,7 +34,7 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 
 			try
 			{
-				Extractor* extractor = m_enumMapExtractor[header.getEnum()];
+				Extractor* extractor = g_enumMapExtractor[header.getEnum()];
 				if (((int)extractor->getExtractorType() & (int)types) == 0)
 					continue;
 

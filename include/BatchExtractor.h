@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
+#include "Logger.h"
 #include "BinaryReaderBase.h"
 #include "CommonHeader.h"
 #include "Ensmallening.hpp"
@@ -27,7 +27,7 @@ namespace WarframeExporter
 		const Ensmallening m_ensmalleningData;
 		ExportPathManager m_pathManager;
 		EnumMap<Extractor> m_enumMapExtractor;
-		std::shared_ptr<spdlog::logger> m_logger;
+		Logger& m_logger;
 
 	public:
 		BatchExtractor(PackageReader::PackageDir* package, const Ensmallening& ensmalleningData, std::string baseOutputPath);

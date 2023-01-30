@@ -7,7 +7,7 @@ ExportDebugger::ExportDebugger(PackageReader::PackageDir* package, const Ensmall
 	m_pathManager(baseOutputPath),
 	m_ensmalleningData(ensmallData),
 	m_enumMapExtractor(),
-	m_logger(spdlog::get("Warframe-Exporter"))
+	m_logger(Logger::getInstance())
 {
 	m_enumMapExtractor
 		.registerClass(Model::ExtractorModel::getInstance())
@@ -33,7 +33,7 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 			CommonFileHeader header;
 			if (!tryReadHeader(rawData, header))
 			{
-				m_logger->debug("Common header error: " + curFile->getFullPath());
+				m_logger.debug("Common header error: " + curFile->getFullPath());
 				continue;
 			}
 
@@ -62,17 +62,17 @@ ExportDebugger::debugExtract(PackageDirLimited& pkgParam, const std::string& pac
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger->debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
+		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
 		writeAllDebugs(pkgParam, packageName, internalPath);
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger->debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
+		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
 		writeAllDebugs(pkgParam, packageName, internalPath);
 	}
 	catch (std::runtime_error& err)
 	{
-		m_logger->error(std::string(err.what()) + ": " + internalPath);
+		m_logger.error(std::string(err.what()) + ": " + internalPath);
 		writeAllDebugs(pkgParam, packageName, internalPath);
 	}
 }
@@ -104,17 +104,17 @@ ExportDebugger::printEnumCounts(const std::string& package)
 		}
 		catch (DecompressionException&)
 		{
-			m_logger->warn("Decompress error: " + curFile->getFullPath());
+			m_logger.warn("Decompress error: " + curFile->getFullPath());
 			continue;
 		}
 		catch (LimitException& ex)
 		{
-			m_logger->warn(std::string(ex.what()) + curFile->getFullPath());
+			m_logger.warn(std::string(ex.what()) + curFile->getFullPath());
 			continue;
 		}
 		catch (std::exception& ex)
 		{
-			m_logger->error(std::string(ex.what()) + ": " + curFile->getFullPath());
+			m_logger.error(std::string(ex.what()) + ": " + curFile->getFullPath());
 			continue;
 		}
 	}
@@ -138,7 +138,7 @@ ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::
 		}
 		catch (std::exception&)
 		{
-			m_logger->error("Package does not exist: " + curPkgStr);
+			m_logger.error("Package does not exist: " + curPkgStr);
 			throw std::runtime_error("Package does not exist: " + curPkgStr);
 		}
 	}

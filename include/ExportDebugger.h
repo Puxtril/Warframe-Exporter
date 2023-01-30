@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
+#include "Logger.h"
 #include "BinaryReaderExceptions.h"
 #include "BinaryReaderBuffered.h"
 #include "ExportPathManager.h"
@@ -26,7 +26,7 @@ namespace WarframeExporter
 		ExportPathManager m_pathManager;
 		const Ensmallening m_ensmalleningData;
 		EnumMap<Extractor> m_enumMapExtractor;
-		std::shared_ptr<spdlog::logger> m_logger;
+		Logger& m_logger;
 
 	public:
 		ExportDebugger(PackageReader::PackageDir* package, const Ensmallening& ensmallData, std::string baseOutputPath);

@@ -7,7 +7,7 @@ BatchExtractor::BatchExtractor(PackageReader::PackageDir* package, const Ensmall
 	m_ensmalleningData(ensmalleningData),
 	m_pathManager(baseOutputPath),
 	m_enumMapExtractor(),
-	m_logger(spdlog::get("Warframe-Exporter"))
+	m_logger(Logger::getInstance())
 {
 	m_enumMapExtractor
 		.registerClass(Model::ExtractorModel::getInstance())
@@ -33,7 +33,7 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 			CommonFileHeader header;
 			if (!tryReadHeader(rawData, header))
 			{
-				m_logger->debug("Common header error: " + curFile->getFullPath());
+				m_logger.debug("Common header error: " + curFile->getFullPath());
 				continue;
 			}
 
@@ -46,7 +46,7 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 				std::string outputPath = m_pathManager.getOutputFilePath(curFile->getFullPath(), extractor->getOutputExtension());
 				if (existingFileIdentical(curFile->getFullPath(), outputPath, curPair, curPackageName))
 				{
-					m_logger->info("Identical file time, skipping: " + curFile->getFullPath());
+					m_logger.info("Identical file time, skipping: " + curFile->getFullPath());
 					continue;
 				}
 
@@ -55,7 +55,7 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 			// Files that don't match specified enums
 			catch (std::out_of_range&)
 			{
-				m_logger->debug("Skipping file type " + std::to_string(header.getEnum()) + ": " + curFile->getFullPath());
+				m_logger.debug("Skipping file type " + std::to_string(header.getEnum()) + ": " + curFile->getFullPath());
 				continue;
 			}
 		}
@@ -67,21 +67,21 @@ BatchExtractor::extractOrLog(PackageDirLimited& pkgParam, const std::string& pac
 {
 	try
 	{
-		m_logger->info("Extracting " + internalPath);
+		m_logger.info("Extracting " + internalPath);
 		extractor->extract(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData, outputPath);
 		writeFileProperties(outputPath, internalPath, packageName);
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger->debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
+		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger->debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
+		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
 	}
 	catch (std::exception& err)
 	{
-		m_logger->error(std::string(err.what()) + ": " + internalPath);
+		m_logger.error(std::string(err.what()) + ": " + internalPath);
 	}
 }
 
@@ -113,7 +113,7 @@ BatchExtractor::validatePackages(std::vector<std::string> packages)
 		}
 		catch (std::exception&)
 		{
-			m_logger->error("Package does not exist: " + curPkgStr);
+			m_logger.error("Package does not exist: " + curPkgStr);
 			throw std::runtime_error("Package does not exist: " + curPkgStr);
 		}
 	}

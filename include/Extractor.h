@@ -5,8 +5,7 @@
 #include "CommonHeader.h"
 #include "Ensmallening.hpp"
 #include "CacheReaderLimited.h"
-#include "spdlog/spdlog.h"
-#include "spdlog/fmt/fmt.h"
+#include "Logger.h"
 
 #include <string>
 #include <vector>
@@ -24,9 +23,9 @@ namespace WarframeExporter
 	class Extractor : public EnumMapValue
 	{
 	protected:
-		std::shared_ptr<spdlog::logger> m_logger;
+		Logger& m_logger;
 
-		Extractor() : m_logger(spdlog::get("Warframe-Exporter")) {}
+		Extractor() : m_logger(Logger::getInstance()) {}
 	
 	public:
 		virtual const std::string& getFriendlyName() const = 0;

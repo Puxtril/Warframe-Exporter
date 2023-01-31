@@ -10,7 +10,7 @@ GltfModel::GltfModel()
 void
 GltfModel::addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
-	if (header.getBoneTree().size() > 0)
+	if (header.boneTree.size() > 0)
 		addModelDataRigged(header, body);
 	else
 		addModelDataStatic(header, body);
@@ -21,13 +21,13 @@ GltfModel::addModelDataRigged(const ModelHeaderInternal& header, const ModelBody
 {
 	modifyAsset();
 
-	Attributes vertsAttrs = addVertexDataRigged(body, header.getVertexCount());
-	unsigned int indicesBufViewIndex = addIndexData(body.getIndices());
-	std::vector<int32_t> meshIndices = createMeshes(header.getMeshInfos(), vertsAttrs, indicesBufViewIndex);
+	Attributes vertsAttrs = addVertexDataRigged(body, header.vertexCount);
+	unsigned int indicesBufViewIndex = addIndexData(body.indices);
+	std::vector<int32_t> meshIndices = createMeshes(header.meshInfos, vertsAttrs, indicesBufViewIndex);
 
-	int32_t rootBoneNodeIndex = createBones(header.getBoneTree());
-	int32_t inverseMatricesIndex = addInverseBindMatrices(header.getBoneTree(), header.getWeightedBones());
-	int32_t skinIndex = createSkin(header.getWeightedBones(), header.getBoneTree().size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
+	int32_t rootBoneNodeIndex = createBones(header.boneTree);
+	int32_t inverseMatricesIndex = addInverseBindMatrices(header.boneTree, header.weightedBones);
+	int32_t skinIndex = createSkin(header.weightedBones, header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
 
 	createSceneWithModelNodes(meshIndices, skinIndex);
 	m_document.scenes[0].nodes.push_back(rootBoneNodeIndex);
@@ -38,9 +38,9 @@ GltfModel::addModelDataStatic(const ModelHeaderInternal& header, const ModelBody
 {
 	modifyAsset();
 
-	Attributes vertsAttrs = addVertexDataStatic(body, header.getVertexCount());
-	int32_t indicesBufViewIndex = addIndexData(body.getIndices());
-	std::vector<int32_t> meshIndices = createMeshes(header.getMeshInfos(), vertsAttrs, indicesBufViewIndex);
+	Attributes vertsAttrs = addVertexDataStatic(body, header.vertexCount);
+	int32_t indicesBufViewIndex = addIndexData(body.indices);
+	std::vector<int32_t> meshIndices = createMeshes(header.meshInfos, vertsAttrs, indicesBufViewIndex);
 
 	createSceneWithModelNodes(meshIndices, -1);
 }
@@ -103,11 +103,11 @@ GltfModel::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
 	for (uint16_t x = 0; x < static_cast<uint16_t>(boneTree.size()); x++)
 	{
 		Node boneNode;
-		boneNode.name = boneTree[x].getName();
+		boneNode.name = boneTree[x].name;
 		findChildrenOfBone(boneTree, x, boneNode.children);
 
-		std::memcpy(&boneNode.rotation[0], &boneTree[x].getRotation()[0], sizeof(float) * 4);
-		std::memcpy(&boneNode.translation[0], &boneTree[x].getPosition()[0], sizeof(float) * 3);
+		std::memcpy(&boneNode.rotation[0], &boneTree[x].rotation[0], sizeof(float) * 4);
+		std::memcpy(&boneNode.translation[0], &boneTree[x].position[0], sizeof(float) * 3);
 
 		m_document.nodes.push_back(boneNode);
 	}
@@ -146,7 +146,7 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 	checkAndFixBufferAllignment();
 
 	Buffer& buf = m_document.buffers[0];
-	uint32_t matSize = static_cast<uint32_t>(sizeof(boneTree[0].getReverseBind()));
+	uint32_t matSize = static_cast<uint32_t>(sizeof(boneTree[0].reverseBind));
 	uint32_t byteLen = static_cast<uint32_t>(boneTree.size()) * matSize;
 	uint32_t startOffset = buf.byteLength;
 
@@ -158,7 +158,7 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 	for (uint32_t x = 0; x < weightedIndices.size(); x++)
 	{
 		uint32_t boneTreeIndex = weightedIndices[x];
-		std::memcpy(curPos, glm::value_ptr(boneTree[boneTreeIndex].getReverseBind()), matSize);
+		std::memcpy(curPos, glm::value_ptr(boneTree[boneTreeIndex].reverseBind), matSize);
 		curPos += matSize;
 		addedBones[boneTreeIndex] = true;
 	}
@@ -166,7 +166,7 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 	{
 		if (!addedBones[x])
 		{
-			std::memcpy(curPos, glm::value_ptr(boneTree[x].getReverseBind()), matSize);
+			std::memcpy(curPos, glm::value_ptr(boneTree[x].reverseBind), matSize);
 			curPos += matSize;
 		}
 	}
@@ -202,21 +202,21 @@ GltfModel::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attribut
 		Accessor curAcc;
 		int32_t curAccIndex = static_cast<int32_t>(m_document.accessors.size());
 		curAcc.bufferView = indicesBuffViewIndex;
-		curAcc.byteOffset = meshInfos[x].getLODOffsets()[0] * 2;
-		curAcc.count = meshInfos[x].getLODCounts()[0];
+		curAcc.byteOffset = meshInfos[x].faceLODOffsets[0] * 2;
+		curAcc.count = meshInfos[x].faceLODCounts[0];
 		curAcc.type = Accessor::Type::Scalar;
 		curAcc.componentType = Accessor::ComponentType::UnsignedShort;
 		m_document.accessors.push_back(curAcc);
 
 		Primitive curPrim;
 		curPrim.indices = curAccIndex;
-		curPrim.material = findOrCreateMaterial(meshInfos[x].getMaterialName());
+		curPrim.material = findOrCreateMaterial(meshInfos[x].matName);
 		curPrim.mode = Primitive::Mode::Triangles;
 		curPrim.attributes = attrs;
 
 		Mesh curMesh;
 		int32_t curMeshIndex = static_cast<int32_t>(m_document.meshes.size());
-		curMesh.name = meshInfos[x].getName();
+		curMesh.name = meshInfos[x].name;
 		curMesh.primitives.push_back(curPrim);
 		m_document.meshes.push_back(curMesh);
 		
@@ -260,15 +260,15 @@ GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 
 	for (size_t iVert = 0; iVert < vertCount; iVert++)
 	{
-		memcpy(curPos, &body.getPositions()[iVert].x, ModelBodyInternal::positionLen);
+		memcpy(curPos, &body.positions[iVert].x, ModelBodyInternal::positionLen);
 		curPos += ModelBodyInternal::positionLen;
-		memcpy(curPos, &body.getUV1()[iVert].x, ModelBodyInternal::UVLen);
+		memcpy(curPos, &body.UV1[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.getUV2()[iVert].x, ModelBodyInternal::UVLen);
+		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.getBoneIndices()[iVert].x, ModelBodyInternal::boneIndexLen);
+		memcpy(curPos, &body.boneIndices[iVert].x, ModelBodyInternal::boneIndexLen);
 		curPos += ModelBodyInternal::boneIndexLen;
-		memcpy(curPos, &body.getBoneWeights()[iVert].x, ModelBodyInternal::boneWeightLen);
+		memcpy(curPos, &body.boneWeights[iVert].x, ModelBodyInternal::boneWeightLen);
 		curPos += ModelBodyInternal::boneWeightLen;
 	}
 	
@@ -290,8 +290,8 @@ GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 	posAcc.count = vertCount;
 	posAcc.type = Accessor::Type::Vec3;
 	posAcc.componentType = Accessor::ComponentType::Float;
-	posAcc.max = findMaxVec3(body.getPositions());
-	posAcc.min = findMinVec3(body.getPositions());
+	posAcc.max = findMaxVec3(body.positions);
+	posAcc.min = findMinVec3(body.positions);
 	m_document.accessors.push_back(posAcc);
 	curByteOffset += ModelBodyInternal::positionLen;
 	
@@ -361,11 +361,11 @@ GltfModel::addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount)
 
 	for (size_t iVert = 0; iVert < vertCount; iVert++)
 	{
-		memcpy(curPos, &body.getPositions()[iVert].x, ModelBodyInternal::positionLen);
+		memcpy(curPos, &body.positions[iVert].x, ModelBodyInternal::positionLen);
 		curPos += ModelBodyInternal::positionLen;
-		memcpy(curPos, &body.getUV1()[iVert].x, ModelBodyInternal::UVLen);
+		memcpy(curPos, &body.UV1[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.getUV2()[iVert].x, ModelBodyInternal::UVLen);
+		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
 	}
 
@@ -387,8 +387,8 @@ GltfModel::addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount)
 	posAcc.count = vertCount;
 	posAcc.type = Accessor::Type::Vec3;
 	posAcc.componentType = Accessor::ComponentType::Float;
-	posAcc.max = findMaxVec3(body.getPositions());
-	posAcc.min = findMinVec3(body.getPositions());
+	posAcc.max = findMaxVec3(body.positions);
+	posAcc.min = findMinVec3(body.positions);
 	m_document.accessors.push_back(posAcc);
 	curByteOffset += ModelBodyInternal::positionLen;
 	
@@ -512,7 +512,7 @@ GltfModel::findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree,
 {
 	for (uint16_t x = 0; x < boneTree.size(); x++)
 	{
-		if (boneTree[x].getParentIndex() == boneIndex)
+		if (boneTree[x].parentIndex == boneIndex)
 			out.push_back(x);
 	}
 }

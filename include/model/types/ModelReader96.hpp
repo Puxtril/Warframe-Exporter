@@ -262,10 +262,10 @@ namespace WarframeExporter
 				headerReader->seek(0x20, std::ios_base::cur);
 
 				// Main model data
-				outHeader.setVertexCount(headerReader->readUInt32());
-				outHeader.setFaceCount(headerReader->readUInt32());
-				outHeader.setMorphCount(headerReader->readUInt32());
-				outHeader.setBoneCount(headerReader->readUInt32());
+				outHeader.vertexCount = headerReader->readUInt32();
+				outHeader.faceCount = headerReader->readUInt32();
+				outHeader.morphCount = headerReader->readUInt32();
+				outHeader.boneCount = headerReader->readUInt32();
 
 				headerReader->seek(0x18, std::ios_base::cur);
 
@@ -279,26 +279,25 @@ namespace WarframeExporter
 
 				// Mesh Infos
 				uint32_t meshInfoCount = headerReader->readUInt32();
-				std::vector<MeshInfoExternal> meshInfos(meshInfoCount);
+				outHeader.meshInfos.resize(meshInfoCount);
 				for (uint32_t x = 0; x < meshInfoCount; x++)
 				{
-					MeshInfoExternal& curMeshInfo = meshInfos[x];
+					MeshInfoExternal& curMeshInfo = outHeader.meshInfos[x];
 
-					headerReader->readFloatArray(&curMeshInfo.getVec1Ptr().x, 4);
-					headerReader->readFloatArray(&curMeshInfo.getVec2Ptr().x, 4);
+					headerReader->readFloatArray(&curMeshInfo.vector1.x, 4);
+					headerReader->readFloatArray(&curMeshInfo.vector2.x, 4);
 
 					uint32_t meshInfoNameLen = headerReader->readUInt32();
-					curMeshInfo.setName(headerReader->readAsciiString(meshInfoNameLen));
+					curMeshInfo.name = headerReader->readAsciiString(meshInfoNameLen);
 
-					headerReader->readUInt32Array(curMeshInfo.getLODOffsetsPtr().data(), 5);
-					headerReader->readUInt32Array(curMeshInfo.getLODCountsPtr().data(), 5);
+					headerReader->readUInt32Array(curMeshInfo.faceLODOffsets.data(), 5);
+					headerReader->readUInt32Array(curMeshInfo.faceLODCounts.data(), 5);
 
 					headerReader->seek(0x20, std::ios_base::cur);
 					uint32_t unkNameLen = headerReader->readUInt32();
 					headerReader->seek(unkNameLen, std::ios_base::cur);
 					headerReader->seek(0x10, std::ios_base::cur);
 				}
-				outHeader.setMeshInfos(meshInfos);
 
 				uint32_t shortCount = headerReader->readUInt32();
 				headerReader->seek(shortCount * 2U, std::ios_base::cur);
@@ -332,37 +331,35 @@ namespace WarframeExporter
 
 				// PhysX Meshes
 				uint32_t physXMeshCount = headerReader->readUInt32();
-				std::vector<PhysXMesh> physXMeshes(physXMeshCount);
+				outHeader.physXMeshes.resize(physXMeshCount);
 				for (uint32_t x = 0; x < physXMeshCount; x++)
 				{
-					PhysXMesh& curPhys = physXMeshes[x];
+					PhysXMesh& curPhys = outHeader.physXMeshes[x];
 
-					curPhys.setTypeEnum(headerReader->readUInt32());
-					if (curPhys.getTypeEnum() == 1)
+					curPhys.typeEnum = headerReader->readUInt32();
+					if (curPhys.typeEnum == 1)
 						headerReader->seek(0x4C, std::ios_base::cur);
 					else
 						headerReader->seek(0x50, std::ios_base::cur);
 
 					headerReader->seek(0x20, std::ios_base::cur);
 
-					if (curPhys.getTypeEnum() != 0 && curPhys.getTypeEnum() != 2 && curPhys.getTypeEnum() != 3)
+					if (curPhys.typeEnum != 0 && curPhys.typeEnum != 2 && curPhys.typeEnum != 3)
 						headerReader->seek(0x4, std::ios_base::cur);
 
 					headerReader->seek(0x4, std::ios_base::cur);
 
-					curPhys.setDataLength(headerReader->readUInt32());
+					curPhys.dataLength = headerReader->readUInt32();
 					headerReader->seek(0x8, std::ios_base::cur);
 				}
-				outHeader.setPhysXMeshes(physXMeshes);
 
 				uint32_t errorCount = headerReader->readUInt32();
-				std::vector<std::string> errors(errorCount);
+				outHeader.errorMsgs.resize(errorCount);
 				for (uint32_t x = 0; x < errorCount; x++)
 				{
 					uint32_t errorCountStrLen = headerReader->readUInt32();
-					errors[x] = headerReader->readAsciiString(errorCountStrLen);
+					outHeader.errorMsgs[x] = headerReader->readAsciiString(errorCountStrLen);
 				}
-				outHeader.setErrorMsgs(errors);
 
 				if (headerReader->tell() != headerReader->getLength())
 					throw InvalidDataException("Did not reach end of file");
@@ -370,14 +367,14 @@ namespace WarframeExporter
 
 			static void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader)
 			{
-				for (const auto& x : extHeader.getPhysXMeshes())
-					bodyReader->seek(x.getDataLength(), std::ios_base::cur);
+				for (const auto& x : extHeader.physXMeshes)
+					bodyReader->seek(x.dataLength, std::ios_base::cur);
 
-				bodyReader->seek(64 * extHeader.getBoneCount(), std::ios_base::cur);
+				bodyReader->seek(64 * extHeader.boneCount, std::ios_base::cur);
 
 				bodyReader->seek(0x2, std::ios_base::cur);
 
-				for (uint32_t x = 0; x < extHeader.getVertexCount(); x++)
+				for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 				{
 					bodyReader->seek(6, std::ios_base::cur); // Verts
 					bodyReader->seek(6, std::ios_base::cur); // Normals
@@ -388,7 +385,7 @@ namespace WarframeExporter
 				//bodyReader->seek(extHeader.getBodySkipLen2() * 8U, std::ios_base::cur);
 
 				static const std::string facesIndiciesMsg = "Face Indices";
-				delete bodyReader->readUInt16Array(extHeader.getFaceCount(), 0, extHeader.getVertexCount() + 1, facesIndiciesMsg);
+				delete bodyReader->readUInt16Array(extHeader.faceCount, 0, extHeader.vertexCount + 1, facesIndiciesMsg);
 
 				// Extra shorts, no idea where the count is
 				// /Lotus/Characters/Tenno/Garuda/GarudaDeluxe/GarudaDeluxeArmClawRParticleEmit.fbx
@@ -399,34 +396,34 @@ namespace WarframeExporter
 
 			static void readBody(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
 			{
-				for (const auto& x : extHeader.getPhysXMeshes())
-					bodyReader->seek(x.getDataLength(), std::ios_base::cur);
+				for (const auto& x : extHeader.physXMeshes)
+					bodyReader->seek(x.dataLength, std::ios_base::cur);
 
-				bodyReader->seek(64U * extHeader.getBoneCount(), std::ios_base::cur);
+				bodyReader->seek(64U * extHeader.boneCount, std::ios_base::cur);
 
 				bodyReader->seek(0x2, std::ios_base::cur);
 
-				outBody.getPosPtr().resize(extHeader.getVertexCount());
-				outBody.getUV1Ptr().resize(extHeader.getVertexCount());
-				outBody.getUV2Ptr().resize(extHeader.getVertexCount());
-				for (uint32_t x = 0; x < extHeader.getVertexCount(); x++)
+				outBody.positions.resize(extHeader.vertexCount);
+				outBody.UV1.resize(extHeader.vertexCount);
+				outBody.UV2.resize(extHeader.vertexCount);
+				for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 				{
-					outBody.getPosPtr()[x][0] = bodyReader->readInt16() / 32767.0F;
-					outBody.getPosPtr()[x][1] = bodyReader->readInt16() / 32767.0F;
-					outBody.getPosPtr()[x][2] = bodyReader->readInt16() / 32767.0F;
+					outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
+					outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
+					outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
 
 					bodyReader->seek(6, std::ios_base::cur); // Normals?
 					bodyReader->seek(4, std::ios::cur); // Vertex Colors?
 
-					outBody.getUV1Ptr()[x][0] = bodyReader->readHalf();
-					outBody.getUV1Ptr()[x][1] = bodyReader->readHalf();
+					outBody.UV1[x][0] = bodyReader->readHalf();
+					outBody.UV1[x][1] = bodyReader->readHalf();
 
-					outBody.getUV2Ptr()[x][0] = bodyReader->readHalf();
-					outBody.getUV2Ptr()[x][1] = bodyReader->readHalf();
+					outBody.UV2[x][0] = bodyReader->readHalf();
+					outBody.UV2[x][1] = bodyReader->readHalf();
 				}
 
-				outBody.getIndexPtr().resize(extHeader.getFaceCount());
-				bodyReader->readUInt16Array(outBody.getIndexPtr().data(), extHeader.getFaceCount());
+				outBody.indices.resize(extHeader.faceCount);
+				bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 			}
 		};
 	}

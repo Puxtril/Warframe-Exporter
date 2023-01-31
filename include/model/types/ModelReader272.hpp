@@ -80,16 +80,16 @@ namespace WarframeExporter
 				headerReader->seek(unkArrLen * 8, std::ios_base::cur);
 				headerReader->seek(0x31, std::ios_base::cur);
 
-				static const std::string boneTreeCountMsg = "Bone Data Array Count";
-				uint32_t boneTreeCount = headerReader->readUInt32(0, 1000, boneTreeCountMsg); // sometimes can be 0 if weighted is 1
+				static const std::string boneTreeLenMsg = "Bone Data Array Count";
+				uint32_t boneTreeLen = headerReader->readUInt32(0, 1000, boneTreeLenMsg); // sometimes can be 0 if weighted is 1
 
 				static const std::string boneTreeNameLenMsg = "Bone Data name length";
 				static const std::string boneTreeIndexMsg = "Bone Data index";
-				for (uint32_t x = 0; x < boneTreeCount; x++)
+				for (uint32_t x = 0; x < boneTreeLen; x++)
 				{
 					uint32_t boneTreeNameLen = headerReader->readUInt32(0, 100, boneTreeNameLenMsg);
 					headerReader->seek(boneTreeNameLen, std::ios_base::cur);
-					headerReader->readUInt16(0, boneTreeCount + 1, boneTreeIndexMsg); //parent index
+					headerReader->readUInt16(0, boneTreeLen + 1, boneTreeIndexMsg); //parent index
 					headerReader->readUInt16();
 				}
 
@@ -275,13 +275,13 @@ namespace WarframeExporter
 					uint32_t curBoneNameLen = headerReader->readUInt32();
 					weightedBoneNames.push_back(headerReader->readAsciiString(curBoneNameLen));
 				}
-				outHeader.setWeightedBoneNames(weightedBoneNames);
+				outHeader.weightedBoneNames = weightedBoneNames;
 
 				// Main vertex counts
-				outHeader.setFaceCount(headerReader->readUInt32());
-				outHeader.setBoneCount(headerReader->readUInt32());
-				outHeader.setVertexCount(headerReader->readUInt32());
-				outHeader.setMorphCount(headerReader->readUInt32());
+				outHeader.faceCount = headerReader->readUInt32();
+				outHeader.boneCount = headerReader->readUInt32();
+				outHeader.vertexCount = headerReader->readUInt32();
+				outHeader.morphCount = headerReader->readUInt32();
 
 				headerReader->seek(0x8, std::ios_base::cur);
 				uint32_t unkArrLen = headerReader->readUInt32();
@@ -289,18 +289,16 @@ namespace WarframeExporter
 				headerReader->seek(0x31, std::ios_base::cur);
 
 				// Bone tree
-				uint32_t boneTreeCount = headerReader->readUInt32();
-				std::vector<BoneTreeNodeExternal> boneTree;
-				for (uint32_t x = 0; x < boneTreeCount; x++)
+				uint32_t boneTreeLen = headerReader->readUInt32();
+				outHeader.boneTree.resize(boneTreeLen);
+				for (uint32_t x = 0; x < boneTreeLen; x++)
 				{
-					BoneTreeNodeExternal boneNode;
+					BoneTreeNodeExternal& boneNode = outHeader.boneTree[x];
 					uint32_t boneTreeNameLen = headerReader->readUInt32();
-					boneNode.setName(headerReader->readAsciiString(boneTreeNameLen));
-					boneNode.setParentIndex(headerReader->readUInt16());
+					boneNode.name = headerReader->readAsciiString(boneTreeNameLen);
+					boneNode.parentIndex = headerReader->readUInt16();
 					headerReader->seek(2, std::ios_base::cur);
-					boneTree.push_back(boneNode);
 				}
-				outHeader.setBoneTree(boneTree);
 
 				uint32_t unkStructCount = headerReader->readUInt32();
 				for (uint32_t x = 0; x < unkStructCount; x++)
@@ -312,7 +310,7 @@ namespace WarframeExporter
 				}
 
 				headerReader->seek(0x1A, std::ios_base::cur);
-				outHeader.setBodySkipLen1(headerReader->readUInt32());
+				outHeader.bodySkipLen1 = headerReader->readUInt32();
 				headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
 				headerReader->seek(0x8, std::ios_base::cur);
 
@@ -323,20 +321,20 @@ namespace WarframeExporter
 				{
 					MeshInfoExternal meshInfo;
 
-					headerReader->readFloatArray(&meshInfo.getVec1Ptr().x, 4);
-					headerReader->readFloatArray(&meshInfo.getVec2Ptr().x, 4);
+					headerReader->readFloatArray(&meshInfo.vector1.x, 4);
+					headerReader->readFloatArray(&meshInfo.vector2.x, 4);
 
 					uint32_t meshInfoNameLen = headerReader->readUInt32();
-					meshInfo.setName(headerReader->readAsciiString(meshInfoNameLen));
+					meshInfo.name = headerReader->readAsciiString(meshInfoNameLen);
 
-					headerReader->readUInt32Array(meshInfo.getLODOffsetsPtr().data(), 5);
-					headerReader->readUInt32Array(meshInfo.getLODCountsPtr().data(), 5);
+					headerReader->readUInt32Array(meshInfo.faceLODOffsets.data(), 5);
+					headerReader->readUInt32Array(meshInfo.faceLODCounts.data(), 5);
 
 					headerReader->seek(0x34, std::ios_base::cur);
 
 					meshInfos.push_back(meshInfo);
 				}
-				outHeader.setMeshInfos(meshInfos);
+				outHeader.meshInfos = meshInfos;
 
 				uint32_t unkWordCount = headerReader->readUInt32();
 				headerReader->seek(2U * unkWordCount, std::ios_base::cur);
@@ -362,7 +360,7 @@ namespace WarframeExporter
 					}
 					boneMaps.push_back(curBoneMap);
 				}
-				outHeader.setBoneMaps(boneMaps);
+				outHeader.boneMaps = boneMaps;
 
 				// Specifications:
 				//   - Last in the following array
@@ -398,7 +396,7 @@ namespace WarframeExporter
 					uint32_t unkArrCount = headerReader->readUInt32();
 					headerReader->seek(unkArrCount * 4U, std::ios_base::cur);
 				}
-				outHeader.setBodySkipLen2(skipLen2);
+				outHeader.bodySkipLen2 = skipLen2;
 
 				headerReader->seek(0x37, std::ios_base::cur);
 
@@ -412,42 +410,38 @@ namespace WarframeExporter
 				}
 
 				// PhysX Meshes
-				std::vector<PhysXMesh> physXMeshes;
 				uint32_t physXMeshCount = headerReader->readUInt32();
+				outHeader.physXMeshes.resize(physXMeshCount);
 				for (uint32_t x = 0; x < physXMeshCount; x++)
 				{
-					PhysXMesh curPhysXMesh;
+					PhysXMesh& curPhysXMesh = outHeader.physXMeshes[x];
 
-					curPhysXMesh.setTypeEnum(headerReader->readUInt32());
-					if (curPhysXMesh.getTypeEnum() == 1)
+					curPhysXMesh.typeEnum = headerReader->readUInt32();
+					if (curPhysXMesh.typeEnum == 1)
 						headerReader->seek(0x4C, std::ios_base::cur);
 					else
 						headerReader->seek(0x50, std::ios_base::cur);
 
-					headerReader->readFloatArray(&curPhysXMesh.getVec1Ptr().x, 4);
-					headerReader->readFloatArray(&curPhysXMesh.getVec2Ptr().x, 4);
+					headerReader->readFloatArray(&curPhysXMesh.vector1.x, 4);
+					headerReader->readFloatArray(&curPhysXMesh.vector2.x, 4);
 
-					if (curPhysXMesh.getTypeEnum() != 0 && curPhysXMesh.getTypeEnum() != 2 && curPhysXMesh.getTypeEnum() != 3)
+					if (curPhysXMesh.typeEnum != 0 && curPhysXMesh.typeEnum != 2 && curPhysXMesh.typeEnum != 3)
 						headerReader->seek(0x4, std::ios_base::cur);
 
 					headerReader->seek(0x4, std::ios_base::cur);
 
-					curPhysXMesh.setDataLength(headerReader->readUInt32());
+					curPhysXMesh.dataLength = headerReader->readUInt32();
 					headerReader->seek(0x8, std::ios_base::cur);
-
-					physXMeshes.push_back(curPhysXMesh);
 				}
-				outHeader.setPhysXMeshes(physXMeshes);
 
 				// Error Messages
-				std::vector<std::string> errorMsgs;
 				uint32_t errorCount = headerReader->readUInt32();
+				outHeader.errorMsgs.resize(errorCount);
 				for (uint32_t x = 0; x < errorCount; x++)
 				{
 					uint32_t errorCountStrLen = headerReader->readUInt32();
-					errorMsgs.push_back(headerReader->readAsciiString(errorCountStrLen));
+					outHeader.errorMsgs[x] = headerReader->readAsciiString(errorCountStrLen);
 				}
-				outHeader.setErrorMsgs(errorMsgs);
 
 				if (headerReader->tell() != headerReader->getLength())
 					throw InvalidDataException("Did not reach end of file");
@@ -457,27 +451,27 @@ namespace WarframeExporter
 			{
 				bodyReader->seek(0, std::ios_base::beg);
 
-				for (const auto& x : extHeader.getPhysXMeshes())
-					bodyReader->seek(x.getDataLength(), std::ios_base::cur);
+				for (const auto& x : extHeader.physXMeshes)
+					bodyReader->seek(x.dataLength, std::ios_base::cur);
 
 				bodyReader->seek(0x2, std::ios_base::cur);
 
-				delete[] bodyReader->readFloatArray(16 * (extHeader.getWeightedBoneNames().size()));
+				delete[] bodyReader->readFloatArray(16 * (extHeader.weightedBoneNames.size()));
 
-				bodyReader->seek(extHeader.getBodySkipLen1(), std::ios_base::cur);
+				bodyReader->seek(extHeader.bodySkipLen1, std::ios_base::cur);
 
-				delete[] bodyReader->readFloatArray(10 * extHeader.getBoneTree().size());
-				delete[] bodyReader->readUInt16Array(extHeader.getBoneTree().size());
-				delete[] bodyReader->readUInt16Array(extHeader.getBoneTree().size());
+				delete[] bodyReader->readFloatArray(10 * extHeader.boneTree.size());
+				delete[] bodyReader->readUInt16Array(extHeader.boneTree.size());
+				delete[] bodyReader->readUInt16Array(extHeader.boneTree.size());
 
-				if (extHeader.getBoneTree().size() > 0)
+				if (extHeader.boneTree.size() > 0)
 				{
 					bodyReader->seek(0x4, std::ios_base::cur);
 					static const std::string preVertFloatMsg = "Pre Vertex Always 1 float";
 					bodyReader->readFloat(1.0F, 1.01F, CONV_ZERO | FAIL_SUBNORM, preVertFloatMsg);
 				}
 
-				for (uint32_t x = 0; x < extHeader.getVertexCount(); x++)
+				for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 				{
 					bodyReader->seek(6, std::ios_base::cur); // Verts
 					bodyReader->seek(6, std::ios_base::cur); // Normals
@@ -487,10 +481,10 @@ namespace WarframeExporter
 					bodyReader->seek(4, std::ios_base::cur); // Bone Weights
 				}
 
-				bodyReader->seek(extHeader.getBodySkipLen2() * 8U, std::ios_base::cur);
+				bodyReader->seek(extHeader.bodySkipLen2 * 8U, std::ios_base::cur);
 
 				static const std::string facesIndiciesMsg = "Face Indices";
-				delete bodyReader->readUInt16Array(extHeader.getFaceCount(), 0, extHeader.getVertexCount() + 1, facesIndiciesMsg);
+				delete bodyReader->readUInt16Array(extHeader.faceCount, 0, extHeader.vertexCount + 1, facesIndiciesMsg);
 
 				if (bodyReader->tell() != bodyReader->getLength())
 					throw InvalidDataException("Did not reach end of file");
@@ -500,68 +494,68 @@ namespace WarframeExporter
 			{
 				bodyReader->seek(0, std::ios_base::beg);
 
-				for (const auto& x : extHeader.getPhysXMeshes())
-					bodyReader->seek(x.getDataLength(), std::ios_base::cur);
+				for (const auto& x : extHeader.physXMeshes)
+					bodyReader->seek(x.dataLength, std::ios_base::cur);
 
 				bodyReader->seek(0x2, std::ios_base::cur);
 
-				std::vector<glm::mat4x4>& reverseBinds = outBody.getReverseBindsPtr();
-				reverseBinds.resize(extHeader.getWeightedBoneNames().size());
-				for (size_t x = 0; x < extHeader.getWeightedBoneNames().size(); x++)
+				std::vector<glm::mat4x4>& reverseBinds = outBody.reverseBinds;
+				reverseBinds.resize(extHeader.weightedBoneNames.size());
+				for (size_t x = 0; x < extHeader.weightedBoneNames.size(); x++)
 				{
 					bodyReader->readFloatArray(glm::value_ptr(reverseBinds[x]), 16);
 				}
 
-				bodyReader->seek(extHeader.getBodySkipLen1(), std::ios_base::cur);
+				bodyReader->seek(extHeader.bodySkipLen1, std::ios_base::cur);
 
-				std::vector<glm::quat>& outRotations = outBody.getBoneRotationsPtr();
-				std::vector<glm::vec3>& outPositions = outBody.getBonePositionsPtr();
-				outRotations.resize(extHeader.getBoneTree().size());
-				outPositions.resize(extHeader.getBoneTree().size());
-				for (uint32_t x = 0; x < extHeader.getBoneTree().size(); x++)
+				std::vector<glm::quat>& outRotations = outBody.boneRotations;
+				std::vector<glm::vec3>& outPositions = outBody.bonePositions;
+				outRotations.resize(extHeader.boneTree.size());
+				outPositions.resize(extHeader.boneTree.size());
+				for (uint32_t x = 0; x < extHeader.boneTree.size(); x++)
 				{
 					bodyReader->readFloatArray(&outRotations[x].w, 4);
 					bodyReader->readFloatArray(&outPositions[x].x, 3);
 					bodyReader->seek(12, std::ios_base::cur);
 				}
 
-				bodyReader->seek(2 * extHeader.getBoneTree().size(), std::ios_base::cur);
-				bodyReader->seek(2 * extHeader.getBoneTree().size(), std::ios_base::cur);
+				bodyReader->seek(2 * extHeader.boneTree.size(), std::ios_base::cur);
+				bodyReader->seek(2 * extHeader.boneTree.size(), std::ios_base::cur);
 
-				if (extHeader.getBoneTree().size() > 0)
+				if (extHeader.boneTree.size() > 0)
 					bodyReader->seek(0x8, std::ios_base::cur);
 
-				outBody.getPosPtr().resize(extHeader.getVertexCount());
-				outBody.getUV1Ptr().resize(extHeader.getVertexCount());
-				outBody.getUV2Ptr().resize(extHeader.getVertexCount());
-				outBody.getBoneIndicesPtr().resize(extHeader.getVertexCount());
-				outBody.getBoneWeightsPtr().resize(extHeader.getVertexCount());
-				for (uint32_t x = 0; x < extHeader.getVertexCount(); x++)
+				outBody.positions.resize(extHeader.vertexCount);
+				outBody.UV1.resize(extHeader.vertexCount);
+				outBody.UV2.resize(extHeader.vertexCount);
+				outBody.boneIndices.resize(extHeader.vertexCount);
+				outBody.boneWeights.resize(extHeader.vertexCount);
+				for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 				{
-					outBody.getPosPtr()[x][0] = bodyReader->readInt16() / 32767.0F;
-					outBody.getPosPtr()[x][1] = bodyReader->readInt16() / 32767.0F;
-					outBody.getPosPtr()[x][2] = bodyReader->readInt16() / 32767.0F;
+					outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
+					outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
+					outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
 
 					bodyReader->seek(6, std::ios_base::cur); // Normals?
 					bodyReader->seek(4, std::ios::cur); // Vertex colors
 
-					outBody.getUV1Ptr()[x][0] = bodyReader->readHalf();
-					outBody.getUV1Ptr()[x][1] = bodyReader->readHalf();
+					outBody.UV1[x][0] = bodyReader->readHalf();
+					outBody.UV1[x][1] = bodyReader->readHalf();
 
-					outBody.getUV2Ptr()[x][0] = bodyReader->readHalf();
-					outBody.getUV2Ptr()[x][1] = bodyReader->readHalf();
+					outBody.UV2[x][0] = bodyReader->readHalf();
+					outBody.UV2[x][1] = bodyReader->readHalf();
 
-					outBody.getBoneIndicesPtr()[x][0] = bodyReader->readUInt8();
-					outBody.getBoneIndicesPtr()[x][1] = bodyReader->readUInt8();
-					outBody.getBoneIndicesPtr()[x][2] = bodyReader->readUInt8();
-					outBody.getBoneIndicesPtr()[x][3] = bodyReader->readUInt8();
+					outBody.boneIndices[x][0] = bodyReader->readUInt8();
+					outBody.boneIndices[x][1] = bodyReader->readUInt8();
+					outBody.boneIndices[x][2] = bodyReader->readUInt8();
+					outBody.boneIndices[x][3] = bodyReader->readUInt8();
 
 					uint32_t weightUInt = bodyReader->readUInt32();
 					float weightLast = 1.0F;
 					for (int y = 0; y < 3; y++)
 					{
 						float curWeight = (float)(weightUInt & 0x3FF) / (float)0x3FF;
-						outBody.getBoneWeightsPtr()[x][y] = curWeight;
+						outBody.boneWeights[x][y] = curWeight;
 						weightUInt >>= 10;
 						weightLast -= curWeight;
 					}
@@ -569,13 +563,13 @@ namespace WarframeExporter
 					// This determines if the vertex is weighted,
 					//  so it's important this gets set to exactly 0
 					if (weightLast > 0.0001F)
-						outBody.getBoneWeightsPtr()[x][3] = std::max(weightLast, 0.0F);
+						outBody.boneWeights[x][3] = std::max(weightLast, 0.0F);
 				}
 
-				bodyReader->seek(extHeader.getBodySkipLen2() * 8U, std::ios_base::cur);
+				bodyReader->seek(extHeader.bodySkipLen2 * 8U, std::ios_base::cur);
 
-				outBody.getIndexPtr().resize(extHeader.getFaceCount());
-				bodyReader->readUInt16Array(outBody.getIndexPtr().data(), extHeader.getFaceCount());
+				outBody.indices.resize(extHeader.faceCount);
+				bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 
 				if (bodyReader->tell() != bodyReader->getLength())
 					throw InvalidDataException("Did not reach end of file");

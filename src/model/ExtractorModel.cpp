@@ -35,15 +35,15 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 		ModelReader96::readBody(headerExt, bReader, bodyExt);
 		break;
 	}
-	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", headerExt.getBoneTree().size(), headerExt.getWeightedBoneNames().size(), headerExt.getMeshInfos().size(), headerExt.getVertexCount(), headerExt.getFaceCount(), headerExt.getMorphCount(), headerExt.getPhysXMeshes().size()));
+	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", headerExt.boneTree.size(), headerExt.weightedBoneNames.size(), headerExt.meshInfos.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size()));
 
-	if (headerExt.getMeshInfos().size() == 0)
+	if (headerExt.meshInfos.size() == 0)
 		throw InvalidDataException("Mesh has zero MeshInfos");
 
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
 	ModelConverter::convertToInternal(headerExt, bodyExt, header.getAttributes(), headerInt, bodyInt);
-	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.getModelScale().x, headerInt.getModelScale().y, headerInt.getModelScale().z));
+	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
 	GltfModel outModel;
 	outModel.addModelData(headerInt, bodyInt);

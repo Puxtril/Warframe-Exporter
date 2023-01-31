@@ -13,14 +13,14 @@ TextureBody::getBody(BinaryReaderBuffered* bodyReader, const TextureHeaderIntern
 {
 	if (postEnsmallening.isPostPart1())
 	{
-		return TextureBodyInternal(bodyReader->getPtr(), bodyReader->getLength(), true);
+		return TextureBodyInternal{ bodyReader->getPtr(), bodyReader->getLength(), true };
 	}
 	else
 	{
 		char* rawData = (char*)bodyReader->readUInt8Array(bodyReader->getLength());
 		char* unSwizzled = new char[bodyReader->getLength()];
-		headerInternal.getFormatClass()->unSwizzle(rawData, bodyReader->getLength(), unSwizzled);
+		headerInternal.formatClass->unSwizzle(rawData, bodyReader->getLength(), unSwizzled);
 		delete[] rawData;
-		return TextureBodyInternal(unSwizzled, bodyReader->getLength(), false);
+		return TextureBodyInternal{unSwizzled, bodyReader->getLength(), false};
 	}
 }

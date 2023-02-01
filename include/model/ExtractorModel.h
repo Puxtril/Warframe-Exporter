@@ -25,9 +25,9 @@ namespace WarframeExporter
 
 		class ExtractorModel : public Extractor
 		{
-		public:
 			ExtractorModel() : Extractor() {}
-
+		
+		public:
 			ExtractorModel(const ExtractorModel&) = delete;
 			ExtractorModel operator=(const ExtractorModel&) = delete;
 

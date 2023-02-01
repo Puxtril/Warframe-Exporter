@@ -17,9 +17,9 @@ namespace WarframeExporter
 
 		class ExtractorMaterial : public Extractor
 		{
-		public:
 			ExtractorMaterial() : Extractor() {}
-
+		
+		public:
 			ExtractorMaterial(const ExtractorMaterial&) = delete;
 			ExtractorMaterial operator=(const ExtractorMaterial&) = delete;
 

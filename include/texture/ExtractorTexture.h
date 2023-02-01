@@ -32,9 +32,9 @@ namespace WarframeExporter
 	
 		class ExtractorTexture : public Extractor
 		{
-		public:
 			ExtractorTexture() : Extractor() {}
-
+		
+		public:
 			ExtractorTexture(const ExtractorTexture&) = delete;
 			ExtractorTexture operator=(const ExtractorTexture&) = delete;
 

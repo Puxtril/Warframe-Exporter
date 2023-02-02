@@ -14,6 +14,7 @@ TextureBody::getBody(BinaryReaderBuffered* bodyReader, const TextureHeaderIntern
 	if (postEnsmallening.isPostPart1())
 	{
 		std::unique_ptr<char[]> data = std::make_unique<char[]>(bodyReader->getLength());
+		std::memcpy(data.get(), bodyReader->getPtr(), bodyReader->getLength());
 		return TextureBodyInternal{ std::move(data), bodyReader->getLength() };
 	}
 	else

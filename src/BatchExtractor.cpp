@@ -32,27 +32,22 @@ BatchExtractor::batchExtract(std::string basePath, std::vector<std::string> pack
 				continue;
 			}
 
-			try
-			{
-				Extractor* extractor = g_enumMapExtractor[header.getEnum()];
-				if (((int)extractor->getExtractorType() & (int)types) == 0)
-					continue;
+			Extractor* extractor = g_enumMapExtractor[header.getEnum()];
 
-				std::string outputPath = m_pathManager.getOutputFilePath(curFile->getFullPath(), extractor->getOutputExtension());
-				if (existingFileIdentical(curFile->getFullPath(), outputPath, curPair, curPackageName))
-				{
-					m_logger.info("Identical file time, skipping: " + curFile->getFullPath());
-					continue;
-				}
-
-				extractOrLog(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, outputPath, extractor);
-			}
-			// Files that don't match specified enums
-			catch (std::out_of_range&)
-			{
+			if (extractor == nullptr)
 				m_logger.debug("Skipping file type " + std::to_string(header.getEnum()) + ": " + curFile->getFullPath());
+
+			if (((int)extractor->getExtractorType() & (int)types) == 0)
+				continue;
+
+			std::string outputPath = m_pathManager.getOutputFilePath(curFile->getFullPath(), extractor->getOutputExtension());
+			if (existingFileIdentical(curFile->getFullPath(), outputPath, curPair, curPackageName))
+			{
+				m_logger.info("Identical file time, skipping: " + curFile->getFullPath());
 				continue;
 			}
+
+			extractOrLog(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, outputPath, extractor);
 		}
 	}
 }
@@ -63,6 +58,7 @@ BatchExtractor::extractOrLog(PackageDirLimited& pkgParam, const std::string& pac
 	try
 	{
 		m_logger.info("Extracting " + internalPath);
+		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), header.getEnum()));
 		extractor->extract(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData, outputPath);
 		writeFileProperties(outputPath, internalPath, packageName);
 	}

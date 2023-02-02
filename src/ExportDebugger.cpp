@@ -32,18 +32,11 @@ ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std:
 				continue;
 			}
 
-			try
-			{
-				Extractor* extractor = g_enumMapExtractor[header.getEnum()];
-				if (((int)extractor->getExtractorType() & (int)types) == 0)
-					continue;
-				
-				debugExtract(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, extractor);
-			}
-			catch (std::out_of_range&)
-			{
+			Extractor* extractor = g_enumMapExtractor[header.getEnum()];
+			if (((int)extractor->getExtractorType() & (int)types) == 0)
 				continue;
-			}
+				
+			debugExtract(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, extractor);
 		}
 	}
 }

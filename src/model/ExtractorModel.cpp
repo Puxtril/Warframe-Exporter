@@ -17,34 +17,28 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 	if (bReader->getLength() == 0)
 		throw InvalidDataException("Mesh has no body");
 
-	ModelHeaderExternal headerExt;
-	ModelBodyExternal bodyExt;
+	// Read body/header data
+	WFModelReader* modelReader = g_enumMapModel[header.getEnum()];
 
-	switch (header.getEnum())
-	{
-	case 269:
-		ModelReader269::readHeader(hReader, ensmalleningData, header, headerExt);
-		ModelReader269::readBody(headerExt, bReader, bodyExt);
-		break;
-	case 272:
-		ModelReader272::readHeader(hReader, ensmalleningData, header, headerExt);
-		ModelReader272::readBody(headerExt, bReader, bodyExt);
-		break;
-	case 96:
-		ModelReader96::readHeader(hReader, ensmalleningData, header, headerExt);
-		ModelReader96::readBody(headerExt, bReader, bodyExt);
-		break;
-	}
+	ModelHeaderExternal headerExt;
+	modelReader->readHeader(hReader, ensmalleningData, header, headerExt);
+
+	ModelBodyExternal bodyExt;
+	modelReader->readBody(headerExt, bReader, bodyExt);
+
 	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", headerExt.boneTree.size(), headerExt.weightedBoneNames.size(), headerExt.meshInfos.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size()));
 
+	// Error checking. Properly extracted models will never trigger this.
 	if (headerExt.meshInfos.size() == 0)
 		throw InvalidDataException("Mesh has zero MeshInfos");
 
+	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
 	ModelConverter::convertToInternal(headerExt, bodyExt, header.getAttributes(), headerInt, bodyInt);
 	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
+	// Convert body/header into exportable format
 	GltfModel outModel;
 	outModel.addModelData(headerInt, bodyInt);
 	outModel.save(outputPath);
@@ -57,25 +51,10 @@ ExtractorModel::extractDebug(const CommonFileHeader& header, BinaryReaderBuffere
 	ModelHeaderExternal headerExt;
 
 	size_t pos = hReader->tell();
-	switch (header.getEnum())
-	{
-	case 269:
-		ModelReader269::readHeaderDebug(hReader, ensmalleningData, header);
-		hReader->seek(pos, std::ios_base::beg);
-		ModelReader269::readHeader(hReader, ensmalleningData, header, headerExt);
-		ModelReader269::readBodyDebug(headerExt, bReader);
-		break;
-	case 272:
-		ModelReader272::readHeaderDebug(hReader, ensmalleningData, header);
-		hReader->seek(pos, std::ios_base::beg);
-		ModelReader272::readHeader(hReader, ensmalleningData, header, headerExt);
-		ModelReader272::readBodyDebug(headerExt, bReader);
-		break;
-	case 96:
-		ModelReader96::readHeaderDebug(hReader, ensmalleningData, header);
-		hReader->seek(pos, std::ios_base::beg);
-		ModelReader96::readHeader(hReader, ensmalleningData, header, headerExt);
-		ModelReader96::readBodyDebug(headerExt, bReader);
-		break;
-	}
+	WFModelReader* modelReader = g_enumMapModel[header.getEnum()];
+
+	modelReader->readHeaderDebug(hReader, ensmalleningData, header);
+	hReader->seek(pos, std::ios_base::beg);
+	modelReader->readHeader(hReader, ensmalleningData, header, headerExt);
+	modelReader->readBodyDebug(headerExt, bReader);
 }

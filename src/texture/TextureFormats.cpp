@@ -1,50 +1,33 @@
 #include "texture/TextureFormats.h"
 
-using namespace WarframeExporter;
+using namespace WarframeExporter::Texture;
 
-Texture::TextureFormatBase*
-Texture::formatClassFactory(Texture::TextureFormatExternal formatEnum)
-{
-    switch (formatEnum)
-    {
-    case TextureFormatExternal::BC1:
-        return &Texture::Internal::TextureFormatBC1::getInstance();
-    case TextureFormatExternal::BC2:
-        return &Texture::Internal::TextureFormatBC2::getInstance();
-    case TextureFormatExternal::BC3:
-        return &Texture::Internal::TextureFormatBC3::getInstance();
-    case TextureFormatExternal::BC4:
-        return &Texture::Internal::TextureFormatBC4::getInstance();
-    case TextureFormatExternal::BC5:
-        return &Texture::Internal::TextureFormatBC5::getInstance();
-    case TextureFormatExternal::BC6:
-        return &Texture::Internal::TextureFormatBC6::getInstance();
-    case TextureFormatExternal::BC7:
-        return &Texture::Internal::TextureFormatBC7::getInstance();
-    case TextureFormatExternal::Uncompressed:
-        return &Texture::Internal::TextureFormatUncompressed::getInstance();
-    case TextureFormatExternal::Default:
-    default:
-        return &Texture::Internal::TextureFormatBC1::getInstance();
-    }
-}
+///////////////////////////////////////////////////////////////
+// BC1
 
-Texture::Internal::TextureFormatBC1&
-Texture::Internal::TextureFormatBC1::getInstance()
+TextureInfoBC1*
+TextureInfoBC1::getInstance()
 {
-    static Texture::Internal::TextureFormatBC1 instance;
+    static TextureInfoBC1* instance = new TextureInfoBC1();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC1::format()
+std::vector<int>
+TextureInfoBC1::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC1_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC1, (int)TextureCompression::Default };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC1::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC1_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC1::unSwizzle(char* inData, size_t inDataLen, char* outData)
+TextureInfoBC1::unSwizzle(char* inData, size_t inDataLen, char* outData) const
 {
     const static int WFBLOCKSZ = 0x2000;
     const static int WriteBlockSz = 0x0004;
@@ -74,68 +57,98 @@ Texture::Internal::TextureFormatBC1::unSwizzle(char* inData, size_t inDataLen, c
     }
 }
 
-Texture::Internal::TextureFormatBC2&
-Texture::Internal::TextureFormatBC2::getInstance()
+///////////////////////////////////////////////////////////////
+// BC2
+
+TextureInfoBC2*
+TextureInfoBC2::getInstance()
 {
-    static Texture::Internal::TextureFormatBC2 instance;
+    static TextureInfoBC2* instance = new TextureInfoBC2();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC2::format()
+std::vector<int>
+TextureInfoBC2::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC2_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC2 };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC2::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC2_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC2::unSwizzle(char* inData, size_t inDatLen, char* outData)
+TextureInfoBC2::unSwizzle(char* inData, size_t inDatLen, char* outData)const
 {
     char* buffer = new char[inDatLen];
-    Texture::Internal::TextureFormatBC1::getInstance().unSwizzle(inData, inDatLen, buffer);
-    Texture::Internal::TextureFormatBC1::getInstance().unSwizzle(buffer, inDatLen, outData);
+    TextureInfoBC1::getInstance()->unSwizzle(inData, inDatLen, buffer);
+    TextureInfoBC1::getInstance()->unSwizzle(buffer, inDatLen, outData);
     delete[] buffer;
 }
 
-Texture::Internal::TextureFormatBC3&
-Texture::Internal::TextureFormatBC3::getInstance()
+///////////////////////////////////////////////////////////////
+// BC3
+
+TextureInfoBC3*
+TextureInfoBC3::getInstance()
 {
-    static Texture::Internal::TextureFormatBC3 instance;
+    static TextureInfoBC3* instance = new TextureInfoBC3();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC3::format()
+std::vector<int>
+TextureInfoBC3::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC3_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC3 };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC3::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC3_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC3::unSwizzle(char* inData, size_t inDatLen, char* outData)
+TextureInfoBC3::unSwizzle(char* inData, size_t inDatLen, char* outData) const
 {
     char* buffer = new char[inDatLen];
-    Texture::Internal::TextureFormatBC1::getInstance().unSwizzle(inData, inDatLen, buffer);
-    Texture::Internal::TextureFormatBC1::getInstance().unSwizzle(buffer, inDatLen, outData);
+    TextureInfoBC1::getInstance()->unSwizzle(inData, inDatLen, buffer);
+    TextureInfoBC1::getInstance()->unSwizzle(buffer, inDatLen, outData);
     delete[] buffer;
 }
 
-Texture::Internal::TextureFormatBC4&
-Texture::Internal::TextureFormatBC4::getInstance()
+///////////////////////////////////////////////////////////////
+// BC4
+
+TextureInfoBC4*
+TextureInfoBC4::getInstance()
 {
-    static Texture::Internal::TextureFormatBC4 instance;
+    static TextureInfoBC4* instance = new TextureInfoBC4();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC4::format()
+std::vector<int>
+TextureInfoBC4::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC4_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC4 };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC4::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC4_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC4::unSwizzle(char* inData, size_t inDatLen, char* outData)
+TextureInfoBC4::unSwizzle(char* inData, size_t inDatLen, char* outData) const
 {
     const static int WFBlockSize = 0x4000;
     int channelBlockCount = inDatLen / WFBlockSize;
@@ -160,22 +173,32 @@ Texture::Internal::TextureFormatBC4::unSwizzle(char* inData, size_t inDatLen, ch
     }
 }
 
-Texture::Internal::TextureFormatBC5&
-Texture::Internal::TextureFormatBC5::getInstance()
+///////////////////////////////////////////////////////////////
+// BC5
+
+TextureInfoBC5*
+TextureInfoBC5::getInstance()
 {
-    static Texture::Internal::TextureFormatBC5 instance;
+    static TextureInfoBC5* instance = new TextureInfoBC5();
     return instance;
 }
-
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC5::format()
+std::vector<int>
+TextureInfoBC5::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC5_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC5 };
+    return extTypes;
+};
+
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC5::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC5_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC5::unSwizzle(char* inData, size_t inDatLen, char* outData)
+TextureInfoBC5::unSwizzle(char* inData, size_t inDatLen, char* outData) const
 {
     const static int WFChannelBlockSize = 0x2000;
     const static int block0Size = WFChannelBlockSize / 4;
@@ -204,62 +227,92 @@ Texture::Internal::TextureFormatBC5::unSwizzle(char* inData, size_t inDatLen, ch
     }
 }
 
-Texture::Internal::TextureFormatUncompressed&
-Texture::Internal::TextureFormatUncompressed::getInstance()
+///////////////////////////////////////////////////////////////
+// Uncompressed
+
+TextureInfoUncompressed*
+TextureInfoUncompressed::getInstance()
 {
-    static Texture::Internal::TextureFormatUncompressed instance;
+    static TextureInfoUncompressed* instance = new TextureInfoUncompressed();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatUncompressed::format()
+std::vector<int>
+TextureInfoUncompressed::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::R8G8B8A8_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::Uncompressed };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoUncompressed::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::R8G8B8A8_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatUncompressed::unSwizzle(char* inData, size_t inDataLen, char* outData)
+TextureInfoUncompressed::unSwizzle(char* inData, size_t inDataLen, char* outData) const
 {
     memcpy(outData, inData, inDataLen);
 }
 
-Texture::Internal::TextureFormatBC6&
-Texture::Internal::TextureFormatBC6::getInstance()
+///////////////////////////////////////////////////////////////
+// BC6
+
+TextureInfoBC6*
+TextureInfoBC6::getInstance()
 {
-    static Texture::Internal::TextureFormatBC6 instance;
+    static TextureInfoBC6* instance = new TextureInfoBC6();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC6::format()
+std::vector<int>
+TextureInfoBC6::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC6H_UF16;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC6 };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC6::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC6H_UF16;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC6::unSwizzle(char* inData, size_t inDataLen, char* outData)
+TextureInfoBC6::unSwizzle(char* inData, size_t inDataLen, char* outData) const
 {
     memcpy(outData, inData, inDataLen);
 }
 
-Texture::Internal::TextureFormatBC7&
-Texture::Internal::TextureFormatBC7::getInstance()
+///////////////////////////////////////////////////////////////
+// BC7
+
+TextureInfoBC7*
+TextureInfoBC7::getInstance()
 {
-    static Texture::Internal::TextureFormatBC7 instance;
+    static TextureInfoBC7* instance = new TextureInfoBC7();
     return instance;
 }
 
-ddspp::DXGIFormat
-Texture::Internal::TextureFormatBC7::format()
+std::vector<int>
+TextureInfoBC7::getEnumMapKeys() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC7_UNORM;
+    static std::vector<int> extTypes = { (int)TextureCompression::BC7 };
+    return extTypes;
+};
+
+WarframeExporter::ddspp::DXGIFormat
+TextureInfoBC7::getFormat() const
+{
+    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC7_UNORM;
     return format;
 }
 
 void
-Texture::Internal::TextureFormatBC7::unSwizzle(char* inData, size_t inDataLen, char* outData)
+TextureInfoBC7::unSwizzle(char* inData, size_t inDataLen, char* outData) const
 {
     memcpy(outData, inData, inDataLen);
 }

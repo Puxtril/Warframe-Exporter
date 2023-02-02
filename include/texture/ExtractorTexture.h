@@ -8,6 +8,7 @@
 #include "TextureHeader.h"
 #include "TextureBody.h"
 #include "CacheReaderLimited.h"
+#include "EnumMapTexture.h"
 
 #include <iostream>
 
@@ -76,8 +77,6 @@ namespace WarframeExporter
 			};
 
 			static ExtractorTexture* getInstance();
-			static TextureHeaderInternal readHeader	(BinaryReaderBuffered* HfileReader, BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, Logger& logger);
-			static TextureBodyInternal readBody (BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, const TextureHeaderInternal& headerInternal, Logger& logger);
 			static void writeData (const std::string& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const CommonFileHeader& comHeader);
 
 			void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;

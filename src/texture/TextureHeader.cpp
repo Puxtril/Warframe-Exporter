@@ -25,15 +25,14 @@ TextureHeader::readHeader(BinaryReaderBuffered* headerReader, const Ensmallening
 TextureHeaderInternal
 TextureHeader::convertHeader(TextureHeaderExternal& headerExternal, size_t fileSize)
 {
-	TextureFormatExternal extFormat = static_cast<TextureFormatExternal>(headerExternal.format);
-	TextureFormatBase* formatClass = formatClassFactory(extFormat);
+	TextureInfo* formatClass = g_enumMapTexture[(int)headerExternal.format];
 
-	bool isCompressed = ddspp::is_compressed(formatClass->format());
-	int squareSize = ddspp::get_bits_per_pixel_or_block(formatClass->format()) / 8;
+	bool isCompressed = ddspp::is_compressed(formatClass->getFormat());
+	int squareSize = ddspp::get_bits_per_pixel_or_block(formatClass->getFormat()) / 8;
 	auto dimensions = getCorrectResolution(headerExternal.widthBase, headerExternal.heightBase, isCompressed, fileSize, squareSize);
 	uint32_t mip0Len = getMip0Len(std::get<0>(dimensions), std::get<1>(dimensions), isCompressed, squareSize);
 
-	return TextureHeaderInternal{ extFormat, formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions) };
+	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions) };
 }
 
 std::pair<uint16_t, uint16_t>

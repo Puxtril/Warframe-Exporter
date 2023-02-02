@@ -5,140 +5,161 @@
 #include <string>
 #include <iostream>
 
-#include "TextureEnums.hpp"
-#include "ddspp.hpp"
+#include "TextureReader.h"
 
-namespace WarframeExporter
+namespace WarframeExporter::Texture
 {
-	namespace Texture
+	///////////////////////////////////////////////////////////////
+	// BC1
+
+	class TextureInfoBC1 : public TextureInfo
 	{
-		class TextureFormatBase
-		{
-		protected:
-			TextureFormatBase() = default;
-			TextureFormatBase(const TextureFormatBase& other) = delete;
-			TextureFormatBase& operator=(const TextureFormatBase& other) = delete;
+	protected:
+		TextureInfoBC1() = default;
 
-		public:
-			virtual ddspp::DXGIFormat format() = 0;
-			virtual void unSwizzle(char* inData, size_t inDataLen, char* outData) = 0;
-		};
+	public:
+		TextureInfoBC1(const TextureInfoBC1& other) = delete;
+		TextureInfoBC1& operator=(const TextureInfoBC1& other) = delete;
 
-		TextureFormatBase*
-		formatClassFactory(TextureFormatExternal formatEnum);
+		static TextureInfoBC1* getInstance();
 
-		namespace Internal
-		{
-			class TextureFormatBC1 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC1() = default;
-				TextureFormatBC1(const TextureFormatBC1& other) = delete;
-				TextureFormatBC1& operator=(const TextureFormatBC1& other) = delete;
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 
-			public:
-				static TextureFormatBC1& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+	///////////////////////////////////////////////////////////////
+	// BC2
 
+	class TextureInfoBC2 : public TextureInfo
+	{
+	protected:
+		TextureInfoBC2() = default;
 
-			class TextureFormatBC2 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC2() = default;
-				TextureFormatBC2(const TextureFormatBC2& other) = delete;
-				TextureFormatBC2& operator=(const TextureFormatBC2& other) = delete;
+	public:
+		TextureInfoBC2(const TextureInfoBC2& other) = delete;
+		TextureInfoBC2& operator=(const TextureInfoBC2& other) = delete;
 
-			public:
-				static TextureFormatBC2& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+		static TextureInfoBC2* getInstance();
 
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 
-			class TextureFormatBC3 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC3() = default;
-				TextureFormatBC3(const TextureFormatBC3& other) = delete;
-				TextureFormatBC3& operator=(const TextureFormatBC3& other) = delete;
+	///////////////////////////////////////////////////////////////
+	// BC3
 
-			public:
-				static TextureFormatBC3& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+	class TextureInfoBC3 : public TextureInfo
+	{
+	protected:
+		TextureInfoBC3() = default;
 
+	public:
+		TextureInfoBC3(const TextureInfoBC3& other) = delete;
+		TextureInfoBC3& operator=(const TextureInfoBC3& other) = delete;
 
-			class TextureFormatBC4 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC4() = default;
-				TextureFormatBC4(const TextureFormatBC4& other) = delete;
-				TextureFormatBC4& operator=(const TextureFormatBC4& other) = delete;
+		static TextureInfoBC3* getInstance();
+		
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 
-			public:
-				static TextureFormatBC4& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+	///////////////////////////////////////////////////////////////
+	// BC4
 
+	class TextureInfoBC4 : public TextureInfo
+	{
+	protected:
+		TextureInfoBC4() = default;
 
-			class TextureFormatBC5 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC5() = default;
-				TextureFormatBC5(const TextureFormatBC5& other) = delete;
-				TextureFormatBC5& operator=(const TextureFormatBC5& other) = delete;
+	public:
+		TextureInfoBC4(const TextureInfoBC4& other) = delete;
+		TextureInfoBC4& operator=(const TextureInfoBC4& other) = delete;
+		
+		static TextureInfoBC4* getInstance();
+		
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 
-			public:
-				static TextureFormatBC5& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+	///////////////////////////////////////////////////////////////
+	// BC5
 
+	class TextureInfoBC5 : public TextureInfo
+	{
+	protected:
+		TextureInfoBC5() = default;
 
-			class TextureFormatUncompressed : public TextureFormatBase
-			{
-			protected:
-				TextureFormatUncompressed() = default;
-				TextureFormatUncompressed(const TextureFormatUncompressed& other) = delete;
-				TextureFormatUncompressed& operator=(const TextureFormatUncompressed& other) = delete;
+	public:
+		TextureInfoBC5(const TextureInfoBC5& other) = delete;
+		TextureInfoBC5& operator=(const TextureInfoBC5& other) = delete;
 
-			public:
-				static TextureFormatUncompressed& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+		static TextureInfoBC5* getInstance();
+		
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 
+	///////////////////////////////////////////////////////////////
+	// Uncompressed
 
-			class TextureFormatBC6 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC6() = default;
-				TextureFormatBC6(const TextureFormatBC6& other) = delete;
-				TextureFormatBC6& operator=(const TextureFormatBC6& other) = delete;
+	class TextureInfoUncompressed : public TextureInfo
+	{
+	protected:
+		TextureInfoUncompressed() = default;
 
-			public:
-				static TextureFormatBC6& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
+	public:
+		TextureInfoUncompressed(const TextureInfoUncompressed& other) = delete;
+		TextureInfoUncompressed& operator=(const TextureInfoUncompressed& other) = delete;
+		
+		static TextureInfoUncompressed* getInstance();
 
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 
-			class TextureFormatBC7 : public TextureFormatBase
-			{
-			protected:
-				TextureFormatBC7() = default;
-				TextureFormatBC7(const TextureFormatBC7& other) = delete;
-				TextureFormatBC7& operator=(const TextureFormatBC7& other) = delete;
+	///////////////////////////////////////////////////////////////
+	// BC6
 
-			public:
-				static TextureFormatBC7& getInstance();
-				ddspp::DXGIFormat format();
-				void unSwizzle(char* inData, size_t inDataLen, char* outData);
-			};
-		}
-	}
+	class TextureInfoBC6 : public TextureInfo
+	{
+	protected:
+		TextureInfoBC6() = default;
+
+	public:
+		TextureInfoBC6(const TextureInfoBC6& other) = delete;
+		TextureInfoBC6& operator=(const TextureInfoBC6& other) = delete;
+
+		static TextureInfoBC6* getInstance();
+
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		// Format was introduced after swizzling was removed. So this should never be called.
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
+
+	///////////////////////////////////////////////////////////////
+	// BC7
+
+	class TextureInfoBC7 : public TextureInfo
+	{
+	protected:
+		TextureInfoBC7() = default;
+
+	public:
+		TextureInfoBC7(const TextureInfoBC7& other) = delete;
+		TextureInfoBC7& operator=(const TextureInfoBC7& other) = delete;
+
+		static TextureInfoBC7* getInstance();
+
+		std::vector<int> getEnumMapKeys() const override;
+		ddspp::DXGIFormat getFormat() const override;
+		// Format was introduced after swizzling was removed. So this should never be called.
+		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+	};
 }

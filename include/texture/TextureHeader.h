@@ -3,7 +3,7 @@
 #include "BinaryReaderBuffered.h"
 #include "../Ensmallening.hpp"
 #include "TextureStructs.hpp"
-#include "TextureFormats.h"
+#include "EnumMapTexture.h"
 
 #include <algorithm>
 

@@ -3,6 +3,7 @@
 #include "TextureFormats.h"
 
 #include <cstdint>
+#include <memory>
 
 namespace WarframeExporter
 {
@@ -29,15 +30,8 @@ namespace WarframeExporter
 
 		struct TextureBodyInternal
 		{
-			const char* data;
+			std::unique_ptr<char[]> data;
 			size_t dataLen;
-			bool sharedData;
-
-			~TextureBodyInternal()
-			{
-				if (!sharedData)
-					delete[] data;
-			}
 		};
 	}
 }

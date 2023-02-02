@@ -43,7 +43,7 @@ ExtractorTexture::writeData(const std::string& outputFile, const TextureHeaderIn
 		ddspp::serialize(out, *ddsHeaderDX10);
 
 	int32_t mip0Start = body.dataLen - header.mip0Len;
-	out.write(body.data + mip0Start, header.mip0Len);
+	out.write(body.data.get() + mip0Start, header.mip0Len);
 	out.close();
 }
 

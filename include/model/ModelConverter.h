@@ -15,27 +15,24 @@
 #include <regex>
 #include <unordered_map>
 
-namespace WarframeExporter
+namespace WarframeExporter::Model
 {
-	namespace Model
+	class ModelConverter
 	{
-		class ModelConverter
-		{
-		public:
-			static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody);
+	public:
+		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody);
 
-		private:
-			//static void convertToInternalHeader(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
-			//static void convertToInternalBody(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
+	private:
+		//static void convertToInternalHeader(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
+		//static void convertToInternalBody(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
 	
-			static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
-			static void convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
-			static void convertInternalBodyRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
-			static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
+		static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
+		static void convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader);
+		static void convertInternalBodyRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
+		static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
 
-			static void flipXAxis(ModelBodyExternal& extBody);
-			static std::vector<std::string> extractMaterialNames(const std::string& attributes);
-			static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec3& outScale);
-		};
-	}
+		static void flipXAxis(ModelBodyExternal& extBody);
+		static std::vector<std::string> extractMaterialNames(const std::string& attributes);
+		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec3& outScale);
+	};
 }

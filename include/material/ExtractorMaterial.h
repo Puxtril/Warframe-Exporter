@@ -4,58 +4,55 @@
 #include "BinaryReaderBuffered.h"
 #include "../Ensmallening.hpp"
 
-namespace WarframeExporter
+namespace WarframeExporter::Material
 {
-	namespace Material
+	enum class MaterialType
 	{
-		enum class MaterialType
-		{
-			MATERIAL_203 = 203,
-			MATERIAL_204 = 204,
-			MATERIAL_205 = 205,
-		};
+		MATERIAL_203 = 203,
+		MATERIAL_204 = 204,
+		MATERIAL_205 = 205,
+	};
 
-		class ExtractorMaterial : public Extractor
-		{
-			ExtractorMaterial() : Extractor() {}
+	class ExtractorMaterial : public Extractor
+	{
+		ExtractorMaterial() : Extractor() {}
 		
-		public:
-			ExtractorMaterial(const ExtractorMaterial&) = delete;
-			ExtractorMaterial operator=(const ExtractorMaterial&) = delete;
+	public:
+		ExtractorMaterial(const ExtractorMaterial&) = delete;
+		ExtractorMaterial operator=(const ExtractorMaterial&) = delete;
 
-			inline const std::string& getOutputExtension() const override
-			{
-				const static std::string outFileExt = "txt";
-				return outFileExt;
-			}
+		inline const std::string& getOutputExtension() const override
+		{
+			const static std::string outFileExt = "txt";
+			return outFileExt;
+		}
 
-			inline const std::string& getFriendlyName() const override
-			{
-				const static std::string friendlyName = "Material";
-				return friendlyName;
-			}
+		inline const std::string& getFriendlyName() const override
+		{
+			const static std::string friendlyName = "Material";
+			return friendlyName;
+		}
 
-			inline ExtractorType getExtractorType() const override
-			{
-				static ExtractorType type = ExtractorType::Material;
-				return type;
-			}
+		inline ExtractorType getExtractorType() const override
+		{
+			static ExtractorType type = ExtractorType::Material;
+			return type;
+		}
 
-			inline std::vector<int> getEnumMapKeys() const override
-			{
-				const static std::vector<int> extTypes = {
-					(int)MaterialType::MATERIAL_203,
-					(int)MaterialType::MATERIAL_204,
-					(int)MaterialType::MATERIAL_205
-				};
-				return extTypes;
-			}
+		inline std::vector<int> getEnumMapKeys() const override
+		{
+			const static std::vector<int> extTypes = {
+				(int)MaterialType::MATERIAL_203,
+				(int)MaterialType::MATERIAL_204,
+				(int)MaterialType::MATERIAL_205
+			};
+			return extTypes;
+		}
 
-			static ExtractorMaterial* getInstance();
+		static ExtractorMaterial* getInstance();
 
-			void getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths);
-			void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
-			void extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) override;
-		};
-	}
+		void getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths);
+		void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
+		void extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) override;
+	};
 }

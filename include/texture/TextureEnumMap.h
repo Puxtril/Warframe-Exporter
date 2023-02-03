@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EnumMap.h"
-#include "TextureFormats.h"
+#include "TextureInfos.h"
 
 namespace WarframeExporter::Texture
 {

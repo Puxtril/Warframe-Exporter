@@ -5,7 +5,7 @@
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "model/WFModelReader.h"
+#include "model/ModelReader.h"
 
 #include <cassert>
 #include <iomanip>
@@ -16,7 +16,7 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader96 : public WFModelReader
+	class ModelReader96 : public ModelReader
 	{
 		ModelReader96() = default;
 

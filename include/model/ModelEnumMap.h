@@ -7,7 +7,7 @@
 
 namespace WarframeExporter::Model
 {
-	const static EnumMap<WFModelReader> g_enumMapModel = EnumMap<WFModelReader>()
+	const static EnumMap<ModelReader> g_enumMapModel = EnumMap<ModelReader>()
 		.registerClass(ModelReader96::getInstance())
 		.registerClass(ModelReader269::getInstance())
 		.registerClass(ModelReader272::getInstance());

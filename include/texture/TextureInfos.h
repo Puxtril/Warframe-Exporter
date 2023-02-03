@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 
-#include "TextureReader.h"
+#include "TextureInfo.h"
 
 namespace WarframeExporter::Texture
 {

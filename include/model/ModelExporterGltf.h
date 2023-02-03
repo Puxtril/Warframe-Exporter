@@ -17,14 +17,14 @@ using namespace fx::gltf;
 
 namespace WarframeExporter::Model
 {
-	class GltfModel
+	class ModelExporterGltf
 	{
 		Document m_document;
 		inline static const std::string m_generatorName = "Puxtrils Warframe Model Exporter";
 		inline static const std::string m_copyright = "DIGITAL EXTREMES Ltd.";
 
 	public:
-		GltfModel();
+		ModelExporterGltf();
 
 		void addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body);
 		void save(const std::string& outPathStr);

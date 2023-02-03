@@ -1,4 +1,4 @@
-#include "texture/dds.h"
+#include "texture/TextureExporterDDS.h"
 
 using namespace WarframeExporter::Texture;
 

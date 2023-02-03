@@ -1,16 +1,16 @@
-#include "material/ExtractorMaterial.h"
+#include "material/MaterialExtractor.h"
 
 using namespace WarframeExporter::Material;
 
-ExtractorMaterial*
-ExtractorMaterial::getInstance()
+MaterialExtractor*
+MaterialExtractor::getInstance()
 {
-	static ExtractorMaterial* instance = new ExtractorMaterial();
+	static MaterialExtractor* instance = new MaterialExtractor();
 	return instance;
 }
 
 void
-ExtractorMaterial::getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths)
+MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths)
 {
 	uint32_t pathCount = headerReader->readUInt32();
 	for (uint32_t x = 0; x < pathCount; x++)
@@ -22,7 +22,7 @@ ExtractorMaterial::getExtraNames(BinaryReaderBuffered* headerReader, std::vector
 }
 
 void
-ExtractorMaterial::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+MaterialExtractor::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
 	std::ofstream out;
 	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
@@ -43,7 +43,7 @@ ExtractorMaterial::extract(const CommonFileHeader& header, BinaryReaderBuffered*
 }
 
 void
-ExtractorMaterial::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
+MaterialExtractor::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
 {
 
 }

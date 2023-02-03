@@ -1,4 +1,4 @@
-#include "texture/TextureFormats.h"
+#include "texture/TextureInfos.h"
 
 using namespace WarframeExporter::Texture;
 

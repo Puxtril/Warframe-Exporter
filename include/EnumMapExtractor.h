@@ -2,14 +2,14 @@
 
 #include "EnumMap.h"
 #include "Extractor.h"
-#include "model/ExtractorModel.h"
-#include "texture/ExtractorTexture.h"
-#include "material/ExtractorMaterial.h"
+#include "model/ModelExtractor.h"
+#include "texture/TextureExtractor.h"
+#include "material/MaterialExtractor.h"
 
 namespace WarframeExporter
 {
 	const static EnumMap<Extractor> g_enumMapExtractor = EnumMap<Extractor>()
-		.registerClass(Model::ExtractorModel::getInstance())
-		.registerClass(Texture::ExtractorTexture::getInstance())
-		.registerClass(Material::ExtractorMaterial::getInstance());
+		.registerClass(Model::ModelExtractor::getInstance())
+		.registerClass(Texture::TextureExtractor::getInstance())
+		.registerClass(Material::MaterialExtractor::getInstance());
 }

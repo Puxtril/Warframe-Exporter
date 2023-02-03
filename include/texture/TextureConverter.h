@@ -3,16 +3,15 @@
 #include "BinaryReaderBuffered.h"
 #include "../Ensmallening.hpp"
 #include "TextureStructs.hpp"
-#include "EnumMapTexture.h"
+#include "TextureEnumMap.h"
 
 #include <algorithm>
 
 namespace WarframeExporter::Texture
 {
-	class TextureHeader
+	class TextureConverter
 	{
 	public:
-		static TextureHeaderExternal readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData);
 		static TextureHeaderInternal convertHeader(TextureHeaderExternal& headerExternal, size_t fileSize);
 
 	private:

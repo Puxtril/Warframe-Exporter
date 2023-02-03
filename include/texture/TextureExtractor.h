@@ -5,11 +5,11 @@
 #include "TextureStructs.hpp"
 #include "BinaryReaderBase.h"
 #include "BinaryReaderBuffered.h"
-#include "TextureHeader.h"
-#include "TextureBody.h"
+#include "TextureReader.h"
+#include "TextureConverter.h"
 #include "CacheReaderLimited.h"
-#include "EnumMapTexture.h"
-#include "dds.h"
+#include "TextureEnumMap.h"
+#include "TextureExporterDDS.h"
 
 #include <iostream>
 
@@ -30,13 +30,13 @@ namespace WarframeExporter::Texture
 		TEXTURE_DETAILSPACK = 195
 	};
 	
-	class ExtractorTexture : public Extractor
+	class TextureExtractor : public Extractor
 	{
-		ExtractorTexture() : Extractor() {}
+		TextureExtractor() : Extractor() {}
 		
 	public:
-		ExtractorTexture(const ExtractorTexture&) = delete;
-		ExtractorTexture operator=(const ExtractorTexture&) = delete;
+		TextureExtractor(const TextureExtractor&) = delete;
+		TextureExtractor operator=(const TextureExtractor&) = delete;
 
 		inline const std::string& getOutputExtension() const override
 		{
@@ -75,7 +75,7 @@ namespace WarframeExporter::Texture
 			return extTypes;
 		};
 
-		static ExtractorTexture* getInstance();
+		static TextureExtractor* getInstance();
 		static void writeData (const std::string& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const CommonFileHeader& comHeader);
 
 		void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TextureReader.h"
+#include "TextureInfo.h"
 
 #include <cstdint>
 #include <memory>

@@ -1,14 +1,14 @@
-#include "model/GltfExporter.h"
+#include "model/ModelExporterGltf.h"
 
 using namespace WarframeExporter::Model;
 
-GltfModel::GltfModel()
+ModelExporterGltf::ModelExporterGltf()
 	: m_document()
 {
 }
 
 void
-GltfModel::addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
 	if (header.boneTree.size() > 0)
 		addModelDataRigged(header, body);
@@ -17,7 +17,7 @@ GltfModel::addModelData(const ModelHeaderInternal& header, const ModelBodyIntern
 }
 
 void
-GltfModel::addModelDataRigged(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::addModelDataRigged(const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
 	modifyAsset();
 
@@ -34,7 +34,7 @@ GltfModel::addModelDataRigged(const ModelHeaderInternal& header, const ModelBody
 }
 
 void
-GltfModel::addModelDataStatic(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::addModelDataStatic(const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
 	modifyAsset();
 
@@ -46,7 +46,7 @@ GltfModel::addModelDataStatic(const ModelHeaderInternal& header, const ModelBody
 }
 
 void
-GltfModel::save(const std::string& outPathStr)
+ModelExporterGltf::save(const std::string& outPathStr)
 {
 	std::filesystem::path outPath = { outPathStr };
 	try
@@ -60,7 +60,7 @@ GltfModel::save(const std::string& outPathStr)
 }
 
 void
-GltfModel::print_exception(const std::exception& e, int level)
+ModelExporterGltf::print_exception(const std::exception& e, int level)
 {
 	std::cerr << std::string(level, ' ') << "exception: " << e.what() << '\n';
 	try {
@@ -73,7 +73,7 @@ GltfModel::print_exception(const std::exception& e, int level)
 }
 
 void
-GltfModel::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t skinIndex)
+ModelExporterGltf::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t skinIndex)
 {
 	assert(m_document.scenes.size() == 0);
 	Scene scene;
@@ -95,7 +95,7 @@ GltfModel::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t
 }
 
 int32_t
-GltfModel::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
+ModelExporterGltf::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
 {
 	int32_t rootIndex = -1;
 	if (boneTree.size() > 0)
@@ -115,7 +115,7 @@ GltfModel::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
 }
 
 int32_t
-GltfModel::createSkin(const std::vector<size_t>& weightedIndices, size_t totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
+ModelExporterGltf::createSkin(const std::vector<size_t>& weightedIndices, size_t totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
 {
 	Skin skin;
 	int32_t skinIndex = static_cast<int32_t>(m_document.skins.size());
@@ -139,7 +139,7 @@ GltfModel::createSkin(const std::vector<size_t>& weightedIndices, size_t totalBo
 }
 
 int32_t
-GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<size_t>& weightedIndices)
+ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<size_t>& weightedIndices)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
@@ -192,7 +192,7 @@ GltfModel::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneT
 }
 
 std::vector<int32_t>
-GltfModel::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex)
+ModelExporterGltf::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex)
 {
 	Mesh mesh;
 	std::vector<int32_t> meshIndices;
@@ -227,7 +227,7 @@ GltfModel::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attribut
 }
 
 int32_t
-GltfModel::findOrCreateMaterial(const std::string& materialName)
+ModelExporterGltf::findOrCreateMaterial(const std::string& materialName)
 {
 	for (int32_t x = 0; x < (int32_t)m_document.materials.size(); x++)
 	{
@@ -245,7 +245,7 @@ GltfModel::findOrCreateMaterial(const std::string& materialName)
 }
 
 Attributes
-GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
+ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
@@ -346,7 +346,7 @@ GltfModel::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
 }
 
 Attributes
-GltfModel::addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount)
+ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
@@ -420,7 +420,7 @@ GltfModel::addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount)
 }
 
 int32_t
-GltfModel::addIndexData(const std::vector<uint16_t>& body)
+ModelExporterGltf::addIndexData(const std::vector<uint16_t>& body)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
@@ -446,14 +446,14 @@ GltfModel::addIndexData(const std::vector<uint16_t>& body)
 }
 
 void
-GltfModel::modifyAsset()
+ModelExporterGltf::modifyAsset()
 {
 	m_document.asset.generator = m_generatorName;
 	m_document.asset.copyright = m_copyright;
 }
 
 void
-GltfModel::createBuffer()
+ModelExporterGltf::createBuffer()
 {
 	assert(m_document.buffers.size() == 0);
 
@@ -464,7 +464,7 @@ GltfModel::createBuffer()
 }
 
 void
-GltfModel::checkAndFixBufferAllignment()
+ModelExporterGltf::checkAndFixBufferAllignment()
 {
 	Buffer& buf = m_document.buffers[0];
 	int mod = buf.byteLength % 4;
@@ -476,7 +476,7 @@ GltfModel::checkAndFixBufferAllignment()
 }
 
 std::vector<float>
-GltfModel::findMaxVec3(const std::vector<glm::vec3>& body)
+ModelExporterGltf::findMaxVec3(const std::vector<glm::vec3>& body)
 {
 	std::vector<float> max = { -100.0F, -100.0F, -100.0F };
 	for (size_t x = 0; x < body.size(); x++)
@@ -492,7 +492,7 @@ GltfModel::findMaxVec3(const std::vector<glm::vec3>& body)
 }
 
 std::vector<float>
-GltfModel::findMinVec3(const std::vector<glm::vec3>& body)
+ModelExporterGltf::findMinVec3(const std::vector<glm::vec3>& body)
 {
 	std::vector<float> min = { 100.0F, 100.0F, 100.0F };
 	for (size_t x = 0; x < body.size(); x++)
@@ -508,7 +508,7 @@ GltfModel::findMinVec3(const std::vector<glm::vec3>& body)
 }
 
 void
-GltfModel::findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree, uint16_t boneIndex, std::vector<int32_t>& out)
+ModelExporterGltf::findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree, uint16_t boneIndex, std::vector<int32_t>& out)
 {
 	for (uint16_t x = 0; x < boneTree.size(); x++)
 	{

@@ -1,16 +1,16 @@
-#include "model/ExtractorModel.h"
+#include "model/ModelExtractor.h"
 
 using namespace WarframeExporter::Model;
 
-ExtractorModel*
-ExtractorModel::getInstance()
+ModelExtractor*
+ModelExtractor::getInstance()
 {
-	static ExtractorModel* instance = new ExtractorModel();
+	static ModelExtractor* instance = new ModelExtractor();
 	return instance;
 }
 
 void
-ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+ModelExtractor::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
 	BinaryReaderBuffered* bReader = cacheDir.getFileReader(package, PackageReader::PackageTrioType::B, internalpath);
 
@@ -18,7 +18,7 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 		throw InvalidDataException("Mesh has no body");
 
 	// Read body/header data
-	WFModelReader* modelReader = g_enumMapModel[header.getEnum()];
+	ModelReader* modelReader = g_enumMapModel[header.getEnum()];
 
 	ModelHeaderExternal headerExt;
 	modelReader->readHeader(hReader, ensmalleningData, header, headerExt);
@@ -39,19 +39,19 @@ ExtractorModel::extract(const CommonFileHeader& header, BinaryReaderBuffered* hR
 	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
 	// Convert body/header into exportable format
-	GltfModel outModel;
+	ModelExporterGltf outModel;
 	outModel.addModelData(headerInt, bodyInt);
 	outModel.save(outputPath);
 }
 
 void
-ExtractorModel::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
+ModelExtractor::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
 {
 	BinaryReaderBuffered* bReader = cacheDir.getFileReader(package, PackageReader::PackageTrioType::B, internalpath);
 	ModelHeaderExternal headerExt;
 
 	size_t pos = hReader->tell();
-	WFModelReader* modelReader = g_enumMapModel[header.getEnum()];
+	ModelReader* modelReader = g_enumMapModel[header.getEnum()];
 
 	modelReader->readHeaderDebug(hReader, ensmalleningData, header);
 	hReader->seek(pos, std::ios_base::beg);

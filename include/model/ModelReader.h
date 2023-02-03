@@ -15,10 +15,10 @@ namespace WarframeExporter::Model
 		MODEL_RIGGED_272 = 272
 	};
 
-	class WFModelReader : public EnumMapValue
+	class ModelReader : public EnumMapValue
 	{
 	protected:
-		WFModelReader() = default;
+		ModelReader() = default;
 
 	public:
 		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header) = 0;

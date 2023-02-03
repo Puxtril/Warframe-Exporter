@@ -15,14 +15,8 @@ ExtractorTexture::writeData(const std::string& outputFile, const TextureHeaderIn
 	std::ofstream out;
 	out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
 	
-	static uint32_t magic = 542327876;
-	ddspp::Header* ddsHeader = new ddspp::Header();
-	ddspp::HeaderDXT10* ddsHeaderDX10 = new ddspp::HeaderDXT10();
-	bool writeDXT10 = ddspp::encode_header(header.formatClass->getFormat(), header.width, header.height, 1, ddspp::Texture2D, 1, 1, *ddsHeader, *ddsHeaderDX10);
-	out.write((char*)&magic, 4);
-	ddspp::serialize(out, *ddsHeader);
-	if (writeDXT10)
-		ddspp::serialize(out, *ddsHeaderDX10);
+	DDSHeaderFull headerFull = DDSLib::encodeHeader(header.formatClass->getFormat(), header.width, header.height);
+	DDSLib::serialize(out, headerFull);
 
 	int32_t mip0Start = body.dataLen - header.mip0Len;
 	out.write(body.data.get() + mip0Start, header.mip0Len);

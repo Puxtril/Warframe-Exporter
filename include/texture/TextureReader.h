@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EnumMapValue.h"
-#include "texture/ddspp.hpp"
+#include "ddspp.h"
 
 namespace WarframeExporter::Texture
 {

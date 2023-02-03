@@ -19,10 +19,10 @@ TextureInfoBC1::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC1::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC1_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC1_UNORM;
     return format;
 }
 
@@ -74,10 +74,10 @@ TextureInfoBC2::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC2::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC2_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC2_UNORM;
     return format;
 }
 
@@ -107,10 +107,10 @@ TextureInfoBC3::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC3::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC3_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC3_UNORM;
     return format;
 }
 
@@ -140,10 +140,10 @@ TextureInfoBC4::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC4::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC4_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC4_UNORM;
     return format;
 }
 
@@ -189,11 +189,10 @@ TextureInfoBC5::getEnumMapKeys() const
     return extTypes;
 };
 
-
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC5::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC5_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC5_UNORM;
     return format;
 }
 
@@ -244,10 +243,10 @@ TextureInfoUncompressed::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoUncompressed::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::R8G8B8A8_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::R8G8B8A8_UNORM;
     return format;
 }
 
@@ -274,10 +273,10 @@ TextureInfoBC6::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC6::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC6H_UF16;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC6H_UF16;
     return format;
 }
 
@@ -304,10 +303,10 @@ TextureInfoBC7::getEnumMapKeys() const
     return extTypes;
 };
 
-WarframeExporter::ddspp::DXGIFormat
+ddspp::DXGIFormat
 TextureInfoBC7::getFormat() const
 {
-    static WarframeExporter::ddspp::DXGIFormat format = WarframeExporter::ddspp::DXGIFormat::BC7_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::BC7_UNORM;
     return format;
 }
 

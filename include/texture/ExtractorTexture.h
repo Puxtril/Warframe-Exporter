@@ -9,6 +9,7 @@
 #include "TextureBody.h"
 #include "CacheReaderLimited.h"
 #include "EnumMapTexture.h"
+#include "dds.h"
 
 #include <iostream>
 

@@ -1,52 +1,19 @@
-#include "ExportDebugger.h"
+#include "BatchIteratorDebug.h"
 
 using namespace WarframeExporter;
 
-ExportDebugger::ExportDebugger(PackageReader::PackageDir* package, const Ensmallening& ensmallData, std::string baseOutputPath)
-	: m_package(package),
-	m_pathManager(baseOutputPath),
-	m_ensmalleningData(ensmallData),
-	m_logger(Logger::getInstance())
+BatchIteratorDebug::BatchIteratorDebug(PackageReader::PackageDir* package, const Ensmallening& ensmallData, std::string baseOutputPath)
+	: BatchIterator(package, ensmallData, baseOutputPath)
 {
 }
 
 void
-ExportDebugger::debugBatchExtract(std::string internalBasePath, std::vector<std::string> packages, ExtractorType types)
-{
-	this->validatePackages(internalBasePath, packages);
-	PackageDirLimited pkgParam = PackageDirLimited(m_package);
-
-	for (const std::string& curPackageName : packages)
-	{
-		const PackageReader::CachePair* curPair = (*m_package)[curPackageName][PackageReader::PackageTrioType::H];
-		for (auto start = curPair->getIteratorRecursive(internalBasePath), end = curPair->end(); start != end; ++start)
-		{
-			const Entries::FileNode* curFile = *start;
-			std::string fullFilePath = curFile->getFullPath();
-			BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
-			
-			CommonFileHeader header;
-			if (!tryReadHeader(rawData, header))
-			{
-				m_logger.debug("Common header error: " + curFile->getFullPath());
-				continue;
-			}
-
-			Extractor* extractor = g_enumMapExtractor[header.getEnum()];
-			if (((int)extractor->getExtractorType() & (int)types) == 0)
-				continue;
-				
-			debugExtract(pkgParam, curPackageName, curFile->getFullPath(), &rawData, header, extractor);
-		}
-	}
-}
-
-void
-ExportDebugger::debugExtract(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor* extractor)
+BatchIteratorDebug::processKnownFile(PackageDirLimited& pkgParam, const std::string& packageName, const std::string& internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor* extractor)
 {
 	try
 	{
 		extractor->extractDebug(header, hReader, pkgParam, packageName, internalPath, m_ensmalleningData);
+		m_logger.debug("Successfully processed: " + internalPath);
 	}
 	catch (not_imeplemented_error& err)
 	{
@@ -66,7 +33,19 @@ ExportDebugger::debugExtract(PackageDirLimited& pkgParam, const std::string& pac
 }
 
 void
-ExportDebugger::printEnumCounts(const std::string& package)
+BatchIteratorDebug::processUnknownFile(const std::string& internalPath, const CommonFileHeader& header, const Entries::FileNode* file)
+{
+	m_logger.debug("Unknown file type " + std::to_string(header.getEnum()) + ": " + internalPath);
+}
+
+void
+BatchIteratorDebug::processSkipFile(const std::string& internalPath, const CommonFileHeader& header, const Entries::FileNode* file, const Extractor* extractor)
+{
+	m_logger.debug("Skipping file type " + std::to_string(header.getEnum()) + " (" + extractor->getFriendlyName() + "): " + internalPath);
+}
+
+void
+BatchIteratorDebug::printEnumCounts(const std::string& package)
 {
 	std::map<uint32_t, int> enumCounts;
 	std::map<uint32_t, std::vector<std::string>> enumExamples;
@@ -116,24 +95,7 @@ ExportDebugger::printEnumCounts(const std::string& package)
 }
 
 void
-ExportDebugger::validatePackages(std::string internalBasePath, std::vector<std::string> packages)
-{
-	for (auto& curPkgStr : packages)
-	{
-		try
-		{
-			(*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
-		}
-		catch (std::exception&)
-		{
-			m_logger.error("Package does not exist: " + curPkgStr);
-			throw std::runtime_error("Package does not exist: " + curPkgStr);
-		}
-	}
-}
-
-void
-ExportDebugger::writeAllDebugs(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath)
+BatchIteratorDebug::writeAllDebugs(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath)
 {
 	BinaryReaderBuffered* HReader = pkgParam.getFileReader(packageName, PackageReader::PackageTrioType::H, internalPath);
 	if (HReader != nullptr)
@@ -165,18 +127,4 @@ ExportDebugger::writeAllDebugs(PackageDirLimited& pkgParam, const std::string& p
 		out.write(FReader->getPtr(), FReader->getLength());
 		out.close();
 	}
-}
-
-bool
-ExportDebugger::tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& outHeader)
-{
-	try
-	{
-		outHeader = CommonFileHeader(rawData);
-	}
-	catch (LimitException&)
-	{
-		return false;
-	}
-	return true;
 }

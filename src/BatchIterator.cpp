@@ -2,38 +2,42 @@
 
 using namespace WarframeExporter;
 
-BatchIterator::BatchIterator(PackageReader::PackageDir* package, const Ensmallening& ensmallData, std::string baseOutputPath)
+BatchIterator::BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::string baseOutputPath)
 	: m_package(package),
-	m_pathManager(baseOutputPath),
 	m_ensmalleningData(ensmallData),
+	m_pathManager(baseOutputPath),
 	m_logger(Logger::getInstance())
 {
 }
 
 void
-BatchIterator::batchIterate(std::string basePath, std::vector<std::string> packages, ExtractorType types)
+BatchIterator::batchIterate(const std::string& basePath, const std::vector<std::string>& packages, ExtractorType types)
 {
 	this->validatePackages(packages);
-	PackageDirLimited pkgParam = PackageDirLimited(m_package);
 
 	for (const std::string& curPackageName : packages)
 	{
-		const PackageReader::CachePair* curPair = (*m_package)[curPackageName][PackageReader::PackageTrioType::H];
+		auto curPair = (*m_package)[curPackageName][LotusLib::PackageTrioType::H];
+		curPair->readToc();
+		(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->readToc();
+		(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->readToc();
 
-		for (auto start = curPair->getIteratorRecursive(basePath), end = curPair->end(); start != end; ++start)
+		for (auto iter = curPair->getIter(basePath); iter != curPair->getIter(); iter++)
 		{
-			const Entries::FileNode* curFile = *start;
-			BinaryReaderBuffered rawData(curPair->getDataAndDecompress(curFile), curFile->getLen());
+			const LotusLib::FileEntries::FileNode* curFile = *iter;
+
+			std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
+			BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release (), curFile->getLen());
 			std::string curFilePath = curFile->getFullPath();
 
-			CommonFileHeader header;
-			if (!tryReadHeader(rawData, header))
+			LotusLib::CommonHeader header;
+			if (!tryReadHeader(rawDataReader, header))
 			{
 				m_logger.debug("Common header error: " + curFilePath);
 				continue;
 			}
 
-			Extractor* extractor = g_enumMapExtractor[header.getEnum()];
+			Extractor* extractor = g_enumMapExtractor[header.type];
 
 			if (extractor == nullptr)
 			{
@@ -47,19 +51,23 @@ BatchIterator::batchIterate(std::string basePath, std::vector<std::string> packa
 				continue;
 			}
 
-			processKnownFile(pkgParam, curPackageName, curFilePath, &rawData, header, extractor);
+			processKnownFile(curPackageName, curFilePath, &rawDataReader, header, extractor);
 		}
+
+		curPair->unReadToc();
+		(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->unReadToc();
+		(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->unReadToc();
 	}
 }
 
 void
-BatchIterator::validatePackages(std::vector<std::string> packages)
+BatchIterator::validatePackages(const std::vector<std::string>& packages) const
 {
 	for (auto& curPkgStr : packages)
 	{
 		try
 		{
-			(*m_package)[curPkgStr][PackageReader::PackageTrioType::H];
+			(*m_package)[curPkgStr][LotusLib::PackageTrioType::H];
 		}
 		catch (std::exception&)
 		{
@@ -70,13 +78,14 @@ BatchIterator::validatePackages(std::vector<std::string> packages)
 }
 
 bool
-BatchIterator::tryReadHeader(BinaryReaderBuffered& rawData, CommonFileHeader& outHeader)
+BatchIterator::tryReadHeader(BinaryReaderBuffered& rawData, LotusLib::CommonHeader& outHeader) const
 {
 	try
 	{
-		outHeader = CommonFileHeader(rawData);
+		int headerLen = LotusLib::CommonHeaderReader::readHeader(rawData.getPtr(), outHeader);
+		rawData.seek(headerLen, std::ios::beg);
 	}
-	catch (LimitException&)
+	catch (LotusLib::LotusException&)
 	{
 		return false;
 	}

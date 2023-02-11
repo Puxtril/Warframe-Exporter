@@ -7,7 +7,6 @@
 #include "BinaryReaderBuffered.h"
 #include "TextureReader.h"
 #include "TextureConverter.h"
-#include "CacheReaderLimited.h"
 #include "TextureEnumMap.h"
 #include "TextureExporterDDS.h"
 
@@ -76,9 +75,9 @@ namespace WarframeExporter::Texture
 		};
 
 		static TextureExtractor* getInstance();
-		static void writeData (const std::string& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const CommonFileHeader& comHeader);
+		static void writeData (const std::string& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const LotusLib::CommonHeader& comHeader);
 
-		void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
-		void extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) override;
+		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalPath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
+		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalPath, const Ensmallening& ensmalleningData) override;
 	};
 }

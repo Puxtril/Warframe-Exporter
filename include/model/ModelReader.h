@@ -21,8 +21,8 @@ namespace WarframeExporter::Model
 		ModelReader() = default;
 
 	public:
-		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header) = 0;
-		virtual void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, ModelHeaderExternal& outHeader) = 0;
+		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) = 0;
+		virtual void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
 		virtual void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) = 0;
 		virtual void readBody(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) = 0;
 	};

@@ -16,3 +16,6 @@
 [submodule "lib/ddspp"]
 	path = lib/ddspp
 	url = https://github.com/redorav/ddspp.git
+[submodule "lib/LotusLib"]
+	path = lib/LotusLib
+	url = https://github.com/Puxtril/LotusLib.git

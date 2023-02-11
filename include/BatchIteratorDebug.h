@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Logger.h"
+#include "CachePairReader.h"
+#include "ExporterLogger.h"
 #include "BinaryReaderExceptions.h"
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 #include "EnumMapExtractor.h"
 #include "BatchIterator.h"
-#include "BatchIterator.h"
+#include "PackageCollection.h"
 
 #include <vector>
 #include <map>
@@ -18,15 +19,15 @@ namespace WarframeExporter
 	class BatchIteratorDebug : public BatchIterator
 	{
 	public:
-		BatchIteratorDebug(PackageReader::PackageDir* package, const Ensmallening& ensmallData, std::string baseOutputPath);
+		BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::string baseOutputPath);
 
 		void printEnumCounts(const std::string& package);
 
 	protected:
-		void processKnownFile(PackageDirLimited& pkgParam, const std::string& packageName, const std::string& internalPath, BinaryReaderBuffered* hReader, const CommonFileHeader& header, Extractor* extractor) override;
-		void processUnknownFile(const std::string& internalPath, const CommonFileHeader& header, const Entries::FileNode* file) override;
-		void processSkipFile(const std::string& internalPath, const CommonFileHeader& header, const Entries::FileNode* file, const Extractor* extractor) override;
+		void processKnownFile(const std::string& packageName, const std::string& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor) override;
+		void processUnknownFile(const std::string& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file) override;
+		void processSkipFile(const std::string& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor) override;
 
-		void writeAllDebugs(PackageDirLimited& pkgParam, const std::string& packageName, const std::string internalPath);
+		void writeAllDebugs(const std::string& packageName, const std::string& internalPath);
 	};
 }

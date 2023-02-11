@@ -4,8 +4,8 @@
 #include "BinaryReaderBuffered.h"
 #include "CommonHeader.h"
 #include "Ensmallening.hpp"
-#include "CacheReaderLimited.h"
-#include "Logger.h"
+#include "PackageCollection.h"
+#include "ExporterLogger.h"
 
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@ namespace WarframeExporter
 		virtual const std::string& getFriendlyName() const = 0;
 		virtual const std::string& getOutputExtension() const = 0;
 		virtual ExtractorType getExtractorType() const = 0;
-		virtual void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) = 0;
-		virtual void extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) = 0;
+		virtual void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) = 0;
+		virtual void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) = 0;
 	};
 }

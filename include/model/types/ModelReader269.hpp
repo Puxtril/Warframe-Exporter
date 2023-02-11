@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ReaderExceptions.h"
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "model/ModelReader.h"
+#include "ExporterExceptions.h"
 
 #include <cassert>
 #include <iomanip>
@@ -33,7 +33,7 @@ namespace WarframeExporter::Model
 			return extTypes;
 		}
 
-		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header) override
+		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
 		{
 			headerReader->seek(0x1C, std::ios_base::cur);
 			delete headerReader->readUInt32Array(5); // Possible LOD Data
@@ -259,10 +259,10 @@ namespace WarframeExporter::Model
 			}
 
 			if (headerReader->tell() != headerReader->getLength())
-				throw InvalidDataException("Did not reach end of file");
+				throw unknown_format_error("Did not reach end of file");
 		}
 
-		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const CommonFileHeader& header, ModelHeaderExternal& outHeader) override
+		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override
 		{
 			headerReader->seek(0x38, std::ios_base::cur);
 
@@ -451,7 +451,7 @@ namespace WarframeExporter::Model
 			outHeader.errorMsgs = errorMsgs;
 
 			if (headerReader->tell() != headerReader->getLength())
-				throw InvalidDataException("Did not reach end of file");
+				throw unknown_format_error("Did not reach end of file");
 		}
 
 		void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) override
@@ -494,7 +494,7 @@ namespace WarframeExporter::Model
 			delete bodyReader->readUInt16Array(extHeader.faceCount, 0, extHeader.vertexCount + 1, facesIndiciesMsg);
 
 			if (bodyReader->tell() != bodyReader->getLength())
-				throw InvalidDataException("Did not reach end of file");
+				throw unknown_format_error("Did not reach end of file");
 		}
 
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override
@@ -579,7 +579,7 @@ namespace WarframeExporter::Model
 			bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 
 			if (bodyReader->tell() != bodyReader->getLength())
-				throw InvalidDataException("Did not reach end of file");
+				throw unknown_format_error("Did not reach end of file");
 		}
 	};
 }

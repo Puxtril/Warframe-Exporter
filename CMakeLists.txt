@@ -29,4 +29,4 @@ target_include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/spdlog/include")
 target_include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/json/single_include")
 target_include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader/include")
-target_include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Warframe-Reader/include")
+target_include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include")

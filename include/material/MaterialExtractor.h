@@ -2,7 +2,6 @@
 
 #include "Extractor.h"
 #include "BinaryReaderBuffered.h"
-#include "../Ensmallening.hpp"
 
 namespace WarframeExporter::Material
 {
@@ -52,7 +51,7 @@ namespace WarframeExporter::Material
 		static MaterialExtractor* getInstance();
 
 		void getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths);
-		void extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
-		void extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) override;
+		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath) override;
+		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData) override;
 	};
 }

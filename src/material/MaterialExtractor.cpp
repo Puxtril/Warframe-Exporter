@@ -22,12 +22,12 @@ MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector
 }
 
 void
-MaterialExtractor::extract(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
 	std::ofstream out;
 	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 	
-	out.write(header.getAttributes().c_str(), header.getAttributes().length());
+	out.write(header.attributes.c_str(), header.attributes.length());
 	
 	std::vector<std::string> extraNames;
 	getExtraNames(hReader, extraNames);
@@ -43,7 +43,7 @@ MaterialExtractor::extract(const CommonFileHeader& header, BinaryReaderBuffered*
 }
 
 void
-MaterialExtractor::extractDebug(const CommonFileHeader& header, BinaryReaderBuffered* hReader, PackageDirLimited& cacheDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
+MaterialExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
 {
 
 }

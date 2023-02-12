@@ -24,7 +24,7 @@ TextureExtractor::writeData(const std::string& outputFile, const TextureHeaderIn
 }
 
 void
-TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalPath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
 	// Typically, textures above 256x256 are in F. Textures below are in B
 	LotusLib::PackageTrioType bodyTrioType = LotusLib::PackageTrioType::F;
@@ -52,7 +52,7 @@ TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuff
 }
 
 void
-TextureExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalPath, const Ensmallening& ensmalleningData)
+TextureExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData)
 {
 	/*
 	BinaryReaderBuffered* fReader = pkgDir.getFileReader(package, PackageReader::PackageTrioType::F, internalpath);

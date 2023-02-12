@@ -22,7 +22,7 @@ MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector
 }
 
 void
-MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
 	std::ofstream out;
 	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
@@ -43,7 +43,7 @@ MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuf
 }
 
 void
-MaterialExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalpath, const Ensmallening& ensmalleningData)
+MaterialExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData)
 {
 
 }

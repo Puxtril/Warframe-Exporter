@@ -11,7 +11,7 @@ BatchIterator::BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairRead
 }
 
 void
-BatchIterator::batchIterate(const std::string& basePath, const std::vector<std::string>& packages, ExtractorType types)
+BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types)
 {
 	this->validatePackages(packages);
 

@@ -25,12 +25,12 @@ namespace WarframeExporter
 	public:
 		BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmalleningData, std::string baseOutputPath);
 
-		void batchIterate(const std::string& basePath, const std::vector<std::string>& packages, ExtractorType types);
+		void batchIterate(const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types);
 
 	protected:
-		virtual void processKnownFile(const std::string& packageName, const std::string& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor) = 0;
-		virtual void processUnknownFile(const std::string& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file) = 0;
-		virtual void processSkipFile(const std::string& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor) = 0;
+		virtual void processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor) = 0;
+		virtual void processUnknownFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file) = 0;
+		virtual void processSkipFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor) = 0;
 
 		void validatePackages(const std::vector<std::string>& packages) const;
 

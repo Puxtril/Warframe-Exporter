@@ -10,7 +10,7 @@ ModelExtractor::getInstance()
 }
 
 void
-ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalPath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::string& outputPath)
 {
 	const LotusLib::FileEntries::FileNode* bEntry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> bRawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(bEntry);
@@ -47,7 +47,7 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 }
 
 void
-ModelExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const std::string& internalPath, const Ensmallening& ensmalleningData)
+ModelExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData)
 {
 	const LotusLib::FileEntries::FileNode* bEntry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> bRawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(bEntry);

@@ -8,40 +8,40 @@ BatchIteratorDebug::BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::Cac
 }
 
 void
-BatchIteratorDebug::processKnownFile(const std::string& packageName, const std::string& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor)
+BatchIteratorDebug::processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor)
 {
 	try
 	{
 		extractor->extractDebug(header, hReader, *m_package, packageName, internalPath, m_ensmalleningData);
-		m_logger.debug("Successfully processed: " + internalPath);
+		m_logger.debug("Successfully processed: " + internalPath.string());
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath);
+		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
 		writeAllDebugs(packageName, internalPath);
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath);
+		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
 		writeAllDebugs(packageName, internalPath);
 	}
 	catch (std::runtime_error& err)
 	{
-		m_logger.error(std::string(err.what()) + ": " + internalPath);
+		m_logger.error(std::string(err.what()) + ": " + internalPath.string());
 		writeAllDebugs(packageName, internalPath);
 	}
 }
 
 void
-BatchIteratorDebug::processUnknownFile(const std::string& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file)
+BatchIteratorDebug::processUnknownFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file)
 {
-	m_logger.debug("Unknown file type " + std::to_string(header.type) + ": " + internalPath);
+	m_logger.debug("Unknown file type " + std::to_string(header.type) + ": " + internalPath.string());
 }
 
 void
-BatchIteratorDebug::processSkipFile(const std::string& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor)
+BatchIteratorDebug::processSkipFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor)
 {
-	m_logger.debug("Skipping file type " + std::to_string(header.type) + " (" + extractor->getFriendlyName() + "): " + internalPath);
+	m_logger.debug("Skipping file type " + std::to_string(header.type) + " (" + extractor->getFriendlyName() + "): " + internalPath.string());
 }
 
 void
@@ -101,13 +101,13 @@ BatchIteratorDebug::printEnumCounts(const std::string& package)
 }
 
 void
-BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const std::string& internalPath)
+BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLib::LotusPath& internalPath)
 {
 	const LotusLib::FileEntries::FileNode* hFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> hDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getDataAndDecompress(hFileEntry);
 	if (hDataRaw)
 	{
-		std::string debugHPath = m_pathManager.getDebugOutputFilePath(internalPath, "_H");
+		std::string debugHPath = m_pathManager.getDebugOutputFilePath(internalPath.string(), "_H");
 		std::ofstream out;
 		out.open(debugHPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		out.write(hDataRaw.get(), hFileEntry->getLen());
@@ -117,7 +117,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const std::st
 	std::unique_ptr<char[]> bDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getDataAndDecompress(bFileEntry);
 	if (bDataRaw)
 	{
-		std::string debugBPath = m_pathManager.getDebugOutputFilePath(internalPath, "_B");
+		std::string debugBPath = m_pathManager.getDebugOutputFilePath(internalPath.string(), "_B");
 		std::ofstream out;
 		out.open(debugBPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		out.write(bDataRaw.get(), bFileEntry->getLen());
@@ -127,7 +127,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const std::st
 	std::unique_ptr<char[]> fDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getDataAndDecompress(fFileEntry);
 	if (fDataRaw)
 	{
-		std::string debugFPath = m_pathManager.getDebugOutputFilePath(internalPath, "_F");
+		std::string debugFPath = m_pathManager.getDebugOutputFilePath(internalPath.string(), "_F");
 		std::ofstream out;
 		out.open(debugFPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		out.write(fDataRaw.get(), fFileEntry->getLen());

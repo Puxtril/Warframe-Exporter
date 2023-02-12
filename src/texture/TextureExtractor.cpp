@@ -28,8 +28,12 @@ TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuff
 {
 	// Typically, textures above 256x256 are in F. Textures below are in B
 	LotusLib::PackageTrioType bodyTrioType = LotusLib::PackageTrioType::F;
-	const LotusLib::FileEntries::FileNode* entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);
-	if (entry == nullptr)
+	const LotusLib::FileEntries::FileNode* entry;
+	try
+	{
+		entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);
+	}
+	catch (std::filesystem::filesystem_error&)
 	{
 		bodyTrioType = LotusLib::PackageTrioType::B;
 		entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);

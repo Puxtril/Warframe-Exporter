@@ -4,7 +4,6 @@
 #include "BinaryReaderBase.h"
 #include "CommonHeader.h"
 #include "Ensmallening.hpp"
-#include "ExportPathManager.h"
 #include "PackageCollection.h"
 #include "ExporterExceptions.h"
 #include "FileProperties.h"
@@ -19,11 +18,11 @@ namespace WarframeExporter
 	protected:
 		LotusLib::PackageCollection<LotusLib::CachePairReader>* m_package;
 		const Ensmallening m_ensmalleningData;
-		ExportPathManager m_pathManager;
+		std::filesystem::path m_baseOutPath;
 		Logger& m_logger;
 
 	public:
-		BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmalleningData, std::string baseOutputPath);
+		BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath);
 
 		void batchIterate(const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types);
 

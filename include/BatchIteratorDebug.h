@@ -18,8 +18,11 @@ namespace WarframeExporter
 {
 	class BatchIteratorDebug : public BatchIterator
 	{
+	protected:
+		std::filesystem::path m_outDebugPath;
+
 	public:
-		BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::string baseOutputPath);
+		BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath);
 
 		void printEnumCounts(const std::string& package);
 

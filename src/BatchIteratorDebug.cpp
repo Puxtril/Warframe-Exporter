@@ -2,8 +2,8 @@
 
 using namespace WarframeExporter;
 
-BatchIteratorDebug::BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::string baseOutputPath)
-	: BatchIterator(package, ensmallData, baseOutputPath)
+BatchIteratorDebug::BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
+	: BatchIterator(package, ensmallData, baseOutputPath), m_outDebugPath(m_baseOutPath / "Debug")
 {
 }
 
@@ -105,31 +105,38 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 {
 	const LotusLib::FileEntries::FileNode* hFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> hDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getDataAndDecompress(hFileEntry);
+	
+	std::filesystem::path debugPath = m_outDebugPath / internalPath.getPreferredPath().relative_path();
+	if (!std::filesystem::exists(debugPath.parent_path()))
+		std::filesystem::create_directories(debugPath.parent_path());
+
 	if (hDataRaw)
 	{
-		std::string debugHPath = m_pathManager.getDebugOutputFilePath(internalPath.string(), "_H");
+		debugPath.replace_filename(internalPath.stem().string() + "_H");
 		std::ofstream out;
-		out.open(debugHPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		out.write(hDataRaw.get(), hFileEntry->getLen());
 		out.close();
 	}
+
 	const LotusLib::FileEntries::FileNode* bFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> bDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getDataAndDecompress(bFileEntry);
 	if (bDataRaw)
 	{
-		std::string debugBPath = m_pathManager.getDebugOutputFilePath(internalPath.string(), "_B");
+		debugPath.replace_filename(internalPath.stem().string() + "_B");
 		std::ofstream out;
-		out.open(debugBPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		out.write(bDataRaw.get(), bFileEntry->getLen());
 		out.close();
 	}
+
 	const LotusLib::FileEntries::FileNode* fFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> fDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getDataAndDecompress(fFileEntry);
 	if (fDataRaw)
 	{
-		std::string debugFPath = m_pathManager.getDebugOutputFilePath(internalPath.string(), "_F");
+		debugPath.replace_filename(internalPath.stem().string() + "_F");
 		std::ofstream out;
-		out.open(debugFPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		out.write(fDataRaw.get(), fFileEntry->getLen());
 		out.close();
 	}

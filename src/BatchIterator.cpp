@@ -2,10 +2,10 @@
 
 using namespace WarframeExporter;
 
-BatchIterator::BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::string baseOutputPath)
+BatchIterator::BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
 	: m_package(package),
 	m_ensmalleningData(ensmallData),
-	m_pathManager(baseOutputPath),
+	m_baseOutPath(baseOutputPath),
 	m_logger(Logger::getInstance())
 {
 }

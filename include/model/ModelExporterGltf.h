@@ -27,7 +27,7 @@ namespace WarframeExporter::Model
 		ModelExporterGltf();
 
 		void addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body);
-		void save(const std::string& outPathStr);
+		void save(const std::filesystem::path& outPath);
 
 	private:
 		void print_exception(const std::exception& e, int level = 0);

@@ -46,9 +46,8 @@ ModelExporterGltf::addModelDataStatic(const ModelHeaderInternal& header, const M
 }
 
 void
-ModelExporterGltf::save(const std::string& outPathStr)
+ModelExporterGltf::save(const std::filesystem::path& outPath)
 {
-	std::filesystem::path outPath = { outPathStr };
 	try
 	{
 		Save(m_document, outPath, true);

@@ -22,7 +22,7 @@ MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector
 }
 
 void
-MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
 	std::ofstream out;
 	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);

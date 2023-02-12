@@ -10,7 +10,7 @@ TextureExtractor::getInstance()
 }
 
 void
-TextureExtractor::writeData(const std::string& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const LotusLib::CommonHeader& comHeader)
+TextureExtractor::writeData(const std::filesystem::path& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const LotusLib::CommonHeader& comHeader)
 {
 	std::ofstream out;
 	out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
@@ -24,7 +24,7 @@ TextureExtractor::writeData(const std::string& outputFile, const TextureHeaderIn
 }
 
 void
-TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::string& outputPath)
+TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
 	// Typically, textures above 256x256 are in F. Textures below are in B
 	LotusLib::PackageTrioType bodyTrioType = LotusLib::PackageTrioType::F;

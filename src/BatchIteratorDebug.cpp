@@ -1,4 +1,5 @@
 #include "BatchIteratorDebug.h"
+#include "FileNode.h"
 
 using namespace WarframeExporter;
 
@@ -51,6 +52,8 @@ BatchIteratorDebug::printEnumCounts(const std::string& package)
 	std::map<uint32_t, std::vector<std::string>> enumExamples;
 
 	std::shared_ptr<LotusLib::CachePairReader> curPair = (*m_package)[package][LotusLib::PackageTrioType::H];
+	curPair->readToc();
+	m_logger.info("Collecting Common Header Format stats");
 	for (const auto& curFile : *curPair)
 	{
 		try
@@ -91,6 +94,7 @@ BatchIteratorDebug::printEnumCounts(const std::string& package)
 			continue;
 		}
 	}
+	curPair->unReadToc();
 
 	for (auto& x : enumCounts)
 	{

@@ -19,3 +19,6 @@
 [submodule "lib/LotusLib"]
 	path = lib/LotusLib
 	url = https://github.com/Puxtril/LotusLib.git
+[submodule "lib/tclap-code"]
+	path = lib/tclap-code
+	url = https://git.code.sf.net/p/tclap/code

@@ -46,7 +46,7 @@ BatchIteratorDebug::processSkipFile(const LotusLib::LotusPath& internalPath, con
 }
 
 void
-BatchIteratorDebug::printEnumCounts(const std::string& package)
+BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::LotusPath& internalPath)
 {
 	std::map<uint32_t, int> enumCounts;
 	std::map<uint32_t, std::vector<std::string>> enumExamples;
@@ -54,12 +54,13 @@ BatchIteratorDebug::printEnumCounts(const std::string& package)
 	std::shared_ptr<LotusLib::CachePairReader> curPair = (*m_package)[package][LotusLib::PackageTrioType::H];
 	curPair->readToc();
 	m_logger.info("Collecting Common Header Format stats");
-	for (const auto& curFile : *curPair)
+	for (auto iter = curPair->getIter(internalPath); iter != curPair->getIter(); iter++)
 	{
+		const LotusLib::FileEntries::FileNode* curFile = *iter;
 		try
 		{
-			std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(&curFile);
-			BinaryReaderBuffered rawDataReader((uint8_t*)rawData.get(), curFile.getLen());
+			std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
+			BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release(), curFile->getLen());
 			
 			LotusLib::CommonHeader header;
 			if (!tryReadHeader(rawDataReader, header))
@@ -69,28 +70,28 @@ BatchIteratorDebug::printEnumCounts(const std::string& package)
 			
 			// For the first 10 files, add directly into examples
 			if (enumExamples[header.type].size() < 10)
-				enumExamples[header.type].push_back(curFile.getFullPath());
+				enumExamples[header.type].push_back(curFile->getFullPath());
 			
 			// Every 10 new files, replace an existing example
 			else if (enumCounts[header.type] % 10 == 0)
 			{
 				int newIndex = enumCounts[header.type] % 100 / 10;
-				enumExamples[header.type][newIndex] = curFile.getFullPath();
+				enumExamples[header.type][newIndex] = curFile->getFullPath();
 			}
 		}
 		catch (LotusLib::DecompressionException&)
 		{
-			m_logger.warn("Decompress error: " + curFile.getFullPath());
+			m_logger.warn("Decompress error: " + curFile->getFullPath());
 			continue;
 		}
 		catch (LimitException& ex)
 		{
-			m_logger.warn(std::string(ex.what()) + curFile.getFullPath());
+			m_logger.warn(std::string(ex.what()) + curFile->getFullPath());
 			continue;
 		}
 		catch (std::exception& ex)
 		{
-			m_logger.error(std::string(ex.what()) + ": " + curFile.getFullPath());
+			m_logger.error(std::string(ex.what()) + ": " + curFile->getFullPath());
 			continue;
 		}
 	}

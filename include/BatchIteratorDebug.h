@@ -7,6 +7,7 @@
 #include "ExporterExceptions.h"
 #include "EnumMapExtractor.h"
 #include "BatchIterator.h"
+#include "LotusPath.h"
 #include "PackageCollection.h"
 
 #include <vector>
@@ -24,7 +25,7 @@ namespace WarframeExporter
 	public:
 		BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath);
 
-		void printEnumCounts(const std::string& package);
+		void printEnumCounts(const std::string& package, const LotusLib::LotusPath& internalPath);
 
 	protected:
 		void processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor) override;

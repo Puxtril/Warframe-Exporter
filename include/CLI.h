@@ -17,7 +17,7 @@
 #include <string>
 #include <string_view>
 
-const static std::string_view g_version = "1.0";
+const static std::string_view g_version = "2.0";
 const static std::string_view g_description = "Warframe Exporter: https://github.com/Puxtril/Warframe-Exporter";
 const static spdlog::level::level_enum g_logLevel = spdlog::level::debug;
 

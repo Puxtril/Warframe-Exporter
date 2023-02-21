@@ -22,7 +22,7 @@ const static std::string_view g_description = "Warframe Exporter: https://github
 const static spdlog::level::level_enum g_logLevel = spdlog::level::debug;
 
 const std::vector<CLIFeature*> g_features = {
-#ifdef WF_COMPARE
+#ifdef WF_EXTRACT
 	CLIExtract::getInstance(),
 #endif
 #ifdef WF_DEBUG

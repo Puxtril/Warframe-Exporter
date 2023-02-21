@@ -8,7 +8,7 @@ namespace WarframeExporter::Texture
 {
 	struct DDSHeaderFull
 	{
-		const static unsigned int magic = 542327876;
+		const unsigned int magic = 542327876;
 		ddspp::Header header;
 		ddspp::HeaderDXT10 header10;
 	};

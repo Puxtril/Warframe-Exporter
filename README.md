@@ -81,20 +81,26 @@ If you indend to add a new format such as Animation, Maps, Audio, etc.
 1. Register the class inside `EnumMapExtractor.h`.
 1. Add documentation below and at the beginning of this README.
 
-## Adding a new 3D model format
+## Adding a new 3D Model format
 
-1. Add the new enumeration value inside `model/ModelReader.h`
-1. Add a new reader class inside `model/types`. You should copy an existing class - the formats will likely be very similar.
-1. Register the class inside `model/ModelEnumMap.h`.
+1. Add the new enum value to `WarframeExporter::Model::ModelType` (inside `model/ModelReader.h`)
+1. Add the enum value to `WarframeExporter::Model::ModelExtractor::getEnumMapKeys()` (inside `model/ModelExtractor.h`)
+1. Add a new reader class in the directory `model/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
+1. Register the class to `WarframeExporter::Model::g_enumMapModel` (inside `model/ModelEnumMap.h`)
 
 ## Adding a new Texture Format
 
-### Common header format
+1. Add the new enum value to `WarframeExporter::Texture::TextureType` (inside `texture/TextureExtractor.h`)
+1. Add the enum value to `WarframeExporter::Texture::TextureExtractor::getEnumMapKeys()` (inside `texture/TextureExtractor.h`)
 
-Add the new enumeration value inside `texture/TextureExtractor.h`
+## Adding a new Texture Compression Format
+This is very unlikely to occur. They recently started using BC6 and BC7, so there's no more compression formats they could use. Unless they add another uncompressed format.
 
-### Texture header format (compression format)
-
-1. Add the new enumeration value inside `texture/TextureInfo.h`
+1. Add the new enum value to `WarframeExporter::Texture::TextureCompression` (inside `texture/TextureInfo.h`)
 1. Add a new class inside `texture/TextureInfos.h`.
-1. Register the new class inside `texture/TextureEnumMap.h`
+1. Register the new class to `WarframeExporter::Texture::g_enumMapTexture` (inside `texture/TextureEnumMap.h`)
+
+## Adding a new Material format
+
+1. Add the new enum value to `WarframeExporter::Material::MaterialType` (inside `material/MaterialExtractor.h`)
+1. Add the enum value to `WarframeExporter::Material::MaterialExtractor::getEnumMapKeys()` (inside `material/MaterialExtractor.h`)

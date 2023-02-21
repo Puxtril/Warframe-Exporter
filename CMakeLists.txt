@@ -2,8 +2,6 @@
 # Set these appropriately!
 
 set(ENABLE_EXE_COMPILATION ON BOOL)
-set(ENABLE_CLI_EXTRACT ON BOOL)
-set(ENABLE_CLI_DEBUG ON BOOL)
 
 ##################################################
 # Project stuff
@@ -39,22 +37,25 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 ##################################################
 # Include dirs
 
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/fx-gltf/include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/spdlog/include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/json/single_include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader/include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/ddspp")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code/include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include")
-include_directories(Warframe-Exporter PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Oodle-2.9/include")
+include_directories(
+	"${CMAKE_CURRENT_SOURCE_DIR}/include" 
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/fx-gltf/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/glm"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/spdlog/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/json/single_include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/ddspp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Oodle-2.9/include"
+)
 
 ##################################################
 # Executable compile commands
 
 if(ENABLE_EXE_COMPILATION)
 	add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES})
+	add_executable(Warframe-Exporter-Debug ${WARFRAME_EXPORTER_SOURCES})
 	
 	# Compile subprojects
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader")
@@ -71,14 +72,11 @@ if(ENABLE_EXE_COMPILATION)
 		find_library(OODLE_CORE NAMES oo2corelinux64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux)
 	endif()
 	target_link_libraries(Warframe-Exporter Binary-Reader LotusLib ${OODLE_CORE})
+	target_link_libraries(Warframe-Exporter-Debug Binary-Reader LotusLib ${OODLE_CORE})
 	
 	# Set CLI options
-	if(ENABLE_CLI_EXTRACT)
-		target_compile_definitions(Warframe-Exporter PUBLIC WF_EXTRACT)
-	endif()
-	if(ENABLE_CLI_DEBUG)
-		target_compile_definitions(Warframe-Exporter PUBLIC WF_DEBUG)
-	endif()
+	target_compile_definitions(Warframe-Exporter PUBLIC WF_EXTRACT)
+	target_compile_definitions(Warframe-Exporter-Debug PUBLIC WF_EXTRACT WF_DEBUG)
 endif()
 
 ##################################################

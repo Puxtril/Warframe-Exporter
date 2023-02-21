@@ -10,6 +10,7 @@ namespace WarframeExporter::Material
 		MATERIAL_203 = 203,
 		MATERIAL_204 = 204,
 		MATERIAL_205 = 205,
+		MATERIAL_206 = 206
 	};
 
 	class MaterialExtractor : public Extractor
@@ -43,7 +44,8 @@ namespace WarframeExporter::Material
 			const static std::vector<int> extTypes = {
 				(int)MaterialType::MATERIAL_203,
 				(int)MaterialType::MATERIAL_204,
-				(int)MaterialType::MATERIAL_205
+				(int)MaterialType::MATERIAL_205,
+				(int)MaterialType::MATERIAL_206
 			};
 			return extTypes;
 		}

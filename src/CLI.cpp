@@ -18,10 +18,10 @@ main(int argc, char** argv)
 	cmd.add(cmds);
 
 	// Add flags
-	TCLAP::ValueArg<std::string> outPathCmd("", "output-path", "Destination of extracted assets, Ex: C:\\Users\\Puxtril\\Downloads\\Extracted (Default: Current directory)", false, "Extracted", "Output path");
-	TCLAP::ValueArg<std::string> intPathCmd("", "internal-path", "Internal path base, Ex: /Lotus/Characters/Tenno/Excalibur (Default: / )", false, "/", "Internal Path");
-	TCLAP::ValueArg<std::string> pkgCmd("", "package", "Warframe package, Ex: \"Misc\" or \"Texture\" (Default: Misc)", false, "", "Package name");
-	TCLAP::ValueArg<std::string> cacheDirCmd("", "cache-dir", "Cache directory, Ex: C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows", true, "", "Cache.Windows path");
+	TCLAP::ValueArg<std::string> outPathCmd("", "output-path", "Destination of extracted assets. Ex: C:\\Users\\Puxtril\\Downloads\\Extracted (Default: Current directory)", false, "Extracted", "Output path");
+	TCLAP::ValueArg<std::string> intPathCmd("", "internal-path", "Internal path base. Ex: /Lotus/Characters/Tenno/Excalibur", false, "/", "Internal Path");
+	TCLAP::ValueArg<std::string> pkgCmd("", "package", "Warframe package. Ex: \"Misc\" or \"Texture\"", false, "", "Package name");
+	TCLAP::ValueArg<std::string> cacheDirCmd("", "cache-dir", "Cache directory. Ex: C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows", true, "", "Cache.Windows path");
 	cmd.add(intPathCmd).add(pkgCmd).add(cacheDirCmd).add(outPathCmd);
 
 	for (CLIFeature* feat : g_features)

@@ -11,10 +11,14 @@
 
 #include <filesystem>
 #include <memory>
+#include <vector>
 
 class CLIDebug : public CLIFeature
 {
 	std::shared_ptr<TCLAP::SwitchArg> m_printEnums;
+	std::shared_ptr<TCLAP::SwitchArg> m_debugTextCmd;
+	std::shared_ptr<TCLAP::SwitchArg> m_debugModelCmd;
+	std::shared_ptr<TCLAP::SwitchArg> m_debugMatCmd;
 	
 	CLIDebug();
 
@@ -27,4 +31,9 @@ public:
 	void addMainCmds(TCLAP::OneOf& oneOfCmd);
 	void addMiscCmds(TCLAP::CmdLine& cmdLine);
 	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache) override;
+
+private:
+	void printEnums(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache);
+	void debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types);
+	std::vector<std::string> getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache);
 };

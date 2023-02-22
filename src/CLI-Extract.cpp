@@ -41,6 +41,9 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
 {
+	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAllCmd->getValue())
+		return;
+
 	int types = 0;
 	if (m_extTextCmd->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Texture;

@@ -31,7 +31,7 @@ FileProperties::readFileTime(std::filesystem::path filePath)
     std::wstring winPathWide(winPath.begin(), winPath.end());
     LPCWSTR winPathPtr(winPathWide.c_str());
 
-    HANDLE hFile = CreateFile(winPathPtr, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileW(winPathPtr, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     std::tuple<FILETIME, FILETIME, FILETIME> outTime;
     GetFileTime(hFile, &std::get<0>(outTime), &std::get<1>(outTime), &std::get<2>(outTime));
     CloseHandle(hFile);
@@ -45,7 +45,7 @@ FileProperties::writeFileTime(std::filesystem::path filePath, FILETIME createTim
     std::wstring winPathWide(winPath.begin(), winPath.end());
     LPCWSTR winPathPtr(winPathWide.c_str());
 
-    HANDLE hFile = CreateFile(winPathPtr, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileW(winPathPtr, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     SetFileTime(hFile, &createTime, &accessTime, &writeTime);
     CloseHandle(hFile);
 }

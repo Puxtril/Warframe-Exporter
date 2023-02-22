@@ -16,6 +16,7 @@
 class CLIDebug : public CLIFeature
 {
 	std::shared_ptr<TCLAP::SwitchArg> m_printEnums;
+	std::shared_ptr<TCLAP::SwitchArg> m_writeRaw;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugTextCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugModelCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugMatCmd;
@@ -34,6 +35,7 @@ public:
 
 private:
 	void printEnums(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache);
-	void debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types);
+	void writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache);
+	void debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath);
 	std::vector<std::string> getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache);
 };

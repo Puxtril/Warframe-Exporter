@@ -13,13 +13,13 @@
 #include <filesystem>
 #include <iostream>
 
-using namespace fx::gltf;
+using namespace fx;
 
 namespace WarframeExporter::Model
 {
 	class ModelExporterGltf
 	{
-		Document m_document;
+		gltf::Document m_document;
 		inline static const std::string m_generatorName = "Puxtrils Warframe Model Exporter";
 		inline static const std::string m_copyright = "DIGITAL EXTREMES Ltd.";
 
@@ -46,13 +46,13 @@ namespace WarframeExporter::Model
 		int32_t addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<size_t>& weightedIndices);
 
 		// Returns index of new Mesh
-		std::vector<int32_t> createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex);
+		std::vector<int32_t> createMeshes(const std::vector<MeshInfoInternal>& meshInfos, gltf::Attributes attrs, int32_t indicesBuffViewIndex);
 
 		int32_t findOrCreateMaterial(const std::string& materialName);
 	
 		// Returns Attributes for Primetives
-		Attributes addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount);
-		Attributes addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount);
+		gltf::Attributes addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount);
+		gltf::Attributes addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount);
 	
 		// Returns index of the created BufferView
 		int32_t addIndexData(const std::vector<uint16_t>& body);

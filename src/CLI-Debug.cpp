@@ -4,6 +4,7 @@ CLIDebug::CLIDebug()
 {
 	m_printEnums = std::make_shared<TCLAP::SwitchArg>("", "print-enums", "Print file enums", false);
 	m_writeRaw = std::make_shared<TCLAP::SwitchArg>("", "write-raw", "Write unprocessed decompressed file(s)", false);
+	m_debugAnimCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-animations", "Attempts to read animations", false);
 	m_debugTextCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-textures", "Attempts to read textures", false);
 	m_debugModelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-models", "Attempts to read models", false);
 	m_debugMatCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-materials", "Attempts to read materials", false);
@@ -29,6 +30,7 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 	oneOfCmd
 		.add(m_printEnums.get())
 		.add(m_writeRaw.get())
+		.add(m_debugAnimCmd.get())
 		.add(m_debugTextCmd.get())
 		.add(m_debugModelCmd.get())
 		.add(m_debugMatCmd.get());
@@ -42,10 +44,11 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
 {
-	if (m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue())
+	if (m_debugAnimCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue())
 	{
 		debug(cache, pkg, internalPath, outPath);
 	}
+
 	else if (m_printEnums->getValue())
 	{
 		if (pkg.empty())
@@ -125,6 +128,8 @@ void
 CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath)
 {
 	int types = 0;
+	if (m_debugAnimCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Animation;
 	if (m_debugTextCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Texture;
 	if (m_debugModelCmd->getValue())
@@ -160,7 +165,7 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageC
 		}
 	}
 
-	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material)
+	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material || (int)types & (int)WarframeExporter::ExtractorType::Animation)
 	{
 		pkgNames.push_back("Misc");
 	}

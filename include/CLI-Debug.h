@@ -17,6 +17,7 @@ class CLIDebug : public CLIFeature
 {
 	std::shared_ptr<TCLAP::SwitchArg> m_printEnums;
 	std::shared_ptr<TCLAP::SwitchArg> m_writeRaw;
+	std::shared_ptr<TCLAP::SwitchArg> m_debugAnimCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugTextCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugModelCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugMatCmd;

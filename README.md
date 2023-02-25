@@ -1,3 +1,21 @@
+# Animation WIP
+
+Welcome to the animation branch. I would absolutely love to have animations working, but I cannot figure out rotation data for the life of me. The current progress is halted in `WarframeExporter::Animation::AnimationReader132::readBody()`. Channel type 2 contains rotations. 6 bytes, presumably as 2 shorts.
+
+I dug up these notes, make of them what you please.
+
+```
+[    Short 1    ] [    Short 2    ] [    Short 3    ]
+ABBBBBBB BBBBBBBA CCDDDDDD DDDDDDDD EEEEEEEE EEEEEEFF
+
+A: Direction bits
+B: 14-bit signed integer
+C: Direction bits
+D: 14-bit unsigned integer
+E: 14-bit unsigned integer
+F: Direction bits
+```
+
 # Warframe Extractor
 
 A cross-platform program/library for exporting files from Warframe. Provides a command-line interface for users, can be compiled into a library for programmers. "Easily" extensible to support new formats and upgrades to existing formats.

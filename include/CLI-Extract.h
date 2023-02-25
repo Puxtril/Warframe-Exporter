@@ -15,6 +15,7 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_extAllCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extTextCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extModelCmd;
+	std::shared_ptr<TCLAP::SwitchArg> m_extAnimCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extMatCmd;
 
 	CLIExtract();

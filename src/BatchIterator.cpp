@@ -19,8 +19,10 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 	{
 		auto curPair = (*m_package)[curPackageName][LotusLib::PackageTrioType::H];
 		curPair->readToc();
-		(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->readToc();
-		(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->readToc();
+		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::B])
+			(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->readToc();
+		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::F])
+			(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->readToc();
 
 		for (auto iter = curPair->getIter(basePath); iter != curPair->getIter(); iter++)
 		{
@@ -55,8 +57,10 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 		}
 
 		curPair->unReadToc();
-		(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->unReadToc();
-		(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->unReadToc();
+		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::B])
+			(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->unReadToc();
+		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::F])
+			(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->unReadToc();
 	}
 }
 

@@ -1,3 +1,7 @@
+# Level Branch
+
+Unfortunately not much progress has been made here. I saw a bunch of integers listed in the body file for levels and could not find what they reference.
+
 # Warframe Extractor
 
 A cross-platform program/library for exporting files from Warframe. Provides a command-line interface for users, can be compiled into a library for programmers. "Easily" extensible to support new formats and upgrades to existing formats.
@@ -14,11 +18,6 @@ Formats with started progress:
 
 Download the latest from the Releases section.
 #TODO
-
-# To-Do List
-
-- [ ] Add Animation progress in a separate branch
-- [ ] Add Level progress in a separate branch
 
 # External Libraries
 
@@ -104,3 +103,10 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 
 1. Add the new enum value to `WarframeExporter::Material::MaterialType` (inside `material/MaterialExtractor.h`)
 1. Add the enum value to `WarframeExporter::Material::MaterialExtractor::getEnumMapKeys()` (inside `material/MaterialExtractor.h`)
+
+## Adding a new Level format
+
+1. Add the new enum value to `WarframeExporter::Level::LevelType` (inside `level/LevelReader.h`)
+1. Add the enum value to `WarframeExporter::Level::LevelExtractor::getEnumMapKeys()` (inside `level/LevelExtractor.h`)
+1. Add a new reader class in the directory `level/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
+1. Register the class to `WarframeExporter::Level::g_enumMapLevel` (inside `level/LevelEnumMap.h`)

@@ -7,6 +7,7 @@ CLIDebug::CLIDebug()
 	m_debugTextCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-textures", "Attempts to read textures", false);
 	m_debugModelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-models", "Attempts to read models", false);
 	m_debugMatCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-materials", "Attempts to read materials", false);
+	m_debugLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-levels", "Attempts to read levels", false);
 }
 
 CLIDebug*
@@ -31,7 +32,8 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_writeRaw.get())
 		.add(m_debugTextCmd.get())
 		.add(m_debugModelCmd.get())
-		.add(m_debugMatCmd.get());
+		.add(m_debugMatCmd.get())
+		.add(m_debugLevelCmd.get());
 }
 
 void
@@ -42,7 +44,7 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
 {
-	if (m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue())
+	if (m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
 	{
 		debug(cache, pkg, internalPath, outPath);
 	}
@@ -131,6 +133,8 @@ CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, c
 		types |= (int)WarframeExporter::ExtractorType::Model;
 	if (m_debugMatCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Material;
+	if (m_debugLevelCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Level;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -158,6 +162,11 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageC
 		{
 			pkgNames.push_back("TextureDx9");
 		}
+	}
+
+	if ((int)types & (int)WarframeExporter::ExtractorType::Level)
+	{
+		pkgNames.push_back("AnimRetarget");
 	}
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material)

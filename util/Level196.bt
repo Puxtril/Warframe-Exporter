@@ -1,0 +1,75 @@
+//------------------------------------------------
+//--- 010 Editor v12.0 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+//------------------------------------------------
+// Helper structs
+
+typedef struct {
+    uint32 nameLen <bgcolor=cNone>;
+    char name[nameLen];
+} basicString;
+
+local uint32 i;
+typedef struct { 
+    uint32 pathCount;
+    basicString strs[pathCount] <optimize=false>;
+} basicPathArray;
+
+//------------------------------------------------
+// Level structs
+
+typedef struct {
+    basicString path;
+    float pos[3];
+    float rot[4];
+    basicString objType;
+    uint32 unk1;
+    uint32 unk2;
+} levelObject;
+
+typedef struct {
+    uint32 unkNum;
+    uint32 levelObjectCount;
+    levelObject levelObjs[levelObjectCount] <optimize=false>;
+} levelObjectArray;
+
+//------------------------------------------------
+// Main struct
+
+typedef struct {
+    basicPathArray paths;
+    basicPathArray actionPaths;
+    basicPathArray assetPaths;
+    levelObjectArray levelObjs;
+} Level196;
+
+//------------------------------------------------
+// Common Header
+
+typedef struct {
+    char fileHash[16] <hidden=true>;
+    uint32 numEntries;
+    basicString paths[numEntries] <optimize=false>;
+    uint32 propsLen <hidden=true>;
+    char propsStr[propsLen];
+    if (propsLen != 0) {
+        FSkip(1);
+    }
+    uint32 fileTypeEnum;
+} commonHeader;
+
+//------------------------------------------------
+// Actual script
+
+commonHeader header;
+Level196 level;

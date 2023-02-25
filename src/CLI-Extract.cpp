@@ -7,6 +7,7 @@ CLIExtract::CLIExtract()
 	m_extModelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-models", "Extract all 3D models", false);
 	m_extMatCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-materials", "Extract material metadata", false);
 	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
+	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract all levels", false);
 }
 
 CLIExtract*
@@ -30,7 +31,8 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extTextCmd.get())
 		.add(m_extModelCmd.get())
 		.add(m_extMatCmd.get())
-		.add(m_extAllCmd.get());
+		.add(m_extAllCmd.get())
+		.add(m_extLevelCmd.get());
 }
 
 void
@@ -41,7 +43,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
 {
-	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAllCmd->getValue())
+	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAllCmd->getValue() && !m_extLevelCmd->getValue())
 		return;
 
 	int types = 0;
@@ -51,6 +53,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		types |= (int)WarframeExporter::ExtractorType::Model;
 	if (m_extMatCmd->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Material;
+	if (m_extLevelCmd->getValue() || m_extAllCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Level;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -94,6 +98,11 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::Packag
 		{
 			pkgNames.push_back("TextureDx9");
 		}
+	}
+
+	if ((int)types & (int)WarframeExporter::ExtractorType::Level)
+	{
+		pkgNames.push_back("AnimRetarget");
 	}
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material)

@@ -13,6 +13,7 @@ class CLIExtract : public CLIFeature
 {
 	// operator= is deleted for these
 	std::shared_ptr<TCLAP::SwitchArg> m_extAllCmd;
+	std::shared_ptr<TCLAP::SwitchArg> m_extLevelCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extTextCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extModelCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extMatCmd;

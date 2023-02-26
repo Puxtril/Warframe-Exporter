@@ -12,13 +12,7 @@ Formats with started progress:
 
 # How to use
 
-Download the latest from the Releases section.
-#TODO
-
-# To-Do List
-
-- [ ] Add Animation progress in a separate branch
-- [ ] Add Level progress in a separate branch
+Download the latest from the Releases section. This is a CLI program, so open up CMD or Powershell in the same folder as the executable and type `.\Warframe-Exporter.exe --help` to get started.
 
 # External Libraries
 

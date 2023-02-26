@@ -226,8 +226,13 @@ ModelExporterGltf::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, 
 }
 
 int32_t
-ModelExporterGltf::findOrCreateMaterial(const std::string& materialName)
+ModelExporterGltf::findOrCreateMaterial(const std::string& materialPath)
 {
+	std::string materialName = materialPath;
+	size_t lastSlashOffset = materialPath.find_last_of("/");
+	if (lastSlashOffset != std::string::npos)
+		materialName = materialPath.substr(lastSlashOffset + 1);
+
 	for (int32_t x = 0; x < (int32_t)m_document.materials.size(); x++)
 	{
 		if (m_document.materials[x].name.compare(materialName) == 0)
@@ -238,6 +243,7 @@ ModelExporterGltf::findOrCreateMaterial(const std::string& materialName)
 	Material mat;
 	mat.name = materialName;
 	mat.doubleSided = true;
+	mat.extensionsAndExtras["extras"]["FullPath"] = materialPath;
 	m_document.materials.push_back(mat);
 
 	return matIndex;

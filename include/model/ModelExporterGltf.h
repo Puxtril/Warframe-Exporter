@@ -48,7 +48,7 @@ namespace WarframeExporter::Model
 		// Returns index of new Mesh
 		std::vector<int32_t> createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex);
 
-		int32_t findOrCreateMaterial(const std::string& materialName);
+		int32_t findOrCreateMaterial(const std::string& materialPath);
 	
 		// Returns Attributes for Primetives
 		Attributes addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount);

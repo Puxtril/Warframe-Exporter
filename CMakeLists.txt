@@ -16,7 +16,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # OS-based flags
 
 if(MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /W4")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /sdl /Oi /W3 /std:c++17")
+	add_definitions(-DUNICODE -D_UNICODE)
 elseif(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 endif()
@@ -62,8 +63,8 @@ if(ENABLE_EXE_COMPILATION)
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
 	
 	# Link Oodle static library
-	if(MSVC)
-		find_library(OODLE_CORE NAMES oo2core_win64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Win64)
+	if(WIN32)
+		find_library(OODLE_CORE NAMES oo2core_win64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Win64)	
 	elseif(APPLE)
 		find_library(OODLE_CORE NAMES oo2core64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Mac)
 	elseif(ANDROID)

@@ -10,6 +10,21 @@ Formats with started progress:
 - Animation -> glTF
 - Levels -> glTF (presumably)
 
+# Table of Contents
+
+1. [How to use](#how-to-use)
+1. [External Libraries](#external-libraries)
+1. [Library Overview](#library-overview)
+    1. [High level](##high-level-overview)
+    1. [Medium level](##medium-level-overview)
+    1. [Low level](##low-level-overview)
+1. [Contributions](#contributions)
+    1. [Extractor](##adding-a-new-extractor)
+    1. [3D Models](##adding-a-new-3d-model-format)
+    1. [Textures](##adding-a-new-texture-format) ([Texture Compression](##adding-a-new-texture-compression-format))
+    1. [Materials](##adding-a-new-material-format)
+1. [Building](#building)
+
 # How to use
 
 Download the latest from the Releases section. This is a CLI program, so open up CMD or Powershell in the same folder as the executable and type `.\Warframe-Exporter.exe --help` to get started.
@@ -98,3 +113,21 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 
 1. Add the new enum value to `WarframeExporter::Material::MaterialType` (inside `material/MaterialExtractor.h`)
 1. Add the enum value to `WarframeExporter::Material::MaterialExtractor::getEnumMapKeys()` (inside `material/MaterialExtractor.h`)
+
+# Building
+
+CMake is very nice and I love it. See how easy this is to compile?
+
+## Requirements
+
+- Windows: CMake, git, Visual Studio 2022
+- Other OSs: CMake, git, any C++ compiler
+
+## Build Commands
+
+1. `git clone https://github.com/Puxtril/Warframe-Exporter.git`
+1. `cd Warframe-Exporter`
+1. `git submodule update --init --recursive`
+1. `mkdir build && cd build`
+1. `cmake ..`
+1. Linux: `make` Windows: `cmake --build . --config Release`

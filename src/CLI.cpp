@@ -36,6 +36,11 @@ main(int argc, char** argv)
 		std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
 		exit(1);
 	}
+	catch (std::exception& e)
+	{
+		std::cerr << "error: " << e.what() << std::endl;
+		exit(1);
+	}
 
 	// Basic checks
 	checkDirs(cacheDirCmd.getValue(), outPathCmd.getValue());
@@ -78,6 +83,8 @@ checkDirs(const std::filesystem::path& cacheDir, const std::filesystem::path& ou
 void
 createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath)
 {
-	//LotusLib::Logger::getInstance().setLogProperties("LotusLib.log", outPath, logLevel);
+#ifdef WF_DEBUG
+	LotusLib::Logger::getInstance().setLogProperties("LotusLib", outPath / "LotusLib.log", logLevel);
+#endif
 	WarframeExporter::Logger::getInstance().setLogProperties(outPath / "Warframe-Exporter.log", logLevel);
 }

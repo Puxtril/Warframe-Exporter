@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 ModelExporterGltf::ModelExporterGltf()
-	: m_document()
+	: m_logger(Logger::getInstance()), m_document()
 {
 }
 
@@ -61,7 +61,7 @@ ModelExporterGltf::save(const std::filesystem::path& outPath)
 void
 ModelExporterGltf::print_exception(const std::exception& e, int level)
 {
-	std::cerr << std::string(level, ' ') << "exception: " << e.what() << '\n';
+	m_logger.error(std::string(level, ' ') + e.what());
 	try {
 		std::rethrow_if_nested(e);
 	}

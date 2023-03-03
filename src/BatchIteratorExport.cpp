@@ -31,11 +31,11 @@ BatchIteratorExport::processKnownFile(const std::string& packageName, const Lotu
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
 	}
 	catch (std::exception& err)
 	{

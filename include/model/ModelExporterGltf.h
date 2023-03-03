@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ExporterLogger.h"
 #include "ModelStructs.hpp"
 #include "fx/gltf.h"
 #include "glm/vec4.hpp"
@@ -19,6 +20,7 @@ namespace WarframeExporter::Model
 {
 	class ModelExporterGltf
 	{
+		Logger& m_logger;
 		Document m_document;
 		inline static const std::string m_generatorName = "Puxtrils Warframe Model Exporter";
 		inline static const std::string m_copyright = "DIGITAL EXTREMES Ltd.";

@@ -14,16 +14,16 @@ BatchIteratorDebug::processKnownFile(const std::string& packageName, const Lotus
 	try
 	{
 		extractor->extractDebug(header, hReader, *m_package, packageName, internalPath, m_ensmalleningData);
-		m_logger.debug("Successfully processed: " + internalPath.string());
+		m_logger.info("Successfully processed: " + internalPath.string());
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
 		writeAllDebugs(packageName, internalPath);
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
 		writeAllDebugs(packageName, internalPath);
 	}
 	catch (std::runtime_error& err)

@@ -61,7 +61,7 @@ namespace WarframeExporter::Model
 	struct BoneTreeNodeInternal
 	{
 		std::string name;
-		int32_t parentIndex;
+		int parentIndex;
 		glm::quat rotation;
 		glm::vec3 position;
 		glm::mat4 reverseBind;
@@ -70,19 +70,19 @@ namespace WarframeExporter::Model
 	struct MeshInfoInternal
 	{
 		std::string name;
-		std::array<uint32_t, 5> faceLODOffsets;
-		std::array<uint32_t, 5> faceLODCounts;
+		std::array<int, 5> faceLODOffsets;
+		std::array<int, 5> faceLODCounts;
 		std::string matName;
 	};
 
 	struct ModelHeaderInternal
 	{
-		std::vector<size_t> weightedBones;
+		std::vector<int32_t> weightedBones;
 		std::vector<BoneTreeNodeInternal> boneTree;
-		uint32_t vertexCount;
-		uint32_t boneCount;
-		uint32_t faceCount;
-		uint32_t morphCount;
+		int vertexCount;
+		int boneCount;
+		int faceCount;
+		int morphCount;
 		std::vector<MeshInfoInternal> meshInfos;
 		std::vector<std::string> errorMsgs;
 		glm::vec3 modelScale;

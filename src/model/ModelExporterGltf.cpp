@@ -27,7 +27,7 @@ ModelExporterGltf::addModelDataRigged(const ModelHeaderInternal& header, const M
 
 	int32_t rootBoneNodeIndex = createBones(header.boneTree);
 	int32_t inverseMatricesIndex = addInverseBindMatrices(header.boneTree, header.weightedBones);
-	int32_t skinIndex = createSkin(header.weightedBones, header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
+	int32_t skinIndex = createSkin(header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
 
 	createSceneWithModelNodes(meshIndices, skinIndex);
 	m_document.scenes[0].nodes.push_back(rootBoneNodeIndex);
@@ -114,7 +114,7 @@ ModelExporterGltf::createBones(const std::vector<BoneTreeNodeInternal>& boneTree
 }
 
 int32_t
-ModelExporterGltf::createSkin(const std::vector<size_t>& weightedIndices, size_t totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
+ModelExporterGltf::createSkin(const std::vector<int32_t>& weightedIndices, int totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
 {
 	Skin skin;
 	int32_t skinIndex = static_cast<int32_t>(m_document.skins.size());
@@ -138,7 +138,7 @@ ModelExporterGltf::createSkin(const std::vector<size_t>& weightedIndices, size_t
 }
 
 int32_t
-ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<size_t>& weightedIndices)
+ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
@@ -156,7 +156,7 @@ ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal
 	std::vector<bool> addedBones(boneTree.size(), false);
 	for (uint32_t x = 0; x < weightedIndices.size(); x++)
 	{
-		uint32_t boneTreeIndex = weightedIndices[x];
+		int boneTreeIndex = weightedIndices[x];
 		std::memcpy(curPos, glm::value_ptr(boneTree[boneTreeIndex].reverseBind), matSize);
 		curPos += matSize;
 		addedBones[boneTreeIndex] = true;
@@ -182,7 +182,7 @@ ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal
 	int32_t matAccIndex = static_cast<int32_t>(m_document.accessors.size());
 	matAcc.bufferView = bufViewIndex;
 	matAcc.byteOffset = 0;
-	matAcc.count = boneTree.size();
+	matAcc.count = (uint32_t)boneTree.size();
 	matAcc.type = Accessor::Type::Mat4;
 	matAcc.componentType = Accessor::ComponentType::Float;
 	m_document.accessors.push_back(matAcc);
@@ -250,20 +250,20 @@ ModelExporterGltf::findOrCreateMaterial(const std::string& materialPath)
 }
 
 Attributes
-ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount)
+ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCount)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
 
 	Buffer& buf = m_document.buffers[0];
-	size_t byteLen = vertCount * body.vertexSizeRigged();
-	size_t startOffset = buf.byteLength;
+	uint32_t byteLen = vertCount * body.vertexSizeRigged();
+	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
 	buf.byteLength += byteLen;
 	uint8_t* curPos = buf.data.data() + startOffset;
 
-	for (size_t iVert = 0; iVert < vertCount; iVert++)
+	for (int iVert = 0; iVert < vertCount; iVert++)
 	{
 		memcpy(curPos, &body.positions[iVert].x, ModelBodyInternal::positionLen);
 		curPos += ModelBodyInternal::positionLen;
@@ -286,7 +286,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t ver
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	m_document.bufferViews.push_back(bufView);
 	
-	size_t curByteOffset = 0;
+	uint32_t curByteOffset = 0;
 
 	Accessor posAcc;
 	int32_t posAccIndex = static_cast<int32_t>(m_document.accessors.size());
@@ -301,7 +301,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t ver
 	curByteOffset += ModelBodyInternal::positionLen;
 	
 	Accessor uv1Acc;
-	int32_t uv1AccIndex = m_document.accessors.size();
+	int32_t uv1AccIndex = (int32_t)m_document.accessors.size();
 	uv1Acc.bufferView = bufViewIndex;
 	uv1Acc.byteOffset = curByteOffset;
 	uv1Acc.count = vertCount;
@@ -311,7 +311,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t ver
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	Accessor uv2Acc;
-	int32_t uv2AccIndex = m_document.accessors.size();
+	int32_t uv2AccIndex = (int32_t)m_document.accessors.size();
 	uv2Acc.bufferView = bufViewIndex;
 	uv2Acc.byteOffset = curByteOffset;
 	uv2Acc.count = vertCount;
@@ -321,7 +321,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t ver
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	Accessor boneIndexAcc;
-	int32_t boneIndexAccIndex = m_document.accessors.size();
+	int32_t boneIndexAccIndex = (int32_t)m_document.accessors.size();
 	boneIndexAcc.bufferView = bufViewIndex;
 	boneIndexAcc.byteOffset = curByteOffset;
 	boneIndexAcc.count = vertCount;
@@ -331,13 +331,12 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t ver
 	curByteOffset += ModelBodyInternal::boneIndexLen;
 
 	Accessor boneWeightAcc;
-	int32_t boneWeightAccIndex = m_document.accessors.size();
+	int32_t boneWeightAccIndex = (int32_t)m_document.accessors.size();
 	boneWeightAcc.bufferView = bufViewIndex;
 	boneWeightAcc.byteOffset = curByteOffset;
 	boneWeightAcc.count = vertCount;
 	boneWeightAcc.type = Accessor::Type::Vec4;
 	boneWeightAcc.componentType = Accessor::ComponentType::Float;
-	//boneWeightAcc.normalized = true;
 	m_document.accessors.push_back(boneWeightAcc);
 
 	Attributes attrs;
@@ -351,20 +350,20 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, size_t ver
 }
 
 Attributes
-ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount)
+ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCount)
 {
 	if (m_document.buffers.size() == 0)
 		createBuffer();
 
 	Buffer& buf = m_document.buffers[0];
-	size_t byteLen = vertCount * body.vertexSizeStatic();
-	size_t startOffset = buf.byteLength;
+	uint32_t byteLen = vertCount * body.vertexSizeStatic();
+	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
 	buf.byteLength += byteLen;
 	uint8_t* curPos = buf.data.data() + startOffset;
 
-	for (size_t iVert = 0; iVert < vertCount; iVert++)
+	for (int iVert = 0; iVert < vertCount; iVert++)
 	{
 		memcpy(curPos, &body.positions[iVert].x, ModelBodyInternal::positionLen);
 		curPos += ModelBodyInternal::positionLen;
@@ -375,7 +374,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, size_t ver
 	}
 
 	BufferView bufView;
-	int32_t bufViewIndex = m_document.bufferViews.size();
+	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
@@ -383,10 +382,10 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, size_t ver
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	m_document.bufferViews.push_back(bufView);
 
-	size_t curByteOffset = 0;
+	uint32_t curByteOffset = 0;
 
 	Accessor posAcc;
-	int32_t posAccIndex = m_document.accessors.size();
+	int32_t posAccIndex = (int32_t)m_document.accessors.size();
 	posAcc.bufferView = bufViewIndex;
 	posAcc.byteOffset = curByteOffset;
 	posAcc.count = vertCount;
@@ -398,7 +397,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, size_t ver
 	curByteOffset += ModelBodyInternal::positionLen;
 	
 	Accessor uv1Acc;
-	int32_t uv1AccIndex = m_document.accessors.size();
+	int32_t uv1AccIndex = (int32_t)m_document.accessors.size();
 	uv1Acc.bufferView = bufViewIndex;
 	uv1Acc.byteOffset = curByteOffset;
 	uv1Acc.count = vertCount;
@@ -408,7 +407,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, size_t ver
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	Accessor uv2Acc;
-	int32_t uv2AccIndex = m_document.accessors.size();
+	int32_t uv2AccIndex = (int32_t)m_document.accessors.size();
 	uv2Acc.bufferView = bufViewIndex;
 	uv2Acc.byteOffset = curByteOffset;
 	uv2Acc.count = vertCount;
@@ -432,15 +431,15 @@ ModelExporterGltf::addIndexData(const std::vector<uint16_t>& body)
 	
 	Buffer& buf = m_document.buffers[0];
 
-	size_t byteLen = body.size() * sizeof(body[0]);
-	size_t startOffset = buf.byteLength;
+	uint32_t byteLen = (uint32_t)body.size() * (uint32_t)sizeof(body[0]);
+	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
 	std::memcpy(&buf.data[startOffset], body.data(), byteLen);
 	buf.byteLength += byteLen;
 
 	BufferView bufView;
-	size_t bufViewIndex = m_document.bufferViews.size();
+	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;

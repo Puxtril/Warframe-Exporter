@@ -25,6 +25,6 @@ namespace WarframeExporter::Texture
 
 	public:
 		virtual ddspp::DXGIFormat getFormat() const = 0;
-		virtual void unSwizzle(char* inData, size_t inDataLen, char* outData) const = 0;
+		virtual void unSwizzle(char* inData, int inDataLen, char* outData) const = 0;
 	};
 }

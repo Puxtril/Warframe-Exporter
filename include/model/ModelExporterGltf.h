@@ -43,9 +43,9 @@ namespace WarframeExporter::Model
 		// Garuntees same order as boneTree
 		int32_t createBones(const std::vector<BoneTreeNodeInternal>& boneTree);
 		// Returns index of new skin
-		int32_t createSkin(const std::vector<size_t>& weightedIndices, size_t totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex);
+		int32_t createSkin(const std::vector<int32_t>& weightedIndices, int totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex);
 		// Add Inverse Bind Matrices to the buffer and return the accessor index
-		int32_t addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<size_t>& weightedIndices);
+		int32_t addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices);
 
 		// Returns index of new Mesh
 		std::vector<int32_t> createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex);
@@ -53,8 +53,8 @@ namespace WarframeExporter::Model
 		int32_t findOrCreateMaterial(const std::string& materialPath);
 	
 		// Returns Attributes for Primetives
-		Attributes addVertexDataRigged(const ModelBodyInternal& body, size_t vertCount);
-		Attributes addVertexDataStatic(const ModelBodyInternal& body, size_t vertCount);
+		Attributes addVertexDataRigged(const ModelBodyInternal& body, int vertCount);
+		Attributes addVertexDataStatic(const ModelBodyInternal& body, int vertCount);
 	
 		// Returns index of the created BufferView
 		int32_t addIndexData(const std::vector<uint16_t>& body);

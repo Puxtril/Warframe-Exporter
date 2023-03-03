@@ -140,25 +140,25 @@ namespace WarframeExporter::Model
 				uint32_t meshInfoNameLen = headerReader->readUInt32();
 				headerReader->seek(meshInfoNameLen, std::ios_base::cur);
 			
-				size_t validLODCount = UInt64LODUnkLen;
-				size_t emptyLODCount = 5 - UInt64LODUnkLen;
+				uint32_t validLODCount = UInt64LODUnkLen;
+				uint32_t emptyLODCount = 5 - UInt64LODUnkLen;
 			
 				static const std::string LODOffsetValidMsg = "MeshInfo LOD Offset Valid";
 				uint32_t curFaceLODOffset = 0;
-				for (size_t x = 0; x < validLODCount; x++)
+				for (uint32_t x = 0; x < validLODCount; x++)
 					curFaceLODOffset = headerReader->readUInt32(curFaceLODOffset, UINT32_MAX, LODOffsetValidMsg);
 
 				static const std::string LODOffsetEmptyMsg = "MeshInfo LOD Offset Empty";
-				for (size_t x = 0; x < emptyLODCount; x++)
+				for (uint32_t x = 0; x < emptyLODCount; x++)
 					headerReader->readUInt32(0, 1, LODOffsetEmptyMsg);
 
 				static const std::string LODFaceCountValidMsg = "MeshInfo LOD Face Count Valid";
 				uint32_t curFaceLODCount = UINT32_MAX - 1;
-				for (size_t x = 0; x < validLODCount; x++)
+				for (uint32_t x = 0; x < validLODCount; x++)
 					curFaceLODCount = headerReader->readUInt32(0, curFaceLODCount + 1, LODFaceCountValidMsg);
 
 				static const std::string LODFaceCountEmptyMsg = "MeshInfo LOD Face Count Empty";
-				for (size_t x = 0; x < emptyLODCount; x++)
+				for (uint32_t x = 0; x < emptyLODCount; x++)
 					headerReader->readUInt32(0, 1, LODFaceCountEmptyMsg);
 
 				headerReader->seek(0x20, std::ios_base::cur);

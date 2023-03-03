@@ -18,7 +18,7 @@ TextureExtractor::writeData(const std::filesystem::path& outputFile, const Textu
 	DDSHeaderFull headerFull = DDSLib::encodeHeader(header.formatClass->getFormat(), header.width, header.height);
 	DDSLib::serialize(out, headerFull);
 
-	int32_t mip0Start = body.dataLen - header.mip0Len;
+	uint32_t mip0Start = (uint32_t)body.dataLen - header.mip0Len;
 	out.write(body.data.get() + mip0Start, header.mip0Len);
 	out.close();
 }

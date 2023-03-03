@@ -25,7 +25,7 @@ namespace WarframeExporter::Texture
 
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ namespace WarframeExporter::Texture
 
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace WarframeExporter::Texture
 		
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ namespace WarframeExporter::Texture
 		
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ namespace WarframeExporter::Texture
 		
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ namespace WarframeExporter::Texture
 
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ namespace WarframeExporter::Texture
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
 		// Format was introduced after swizzling was removed. So this should never be called.
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 
 	///////////////////////////////////////////////////////////////
@@ -160,6 +160,6 @@ namespace WarframeExporter::Texture
 		std::vector<int> getEnumMapKeys() const override;
 		ddspp::DXGIFormat getFormat() const override;
 		// Format was introduced after swizzling was removed. So this should never be called.
-		void unSwizzle(char* inData, size_t inDataLen, char* outData) const override;
+		void unSwizzle(char* inData, int inDataLen, char* outData) const override;
 	};
 }

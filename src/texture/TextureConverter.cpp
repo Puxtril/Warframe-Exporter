@@ -19,7 +19,7 @@ std::pair<int16_t, int16_t>
 TextureConverter::getCorrectResolution(uint16_t baseWidth, uint16_t baseHeight, bool isCompressed, int32_t textureLength, int blockSize)
 {
 	int32_t curMipSize = getMip0Len(baseWidth, baseHeight, isCompressed, blockSize);
-	if (!isCompressed && curMipSize >= textureLength)
+	if (!isCompressed && curMipSize > textureLength)
 		return TextureConverter::getCorrectResolution(baseWidth / 2, baseHeight / 2, isCompressed, textureLength, blockSize);
 	if (isCompressed && curMipSize > textureLength)
 		return TextureConverter::getCorrectResolution(baseWidth / 2, baseHeight / 2, isCompressed, textureLength, blockSize);

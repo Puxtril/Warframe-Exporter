@@ -13,12 +13,12 @@
 [submodule "lib/spdlog"]
 	path = lib/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "lib/ddspp"]
-	path = lib/ddspp
-	url = https://github.com/redorav/ddspp.git
 [submodule "lib/LotusLib"]
 	path = lib/LotusLib
 	url = https://github.com/Puxtril/LotusLib.git
 [submodule "lib/tclap-code"]
 	path = lib/tclap-code
 	url = https://git.code.sf.net/p/tclap/code
+[submodule "lib/ddspp"]
+	path = lib/ddspp
+	url = https://github.com/Puxtril/ddspp.git

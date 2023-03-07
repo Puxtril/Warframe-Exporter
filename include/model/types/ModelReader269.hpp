@@ -282,7 +282,7 @@ namespace WarframeExporter::Model
 			for (uint32_t x = 0; x < weightedBoneCount; x++)
 			{
 				uint32_t curBoneNameLen = headerReader->readUInt32();
-				outHeader.weightedBoneNames.push_back(headerReader->readAsciiString(curBoneNameLen));
+				outHeader.weightedBoneNames[x] = headerReader->readAsciiString(curBoneNameLen);
 			}
 
 			// Main vertex counts

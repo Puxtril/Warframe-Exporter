@@ -34,7 +34,7 @@ Download the latest from the Releases section. This is a CLI program, so open up
 * [spdlog](https://github.com/gabime/spdlog): Logging
 * [Binary-Reader](https://github.com/Protinon/Binary-Reader) Read binary data into primitive data types.
 * [LotusLib](https://github.com/Puxtril/LotusLib): Provides an interface for the Warframe files. [See requirements for Oodle](https://github.com/Puxtril/LotusLib#how-to-install).
-* [ddspp](https://github.com/redorav/ddspp): For exporting textures as DDS
+* [ddspp](https://github.com/puxtril/ddspp): For exporting textures as DDS
 * [fx-gltf](https://github.com/jessey-git/fx-gltf): For exprting models as [glTF](https://en.wikipedia.org/wiki/GlTF).
   * [nlohmann-json](https://github.com/nlohmann/json): Required by fx-gltf.
 * [glm](https://github.com/g-truc/glm): A helper library for models. Provides matrix and vector math operations.

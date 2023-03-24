@@ -127,33 +127,39 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 	}
 	catch (std::filesystem::filesystem_error&) {}
 
-	try
+	if ((*m_package)[packageName][LotusLib::PackageTrioType::B])
 	{
-		const LotusLib::FileEntries::FileNode* bFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
-		std::unique_ptr<char[]> bDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getDataAndDecompress(bFileEntry);
-		if (bDataRaw)
+		try
 		{
-			debugPath.replace_filename(internalPath.stem().string() + "_B");
-			std::ofstream out;
-			out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-			out.write(bDataRaw.get(), bFileEntry->getLen());
-			out.close();
+			const LotusLib::FileEntries::FileNode* bFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
+			std::unique_ptr<char[]> bDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getDataAndDecompress(bFileEntry);
+			if (bDataRaw)
+			{
+				debugPath.replace_filename(internalPath.stem().string() + "_B");
+				std::ofstream out;
+				out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+				out.write(bDataRaw.get(), bFileEntry->getLen());
+				out.close();
+			}
 		}
+		catch (std::filesystem::filesystem_error&) {}
 	}
-	catch (std::filesystem::filesystem_error&) {}
 
-	try
+	if ((*m_package)[packageName][LotusLib::PackageTrioType::F])
 	{
-		const LotusLib::FileEntries::FileNode* fFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getFileEntry(internalPath);
-		std::unique_ptr<char[]> fDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getDataAndDecompress(fFileEntry);
-		if (fDataRaw)
+		try
 		{
-			debugPath.replace_filename(internalPath.stem().string() + "_F");
-			std::ofstream out;
-			out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-			out.write(fDataRaw.get(), fFileEntry->getLen());
-			out.close();
+			const LotusLib::FileEntries::FileNode* fFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getFileEntry(internalPath);
+			std::unique_ptr<char[]> fDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getDataAndDecompress(fFileEntry);
+			if (fDataRaw)
+			{
+				debugPath.replace_filename(internalPath.stem().string() + "_F");
+				std::ofstream out;
+				out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+				out.write(fDataRaw.get(), fFileEntry->getLen());
+				out.close();
+			}
 		}
+		catch (std::filesystem::filesystem_error&) {}
 	}
-	catch (std::filesystem::filesystem_error&) {}
 }

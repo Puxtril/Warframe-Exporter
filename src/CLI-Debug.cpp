@@ -101,8 +101,10 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 	WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
 
 	(*cache)[pkg][LotusLib::PackageTrioType::H]->readToc();
-	(*cache)[pkg][LotusLib::PackageTrioType::B]->readToc();
-	(*cache)[pkg][LotusLib::PackageTrioType::F]->readToc();
+	if ((*cache)[pkg][LotusLib::PackageTrioType::B])
+		(*cache)[pkg][LotusLib::PackageTrioType::B]->readToc();
+	if ((*cache)[pkg][LotusLib::PackageTrioType::F])
+		(*cache)[pkg][LotusLib::PackageTrioType::F]->readToc();
 
 	try
 	{

@@ -11,7 +11,7 @@ void
 BatchIteratorExport::processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor)
 {
 	std::filesystem::path savePath = m_outExportPath / internalPath.getPreferredPath().relative_path();
-	savePath.replace_extension(extractor->getOutputExtension());
+	savePath.replace_extension(extractor->getOutputExtension(header, hReader));
 
 	if (existingFileIdentical(internalPath, savePath, (*m_package)[packageName][LotusLib::PackageTrioType::H], packageName))
 	{

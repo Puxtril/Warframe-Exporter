@@ -37,7 +37,7 @@ namespace WarframeExporter::Texture
 		TextureExtractor(const TextureExtractor&) = delete;
 		TextureExtractor operator=(const TextureExtractor&) = delete;
 
-		inline const std::string& getOutputExtension() const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
 		{
 			static std::string outFileExt = "dds";
 			return outFileExt;

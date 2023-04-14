@@ -20,6 +20,7 @@ class CLIDebug : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_debugTextCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugModelCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_debugMatCmd;
+	std::shared_ptr<TCLAP::SwitchArg> m_debugAudioCmd;
 	
 	CLIDebug();
 

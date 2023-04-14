@@ -6,6 +6,7 @@ CLIExtract::CLIExtract()
 	m_extTextCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-textures", "Extract all textures", false);
 	m_extModelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-models", "Extract all 3D models", false);
 	m_extMatCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-materials", "Extract material metadata", false);
+	m_extAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-audio", "Extract audio clips", false);
 	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
 }
 
@@ -30,6 +31,7 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extTextCmd.get())
 		.add(m_extModelCmd.get())
 		.add(m_extMatCmd.get())
+		.add(m_extAudioCmd.get())
 		.add(m_extAllCmd.get());
 }
 
@@ -41,7 +43,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
 {
-	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAllCmd->getValue())
+	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
 	int types = 0;
@@ -51,6 +53,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		types |= (int)WarframeExporter::ExtractorType::Model;
 	if (m_extMatCmd->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Material;
+	if (m_extAudioCmd->getValue() || m_extAllCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Audio;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -96,7 +100,9 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::Packag
 		}
 	}
 
-	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material)
+	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
+		(int)types & (int)WarframeExporter::ExtractorType::Material ||
+		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
 		pkgNames.push_back("Misc");
 	}

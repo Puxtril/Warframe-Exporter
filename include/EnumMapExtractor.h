@@ -5,11 +5,13 @@
 #include "model/ModelExtractor.h"
 #include "texture/TextureExtractor.h"
 #include "material/MaterialExtractor.h"
+#include "audio/AudioExtractorProxy.h"
 
 namespace WarframeExporter
 {
 	const static EnumMap<Extractor> g_enumMapExtractor = EnumMap<Extractor>()
 		.registerClass(Model::ModelExtractor::getInstance())
 		.registerClass(Texture::TextureExtractor::getInstance())
-		.registerClass(Material::MaterialExtractor::getInstance());
+		.registerClass(Material::MaterialExtractor::getInstance())
+		.registerClass(Audio::AudioExtractorProxy::getInstance());
 }

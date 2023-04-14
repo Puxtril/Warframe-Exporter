@@ -114,6 +114,13 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 1. Add the new enum value to `WarframeExporter::Material::MaterialType` (inside `material/MaterialExtractor.h`)
 1. Add the enum value to `WarframeExporter::Material::MaterialExtractor::getEnumMapKeys()` (inside `material/MaterialExtractor.h`)
 
+## Adding a new Audio format
+
+1. Add the new enum value to `WarframeExporter::Audio::AudioType` (inside `audio/AudioStructs.h`)
+1. Add the enum value to `WarframeExporter::Audio::AudioExtractorProxy::getEnumMapKeys()` (inside `audio/AudioExtractorProxy.h`)
+1. Add a new reader class inside `audio/types`, `audio/AudioPCM/types`, and `audio/AudioOpus/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
+1. Register the class to `WarframeExporter::Audio::g_enumMapAudioExtractor` (inside `model/EnumMapAudioExtractor.h`)
+
 # Building
 
 CMake is very nice and I love it. See how easy this is to compile?

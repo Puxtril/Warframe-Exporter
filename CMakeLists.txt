@@ -33,6 +33,12 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/material/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/model/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/texture/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/types/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioPCM/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioPCM/types/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/types/*.cpp
 )
 
 ##################################################

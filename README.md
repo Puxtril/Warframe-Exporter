@@ -90,6 +90,19 @@ If you indend to add a new format such as Animation, Maps, Audio, etc.
 1. Create a new class that inherits from the Extractor class (in `Extractor.h`).
 1. Register the class inside `EnumMapExtractor.h`.
 1. Add documentation below and at the beginning of this README.
+1. Add the CLI commands (Yes, I know it's a pain. At least it's documented!)
+    1. Debug
+        1. Add the new SwitchArg command in `CLI-Debug.h`
+        1. Initilize that member variable in the constructor inside `CLI-Debug.cpp`
+        1. Add that member variable to the CLI inside `addMainCmds`
+        1. Add the member variable check to the `if` statement inside `processCmd` AND `debug`
+        1. Add a package name to `getPkgsNames`
+    1. Extract
+        1. Add the new SwitchArg command in `CLI-Extract.h`
+        1. Initilize that member variable in the constructor inside `CLI-Extract.cpp`
+        1. Add that member variable to the CLI inside `addMainCmds`
+        1. Add the member variable check to the `if` statement inside `addMiscCommands` AND `processCmd`
+        1. Add a package name to `getPkgsNames`
 
 ## Adding a new 3D Model format
 

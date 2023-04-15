@@ -5,6 +5,7 @@ A cross-platform program/library for exporting files from Warframe. Provides a c
 Formats currently supported:
 - Textures -> DDS
 - 3D Models (mostly) -> glTF
+- Audio -> Ogg & Wav
 
 Formats with started progress:
 - Animation -> glTF
@@ -89,7 +90,9 @@ If you indend to add a new format such as Animation, Maps, Audio, etc.
 1. Create a new folder in *include* and *src*. Store all subsequent files in here.
 1. Create a new class that inherits from the Extractor class (in `Extractor.h`).
 1. Register the class inside `EnumMapExtractor.h`.
-1. Add documentation below and at the beginning of this README.
+1. Add documentation to the README
+    1. Add instructions to "Contributions"
+    1. Add the format to "Formats currently supported"
 1. Add the CLI commands (Yes, I know it's a pain. At least it's documented!)
     1. Debug
         1. Add the new SwitchArg command in `CLI-Debug.h`

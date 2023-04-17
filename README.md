@@ -5,7 +5,7 @@ A cross-platform program/library for exporting files from Warframe. Provides a c
 Formats currently supported:
 - Textures -> DDS
 - 3D Models (mostly) -> glTF
-- Audio -> Ogg & Wav
+- Audio -> Ogg & Wav (Credit to [Sehnryr](https://github.com/sehnryr/wfcache-api))
 
 Formats with started progress:
 - Animation -> glTF

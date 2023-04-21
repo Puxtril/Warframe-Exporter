@@ -122,6 +122,7 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.positions = newPositions;
     outBody.UV1 = extBody.UV1;
     outBody.UV2 = extBody.UV2;
+    outBody.colors = extBody.colors;
     outBody.boneWeights = extBody.boneWeights;
 
     // Convert local bone indices to global

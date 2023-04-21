@@ -249,6 +249,8 @@ ModelExporterGltf::findOrCreateMaterial(const std::string& materialPath)
 	return matIndex;
 }
 
+// Color must be in the format VEC4
+// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
 Attributes
 ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCount)
 {
@@ -256,7 +258,9 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 		createBuffer();
 
 	Buffer& buf = m_document.buffers[0];
-	uint32_t byteLen = vertCount * body.vertexSizeRigged();
+	// 1 colorLen is already factored into this vertex size
+	// Add the other 2
+	uint32_t byteLen = vertCount * (body.vertexSizeRigged() + (ModelBodyInternal::colorLen * 3));
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -271,6 +275,14 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 		curPos += ModelBodyInternal::UVLen;
 		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
 		memcpy(curPos, &body.boneIndices[iVert].x, ModelBodyInternal::boneIndexLen);
 		curPos += ModelBodyInternal::boneIndexLen;
 		memcpy(curPos, &body.boneWeights[iVert].x, ModelBodyInternal::boneWeightLen);
@@ -282,7 +294,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
-	bufView.byteStride = body.vertexSizeRigged();
+	bufView.byteStride = body.vertexSizeRigged() + (ModelBodyInternal::colorLen * 3);
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	m_document.bufferViews.push_back(bufView);
 	
@@ -320,6 +332,17 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	m_document.accessors.push_back(uv2Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
+	Accessor colAcc;
+	int32_t colAccIndex = (int32_t)m_document.accessors.size();
+	colAcc.bufferView = bufViewIndex;
+	colAcc.byteOffset = curByteOffset;
+	colAcc.count = vertCount;
+	colAcc.type = Accessor::Type::Vec4;
+	colAcc.componentType = Accessor::ComponentType::UnsignedByte;
+	colAcc.normalized = true;
+	m_document.accessors.push_back(colAcc);
+	curByteOffset += (ModelBodyInternal::colorLen * 4);
+
 	Accessor boneIndexAcc;
 	int32_t boneIndexAccIndex = (int32_t)m_document.accessors.size();
 	boneIndexAcc.bufferView = bufViewIndex;
@@ -343,12 +366,15 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	attrs["POSITION"] = posAccIndex;
 	attrs["TEXCOORD_0"] = uv1AccIndex;
 	attrs["TEXCOORD_1"] = uv2AccIndex;
+	attrs["COLOR_0"] = colAccIndex;
 	attrs["JOINTS_0"] = boneIndexAccIndex;
 	attrs["WEIGHTS_0"] = boneWeightAccIndex;
 
 	return attrs;
 }
 
+// Color must be in the format VEC4
+// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
 Attributes
 ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCount)
 {
@@ -356,7 +382,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 		createBuffer();
 
 	Buffer& buf = m_document.buffers[0];
-	uint32_t byteLen = vertCount * body.vertexSizeStatic();
+	uint32_t byteLen = vertCount * (body.vertexSizeStatic() + (ModelBodyInternal::colorLen * 3));
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -371,6 +397,14 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 		curPos += ModelBodyInternal::UVLen;
 		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
+		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
+		curPos += ModelBodyInternal::colorLen;
 	}
 
 	BufferView bufView;
@@ -378,7 +412,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
-	bufView.byteStride = body.vertexSizeStatic();
+	bufView.byteStride = body.vertexSizeStatic() + (ModelBodyInternal::colorLen * 3);
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	m_document.bufferViews.push_back(bufView);
 
@@ -414,11 +448,24 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	uv2Acc.type = Accessor::Type::Vec2;
 	uv2Acc.componentType = Accessor::ComponentType::Float;
 	m_document.accessors.push_back(uv2Acc);
+	curByteOffset += ModelBodyInternal::UVLen;
+
+	Accessor colAcc;
+	int32_t colAccIndex = (int32_t)m_document.accessors.size();
+	colAcc.bufferView = bufViewIndex;
+	colAcc.byteOffset = curByteOffset;
+	colAcc.count = vertCount;
+	colAcc.type = Accessor::Type::Vec4;
+	colAcc.componentType = Accessor::ComponentType::UnsignedByte;
+	colAcc.normalized = true;
+	m_document.accessors.push_back(colAcc);
+	curByteOffset += (ModelBodyInternal::colorLen * 4);
 
 	Attributes attrs;
 	attrs["POSITION"] = posAccIndex;
 	attrs["TEXCOORD_0"] = uv1AccIndex;
 	attrs["TEXCOORD_1"] = uv2AccIndex;
+	attrs["COLOR_0"] = colAccIndex;
 
 	return attrs;
 }

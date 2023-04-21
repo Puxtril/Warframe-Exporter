@@ -97,6 +97,7 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> colors;
 		std::vector<glm::u8vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
 	};
@@ -107,23 +108,24 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> colors;
 		std::vector<glm::u16vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
 			
 		static const int positionLen = 12;
-		static const int colorLen = 4;
+		static const int colorLen = 1;
 		static const int UVLen = 8;
 		static const int boneIndexLen = 8;
 		static const int boneWeightLen = 16;
 
 		int32_t vertexSizeRigged() const
 		{
-			return positionLen + (UVLen * 2) + boneIndexLen + boneWeightLen;
+			return positionLen + (UVLen * 2) + colorLen + boneIndexLen + boneWeightLen;
 		}
 
 		int32_t vertexSizeStatic() const
 		{
-			return positionLen + (UVLen * 2);
+			return positionLen + (UVLen * 2) + colorLen;
 		}
 	};
 }

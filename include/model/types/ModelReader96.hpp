@@ -266,7 +266,7 @@ namespace WarframeExporter::Model
 			headerReader->seek(0x2C, std::ios_base::cur);
 
 			uint16_t vecCheck = headerReader->readUInt16();
-			if (vecCheck != 256 && vecCheck != 257 && vecCheck != 0)
+			if (vecCheck != 256 && vecCheck != 257 && vecCheck != 258 && vecCheck != 0)
 				headerReader->seek(-2, std::ios_base::cur);
 
 			headerReader->seek(0x20, std::ios_base::cur);

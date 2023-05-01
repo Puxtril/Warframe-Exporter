@@ -56,6 +56,6 @@ DDSLib::serialize(std::ostream& outStream, DDSHeaderFull& headerFull)
 		outStream.write((char*)&headerFull.header10.resourceDimension, 4);
 		outStream.write((char*)&headerFull.header10.miscFlag, 4);
 		outStream.write((char*)&headerFull.header10.arraySize, 4);
-		outStream.write((char*)&headerFull.header10.reserved, 4);
+		outStream.write((char*)&headerFull.header10.miscFlags2, 4);
 	}
 }

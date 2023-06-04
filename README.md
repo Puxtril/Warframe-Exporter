@@ -144,8 +144,14 @@ CMake is very nice and I love it. See how easy this is to compile?
 
 ## Requirements
 
-- Windows: CMake, git, Visual Studio 2022
-- Other OSs: CMake, git, any C++ compiler
+- Packages 
+    - Windows: CMake, git, Visual Studio 2022
+    - Other OSs: CMake, git, any C++ compiler
+- A copy of the Oodle SDK (Provided by Unreal Engine)
+    - Download Unreal Engine from the official website (You will need an account and the Epic launcher)
+    - Once downloaded find the SDK folder `Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.5/lib`
+    - Create a folder in the root of this repository named `bin`
+    - Copy folders from Unreal into `bin`. Currently the following folders/platforms are supported: `Win64`, `Linux`, and `Mac`
 
 ## Build Commands
 

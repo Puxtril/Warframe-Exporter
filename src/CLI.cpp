@@ -46,11 +46,14 @@ main(int argc, char** argv)
 	checkDirs(cacheDirCmd.getValue(), outPathCmd.getValue());
 	createLoggers(g_logLevel, outPathCmd.getValue());
 
-	LotusLib::PackageCollection<LotusLib::CachePairReader> cacheDir(cacheDirCmd.getValue(), true);
+	LotusLib::PackageCollection<LotusLib::CachePairReader>* cacheDir = new LotusLib::PackageCollection<LotusLib::CachePairReader>(cacheDirCmd.getValue(), true);
+	WarframeExporter::Ensmallening ensmallening(true, true, true);
 
 	// Parse command
 	for (CLIFeature* feat : g_features)
-		feat->processCmd(outPathCmd.getValue(), intPathCmd.getValue(), pkgCmd.getValue(), &cacheDir);
+		feat->processCmd(outPathCmd.getValue(), intPathCmd.getValue(), pkgCmd.getValue(), cacheDir, ensmallening);
+
+	delete cacheDir;
 }
 
 void

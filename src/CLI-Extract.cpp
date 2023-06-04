@@ -41,7 +41,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
  
 void
-CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
 	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extAllCmd->getValue())
 		return;
@@ -62,7 +62,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	else
 		pkgNames = { pkg };
 
-	extract(cache, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types);
+	extract(cache, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
 }
 
 void
@@ -76,10 +76,9 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types)
+CLIExtract::extract(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
 {
-	WarframeExporter::Ensmallening ensmall(true, true, true);
-	WarframeExporter::BatchIteratorExport extractor(cache, ensmall, outPath);
+	WarframeExporter::BatchIteratorExport extractor(cache, ensmallening, outPath);
 	extractor.batchIterate(intPath, pkgs, types);
 }
 

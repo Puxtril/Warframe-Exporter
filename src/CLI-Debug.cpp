@@ -42,11 +42,11 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
 	if (m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue())
 	{
-		debug(cache, pkg, internalPath, outPath);
+		debug(cache, pkg, internalPath, outPath, ensmallening);
 	}
 	else if (m_printEnums->getValue())
 	{
@@ -126,7 +126,7 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 }
 
 void
-CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath)
+CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	int types = 0;
 	if (m_debugTextCmd->getValue())
@@ -144,8 +144,7 @@ CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, c
 	else
 		pkgNames = { pkg };
 
-	WarframeExporter::Ensmallening ensmall(true, true, true);
-	WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
+	WarframeExporter::BatchIteratorDebug debugger(cache, ensmallening, outPath);
 	debugger.batchIterate(intPath, pkgNames, (WarframeExporter::ExtractorType)types);
 }
 

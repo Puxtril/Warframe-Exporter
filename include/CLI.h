@@ -12,6 +12,7 @@
 #include "CLI-Extract.h"
 #include "CLI-Debug.h"
 #include "CLI-Main.h"
+#include "CLI-Advanced.h"
 
 #include <filesystem>
 #include <string>
@@ -22,6 +23,9 @@ const static std::string_view g_description = "https://github.com/Puxtril/Warfra
 const static spdlog::level::level_enum g_logLevel = spdlog::level::debug;
 
 const std::vector<CLIFeature*> g_features = {
+#ifdef WF_ADVANCED
+	CLIAdvanced::getInstance(),
+#endif
 #ifdef WF_EXTRACT
 	CLIExtract::getInstance(),
 #endif

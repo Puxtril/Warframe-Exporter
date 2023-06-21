@@ -8,31 +8,29 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
     ModelConverter::flipXAxis(extBody);
 
     if (extHeader.boneTree.size() > 1)
-        ModelConverter::convertInternalHeaderRigged(extHeader, extBody, attributes, outHeader);
-    ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, extBody, attributes, outHeader);
+        ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
+    ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
 
-    if (extHeader.boneTree.size() > 1)
-        ModelConverter::convertInternalBodyRigged(extHeader, extBody, outBody, outHeader.modelScale);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
 }
 
 void
-ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader)
+ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelHeaderInternal& outHeader)
 {
     // Create fast way to index bone in BoneTree using its name
-    std::unordered_map<std::string, size_t> boneNameMap;
-    for (size_t x = 0; x < extHeader.boneTree.size(); x++)
+    std::unordered_map<std::string, int> boneNameMap;
+    for (int x = 0; x < (int)extHeader.boneTree.size(); x++)
     {
         boneNameMap[extHeader.boneTree[x].name] = x;
     }
+
     // Re-create WeightedBoneNames as indices
-    std::vector<size_t> weightedBoneIndices(0, extHeader.weightedBoneNames.size());
-    for (size_t x = 0; x < extHeader.weightedBoneNames.size(); x++)
+    outHeader.weightedBones.resize(extHeader.weightedBoneNames.size());
+    for (int x = 0; x < (int)extHeader.weightedBoneNames.size(); x++)
     {
         const std::string& boneName = extHeader.weightedBoneNames[x];
-        weightedBoneIndices.push_back(boneNameMap[boneName]);
+        outHeader.weightedBones[x] = (boneNameMap[boneName]);
     }
-    outHeader.weightedBones = weightedBoneIndices;
 
     std::vector<BoneTreeNodeInternal> intNodes;
     for (size_t x = 0; x < extHeader.boneTree.size(); x++)
@@ -56,7 +54,7 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
     for (size_t x = 0; x < outHeader.weightedBones.size(); x++)
     {
         glm::mat4& matrix = extBody.reverseBinds[x];
-        size_t boneTreeIndex = outHeader.weightedBones[x];
+        int boneTreeIndex = outHeader.weightedBones[x];
         intNodes[boneTreeIndex].reverseBind = matrix;
         bonesSetInverseBinds[boneTreeIndex] = true;
     }
@@ -80,7 +78,7 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
 }
 
 void
-ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader)
+ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader)
 {
     outHeader.vertexCount = extHeader.vertexCount;
     outHeader.boneCount = extHeader.boneCount;
@@ -110,21 +108,6 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
 }
 
 void
-ModelConverter::convertInternalBodyRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale)
-{
-    //outBody.setRevserseBinds(extBody.reverseBinds);
-    /*
-    std::vector<glm::mat4> flippedMatrices = std::move(extBody.reverseBinds);
-    for (size_t x = 0; x < flippedMatrices.size(); x++)
-    {
-        //flippedMatrices[x] = glm::scale(flippedMatrices[x], glm::vec3(1, -1, 1));
-        flippedMatrices[x][3] = { 0.0F, 0.0F, 0.0F, 1.0F };
-    }
-    outBody.setRevserseBinds(flippedMatrices);
-    */
-}
-
-void
 ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale)
 {
     outBody.indices = extBody.indices;
@@ -139,6 +122,7 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.positions = newPositions;
     outBody.UV1 = extBody.UV1;
     outBody.UV2 = extBody.UV2;
+    outBody.colors = extBody.colors;
     outBody.boneWeights = extBody.boneWeights;
 
     // Convert local bone indices to global

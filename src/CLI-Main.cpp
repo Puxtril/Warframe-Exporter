@@ -31,12 +31,12 @@ CLIMain::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
 	if (m_lsCmd->getValue())
 	{
 		if (pkg.empty())
-			throw std::runtime_error("Must specify package with --ls");
+			WarframeExporter::Logger::getInstance().error("Must specify package with --ls");
 		(*cache)[pkg][LotusLib::PackageTrioType::H]->readToc();
 		(*cache)[pkg][LotusLib::PackageTrioType::H]->lsDir(internalPath);
 		(*cache)[pkg][LotusLib::PackageTrioType::H]->unReadToc();

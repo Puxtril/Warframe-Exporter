@@ -61,7 +61,7 @@ namespace WarframeExporter::Model
 	struct BoneTreeNodeInternal
 	{
 		std::string name;
-		int32_t parentIndex;
+		int parentIndex;
 		glm::quat rotation;
 		glm::vec3 position;
 		glm::mat4 reverseBind;
@@ -70,19 +70,19 @@ namespace WarframeExporter::Model
 	struct MeshInfoInternal
 	{
 		std::string name;
-		std::array<uint32_t, 5> faceLODOffsets;
-		std::array<uint32_t, 5> faceLODCounts;
+		std::array<int, 5> faceLODOffsets;
+		std::array<int, 5> faceLODCounts;
 		std::string matName;
 	};
 
 	struct ModelHeaderInternal
 	{
-		std::vector<size_t> weightedBones;
+		std::vector<int32_t> weightedBones;
 		std::vector<BoneTreeNodeInternal> boneTree;
-		uint32_t vertexCount;
-		uint32_t boneCount;
-		uint32_t faceCount;
-		uint32_t morphCount;
+		int vertexCount;
+		int boneCount;
+		int faceCount;
+		int morphCount;
 		std::vector<MeshInfoInternal> meshInfos;
 		std::vector<std::string> errorMsgs;
 		glm::vec3 modelScale;
@@ -97,6 +97,7 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> colors;
 		std::vector<glm::u8vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
 	};
@@ -107,23 +108,24 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> colors;
 		std::vector<glm::u16vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
 			
 		static const int positionLen = 12;
-		static const int colorLen = 4;
+		static const int colorLen = 1;
 		static const int UVLen = 8;
 		static const int boneIndexLen = 8;
 		static const int boneWeightLen = 16;
 
 		int32_t vertexSizeRigged() const
 		{
-			return positionLen + (UVLen * 2) + boneIndexLen + boneWeightLen;
+			return positionLen + (UVLen * 2) + colorLen + boneIndexLen + boneWeightLen;
 		}
 
 		int32_t vertexSizeStatic() const
 		{
-			return positionLen + (UVLen * 2);
+			return positionLen + (UVLen * 2) + colorLen;
 		}
 	};
 }

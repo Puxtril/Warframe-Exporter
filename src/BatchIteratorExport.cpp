@@ -11,7 +11,7 @@ void
 BatchIteratorExport::processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor)
 {
 	std::filesystem::path savePath = m_outExportPath / internalPath.getPreferredPath().relative_path();
-	savePath.replace_extension(extractor->getOutputExtension());
+	savePath.replace_extension(extractor->getOutputExtension(header, hReader));
 
 	if (existingFileIdentical(internalPath, savePath, (*m_package)[packageName][LotusLib::PackageTrioType::H], packageName))
 	{
@@ -31,11 +31,11 @@ BatchIteratorExport::processKnownFile(const std::string& packageName, const Lotu
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.debug("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.debug("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
 	}
 	catch (std::exception& err)
 	{

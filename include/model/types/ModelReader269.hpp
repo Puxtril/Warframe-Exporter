@@ -282,7 +282,7 @@ namespace WarframeExporter::Model
 			for (uint32_t x = 0; x < weightedBoneCount; x++)
 			{
 				uint32_t curBoneNameLen = headerReader->readUInt32();
-				outHeader.weightedBoneNames.push_back(headerReader->readAsciiString(curBoneNameLen));
+				outHeader.weightedBoneNames[x] = headerReader->readAsciiString(curBoneNameLen);
 			}
 
 			// Main vertex counts
@@ -535,6 +535,7 @@ namespace WarframeExporter::Model
 			outBody.positions.resize(extHeader.vertexCount);
 			outBody.UV1.resize(extHeader.vertexCount);
 			outBody.UV2.resize(extHeader.vertexCount);
+			outBody.colors.resize(extHeader.vertexCount);
 			outBody.boneIndices.resize(extHeader.vertexCount);
 			outBody.boneWeights.resize(extHeader.vertexCount);
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)
@@ -544,7 +545,9 @@ namespace WarframeExporter::Model
 				outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
 
 				bodyReader->seek(6, std::ios_base::cur); // Normals?
-				bodyReader->seek(4, std::ios::cur); // Vertex Colors?
+				
+				bodyReader->seek(3, std::ios::cur); // Tangent data?
+				outBody.colors[x] = bodyReader->readUInt8();
 
 				outBody.UV1[x][0] = bodyReader->readHalf();
 				outBody.UV1[x][1] = bodyReader->readHalf();

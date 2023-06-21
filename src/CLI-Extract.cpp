@@ -6,6 +6,7 @@ CLIExtract::CLIExtract()
 	m_extTextCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-textures", "Extract all textures", false);
 	m_extModelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-models", "Extract all 3D models", false);
 	m_extMatCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-materials", "Extract material metadata", false);
+	m_extAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-audio", "Extract audio clips", false);
 	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
 	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract all levels", false);
 }
@@ -31,8 +32,9 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extTextCmd.get())
 		.add(m_extModelCmd.get())
 		.add(m_extMatCmd.get())
-		.add(m_extAllCmd.get())
-		.add(m_extLevelCmd.get());
+		.add(m_extLevelCmd.get())
+		.add(m_extAudioCmd.get())
+		.add(m_extAllCmd.get());
 }
 
 void
@@ -41,9 +43,9 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
  
 void
-CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
-	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAllCmd->getValue() && !m_extLevelCmd->getValue())
+	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
 	int types = 0;
@@ -55,6 +57,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		types |= (int)WarframeExporter::ExtractorType::Material;
 	if (m_extLevelCmd->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Level;
+	if (m_extAudioCmd->getValue() || m_extAllCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Audio;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -62,7 +66,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	else
 		pkgNames = { pkg };
 
-	extract(cache, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types);
+	extract(cache, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
 }
 
 void
@@ -76,10 +80,9 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types)
+CLIExtract::extract(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
 {
-	WarframeExporter::Ensmallening ensmall(true, true, true);
-	WarframeExporter::BatchIteratorExport extractor(cache, ensmall, outPath);
+	WarframeExporter::BatchIteratorExport extractor(cache, ensmallening, outPath);
 	extractor.batchIterate(intPath, pkgs, types);
 }
 
@@ -105,7 +108,9 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::Packag
 		pkgNames.push_back("AnimRetarget");
 	}
 
-	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material)
+	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
+		(int)types & (int)WarframeExporter::ExtractorType::Material ||
+		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
 		pkgNames.push_back("Misc");
 	}

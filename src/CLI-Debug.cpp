@@ -8,6 +8,7 @@ CLIDebug::CLIDebug()
 	m_debugModelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-models", "Attempts to read models", false);
 	m_debugMatCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-materials", "Attempts to read materials", false);
 	m_debugLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-levels", "Attempts to read levels", false);
+	m_debugAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-audio", "Attempts to read audios", false);
 }
 
 CLIDebug*
@@ -33,7 +34,8 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_debugTextCmd.get())
 		.add(m_debugModelCmd.get())
 		.add(m_debugMatCmd.get())
-		.add(m_debugLevelCmd.get());
+		.add(m_debugLevelCmd.get())
+		.add(m_debugAudioCmd.get());
 }
 
 void
@@ -42,11 +44,11 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
-	if (m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
+	if (m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
 	{
-		debug(cache, pkg, internalPath, outPath);
+		debug(cache, pkg, internalPath, outPath, ensmallening);
 	}
 	else if (m_printEnums->getValue())
 	{
@@ -103,8 +105,10 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 	WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
 
 	(*cache)[pkg][LotusLib::PackageTrioType::H]->readToc();
-	(*cache)[pkg][LotusLib::PackageTrioType::B]->readToc();
-	(*cache)[pkg][LotusLib::PackageTrioType::F]->readToc();
+	if ((*cache)[pkg][LotusLib::PackageTrioType::B])
+		(*cache)[pkg][LotusLib::PackageTrioType::B]->readToc();
+	if ((*cache)[pkg][LotusLib::PackageTrioType::F])
+		(*cache)[pkg][LotusLib::PackageTrioType::F]->readToc();
 
 	try
 	{
@@ -124,7 +128,7 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 }
 
 void
-CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath)
+CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	int types = 0;
 	if (m_debugTextCmd->getValue())
@@ -135,6 +139,8 @@ CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, c
 		types |= (int)WarframeExporter::ExtractorType::Material;
 	if (m_debugLevelCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Level;
+	if (m_debugAudioCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Audio;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -142,8 +148,7 @@ CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, c
 	else
 		pkgNames = { pkg };
 
-	WarframeExporter::Ensmallening ensmall(true, true, true);
-	WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
+	WarframeExporter::BatchIteratorDebug debugger(cache, ensmallening, outPath);
 	debugger.batchIterate(intPath, pkgNames, (WarframeExporter::ExtractorType)types);
 }
 
@@ -169,7 +174,9 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageC
 		pkgNames.push_back("AnimRetarget");
 	}
 
-	if ((int)types & (int)WarframeExporter::ExtractorType::Model || (int)types & (int)WarframeExporter::ExtractorType::Material)
+	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
+		(int)types & (int)WarframeExporter::ExtractorType::Material ||
+		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
 		pkgNames.push_back("Misc");
 	}

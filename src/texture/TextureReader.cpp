@@ -22,8 +22,8 @@ TextureReader::readHeader(BinaryReaderBuffered* headerReader, const Ensmallening
 	if (!ensmalleningData.isPostPart1())
 		headerReader->seek(9, std::ios_base::cur);
 
-	uint16_t width = headerReader->readUInt16();
-	uint16_t height = headerReader->readUInt16();
+	int16_t width = headerReader->readInt16();
+	int16_t height = headerReader->readInt16();
 
 	return TextureHeaderExternal{ enum1, enum2, enum3, enum4, width, height };
 }
@@ -41,7 +41,7 @@ TextureReader::readBody(BinaryReaderBuffered* bodyReader, const TextureHeaderInt
 	{
 		char* rawData = (char*)bodyReader->readUInt8Array(bodyReader->getLength());
 		std::unique_ptr<char[]> unSwizzled = std::make_unique<char[]>(bodyReader->getLength());
-		headerInternal.formatClass->unSwizzle(rawData, bodyReader->getLength(), unSwizzled.get());
+		headerInternal.formatClass->unSwizzle(rawData, (int)bodyReader->getLength(), unSwizzled.get());
 		delete[] rawData;
 		return TextureBodyInternal{std::move(unSwizzled), bodyReader->getLength()};
 	}

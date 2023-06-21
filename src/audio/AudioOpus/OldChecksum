@@ -1,0 +1,65 @@
+#include "audio/AudioOpus/AudioOpusExporterOggChecksum.h"
+
+using namespace WarframeExporter::Audio;
+
+uint32_t
+AudioOpusExporterOggChecksum::calculateHash(const char* inData, int dataLen)
+{
+	uint32_t CRC = 0xffffffff;
+	uint32_t* pCRC = &CRC;
+
+	while (dataLen--)
+	{
+		//If your compiler complains about the following line, try changing
+		//	each occurrence of *iCRC with ((unsigned int)*iCRC).
+		*pCRC = (*pCRC >> 8) ^ m_lookupTable[(*pCRC & 0xFF) ^ *inData++];
+	}
+	
+	return CRC;
+}
+
+void
+AudioOpusExporterOggChecksum::initTable()
+{
+	if (!m_isLookupTableInit)
+	{
+		_initTable();
+		m_isLookupTableInit = true;
+	}
+}
+
+
+void
+AudioOpusExporterOggChecksum::_initTable()
+{
+	for (int iCodes = 0; iCodes <= 0xFF; iCodes++)
+	{
+		m_lookupTable[iCodes] = initTableHelper(iCodes, 8) << 24;
+		
+		for (int iPos = 0; iPos < 8; iPos++)
+		{
+			m_lookupTable[iCodes] = (m_lookupTable[iCodes] << 1)
+				^ ((m_lookupTable[iCodes] & (1 << 31)) ? m_oggCRC32Polynomial : 0);
+		}
+		
+		m_lookupTable[iCodes] = initTableHelper(m_lookupTable[iCodes], 32);
+	}	
+}
+
+uint32_t
+AudioOpusExporterOggChecksum::initTableHelper(uint32_t initValue, int flipCount)
+{
+	unsigned int iValue = 0;
+
+	// Swap bit 0 for bit 7, bit 1 For bit 6, etc....
+	for (int iPos = 1; iPos < (flipCount + 1); iPos++)
+	{
+		if (initValue & 1)
+		{
+			iValue |= (1 << (flipCount - iPos));
+		}
+		initValue >>= 1;
+	}
+
+	return iValue;
+}

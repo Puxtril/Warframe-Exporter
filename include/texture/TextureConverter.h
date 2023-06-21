@@ -12,10 +12,10 @@ namespace WarframeExporter::Texture
 	class TextureConverter
 	{
 	public:
-		static TextureHeaderInternal convertHeader(TextureHeaderExternal& headerExternal, size_t fileSize);
+		static TextureHeaderInternal convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize);
 
 	private:
-		static std::pair<uint16_t, uint16_t> getCorrectResolution(uint16_t baseWidth, uint16_t baseHeight, bool isCompressed, uint32_t textureLength, int blockSize);
-		static uint32_t getMip0Len(uint16_t width, uint16_t height, bool isCompressed, int blockSize);
+		static std::pair<int16_t, int16_t> getCorrectResolution(uint16_t baseWidth, uint16_t baseHeight, bool isCompressed, int32_t textureLength, int blockSize);
+		static int32_t getMip0Len(int16_t width, int16_t height, bool isCompressed, int blockSize);
 	};
 }

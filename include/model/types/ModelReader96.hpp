@@ -140,25 +140,25 @@ namespace WarframeExporter::Model
 				uint32_t meshInfoNameLen = headerReader->readUInt32();
 				headerReader->seek(meshInfoNameLen, std::ios_base::cur);
 			
-				size_t validLODCount = UInt64LODUnkLen;
-				size_t emptyLODCount = 5 - UInt64LODUnkLen;
+				uint32_t validLODCount = UInt64LODUnkLen;
+				uint32_t emptyLODCount = 5 - UInt64LODUnkLen;
 			
 				static const std::string LODOffsetValidMsg = "MeshInfo LOD Offset Valid";
 				uint32_t curFaceLODOffset = 0;
-				for (size_t x = 0; x < validLODCount; x++)
+				for (uint32_t x = 0; x < validLODCount; x++)
 					curFaceLODOffset = headerReader->readUInt32(curFaceLODOffset, UINT32_MAX, LODOffsetValidMsg);
 
 				static const std::string LODOffsetEmptyMsg = "MeshInfo LOD Offset Empty";
-				for (size_t x = 0; x < emptyLODCount; x++)
+				for (uint32_t x = 0; x < emptyLODCount; x++)
 					headerReader->readUInt32(0, 1, LODOffsetEmptyMsg);
 
 				static const std::string LODFaceCountValidMsg = "MeshInfo LOD Face Count Valid";
 				uint32_t curFaceLODCount = UINT32_MAX - 1;
-				for (size_t x = 0; x < validLODCount; x++)
+				for (uint32_t x = 0; x < validLODCount; x++)
 					curFaceLODCount = headerReader->readUInt32(0, curFaceLODCount + 1, LODFaceCountValidMsg);
 
 				static const std::string LODFaceCountEmptyMsg = "MeshInfo LOD Face Count Empty";
-				for (size_t x = 0; x < emptyLODCount; x++)
+				for (uint32_t x = 0; x < emptyLODCount; x++)
 					headerReader->readUInt32(0, 1, LODFaceCountEmptyMsg);
 
 				headerReader->seek(0x20, std::ios_base::cur);
@@ -266,7 +266,7 @@ namespace WarframeExporter::Model
 			headerReader->seek(0x2C, std::ios_base::cur);
 
 			uint16_t vecCheck = headerReader->readUInt16();
-			if (vecCheck != 256 && vecCheck != 257 && vecCheck != 0)
+			if (vecCheck != 256 && vecCheck != 257 && vecCheck != 258 && vecCheck != 0)
 				headerReader->seek(-2, std::ios_base::cur);
 
 			headerReader->seek(0x20, std::ios_base::cur);
@@ -416,6 +416,7 @@ namespace WarframeExporter::Model
 			outBody.positions.resize(extHeader.vertexCount);
 			outBody.UV1.resize(extHeader.vertexCount);
 			outBody.UV2.resize(extHeader.vertexCount);
+			outBody.colors.resize(extHeader.vertexCount);
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 			{
 				outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
@@ -423,7 +424,9 @@ namespace WarframeExporter::Model
 				outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
 
 				bodyReader->seek(6, std::ios_base::cur); // Normals?
-				bodyReader->seek(4, std::ios::cur); // Vertex Colors?
+				
+				bodyReader->seek(3, std::ios::cur); // Tangent data?
+				outBody.colors[x] = bodyReader->readUInt8();
 
 				outBody.UV1[x][0] = bodyReader->readHalf();
 				outBody.UV1[x][1] = bodyReader->readHalf();

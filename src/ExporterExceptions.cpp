@@ -10,9 +10,7 @@ not_imeplemented_error::not_imeplemented_error(std::string msg)
 std::ostringstream not_imeplemented_error::cnvt;
 const char* not_imeplemented_error::what() const throw()
 {
-    cnvt.str("");
-    cnvt << runtime_error::what();
-    return cnvt.str().c_str();
+    return runtime_error::what();
 }
 
 unknown_format_error::unknown_format_error(std::string msg)
@@ -22,7 +20,5 @@ unknown_format_error::unknown_format_error(std::string msg)
 std::ostringstream unknown_format_error::cnvt;
 const char* unknown_format_error::what() const throw()
 {
-    cnvt.str("");
-    cnvt << runtime_error::what();
-    return cnvt.str().c_str();
+    return runtime_error::what();
 }

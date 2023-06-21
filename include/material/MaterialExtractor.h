@@ -21,7 +21,7 @@ namespace WarframeExporter::Material
 		MaterialExtractor(const MaterialExtractor&) = delete;
 		MaterialExtractor operator=(const MaterialExtractor&) = delete;
 
-		inline const std::string& getOutputExtension() const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
 		{
 			const static std::string outFileExt = "txt";
 			return outFileExt;

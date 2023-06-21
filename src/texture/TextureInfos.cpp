@@ -27,7 +27,7 @@ TextureInfoBC1::getFormat() const
 }
 
 void
-TextureInfoBC1::unSwizzle(char* inData, size_t inDataLen, char* outData) const
+TextureInfoBC1::unSwizzle(char* inData, int inDataLen, char* outData) const
 {
     const static int WFBLOCKSZ = 0x2000;
     const static int WriteBlockSz = 0x0004;
@@ -37,7 +37,6 @@ TextureInfoBC1::unSwizzle(char* inData, size_t inDataLen, char* outData) const
     int inPos = 0;
     int outPos = 0;
 
-    //for (int i = 0; i < std::max(inDataLen / (2 * WFBLOCKSZ), 1ULL); i++)
     for (size_t i = 0; i < inDataLen / (2 * WFBLOCKSZ); i++)
     {
         memcpy(pixels0, inData + inPos, WFBLOCKSZ);
@@ -45,7 +44,7 @@ TextureInfoBC1::unSwizzle(char* inData, size_t inDataLen, char* outData) const
         memcpy(pixels1, inData + inPos, WFBLOCKSZ);
         inPos += WFBLOCKSZ;
 
-        int curBlockLen = std::min((size_t)(WFBLOCKSZ / WriteBlockSz), inDataLen - inPos);
+        int curBlockLen = std::min((WFBLOCKSZ / WriteBlockSz), inDataLen - inPos);
         for (int j = 0; j < curBlockLen; j++)
         {
             int startPos1 = j * WriteBlockSz;
@@ -82,7 +81,7 @@ TextureInfoBC2::getFormat() const
 }
 
 void
-TextureInfoBC2::unSwizzle(char* inData, size_t inDatLen, char* outData)const
+TextureInfoBC2::unSwizzle(char* inData, int inDatLen, char* outData)const
 {
     char* buffer = new char[inDatLen];
     TextureInfoBC1::getInstance()->unSwizzle(inData, inDatLen, buffer);
@@ -115,7 +114,7 @@ TextureInfoBC3::getFormat() const
 }
 
 void
-TextureInfoBC3::unSwizzle(char* inData, size_t inDatLen, char* outData) const
+TextureInfoBC3::unSwizzle(char* inData, int inDatLen, char* outData) const
 {
     char* buffer = new char[inDatLen];
     TextureInfoBC1::getInstance()->unSwizzle(inData, inDatLen, buffer);
@@ -148,7 +147,7 @@ TextureInfoBC4::getFormat() const
 }
 
 void
-TextureInfoBC4::unSwizzle(char* inData, size_t inDatLen, char* outData) const
+TextureInfoBC4::unSwizzle(char* inData, int inDatLen, char* outData) const
 {
     const static int WFBlockSize = 0x4000;
     int channelBlockCount = inDatLen / WFBlockSize;
@@ -197,7 +196,7 @@ TextureInfoBC5::getFormat() const
 }
 
 void
-TextureInfoBC5::unSwizzle(char* inData, size_t inDatLen, char* outData) const
+TextureInfoBC5::unSwizzle(char* inData, int inDatLen, char* outData) const
 {
     const static int WFChannelBlockSize = 0x2000;
     const static int block0Size = WFChannelBlockSize / 4;
@@ -208,7 +207,7 @@ TextureInfoBC5::unSwizzle(char* inData, size_t inDatLen, char* outData) const
     static char greenBlock0[block0Size];
     static char greenBlock1[block1Size];
 
-    for (size_t i = 0; i < inDatLen / WFChannelBlockSize; i += 2)
+    for (int i = 0; i < inDatLen / WFChannelBlockSize; i += 2)
     {
         memcpy(inData + i * WFChannelBlockSize, redBlock0, block0Size);
         memcpy(inData + i * WFChannelBlockSize + block0Size, redBlock1, block1Size);
@@ -246,12 +245,12 @@ TextureInfoUncompressed::getEnumMapKeys() const
 ddspp::DXGIFormat
 TextureInfoUncompressed::getFormat() const
 {
-    static ddspp::DXGIFormat format = ddspp::DXGIFormat::R8G8B8A8_UNORM;
+    static ddspp::DXGIFormat format = ddspp::DXGIFormat::B8G8R8A8_UNORM;
     return format;
 }
 
 void
-TextureInfoUncompressed::unSwizzle(char* inData, size_t inDataLen, char* outData) const
+TextureInfoUncompressed::unSwizzle(char* inData, int inDataLen, char* outData) const
 {
     memcpy(outData, inData, inDataLen);
 }
@@ -281,7 +280,7 @@ TextureInfoBC6::getFormat() const
 }
 
 void
-TextureInfoBC6::unSwizzle(char* inData, size_t inDataLen, char* outData) const
+TextureInfoBC6::unSwizzle(char* inData, int inDataLen, char* outData) const
 {
     memcpy(outData, inData, inDataLen);
 }
@@ -311,7 +310,7 @@ TextureInfoBC7::getFormat() const
 }
 
 void
-TextureInfoBC7::unSwizzle(char* inData, size_t inDataLen, char* outData) const
+TextureInfoBC7::unSwizzle(char* inData, int inDataLen, char* outData) const
 {
     memcpy(outData, inData, inDataLen);
 }

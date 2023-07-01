@@ -4,6 +4,11 @@
 #include "LevelEnumMap.h"
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
+#include "level/LevelConverter.h"
+
+#include "level/LevelExporterGltf.h"
+#include "model/ModelExtractor.h"
+#include "CommonHeader.h"
 
 #include <iostream>
 
@@ -38,7 +43,7 @@ namespace WarframeExporter::Level
 		inline std::vector<int> getEnumMapKeys() const override
 		{
 			std::vector<int> extTypes = {
-				(int)LevelType::LEVEL_196,
+				(int)LevelType::LEVEL_201,
 			};
 			return extTypes;
 		}
@@ -47,5 +52,8 @@ namespace WarframeExporter::Level
 
 		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData) override;
+	
+	private:
+		void createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf);
 	};
 }

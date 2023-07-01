@@ -10,7 +10,7 @@ ModelExtractor::getInstance()
 }
 
 void
-ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+ModelExtractor::extractExternal(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
 {
 	const LotusLib::FileEntries::FileNode* bEntry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
 	std::unique_ptr<char[]> bRawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(bEntry);
@@ -22,17 +22,22 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	// Read body/header data
 	ModelReader* modelReader = g_enumMapModel[header.type];
 
-	ModelHeaderExternal headerExt;
-	modelReader->readHeader(hReader, ensmalleningData, header, headerExt);
+	modelReader->readHeader(hReader, ensmalleningData, header, outHeaderExt);
+	modelReader->readBody(outHeaderExt, &bReader, outBodyExt);
 
-	ModelBodyExternal bodyExt;
-	modelReader->readBody(headerExt, &bReader, bodyExt);
-
-	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", headerExt.boneTree.size(), headerExt.weightedBoneNames.size(), headerExt.meshInfos.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size()));
+	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", outHeaderExt.boneTree.size(), outHeaderExt.weightedBoneNames.size(), outHeaderExt.meshInfos.size(), outHeaderExt.vertexCount, outHeaderExt.faceCount, outHeaderExt.morphCount, outHeaderExt.physXMeshes.size()));
 
 	// Error checking. Properly extracted models will never trigger this.
-	if (headerExt.meshInfos.size() == 0)
+	if (outHeaderExt.meshInfos.size() == 0)
 		throw unknown_format_error("Mesh has zero MeshInfos");
+}
+
+void
+ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+{
+	ModelHeaderExternal headerExt;
+	ModelBodyExternal bodyExt;
+	extractExternal(header, hReader, pkgDir, package, internalPath, ensmalleningData, headerExt, bodyExt);
 
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;

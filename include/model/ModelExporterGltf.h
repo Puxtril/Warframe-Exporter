@@ -20,6 +20,7 @@ namespace WarframeExporter::Model
 {
 	class ModelExporterGltf
 	{
+	protected:
 		Logger& m_logger;
 		Document m_document;
 		inline static const std::string m_generatorName = "Puxtrils Warframe Model Exporter";
@@ -31,7 +32,7 @@ namespace WarframeExporter::Model
 		void addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body);
 		void save(const std::filesystem::path& outPath);
 
-	private:
+	protected:
 		void print_exception(const std::exception& e, int level = 0);
 
 		void addModelDataRigged(const ModelHeaderInternal& header, const ModelBodyInternal& body);

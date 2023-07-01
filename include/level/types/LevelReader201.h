@@ -7,29 +7,33 @@
 
 #include <string>
 #include <cstdint>
+#include <iostream>
+#include <regex>
 
 namespace WarframeExporter::Level
 {
-	class LevelReader196 : public LevelReader
+	class LevelReader201 : public LevelReader
 	{
 	protected:
-		LevelReader196() = default;
+		LevelReader201() = default;
 		
 	public:
-		inline static LevelReader196* getInstance()
+		inline static LevelReader201* getInstance()
 		{
-			static LevelReader196* instance = new LevelReader196();
+			static LevelReader201* instance = new LevelReader201();
 			return instance;
 		}
 
 		inline std::vector<int> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = { (int)LevelType::LEVEL_196 };
+			std::vector<int> extTypes = { (int)LevelType::LEVEL_201 };
 			return extTypes;
 		}
 	
-		void readHeaderDebug(BinaryReaderBase& reader, LevelHeaderExternal& outHeader) const override;
+		void readHeaderDebug(BinaryReaderBase& reader) const override;
 		void readBodyDebug(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader) const override;
 		void readHeader(BinaryReaderBase& reader, LevelHeaderExternal& outHeader) const override;
+		void readBody(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const override;
+
 	};
 };

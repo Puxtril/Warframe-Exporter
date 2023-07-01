@@ -74,9 +74,13 @@ ModelExporterGltf::print_exception(const std::exception& e, int level)
 void
 ModelExporterGltf::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t skinIndex)
 {
-	assert(m_document.scenes.size() == 0);
-	Scene scene;
-	scene.name = "Scene";
+	if (m_document.scenes.size() == 0)
+	{
+		Scene scene;
+		m_document.scenes.resize(1);
+		m_document.scene = 0;
+	}
+	Scene& scene = m_document.scenes[0];
 
 	for (size_t x = 0; x < meshes.size(); x++)
 	{
@@ -87,10 +91,6 @@ ModelExporterGltf::createSceneWithModelNodes(const std::vector<int32_t>& meshes,
 		m_document.nodes.push_back(curNode);
 		scene.nodes.push_back(curNodeIndex);
 	}
-
-	m_document.scenes.push_back(scene);
-	m_document.scene = 0;
-
 }
 
 int32_t

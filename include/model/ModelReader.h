@@ -11,6 +11,7 @@ namespace WarframeExporter::Model
 	enum class ModelType
 	{
 		MODEL_STATIC_96 = 96,
+		MODEL_LEVEL_103 = 103,
 		MODEL_RIGGED_269 = 269,
 		MODEL_RIGGED_272 = 272
 	};

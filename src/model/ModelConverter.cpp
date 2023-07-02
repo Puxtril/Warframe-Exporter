@@ -85,7 +85,8 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
     outHeader.faceCount = extHeader.faceCount;
     outHeader.morphCount = extHeader.morphCount;
 
-    std::vector<std::string> materialNames = ModelConverter::extractMaterialNames(attributes);
+    std::vector<std::string> materialNames = extHeader.materialPaths.size() > 0 ? extHeader.materialPaths : ModelConverter::extractMaterialNames(attributes);
+
     std::vector<MeshInfoInternal> intMeshInfos;
     for (size_t x = 0; x < extHeader.meshInfos.size(); x++)
     {

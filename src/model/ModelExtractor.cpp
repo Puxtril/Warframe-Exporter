@@ -66,5 +66,6 @@ ModelExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderB
 	modelReader->readHeaderDebug(hReader, ensmalleningData, header);
 	hReader->seek(pos, std::ios_base::beg);
 	modelReader->readHeader(hReader, ensmalleningData, header, headerExt);
-	modelReader->readBodyDebug(headerExt, &bReader);
+	if (headerExt.vertexCount > 0)
+		modelReader->readBodyDebug(headerExt, &bReader);
 }

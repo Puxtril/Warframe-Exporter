@@ -54,6 +54,7 @@ namespace WarframeExporter::Model
 		uint32_t bodySkipLen2;
 		std::vector<MeshInfoExternal> meshInfos;
 		std::vector<std::vector<uint32_t>> boneMaps;
+		std::vector<std::string> materialPaths; // Only present on "level" meshes
 		std::vector<PhysXMesh> physXMeshes;
 		std::vector<std::string> errorMsgs;
 	};

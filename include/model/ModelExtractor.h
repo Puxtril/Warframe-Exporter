@@ -42,6 +42,7 @@ namespace WarframeExporter::Model
 		{
 			std::vector<int> extTypes = {
 				(int)ModelType::MODEL_STATIC_96,
+				(int)ModelType::MODEL_LEVEL_103,
 				(int)ModelType::MODEL_RIGGED_269,
 				(int)ModelType::MODEL_RIGGED_272
 			};

@@ -81,7 +81,8 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 		
 			validModels++;
 		} catch (std::exception& ex) {
-			m_logger.error(spdlog::fmt_lib::format("{}::{}: {}", curLevelObj.meshPath, curLevelObj.objName, ex.what()));
+			if (curLevelObj.meshPath.length() > 5)
+				m_logger.error(spdlog::fmt_lib::format("{}::{}: {}", curLevelObj.meshPath, curLevelObj.objName, ex.what()));
 			continue;
 		}
 	}

@@ -121,7 +121,7 @@ LevelConverter::splitAttributes(const std::string& attrs)
 }
 
 bool
-LevelConverter::findInt(std::string_view attrs, const std::string_view& key, int& outValue)
+LevelConverter::findInt(std::string_view attrs, const std::string_view& key, size_t& outValue)
 {
 	size_t offset = attrs.find(key);
 
@@ -135,9 +135,7 @@ LevelConverter::findInt(std::string_view attrs, const std::string_view& key, int
 
 		std::from_chars_result result = std::from_chars(valueStr.data(), valueStr.data() + valueStr.length(), outValue);
 		if (result.ec != std::errc())
-		{
 			return false;
-		}
 	}
 
 	return true;
@@ -157,10 +155,7 @@ LevelConverter::findFloat(std::string_view attrs, const std::string_view& key, f
 		std::string_view valueStr = std::string_view(attrs).substr(offset, end - offset);
 		std::from_chars_result result = std::from_chars(valueStr.data(), valueStr.data() + valueStr.length(), outValue);
 		if (result.ec != std::errc())
-		{
-			std::cout << "Error Converting scale" << std::endl;
 			return false;
-		}
 
 		return true;
 	}
@@ -221,7 +216,6 @@ LevelConverter::findStringArray(std::string_view attrs, const std::string_view& 
 bool
 LevelConverter::findVec3Float(std::string_view attrs, const std::string_view& key, glm::vec3& outValue)
 {
-	//size_t offset = attrs.find("LocalPosition={");
 	size_t offset = attrs.find(key);
 
 	if (offset != std::string::npos)
@@ -239,19 +233,25 @@ LevelConverter::findVec3Float(std::string_view attrs, const std::string_view& ke
 		// Get X
 		subOffset = localPosStr.find(',', subOffset) + 1;
 		std::string_view xStr(localPosStr.substr(prevSubOffset, subOffset - prevSubOffset - 1));
-		std::from_chars(xStr.data(), xStr.data() + xStr.length(), outValue.x);
+		std::from_chars_result result = std::from_chars(xStr.data(), xStr.data() + xStr.length(), outValue.x);
+		if (result.ec != std::errc())
+			return false;
 		prevSubOffset = subOffset;
 
 		// Get Y
 		subOffset = localPosStr.find(',', subOffset) + 1;
 		std::string_view yStr(localPosStr.substr(prevSubOffset, subOffset - prevSubOffset - 1));
-		std::from_chars(yStr.data(), yStr.data() + yStr.length(), outValue.y);
+		result = std::from_chars(yStr.data(), yStr.data() + yStr.length(), outValue.y);
+		if (result.ec != std::errc())
+			return false;
 		prevSubOffset = subOffset;
 
 		// Get Z
 		subOffset = localPosStr.find(',', subOffset) + 1;
 		std::string_view zStr(localPosStr.substr(prevSubOffset, subOffset - prevSubOffset - 1));
-		std::from_chars(zStr.data(), zStr.data() + zStr.length(), outValue.z);
+		result = std::from_chars(zStr.data(), zStr.data() + zStr.length(), outValue.z);
+		if (result.ec != std::errc())
+			return false;
 
 		return true;
 	}

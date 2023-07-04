@@ -24,7 +24,7 @@ namespace WarframeExporter::Level
 			std::map<std::string_view, std::string_view> extraAttrs;
 			float scale;
 			glm::vec3 posOffset;
-			int instance;
+			size_t instance;
 		};
 
 	public:
@@ -33,7 +33,7 @@ namespace WarframeExporter::Level
 	private:
 		static std::vector<SplitAttributes> splitAttributes(const std::string& attrs);
 
-		static bool findInt(std::string_view attrs, const std::string_view& key, int& outValue);
+		static bool findInt(std::string_view attrs, const std::string_view& key, size_t& outValue);
 		static bool findFloat(std::string_view attrs, const std::string_view& key, float& outValue);
 		static bool findString(std::string_view attrs, const std::string_view& key, std::string_view& outValue);
 		static bool findStringArray(std::string_view attrs, const std::string_view& key, std::vector<std::string_view>& outValue);

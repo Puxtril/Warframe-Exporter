@@ -24,7 +24,7 @@ LevelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	levelReader->readBody(bReader, headerExt, bodyExt);
 
 	LevelInternal bodyInt;
-	LevelConverter::convertToInternal(headerExt, bodyExt, bodyInt);
+	LevelConverter::convertToInternal(headerExt, bodyExt, internalpath, bodyInt);
 	m_logger.info("Level mesh count: " + std::to_string(bodyInt.objs.size()));
 
 	LevelExporterGltf gltfOut;
@@ -46,7 +46,6 @@ LevelExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderB
 void
 LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf)
 {
-	size_t validModels = 0;
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
 		LevelObjectInternal& curLevelObj = bodyInt.objs[x];
@@ -62,6 +61,12 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 			LotusLib::CommonHeader commonHeader;
 			int headerLen = LotusLib::CommonHeaderReader::readHeader(hReader.getPtr(), commonHeader);
 			hReader.seek(headerLen, std::ios::beg);
+
+			if (WarframeExporter::Model::g_enumMapModel[commonHeader.type] == nullptr)
+			{
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported mesh: {}", curLevelObj.meshPath));
+				continue;
+			}
 
 			WarframeExporter::Model::ModelHeaderExternal headerExt;
 			WarframeExporter::Model::ModelBodyExternal bodyExt;
@@ -79,7 +84,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 
 			outGltf.addModelData(headerInt, bodyInt, curLevelObj);
 		
-			validModels++;
+
 		} catch (std::exception& ex) {
 			if (curLevelObj.meshPath.length() > 5)
 				m_logger.error(spdlog::fmt_lib::format("{}::{}: {}", curLevelObj.meshPath, curLevelObj.objName, ex.what()));

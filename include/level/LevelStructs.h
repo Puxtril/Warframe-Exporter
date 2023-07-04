@@ -46,7 +46,7 @@ namespace WarframeExporter::Level
 		glm::vec3 pos;
 		glm::vec4 rot;
 		float scale;
-		std::string_view meshPath;
+		std::string meshPath;
 		std::vector<std::string_view> materials;
 		std::map<std::string_view, std::string_view> attributes;
 	};

@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, LevelInternal& intBody)
+LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody)
 {
 	intBody._rawAttributeString = std::move(extBody.attributes);
 	std::vector<LevelConverter::SplitAttributes> splitAttrs = splitAttributes(intBody._rawAttributeString);
@@ -28,7 +28,7 @@ LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExter
 
 		// It all comes together here
 		LevelConverter::SplitAttributes& curAttrs = instanceMap[extObj.meshInstanceIndex];
-		intObj.meshPath = std::move(curAttrs.meshPath);
+		fixInternalPath(internalLevelPath, curAttrs.meshPath, intObj.meshPath);
 		intObj.materials = std::move(curAttrs.materials);
 		intObj.scale = std::move(curAttrs.scale);
 		intObj.attributes = std::move(curAttrs.extraAttrs);
@@ -120,10 +120,23 @@ LevelConverter::splitAttributes(const std::string& attrs)
 	return splitAttrs;
 }
 
+size_t
+LevelConverter::findAttribute(std::string_view attrs, const std::string_view& key)
+{
+	size_t offset = 0;
+	while ((offset = attrs.find(key, offset)) != std::string::npos)
+	{
+		// Check if the key is an exact match
+		if (offset != 0 && (attrs[offset - 1] != '\n' && attrs[offset - 1] != '\0'))
+			return std::string::npos;
+		return offset;
+	}
+}
+
 bool
 LevelConverter::findInt(std::string_view attrs, const std::string_view& key, size_t& outValue)
 {
-	size_t offset = attrs.find(key);
+	size_t offset = findAttribute(attrs, key);
 
 	if (offset != std::string::npos)
 	{
@@ -144,7 +157,7 @@ LevelConverter::findInt(std::string_view attrs, const std::string_view& key, siz
 bool
 LevelConverter::findFloat(std::string_view attrs, const std::string_view& key, float& outValue)
 {
-	size_t offset = attrs.find(key);
+	size_t offset = findAttribute(attrs, key);
 	
 	if (offset != std::string::npos)
 	{
@@ -166,7 +179,7 @@ LevelConverter::findFloat(std::string_view attrs, const std::string_view& key, f
 bool
 LevelConverter::findString(std::string_view attrs, const std::string_view& key, std::string_view& outValue)
 {
-	size_t offset = attrs.find(key);
+	size_t offset = findAttribute(attrs, key);
 
 	if (offset != std::string::npos)
 	{
@@ -183,7 +196,7 @@ LevelConverter::findString(std::string_view attrs, const std::string_view& key, 
 bool
 LevelConverter::findStringArray(std::string_view attrs, const std::string_view& key, std::vector<std::string_view>& outValue)
 {
-	size_t offset = attrs.find(key);
+	size_t offset = findAttribute(attrs, key);
 	
 	if (offset != std::string::npos)
 	{
@@ -216,7 +229,7 @@ LevelConverter::findStringArray(std::string_view attrs, const std::string_view& 
 bool
 LevelConverter::findVec3Float(std::string_view attrs, const std::string_view& key, glm::vec3& outValue)
 {
-	size_t offset = attrs.find(key);
+	size_t offset = findAttribute(attrs, key);
 
 	if (offset != std::string::npos)
 	{
@@ -257,4 +270,17 @@ LevelConverter::findVec3Float(std::string_view attrs, const std::string_view& ke
 	}
 
 	return false;
+}
+
+void
+LevelConverter::fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string_view readPath, std::string& outPath)
+{
+	// Already absolute path
+	if (readPath.size() < 5 || readPath[0] == '/')
+	{
+		outPath = std::string(readPath);
+		return;
+	}
+	
+	outPath = internalLevelPath.parent_path().string() + "/" + internalLevelPath.stem().string() + "/" + std::string(readPath.data(), readPath.length());
 }

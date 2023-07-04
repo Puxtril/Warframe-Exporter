@@ -10,10 +10,10 @@ Formats currently supported:
 - Textures -> DDS
 - 3D Models (mostly) -> glTF
 - Audio -> Ogg & Wav (Credit to [Sehnryr](https://github.com/sehnryr/wfcache-api))
+- Levels -> glTF
 
 Formats with started progress:
 - Animation -> glTF
-- Levels -> glTF (presumably)
 
 # Table of Contents
 
@@ -29,6 +29,7 @@ Formats with started progress:
     1. [Textures](#adding-a-new-texture-format) ([Texture Compression](##adding-a-new-texture-compression-format))
     1. [Materials](#adding-a-new-material-format)
     1. [Audio](#adding-a-new-audio-format)
+    1. [Level](#adding-a-new-level-format)
 1. [Building](#building)
 
 # How to use
@@ -148,6 +149,13 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 1. Add the enum value to `WarframeExporter::Audio::AudioExtractorProxy::getEnumMapKeys()` (inside `audio/AudioExtractorProxy.h`)
 1. Add a new reader class inside `audio/types`, `audio/AudioPCM/types`, and `audio/AudioOpus/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
 1. Register the class to `WarframeExporter::Audio::g_enumMapAudioExtractor` (inside `model/EnumMapAudioExtractor.h`)
+
+## Adding a new Level format
+
+1. Add the new enum value to `WarframeExporter::Level::LevelType` (inside `level/LevelReader.h`)
+1. Add the enum value to `WarframeExporter::Level::LevelExtractor::getEnumMapKeys()` (inside `level/LevelExtractor.h`)
+1. Add a new reader class inside `level/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
+1. Register the class to `WarframeExporter::Level::g_enumMapLevel` (inside `level/LevelEnumMap.h`)
 
 # Building
 

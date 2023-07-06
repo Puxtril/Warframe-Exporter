@@ -7,7 +7,6 @@ LevelReader201::readHeaderDebug(BinaryReaderBase& reader) const
 {
 	const static std::string pathLenMsg = "Internal path length Level header";
 	uint32_t pathCount1 = reader.readUInt32();
-	std::cout << pathCount1 << " ";
 	while (pathCount1--)
 	{
 		uint32_t pathLen = reader.readUInt32(0, 500, pathLenMsg);
@@ -15,7 +14,6 @@ LevelReader201::readHeaderDebug(BinaryReaderBase& reader) const
 	}
 	const static std::string actionPathLenMsg = "Internal path length Level header";
 	uint32_t pathCount2 = reader.readUInt32();
-	std::cout << pathCount2 << " ";
 	while (pathCount2--)
 	{
 		uint32_t pathLen = reader.readUInt32(0, 500, actionPathLenMsg);
@@ -23,7 +21,6 @@ LevelReader201::readHeaderDebug(BinaryReaderBase& reader) const
 	}
 	const static std::string assetPathLenMsg = "Internal path length Level header";
 	uint32_t pathCount3 = reader.readUInt32();
-	std::cout << pathCount3 << " ";
 	while (pathCount3--)
 	{
 		uint32_t pathLen = reader.readUInt32(0, 500, assetPathLenMsg);
@@ -43,8 +40,6 @@ LevelReader201::readHeaderDebug(BinaryReaderBase& reader) const
 		reader.readUInt32();
 		reader.readUInt32();
 	}
-
-	std::cout << levelObjCount << std::endl;
 }
 
 void

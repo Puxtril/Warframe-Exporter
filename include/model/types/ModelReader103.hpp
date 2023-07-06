@@ -97,11 +97,7 @@ namespace WarframeExporter::Model
 			headerReader->readUInt32(); // morph count
 			headerReader->readUInt32(); // bone count
 
-			headerReader->seek(0x8, std::ios_base::cur);
-
-			static const std::string UInt64LODUnkMsg = "UInt64 Array length";
-			uint32_t UInt64LODUnkLen = headerReader->readUInt32(0, 10, UInt64LODUnkMsg);
-			headerReader->seek(UInt64LODUnkLen * 8, std::ios_base::cur);
+			headerReader->seek(0xC, std::ios_base::cur);
 
 			headerReader->readUInt32();
 
@@ -269,12 +265,7 @@ namespace WarframeExporter::Model
 			outHeader.morphCount = headerReader->readUInt32();
 			outHeader.boneCount = headerReader->readUInt32();
 
-			headerReader->seek(0x8, std::ios_base::cur);
-
-			uint32_t UInt64LODUnkLen = headerReader->readUInt32();
-			headerReader->seek(UInt64LODUnkLen * 8, std::ios_base::cur);
-
-			headerReader->seek(0x69, std::ios_base::cur);
+			headerReader->seek(0x75, std::ios_base::cur);
 
 			uint32_t meshInfoCount = headerReader->readUInt32();
 			outHeader.meshInfos.resize(meshInfoCount);

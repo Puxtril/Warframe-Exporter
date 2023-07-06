@@ -124,13 +124,14 @@ size_t
 LevelConverter::findAttribute(std::string_view attrs, const std::string_view& key)
 {
 	size_t offset = 0;
-	while ((offset = attrs.find(key, offset)) != std::string::npos)
+	while ((offset = attrs.find(key, offset)) < attrs.size())
 	{
 		// Check if the key is an exact match
 		if (offset != 0 && (attrs[offset - 1] != '\n' && attrs[offset - 1] != '\0'))
 			return std::string::npos;
 		return offset;
 	}
+	return std::string::npos;
 }
 
 bool

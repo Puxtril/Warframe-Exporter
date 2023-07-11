@@ -1,7 +1,3 @@
-# Level Branch
-
-Unfortunately not much progress has been made here. I saw a bunch of integers listed in the body file for levels and could not find what they reference.
-
 # Warframe Extractor
 
 A cross-platform program/library for exporting files from Warframe. Provides a command-line interface for users, can be compiled into a library for programmers. "Easily" extensible to support new formats and upgrades to existing formats.

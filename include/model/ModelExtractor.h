@@ -7,6 +7,7 @@
 #include "ModelStructs.hpp"
 #include "model/ModelEnumMap.h"
 #include "ExporterExceptions.h"
+#include "model/vertexcolor/VertexColorIndexer.h"
 
 #include <iostream>
 
@@ -15,10 +16,14 @@ namespace WarframeExporter::Model
 	class ModelExtractor : public Extractor
 	{
 		ModelExtractor() : Extractor() {}
+
+		VertexColor::VertexColorIndexer m_vertexColorIndexer;
 		
 	public:
 		ModelExtractor(const ModelExtractor&) = delete;
 		ModelExtractor operator=(const ModelExtractor&) = delete;
+
+		bool m_indexVertexColors = true;
 
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
 		{

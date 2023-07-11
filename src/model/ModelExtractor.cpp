@@ -39,10 +39,14 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	ModelBodyExternal bodyExt;
 	extractExternal(header, hReader, pkgDir, package, internalPath, ensmalleningData, headerExt, bodyExt);
 
+	std::vector<std::vector<glm::u8vec4>> vertexColors;
+	if (m_indexVertexColors)
+		m_vertexColorIndexer.getModelColors(internalPath, vertexColors, pkgDir["Misc"]);
+
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
-	ModelConverter::convertToInternal(headerExt, bodyExt, header.attributes, headerInt, bodyInt);
+	ModelConverter::convertToInternal(headerExt, bodyExt, header.attributes, vertexColors, headerInt, bodyInt);
 	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
 	// Convert body/header into exportable format

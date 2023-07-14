@@ -23,6 +23,8 @@ namespace WarframeExporter::Model
 		ModelReader() = default;
 
 	public:
+		virtual bool needsEnsmalleningScale() const = 0;
+
 		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) = 0;
 		virtual void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
 		virtual void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) = 0;

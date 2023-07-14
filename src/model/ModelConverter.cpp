@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody)
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, bool ensmalleningScale)
 {
     ModelConverter::flipXAxis(extBody);
 
@@ -11,6 +11,8 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
     ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
 
+    if (!ensmalleningScale)
+        outHeader.modelScale = glm::vec3(1.0, 1.0, 1.0);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
 }
 

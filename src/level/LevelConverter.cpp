@@ -5,119 +5,68 @@ using namespace WarframeExporter::Level;
 void
 LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody)
 {
-	intBody._rawAttributeString = std::move(extBody.attributes);
-	std::vector<LevelConverter::SplitAttributes> splitAttrs = splitAttributes(intBody._rawAttributeString);
-
-	// Why does DE index like this...
-	std::map<int, LevelConverter::SplitAttributes> instanceMap;
-	for (int x = 0; x < splitAttrs.size(); x++)
-	{
-		instanceMap[splitAttrs[x].instance] = splitAttrs[x];
-	}
-	
 	intBody.objs.resize(extHeader.levelObjs.size());
 	for (size_t x = 0; x < intBody.objs.size(); x++)
 	{
 		LevelObjectHeaderExternal& extObj = extHeader.levelObjs[x];
 		LevelObjectInternal& intObj = intBody.objs[x];
 		
+		intObj.rawAttributes = std::move(extBody.attributes[x]);
 		intObj.objTypePath = std::move(extObj.objTypePath);
 		intObj.objName = std::move(extObj.objName);
 		intObj.pos = std::move(extObj.pos);
 		intObj.rot = std::move(extObj.rot);
 
-		// It all comes together here
-		LevelConverter::SplitAttributes& curAttrs = instanceMap[extObj.meshInstanceIndex];
-		fixInternalPath(internalLevelPath, curAttrs.meshPath, intObj.meshPath);
-		intObj.materials = std::move(curAttrs.materials);
-		intObj.scale = std::move(curAttrs.scale);
-		intObj.attributes = std::move(curAttrs.extraAttrs);
-		//intObj.pos += curAttrs.posOffset;
+		splitAttributes(intObj.rawAttributes, intBody.objs[x]);
+		fixInternalPath(internalLevelPath, intObj.meshPath);
 	}
 }
 
-std::vector<LevelConverter::SplitAttributes>
-LevelConverter::splitAttributes(const std::string& attrs)
+void
+LevelConverter::splitAttributes(const std::string& attrs, LevelObjectInternal& intObj)
 {
-	size_t prevPos = 0;
-	size_t pos = 0;
-	std::vector<LevelConverter::SplitAttributes> splitAttrs;
-	
-	while ((pos = attrs.find('\0', pos+1)) != std::string::npos) {
-		std::string_view curAttrs = std::string_view(attrs).substr(prevPos, pos - prevPos);
-		
-		LevelConverter::SplitAttributes curAttr;
+	constexpr std::string_view meshKey = "Mesh=";
+	std::string_view meshPath = "";
+	findString(attrs, meshKey, meshPath);
+	intObj.meshPath = std::string(meshPath);
 
-		constexpr std::string_view meshKey = "Mesh=";
-		if (!findString(curAttrs, meshKey, curAttr.meshPath))
-			curAttr.meshPath = "";
+	constexpr std::string_view materialOverrideKey = "OverrideMaterial={";
+	if (!findStringArray(attrs, materialOverrideKey, intObj.materials))
+		intObj.materials = {};
 
-		constexpr std::string_view materialOverrideKey = "OverrideMaterial={";
-		if (!findStringArray(curAttrs, materialOverrideKey, curAttr.materials))
-			curAttr.materials = {};
+	constexpr std::string_view scaleKey = "MeshScale=";
+	if (!findFloat(attrs, scaleKey, intObj.scale))
+		intObj.scale = 1.0;
 
-		/*
-		* I don't know if this is needed...
-		constexpr std::string_view posOffsetKey = "";
-		if (!findVec3Float(curAttrs, posOffsetKey, curAttr.posOffset))
-		{
-			curAttr.posOffset = { 0.0, 0.0, 0.0 };
-		}
-		*/
+	constexpr std::string_view lightmap1Key = "LightMap=";
+	std::string_view lightMapvalue;
+	if (findString(attrs, lightmap1Key, lightMapvalue))
+		intObj.attributes[lightmap1Key] = lightMapvalue;
 
-		constexpr std::string_view scaleKey = "MeshScale=";
-		if (!findFloat(curAttrs, scaleKey, curAttr.scale))
-		{
-			curAttr.scale = 1.0;
-		}
+	constexpr std::string_view lightmapCoordsKey = "LightMapCoords=";
+	std::string_view lightMapCordsValue;
+	if (findString(attrs, lightmapCoordsKey, lightMapCordsValue))
+		intObj.attributes[lightmapCoordsKey] = lightMapCordsValue;
 
-		// Very important
-		// If this doesn't have an index, it's not a mesh
-		// There are scripts, triggers, sounds, etc as well
-		constexpr std::string_view instanceKey = "Instance=";
-		if (!findInt(curAttrs, instanceKey, curAttr.instance))
-		{
-			if (curAttr.meshPath.length() > 0)
-				WarframeExporter::Logger::getInstance().warn("Mesh path attribute is present, but no Instance attribute was found");
-			curAttr.instance = -1;
-		}
+	constexpr std::string_view lightmapNormalizeKey = "LightMapNormalize=";
+	std::string_view lightMapNormalizeValue;
+	if (findString(attrs, lightmapNormalizeKey, lightMapNormalizeValue))
+		intObj.attributes[lightmapNormalizeKey] = lightMapNormalizeValue;
 
-		constexpr std::string_view lightmap1Key = "LightMap=";
-		std::string_view lightMapvalue;
-		if (findString(curAttrs, lightmap1Key, lightMapvalue))
-			curAttr.extraAttrs[lightmap1Key] = lightMapvalue;
+	constexpr std::string_view materialSwapKey = "MaterialForSwap=";
+	std::string_view materialSwapValue;
+	if (findString(attrs, materialSwapKey, materialSwapValue))
+		intObj.attributes[materialSwapKey] = materialSwapValue;
 
-		constexpr std::string_view lightmapCoordsKey = "LightMapCoords=";
-		std::string_view lightMapCordsValue;
-		if (findString(curAttrs, lightmapCoordsKey, lightMapCordsValue))
-			curAttr.extraAttrs[lightmapCoordsKey] = lightMapCordsValue;
+	constexpr std::string_view lightmap2Key = "lightMap=";
+	std::string_view lightmap2Value;
+	if (findString(attrs, lightmap2Key, lightmap2Value))
+		intObj.attributes[lightmap2Key] = lightmap2Value;
 
-		constexpr std::string_view lightmapNormalizeKey = "LightMapNormalize=";
-		std::string_view lightMapNormalizeValue;
-		if (findString(curAttrs, lightmapNormalizeKey, lightMapNormalizeValue))
-			curAttr.extraAttrs[lightmapNormalizeKey] = lightMapNormalizeValue;
-
-		constexpr std::string_view materialSwapKey = "MaterialForSwap=";
-		std::string_view materialSwapValue;
-		if (findString(curAttrs, materialSwapKey, materialSwapValue))
-			curAttr.extraAttrs[materialSwapKey] = materialSwapValue;
-
-		constexpr std::string_view lightmap2Key = "lightMap=";
-		std::string_view lightmap2Value;
-		if (findString(curAttrs, lightmap2Key, lightmap2Value))
-			curAttr.extraAttrs[lightmap2Key] = lightmap2Value;
-
-		constexpr std::string_view lightmap2CoordsKey = "lightMapCoords=";
-		std::string_view lightmap2CoordsValue;
-		if (findString(curAttrs, lightmap2CoordsKey, lightmap2CoordsValue))
-			curAttr.extraAttrs[lightmap2CoordsKey] = lightmap2CoordsValue;
-
-		splitAttrs.push_back(curAttr);
-
-		prevPos = pos;
-	}
-	
-	return splitAttrs;
+	constexpr std::string_view lightmap2CoordsKey = "lightMapCoords=";
+	std::string_view lightmap2CoordsValue;
+	if (findString(attrs, lightmap2CoordsKey, lightmap2CoordsValue))
+		intObj.attributes[lightmap2CoordsKey] = lightmap2CoordsValue;
 }
 
 size_t
@@ -274,14 +223,11 @@ LevelConverter::findVec3Float(std::string_view attrs, const std::string_view& ke
 }
 
 void
-LevelConverter::fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string_view readPath, std::string& outPath)
+LevelConverter::fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string& outPath)
 {
 	// Already absolute path
-	if (readPath.size() < 5 || readPath[0] == '/')
-	{
-		outPath = std::string(readPath);
+	if (outPath.size() < 5 || outPath[0] == '/')
 		return;
-	}
 	
-	outPath = internalLevelPath.parent_path().string() + "/" + internalLevelPath.stem().string() + "/" + std::string(readPath.data(), readPath.length());
+	outPath = internalLevelPath.parent_path().string() + "/" + internalLevelPath.stem().string() + "/" + outPath;
 }

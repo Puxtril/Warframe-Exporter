@@ -34,6 +34,11 @@ namespace WarframeExporter::Model
 			return extTypes;
 		}
 
+		inline bool needsEnsmalleningScale() const override
+		{
+			return true;
+		}
+
 		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
 		{
 			headerReader->seek(0x1C, std::ios_base::cur);

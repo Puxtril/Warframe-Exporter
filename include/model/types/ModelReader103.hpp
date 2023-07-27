@@ -34,6 +34,11 @@ namespace WarframeExporter::Model
 			return extTypes;
 		}
 
+		inline bool needsEnsmalleningScale() const override
+		{
+			return false;
+		}
+
 		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
 		{
 			headerReader->seek(0x1C, std::ios_base::cur);
@@ -411,11 +416,11 @@ namespace WarframeExporter::Model
 				// /shrug
 				bodyReader->seek(12, std::ios_base::cur);
 
-				outBody.UV1[x][0] = bodyReader->readUInt16() / 65535.0F;
-				outBody.UV1[x][1] = bodyReader->readUInt16() / 65535.0F;
+				outBody.UV1[x][0] = bodyReader->readHalf();
+				outBody.UV1[x][1] = bodyReader->readHalf();
 
-				outBody.UV2[x][0] = bodyReader->readUInt16() / 65535.0F;
-				outBody.UV2[x][1] = bodyReader->readUInt16() / 65535.0F;
+				outBody.UV2[x][0] = bodyReader->readHalf();
+				outBody.UV2[x][1] = bodyReader->readHalf();
 			}
 
 			outBody.indices.resize(extHeader.faceCount);

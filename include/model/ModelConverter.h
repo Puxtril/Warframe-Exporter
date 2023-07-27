@@ -20,7 +20,7 @@ namespace WarframeExporter::Model
 	class ModelConverter
 	{
 	public:
-		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody);
+		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, bool ensmalleningScale);
 
 	private:	
 		static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelHeaderInternal& outHeader);

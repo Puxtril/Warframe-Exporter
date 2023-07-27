@@ -50,6 +50,7 @@ namespace WarframeExporter::Model
 		uint32_t boneCount;
 		uint32_t faceCount;
 		uint32_t morphCount;
+		// 2 "free use" variables for skipping data
 		uint32_t bodySkipLen1;
 		uint32_t bodySkipLen2;
 		std::vector<MeshInfoExternal> meshInfos;

@@ -15,24 +15,11 @@ namespace WarframeExporter::Level
 {
 	class LevelConverter
 	{
-		// From a giant string of attributes...
-		// Split into an array of attribute groups...
-		// These are cherry-picked attributes
-		struct SplitAttributes
-		{
-			std::string_view meshPath;
-			std::vector<std::string_view> materials;
-			std::map<std::string_view, std::string_view> extraAttrs;
-			float scale;
-			glm::vec3 posOffset;
-			size_t instance;
-		};
-
 	public:
 		static void convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody);
 
 	private:
-		static std::vector<SplitAttributes> splitAttributes(const std::string& attrs);
+		static void splitAttributes(const std::string& attrs, LevelObjectInternal& intObj);
 
 		// This probably could be performed using Regex, but..
 		//  1) std::regex is very slow
@@ -48,7 +35,6 @@ namespace WarframeExporter::Level
 		static bool findStringArray(std::string_view attrs, const std::string_view& key, std::vector<std::string_view>& outValue);
 		static bool findVec3Float(std::string_view attrs, const std::string_view& key, glm::vec3& outValue);
 
-
 		// Sometimes the internal path to files are relative
 		// Each level file in AnimRetarget has a corresponding folder in Misc
 		// This folder has the name of the level file
@@ -56,6 +42,6 @@ namespace WarframeExporter::Level
 		// Ex
 		// AnimRetarget: /Lotus/Levels/Railjack/GrineerHangerShip/HangarPrisionInterior.level
 		// Misc: /Lotus/Levels/Railjack/GrineerHangerShip/HangarPrisionInterior/
-		static void fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string_view readPath, std::string& outPath);
+		static void fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string& outPath);
 	};
 };

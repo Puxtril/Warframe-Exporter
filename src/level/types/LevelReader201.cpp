@@ -107,10 +107,13 @@ LevelReader201::readHeader(BinaryReaderBase& reader, LevelHeaderExternal& outHea
 void
 LevelReader201::readBody(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const
 {
-	outBody.unkIndices.resize(extHeader.levelObjs.size());
-	for (int x = 0; x < extHeader.levelObjs.size(); x++)
-		outBody.unkIndices[x] = reader.readUInt32();
+	std::vector<uint32_t> attributeLens(extHeader.levelObjs.size());
+	reader.readUInt32Array(attributeLens.data(), extHeader.levelObjs.size());
 
-	int remainingBytes = reader.getLength() - reader.tell();
-	outBody.attributes = reader.readAsciiString(remainingBytes);
+	for (size_t x = 0; x < extHeader.levelObjs.size(); x++)
+	{
+		uint32_t curAttrLen = attributeLens[x];
+		outBody.attributes.push_back(reader.readAsciiString(curAttrLen));
+		reader.seek(1, std::ios::cur);
+	}
 }

@@ -31,12 +31,7 @@ namespace WarframeExporter::Level
 
 	struct LevelBodyExternal
 	{
-		// I have no idea what these are for
-		// You would think there are used to index LevelObjs
-		//   since this array size is always equal to the LevelObj count
-		// But nooooooooooooo
-		std::vector<uint32_t> unkIndices;
-		std::string attributes;
+		std::vector<std::string> attributes;
 	};
 	
 	struct LevelObjectInternal
@@ -46,9 +41,12 @@ namespace WarframeExporter::Level
 		glm::vec3 pos;
 		glm::vec4 rot;
 		float scale;
+		// Cannot be string view, because it might need fixing
+		// See LevelConverter::fixInternalPath
 		std::string meshPath;
 		std::vector<std::string_view> materials;
 		std::map<std::string_view, std::string_view> attributes;
+		std::string rawAttributes;
 	};
 
 	// For optimization purposes, keep the entire attributes string as an std::string
@@ -56,6 +54,5 @@ namespace WarframeExporter::Level
 	struct LevelInternal
 	{
 		std::vector<LevelObjectInternal> objs;
-		std::string _rawAttributeString;
 	};
 }

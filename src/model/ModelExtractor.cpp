@@ -42,7 +42,7 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
-	ModelConverter::convertToInternal(headerExt, bodyExt, header.attributes, headerInt, bodyInt);
+	ModelConverter::convertToInternal(headerExt, bodyExt, header.attributes, headerInt, bodyInt, g_enumMapModel[header.type]->needsEnsmalleningScale());
 	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
 	// Convert body/header into exportable format

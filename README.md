@@ -15,6 +15,7 @@ Formats with started progress:
 
 1. [How to use](#how-to-use)
 1. [External Libraries](#external-libraries)
+1. [ImHex Patterns](#imhex-patterns)
 1. [Library Overview](#overview-of-this-library)
     1. [High level](#high-level-overview)
     1. [Medium level](#medium-level-overview)
@@ -42,6 +43,17 @@ Download the latest from the Releases section. This is a CLI program, so open up
   * [nlohmann-json](https://github.com/nlohmann/json): Required by fx-gltf.
 * [glm](https://github.com/g-truc/glm): A helper library for models. Provides matrix and vector math operations.
 * [TCLAP](https://sourceforge.net/projects/tclap/): Command-line interface library
+
+# ImHex Patterns
+
+Inside the `utils` folder, you'll find a collection of `.hexpat` files. These are patterns for [ImHex](https://github.com/WerWolv/ImHex). If you're interested in the file formats analyzed in this repo, I highly recommend using these.
+
+1. Download and install ImHex
+1. Copy all `.hexpat` files into `C:\Users\<Username>\AppData\Local\imhex\patterns`
+1. Load a raw file into Imhex for analysis
+    1. (Optional) Using the advanced tool, find specific formats using the `--print-enums` flag
+    1. Write raw files from the advanced tool using the `--write-raw` flag
+1. Within ImHex, go to *File -> Import -> Pattern File* and select the appropriate pattern
 
 # Overview of this library
 

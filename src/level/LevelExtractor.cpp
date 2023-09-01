@@ -78,9 +78,12 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 			// Right?
 			headerExt.boneTree.clear();
 
+
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
 			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, commonHeader.attributes, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[commonHeader.type]->needsEnsmalleningScale());
+			
+			LevelConverter::applyTransformation(curLevelObj, bodyInt.positions);
 
 			outGltf.addModelData(headerInt, bodyInt, curLevelObj);
 		

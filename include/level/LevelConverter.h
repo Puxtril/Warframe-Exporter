@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include "glm/vec3.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 #include "LotusPath.h"
 #include "level/LevelStructs.h"
@@ -17,6 +18,7 @@ namespace WarframeExporter::Level
 	{
 	public:
 		static void convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody);
+		static void applyTransformation(LevelObjectInternal& levelObj, std::vector<glm::vec3>& verts);
 
 	private:
 		static void splitAttributes(const std::string& attrs, LevelObjectInternal& intObj);

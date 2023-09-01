@@ -1,4 +1,5 @@
 #include "model/ModelConverter.h"
+#include "glm/ext/matrix_transform.hpp"
 
 using namespace WarframeExporter::Model;
 
@@ -157,6 +158,7 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
 void
 ModelConverter::flipXAxis(ModelBodyExternal& extBody)
 {
+    // For rigged models
     for (auto& x : extBody.reverseBinds)
     {
         x = glm::transpose(glm::scale(glm::transpose(x), { -1, 1, 1 }));
@@ -169,6 +171,15 @@ ModelConverter::flipXAxis(ModelBodyExternal& extBody)
     for (auto& x : extBody.bonePositions)
     {
         x.x *= -1;
+    }
+    
+    // For static models
+    if (extBody.bonePositions.empty())
+    {
+        for (glm::vec3& curPos : extBody.positions)
+        {
+            curPos.z *= -1.0f;
+        }
     }
 }
 

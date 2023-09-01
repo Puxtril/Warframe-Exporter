@@ -21,10 +21,6 @@ LevelExporterGltf::addLevelInformation(const LevelObjectInternal& levelObj, std:
 		int32_t meshIndex = meshIndices[x];
 		Node& curNode = m_document.nodes[meshIndex];
 
-		curNode.translation = std::array<float, 3>{levelObj.pos.x, levelObj.pos.y, levelObj.pos.z};
-		curNode.rotation = std::array<float, 4>{levelObj.rot.x, levelObj.rot.y, levelObj.rot.z, levelObj.rot.w};
-		curNode.scale = std::array<float, 3>{levelObj.scale, levelObj.scale, levelObj.scale};
-
 		Mesh& curMesh = m_document.meshes[curNode.mesh];
 		curMesh.extensionsAndExtras["extras"]["MeshPath"] = levelObj.meshPath;
 		curMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;

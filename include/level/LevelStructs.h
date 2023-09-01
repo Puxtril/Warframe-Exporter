@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/vec3.hpp"
-#include "glm/vec4.hpp"
+#include "glm/gtx/quaternion.hpp"
 
 #include <string>
 #include <string_view>
@@ -15,7 +15,7 @@ namespace WarframeExporter::Level
 	{
 		std::string objTypePath;
 		glm::vec3 pos;
-		glm::vec4 rot;
+		glm::quat rot;
 		std::string objName;
 		uint32_t meshInstanceIndex;
 		uint32_t unk2;
@@ -39,7 +39,7 @@ namespace WarframeExporter::Level
 		std::string objTypePath;
 		std::string objName;
 		glm::vec3 pos;
-		glm::vec4 rot;
+		glm::quat rot;
 		float scale;
 		// Cannot be string view, because it might need fixing
 		// See LevelConverter::fixInternalPath

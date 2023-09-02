@@ -180,6 +180,10 @@ namespace WarframeExporter::Model
 
 				headerReader->seek(0x10, std::ios::cur);
 			}
+			// Terrains should only have 1 meshinfo
+			// It causes issues when there are more than 1
+			// Surely this won't bite me on the ass one day
+			outHeader.meshInfos.resize(1);
 
 			outHeader.vertexCount = headerReader->readUInt32();
 

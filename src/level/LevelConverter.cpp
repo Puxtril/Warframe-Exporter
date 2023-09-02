@@ -23,6 +23,17 @@ LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExter
 }
 
 void
+LevelConverter::replaceOverrideMaterials(const std::vector<std::string_view>& materialNames, Model::ModelHeaderInternal& modelHeader)
+{
+	if (materialNames.size() != modelHeader.meshInfos.size())
+		return;
+
+	for (size_t x = 0; x < materialNames.size(); x++)
+		if (materialNames[x].size() > 2)
+			modelHeader.meshInfos[x].matName = materialNames[x];
+}
+
+void
 LevelConverter::splitAttributes(const std::string& attrs, LevelObjectInternal& intObj)
 {
 	constexpr std::string_view meshKey = "Mesh=";

@@ -17,6 +17,5 @@ namespace WarframeExporter::Level
 	private:
 		void addLevelInformation(const LevelObjectInternal& levelObj, std::vector<int32_t> meshIndices);
 		std::vector<int32_t> getMeshNodeIndices(int32_t startIndex, int32_t endIndex);
-		int32_t createMaterial(const std::string& materialPath);
 	};
 }

@@ -18,13 +18,20 @@ namespace WarframeExporter::Model
 		MODEL_RIGGED_272 = 272
 	};
 
+	enum class ScaleType
+	{
+		XYZ,
+		XZ,
+		NONE
+	};
+
 	class ModelReader : public EnumMapValue
 	{
 	protected:
 		ModelReader() = default;
 
 	public:
-		virtual bool needsEnsmalleningScale() const = 0;
+		virtual ScaleType ensmalleningScale() const = 0;
 
 		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) = 0;
 		virtual void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;

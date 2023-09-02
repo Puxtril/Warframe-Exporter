@@ -33,9 +33,9 @@ namespace WarframeExporter::Model
 			return extTypes;
 		}
 
-		inline bool needsEnsmalleningScale() const override
+		inline ScaleType ensmalleningScale() const override
 		{
-			return true;
+			return ScaleType::XYZ;
 		}
 
 		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override

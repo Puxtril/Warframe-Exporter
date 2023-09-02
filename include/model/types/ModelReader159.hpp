@@ -34,9 +34,9 @@ namespace WarframeExporter::Model
 			return extTypes;
 		}
 
-		inline bool needsEnsmalleningScale() const override
+		inline ScaleType ensmalleningScale() const override
 		{
-			return false;
+			return ScaleType::XZ;
 		}
 
 		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
@@ -239,7 +239,7 @@ namespace WarframeExporter::Model
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 			{
 				outBody.positions[x][0] = bodyReader->readHalf() - 0.5F;
-				outBody.positions[x][1] = bodyReader->readHalf() - 0.5F;
+				outBody.positions[x][1] = bodyReader->readHalf();
 				outBody.positions[x][2] = bodyReader->readHalf() - 0.5F;
 				
 				bodyReader->seek(10, std::ios::cur);

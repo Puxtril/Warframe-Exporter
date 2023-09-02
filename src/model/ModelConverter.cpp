@@ -4,7 +4,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, bool ensmalleningScale)
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType)
 {
     ModelConverter::flipXAxis(extBody);
 
@@ -12,8 +12,7 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
     ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
 
-    if (!ensmalleningScale)
-        outHeader.modelScale = glm::vec3(1.0, 1.0, 1.0);
+    getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
 }
 
@@ -108,7 +107,6 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
     outHeader.meshInfos = intMeshInfos;
 
     outHeader.errorMsgs = extHeader.errorMsgs;
-    getModelScale(extHeader.meshInfos, outHeader.modelScale);
 }
 
 void
@@ -205,7 +203,7 @@ ModelConverter::extractMaterialNames(const std::string& attributes)
 }
 
 void
-ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec3& outScale)
+ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec3& outScale)
 {
     outScale.x = 0.0;
     outScale.y = 0.0;
@@ -215,8 +213,23 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, gl
     {
         for (MeshInfoExternal curMeshInfo : meshInfos)
         {
-            float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
-            outScale[i] = std::max(outScale[i], largerOf2);
+            if (scaleType == ScaleType::XYZ)
+            {
+                float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
+                outScale[i] = std::max(outScale[i], largerOf2);
+            }
+            else if (scaleType == ScaleType::XZ)
+            {
+                // Skip Y axis
+                if (i == 1)
+                {
+                    outScale[i] = 1.0;
+                    continue;
+                }
+
+                float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
+                outScale[i] = largerOf2 * 2;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ModelStructs.hpp"
+#include "ModelReader.h"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -20,7 +21,7 @@ namespace WarframeExporter::Model
 	class ModelConverter
 	{
 	public:
-		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, bool ensmalleningScale);
+		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType);
 
 	private:	
 		static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelHeaderInternal& outHeader);
@@ -29,6 +30,6 @@ namespace WarframeExporter::Model
 
 		static void flipXAxis(ModelBodyExternal& extBody);
 		static std::vector<std::string> extractMaterialNames(const std::string& attributes);
-		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec3& outScale);
+		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec3& outScale);
 	};
 }

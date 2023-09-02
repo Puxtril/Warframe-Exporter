@@ -80,7 +80,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, commonHeader.attributes, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[commonHeader.type]->needsEnsmalleningScale());
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, commonHeader.attributes, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[commonHeader.type]->ensmalleningScale());
 			
 			LevelConverter::applyTransformation(curLevelObj, bodyInt.positions);
 			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);

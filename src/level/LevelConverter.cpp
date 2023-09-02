@@ -254,9 +254,15 @@ LevelConverter::applyTransformation(LevelObjectInternal& levelObj, std::vector<g
 		// Apply level object transforms
 		curVec *= glm::vec3(levelObj.scale, levelObj.scale, levelObj.scale);
 		curVec = glm::rotate(levelObj.rot, curVec);
-		curVec += levelObj.pos;
-
+		
 		// Re-mirror
 		curVec.z *= -1.0f;
 	}
+
+	levelObj.scale = 1.0f;
+	levelObj.rot = glm::quat();
+
+	// Reflect model origin point
+	// Apply this at export-time
+	levelObj.pos.z *= -1.0f;
 }

@@ -12,6 +12,7 @@ namespace WarframeExporter::Model
 	{
 		MODEL_STATIC_96 = 96,
 		MODEL_LEVEL_99 = 99,
+		MODEL_DCM_101 = 101,
 		MODEL_LEVEL_103 = 103,
 		MODEL_TERRAIN_159 = 159,
 		MODEL_RIGGED_269 = 269,

@@ -5,6 +5,7 @@
 #include "tclap/CmdLine.h"
 #include "Ensmallening.hpp"
 #include "BatchIteratorExport.h"
+#include "model/ModelExtractor.h"
 
 #include <memory>
 #include <filesystem>
@@ -18,6 +19,8 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_extModelCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extMatCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extAudioCmd;
+
+	std::shared_ptr<TCLAP::SwitchArg> m_includeVertexColors;
 
 	CLIExtract();
 

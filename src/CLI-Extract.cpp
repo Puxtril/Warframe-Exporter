@@ -1,4 +1,6 @@
 #include "CLI-Extract.h"
+#include "model/ModelExtractor.h"
+#include "tclap/SwitchArg.h"
 
 
 CLIExtract::CLIExtract()
@@ -9,6 +11,8 @@ CLIExtract::CLIExtract()
 	m_extAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-audio", "Extract audio clips", false);
 	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
 	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract all levels", false);
+
+	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
 }
 
 CLIExtract*
@@ -39,7 +43,8 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 
 void
 CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
-{	
+{
+	cmdLine.add(m_includeVertexColors.get());
 }
  
 void
@@ -47,6 +52,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 {
 	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
+
+	WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = m_includeVertexColors->getValue();
 
 	int types = 0;
 	if (m_extTextCmd->getValue() || m_extAllCmd->getValue())

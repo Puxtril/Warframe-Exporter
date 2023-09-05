@@ -32,6 +32,17 @@ ModelExtractor::extractExternal(const LotusLib::CommonHeader& header, BinaryRead
 		throw unknown_format_error("Mesh has zero MeshInfos");
 }
 
+std::vector<std::vector<glm::u8vec4>>
+ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::Package<LotusLib::CachePairReader>& pkg)
+{
+	std::vector<std::vector<glm::u8vec4>> vertexColors;
+	if (m_indexVertexColors)
+		m_vertexColorIndexer.getModelColors(modelPath, vertexColors, pkg);
+	if (vertexColors.size() > 0)
+		m_logger.debug("Found " + std::to_string(vertexColors.size()) + "vertex colors");
+	return vertexColors;
+}
+
 void
 ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
@@ -39,9 +50,7 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	ModelBodyExternal bodyExt;
 	extractExternal(header, hReader, pkgDir, package, internalPath, ensmalleningData, headerExt, bodyExt);
 
-	std::vector<std::vector<glm::u8vec4>> vertexColors;
-	if (m_indexVertexColors)
-		m_vertexColorIndexer.getModelColors(internalPath, vertexColors, pkgDir["Misc"]);
+	auto vertexColors = getVertexColors(internalPath, pkgDir["Misc"]);
 
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;

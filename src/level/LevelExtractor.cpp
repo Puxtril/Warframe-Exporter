@@ -80,11 +80,11 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, commonHeader.attributes, headerInt, bodyInt);
+			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, pkgDir["Misc"]);
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, commonHeader.attributes, vertexColors, headerInt, bodyInt);
 
 			outGltf.addModelData(headerInt, bodyInt, curLevelObj);
 		
-
 		} catch (std::exception& ex) {
 			if (curLevelObj.meshPath.length() > 5)
 				m_logger.error(spdlog::fmt_lib::format("{}::{}: {}", curLevelObj.meshPath, curLevelObj.objName, ex.what()));

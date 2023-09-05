@@ -21,9 +21,6 @@ VertexColorIndexer::getModelColors(const LotusLib::LotusPath& modelPath, std::ve
 	size_t curVcArrayIndex = outColors.size();
 	outColors.resize(outColors.size() + vcPaths.size());
 
-	if (vcPaths.size() > 0)
-		std::cout << "Vertex colors! " << vcPaths.size() << std::endl;
-
 	for (const LotusLib::LotusPath& vcPath : vcPaths)
 	{
 		readColor(pkg, vcPath, outColors[curVcArrayIndex++]);

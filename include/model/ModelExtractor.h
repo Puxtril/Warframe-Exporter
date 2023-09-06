@@ -7,6 +7,7 @@
 #include "ModelStructs.hpp"
 #include "model/ModelEnumMap.h"
 #include "ExporterExceptions.h"
+#include "model/vertexcolor/VertexColorIndexer.h"
 
 #include <iostream>
 
@@ -15,10 +16,14 @@ namespace WarframeExporter::Model
 	class ModelExtractor : public Extractor
 	{
 		ModelExtractor() : Extractor() {}
+
+		VertexColor::VertexColorIndexer m_vertexColorIndexer;
 		
 	public:
 		ModelExtractor(const ModelExtractor&) = delete;
 		ModelExtractor operator=(const ModelExtractor&) = delete;
+
+		bool m_indexVertexColors = true;
 
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
 		{
@@ -55,6 +60,7 @@ namespace WarframeExporter::Model
 		static ModelExtractor* getInstance();
 
 		void extractExternal(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
+		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::Package<LotusLib::CachePairReader>& pkg);
 
 		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData) override;

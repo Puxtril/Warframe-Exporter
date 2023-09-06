@@ -260,7 +260,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	Buffer& buf = m_document.buffers[0];
 	// 1 colorLen is already factored into this vertex size
 	// Add the other 2
-	uint32_t byteLen = vertCount * (body.vertexSizeRigged() + (ModelBodyInternal::colorLen * 3));
+	uint32_t byteLen = vertCount * body.vertexSizeRigged();
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -275,14 +275,11 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 		curPos += ModelBodyInternal::UVLen;
 		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
+		for (int x = 0; x < body.colors.size(); x++)
+		{
+			memcpy(curPos, &body.colors[x][iVert], ModelBodyInternal::colorLen);
+			curPos += ModelBodyInternal::colorLen;
+		}
 		memcpy(curPos, &body.boneIndices[iVert].x, ModelBodyInternal::boneIndexLen);
 		curPos += ModelBodyInternal::boneIndexLen;
 		memcpy(curPos, &body.boneWeights[iVert].x, ModelBodyInternal::boneWeightLen);
@@ -294,7 +291,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
-	bufView.byteStride = body.vertexSizeRigged() + (ModelBodyInternal::colorLen * 3);
+	bufView.byteStride = body.vertexSizeRigged();
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	m_document.bufferViews.push_back(bufView);
 	
@@ -332,16 +329,20 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	m_document.accessors.push_back(uv2Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
-	Accessor colAcc;
-	int32_t colAccIndex = (int32_t)m_document.accessors.size();
-	colAcc.bufferView = bufViewIndex;
-	colAcc.byteOffset = curByteOffset;
-	colAcc.count = vertCount;
-	colAcc.type = Accessor::Type::Vec4;
-	colAcc.componentType = Accessor::ComponentType::UnsignedByte;
-	colAcc.normalized = true;
-	m_document.accessors.push_back(colAcc);
-	curByteOffset += (ModelBodyInternal::colorLen * 4);
+	std::vector<int32_t> vertexColAccIndices;
+	for (int x = 0; x < body.colors.size(); x++)
+	{
+		Accessor colAcc;
+		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
+		colAcc.bufferView = bufViewIndex;
+		colAcc.byteOffset = curByteOffset;
+		colAcc.count = vertCount;
+		colAcc.type = Accessor::Type::Vec4;
+		colAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		colAcc.normalized = true;
+		m_document.accessors.push_back(colAcc);
+		curByteOffset += ModelBodyInternal::colorLen;
+	}
 
 	Accessor boneIndexAcc;
 	int32_t boneIndexAccIndex = (int32_t)m_document.accessors.size();
@@ -366,7 +367,8 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	attrs["POSITION"] = posAccIndex;
 	attrs["TEXCOORD_0"] = uv1AccIndex;
 	attrs["TEXCOORD_1"] = uv2AccIndex;
-	attrs["COLOR_0"] = colAccIndex;
+	for (int x = 0; x < vertexColAccIndices.size(); x++)
+		attrs["COLOR_" + std::to_string(x)] = vertexColAccIndices[x];
 	attrs["JOINTS_0"] = boneIndexAccIndex;
 	attrs["WEIGHTS_0"] = boneWeightAccIndex;
 
@@ -382,7 +384,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 		createBuffer();
 
 	Buffer& buf = m_document.buffers[0];
-	uint32_t byteLen = vertCount * (body.vertexSizeStatic() + (ModelBodyInternal::colorLen * 3));
+	uint32_t byteLen = vertCount * body.vertexSizeStatic();
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -397,14 +399,11 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 		curPos += ModelBodyInternal::UVLen;
 		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
-		memcpy(curPos, &body.colors[iVert], ModelBodyInternal::colorLen);
-		curPos += ModelBodyInternal::colorLen;
+		for (int x = 0; x < body.colors.size(); x++)
+		{
+			memcpy(curPos, &body.colors[x][iVert], ModelBodyInternal::colorLen);
+			curPos += ModelBodyInternal::colorLen;
+		}
 	}
 
 	BufferView bufView;
@@ -412,7 +411,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	bufView.buffer = 0;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
-	bufView.byteStride = body.vertexSizeStatic() + (ModelBodyInternal::colorLen * 3);
+	bufView.byteStride = body.vertexSizeStatic();
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	m_document.bufferViews.push_back(bufView);
 
@@ -450,22 +449,27 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	m_document.accessors.push_back(uv2Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
-	Accessor colAcc;
-	int32_t colAccIndex = (int32_t)m_document.accessors.size();
-	colAcc.bufferView = bufViewIndex;
-	colAcc.byteOffset = curByteOffset;
-	colAcc.count = vertCount;
-	colAcc.type = Accessor::Type::Vec4;
-	colAcc.componentType = Accessor::ComponentType::UnsignedByte;
-	colAcc.normalized = true;
-	m_document.accessors.push_back(colAcc);
-	curByteOffset += (ModelBodyInternal::colorLen * 4);
+	std::vector<int32_t> vertexColAccIndices;
+	for (int x = 0; x < body.colors.size(); x++)
+	{
+		Accessor colAcc;
+		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
+		colAcc.bufferView = bufViewIndex;
+		colAcc.byteOffset = curByteOffset;
+		colAcc.count = vertCount;
+		colAcc.type = Accessor::Type::Vec4;
+		colAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		colAcc.normalized = true;
+		m_document.accessors.push_back(colAcc);
+		curByteOffset += ModelBodyInternal::colorLen;
+	}
 
 	Attributes attrs;
 	attrs["POSITION"] = posAccIndex;
 	attrs["TEXCOORD_0"] = uv1AccIndex;
 	attrs["TEXCOORD_1"] = uv2AccIndex;
-	attrs["COLOR_0"] = colAccIndex;
+	for (int x = 0; x < vertexColAccIndices.size(); x++)
+		attrs["COLOR_" + std::to_string(x)] = vertexColAccIndices[x];
 
 	return attrs;
 }

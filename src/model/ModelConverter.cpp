@@ -4,7 +4,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType)
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType)
 {
     ModelConverter::flipXAxis(extBody);
 
@@ -14,6 +14,7 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
 
     getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
+    ModelConverter::addVertexColors(outBody, vertexColors);
 }
 
 void
@@ -124,8 +125,19 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.positions = newPositions;
     outBody.UV1 = extBody.UV1;
     outBody.UV2 = extBody.UV2;
-    outBody.colors = extBody.colors;
     outBody.boneWeights = extBody.boneWeights;
+
+    // Ambient occlusion
+    std::vector<glm::u8vec4> outColors;
+    outColors.resize(extHeader.vertexCount);
+    for (size_t x = 0; x < extBody.colors.size(); x++)
+    {
+        outColors[x][0] = extBody.colors[x];
+        outColors[x][1] = extBody.colors[x];
+        outColors[x][2] = extBody.colors[x];
+        outColors[x][3] = extBody.colors[x];
+    }
+    outBody.colors.push_back(std::move(outColors));
 
     // Convert local bone indices to global
     std::vector<glm::u16vec4>& newIndices = outBody.boneIndices;
@@ -150,6 +162,22 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
                 }
             }
         }
+    }
+}
+
+void
+ModelConverter::addVertexColors(ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors)
+{
+    // Unfortunately, Blender doesn't like RGBA vertex colors
+    // So we split into RGB and A.
+    for (auto& curVColors : vertexColors)
+    {
+        std::vector<glm::u8vec4> newA;
+        for (glm::u8vec4& curColor : curVColors)
+            newA.push_back(glm::u8vec4(curColor.a, curColor.a, curColor.a, curColor.a));
+
+        outBody.colors.push_back(std::move(curVColors));
+        outBody.colors.push_back(std::move(newA));
     }
 }
 

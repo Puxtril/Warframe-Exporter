@@ -247,7 +247,11 @@ namespace WarframeExporter::Model
 				outBody.positions[x][1] = bodyReader->readHalf();
 				outBody.positions[x][2] = bodyReader->readHalf() - 0.5F;
 				
-				bodyReader->seek(10, std::ios::cur);
+				bodyReader->seek(6, std::ios::cur);
+				outBody.colors[0][x][0] = bodyReader->readUInt8();
+				outBody.colors[0][x][1] = bodyReader->readUInt8();
+				outBody.colors[0][x][2] = bodyReader->readUInt8();
+				outBody.colors[0][x][3] = bodyReader->readUInt8();
 			}
 
 			outBody.indices.resize(extHeader.faceCount);

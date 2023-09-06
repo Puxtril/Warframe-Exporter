@@ -99,7 +99,7 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
-		std::vector<uint8_t> colors;
+		std::vector<std::vector<glm::u8vec4>> colors;
 		std::vector<glm::u8vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
 	};

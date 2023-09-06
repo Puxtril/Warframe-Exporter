@@ -239,7 +239,8 @@ namespace WarframeExporter::Model
 			outBody.positions.resize(extHeader.vertexCount);
 			outBody.UV1.resize(extHeader.vertexCount);
 			outBody.UV2.resize(extHeader.vertexCount);
-			outBody.colors.resize(extHeader.vertexCount);
+			outBody.colors.resize(1);
+			outBody.colors[0].resize(extHeader.vertexCount);
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 			{
 				outBody.positions[x][0] = bodyReader->readHalf() - 0.5F;

@@ -404,7 +404,6 @@ namespace WarframeExporter::Model
 			outBody.positions.resize(extHeader.vertexCount);
 			outBody.UV1.resize(extHeader.vertexCount);
 			outBody.UV2.resize(extHeader.vertexCount);
-			outBody.colors.resize(extHeader.vertexCount);
 			outBody.boneIndices.resize(extHeader.vertexCount);
 			outBody.boneWeights.resize(extHeader.vertexCount);
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)

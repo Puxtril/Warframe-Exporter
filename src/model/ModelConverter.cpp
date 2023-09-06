@@ -1,5 +1,7 @@
 #include "model/ModelConverter.h"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/vector_uint4_sized.hpp"
+#include <iterator>
 
 using namespace WarframeExporter::Model;
 
@@ -127,17 +129,25 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.UV2 = extBody.UV2;
     outBody.boneWeights = extBody.boneWeights;
 
-    // Ambient occlusion
-    std::vector<glm::u8vec4> outColors;
-    outColors.resize(extHeader.vertexCount);
+    // Split RGBA Vertex colors into 2 separate color maps
+    // One is RGB from original
+    // Next is the Alpha channel copied onto RGB channels
+    std::vector<std::vector<glm::u8vec4>> newColors;
     for (size_t x = 0; x < extBody.colors.size(); x++)
     {
-        outColors[x][0] = extBody.colors[x];
-        outColors[x][1] = extBody.colors[x];
-        outColors[x][2] = extBody.colors[x];
-        outColors[x][3] = extBody.colors[x];
+        std::vector<glm::u8vec4> alphaColor(extHeader.vertexCount);
+        for (size_t y = 0; y < extHeader.vertexCount; y++)
+        {
+            alphaColor[y][0] = extBody.colors[x][y][3];
+            alphaColor[y][1] = extBody.colors[x][y][3];
+            alphaColor[y][2] = extBody.colors[x][y][3];
+            extBody.colors[x][y][3] = 0.0f;
+        }
+
+        newColors.push_back(std::move(extBody.colors[x]));
+        newColors.push_back(std::move(alphaColor));
     }
-    outBody.colors.push_back(std::move(outColors));
+    outBody.colors = std::move(newColors);
 
     // Convert local bone indices to global
     std::vector<glm::u16vec4>& newIndices = outBody.boneIndices;

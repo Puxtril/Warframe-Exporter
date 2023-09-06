@@ -11,7 +11,7 @@ VertexColorIndexer::getModelColors(const LotusLib::LotusPath& modelPath, std::ve
 {
 	if (!isIndexed(pkg))
 	{
-		m_logger.info("Indexing vertex colors");
+		m_logger.info("Indexing vertex colors, this will take some time...");
 		indexColors(pkg);
 	}
 

@@ -118,7 +118,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 		std::unique_ptr<char[]> hDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getDataAndDecompress(hFileEntry);
 		if (hDataRaw)
 		{
-			debugPath.replace_filename(internalPath.stem().string() + "_H");
+			debugPath.replace_filename(internalPath.filename().string() + "_H");
 			std::ofstream out;
 			out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 			out.write(hDataRaw.get(), hFileEntry->getLen());
@@ -135,7 +135,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 			std::unique_ptr<char[]> bDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getDataAndDecompress(bFileEntry);
 			if (bDataRaw)
 			{
-				debugPath.replace_filename(internalPath.stem().string() + "_B");
+				debugPath.replace_filename(internalPath.filename().string() + "_B");
 				std::ofstream out;
 				out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 				out.write(bDataRaw.get(), bFileEntry->getLen());
@@ -153,7 +153,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 			std::unique_ptr<char[]> fDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getDataAndDecompress(fFileEntry);
 			if (fDataRaw)
 			{
-				debugPath.replace_filename(internalPath.stem().string() + "_F");
+				debugPath.replace_filename(internalPath.filename().string() + "_F");
 				std::ofstream out;
 				out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 				out.write(fDataRaw.get(), fFileEntry->getLen());

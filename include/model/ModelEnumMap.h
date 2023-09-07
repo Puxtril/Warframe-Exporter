@@ -10,6 +10,7 @@
 #include "model/types/ModelReader159.hpp"
 #include "model/types/ModelReader269.hpp"
 #include "model/types/ModelReader272.hpp"
+#include "model/types/ModelReader289.hpp"
 
 namespace WarframeExporter::Model
 {
@@ -22,5 +23,6 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader103::getInstance())
 		.registerClass(ModelReader159::getInstance())
 		.registerClass(ModelReader269::getInstance())
-		.registerClass(ModelReader272::getInstance());
+		.registerClass(ModelReader272::getInstance())
+		.registerClass(ModelReader289::getInstance());
 }

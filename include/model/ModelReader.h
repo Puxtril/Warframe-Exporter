@@ -18,7 +18,8 @@ namespace WarframeExporter::Model
 		MODEL_LEVEL_103 = 103,
 		MODEL_TERRAIN_159 = 159,
 		MODEL_RIGGED_269 = 269,
-		MODEL_RIGGED_272 = 272
+		MODEL_RIGGED_272 = 272,
+		MODEL_PACKED_289 = 289
 	};
 
 	enum class ScaleType

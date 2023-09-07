@@ -54,7 +54,8 @@ namespace WarframeExporter::Model
 				(int)ModelType::MODEL_LEVEL_103,
 				(int)ModelType::MODEL_TERRAIN_159,
 				(int)ModelType::MODEL_RIGGED_269,
-				(int)ModelType::MODEL_RIGGED_272
+				(int)ModelType::MODEL_RIGGED_272,
+				(int)ModelType::MODEL_PACKED_289
 			};
 			return extTypes;
 		}

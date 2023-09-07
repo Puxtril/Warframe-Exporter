@@ -10,6 +10,7 @@ namespace WarframeExporter::Model
 {
 	enum class ModelType
 	{
+		MODEL_STATIC_86 = 86,
 		MODEL_STATIC_96 = 96,
 		MODEL_LEVEL_99 = 99,
 		MODEL_DCM_101 = 101,

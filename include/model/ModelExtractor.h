@@ -46,6 +46,7 @@ namespace WarframeExporter::Model
 		inline std::vector<int> getEnumMapKeys() const override
 		{
 			std::vector<int> extTypes = {
+				(int)ModelType::MODEL_STATIC_86,
 				(int)ModelType::MODEL_STATIC_96,
 				(int)ModelType::MODEL_LEVEL_99,
 				(int)ModelType::MODEL_DCM_101,

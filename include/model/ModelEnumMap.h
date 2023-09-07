@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EnumMap.h"
+#include "model/types/ModelReader86.hpp"
 #include "model/types/ModelReader96.hpp"
 #include "model/types/ModelReader99.hpp"
 #include "model/types/ModelReader101.hpp"
@@ -13,6 +14,7 @@
 namespace WarframeExporter::Model
 {
 	const static EnumMap<ModelReader> g_enumMapModel = EnumMap<ModelReader>()
+		.registerClass(ModelReader86::getInstance())
 		.registerClass(ModelReader96::getInstance())
 		.registerClass(ModelReader99::getInstance())
 		.registerClass(ModelReader101::getInstance())

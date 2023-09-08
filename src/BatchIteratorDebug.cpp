@@ -16,6 +16,10 @@ BatchIteratorDebug::processKnownFile(const std::string& packageName, const Lotus
 		extractor->extractDebug(header, hReader, *m_package, packageName, internalPath, m_ensmalleningData);
 		m_logger.info("Successfully processed: " + internalPath.string());
 	}
+	catch (LotusLib::DecompressionException& err)
+	{
+		m_logger.warn("Decompression exception: " + std::string(err.what()) + " " + internalPath.string());
+	}
 	catch (not_imeplemented_error& err)
 	{
 		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + internalPath.string());

@@ -9,6 +9,7 @@ CLIDebug::CLIDebug()
 	m_debugMatCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-materials", "Attempts to read materials", false);
 	m_debugLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-levels", "Attempts to read levels", false);
 	m_debugAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-audio", "Attempts to read audios", false);
+	m_debugAnimCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-animations", "Attempts to read animations", false);
 }
 
 CLIDebug*
@@ -35,7 +36,8 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_debugModelCmd.get())
 		.add(m_debugMatCmd.get())
 		.add(m_debugLevelCmd.get())
-		.add(m_debugAudioCmd.get());
+		.add(m_debugAudioCmd.get())
+		.add(m_debugAnimCmd.get());
 }
 
 void
@@ -46,7 +48,7 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
-	if (m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
+	if (m_debugAnimCmd->getValue() || m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
 	{
 		debug(cache, pkg, internalPath, outPath, ensmallening);
 	}
@@ -141,6 +143,8 @@ CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, c
 		types |= (int)WarframeExporter::ExtractorType::Level;
 	if (m_debugAudioCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Audio;
+	if (m_debugAnimCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Animation;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -176,7 +180,8 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageC
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
 		(int)types & (int)WarframeExporter::ExtractorType::Material ||
-		(int)types & (int)WarframeExporter::ExtractorType::Audio)
+		(int)types & (int)WarframeExporter::ExtractorType::Audio ||
+		(int)types & (int)WarframeExporter::ExtractorType::Animation)
 	{
 		pkgNames.push_back("Misc");
 	}

@@ -43,6 +43,8 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioPCM/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/types/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/animation/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/animation/types/*.cpp
 >>>>>>> master
 )
 

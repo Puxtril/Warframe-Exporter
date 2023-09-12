@@ -18,6 +18,7 @@ namespace WarframeExporter
 		Texture = 2,
 		Material = 4,
 		VERTEX_COLOR = 8,
+		Animation = 16,
 		Level = 32,
 		Audio = 64
 	};

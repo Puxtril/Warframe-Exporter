@@ -11,6 +11,7 @@ CLIExtract::CLIExtract()
 	m_extAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-audio", "Extract audio clips", false);
 	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
 	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract all levels", false);
+	m_extAnimCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-animations", "Extract model animations", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
 }
@@ -38,6 +39,7 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extMatCmd.get())
 		.add(m_extLevelCmd.get())
 		.add(m_extAudioCmd.get())
+		.add(m_extAnimCmd.get())
 		.add(m_extAllCmd.get());
 }
 
@@ -50,7 +52,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
 {
-	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
+	if (!m_extAnimCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
 	WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = m_includeVertexColors->getValue();
@@ -66,6 +68,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		types |= (int)WarframeExporter::ExtractorType::Level;
 	if (m_extAudioCmd->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Audio;
+	if (m_extAnimCmd->getValue() || m_extAllCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Animation;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -117,7 +121,8 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::Packag
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
 		(int)types & (int)WarframeExporter::ExtractorType::Material ||
-		(int)types & (int)WarframeExporter::ExtractorType::Audio)
+		(int)types & (int)WarframeExporter::ExtractorType::Audio ||
+		(int)types & (int)WarframeExporter::ExtractorType::Animation)
 	{
 		pkgNames.push_back("Misc");
 	}

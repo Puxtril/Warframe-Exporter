@@ -353,16 +353,16 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 					}
 					/*
 						[    Short 1    ] [    Short 2    ] [    Short 3    ]
-						DAAAAAAA AAAAAAAE GHBBBBBB BBBBBBBB CCCCCCCC CCCCCCHJ
+						DAAAAAAA AAAAAAAE GHBBBBBB BBBBBBBB CCCCCCCC CCCCCCJJ
 
 						A: Split 15-bit signed integer
 						B: Split 15-bit signed integer
 						C: Split 15-bit signed integer
 						D: A signed bit
 						E: C signed bit
-						G: B signed bit
-						H: Largest integer index
-						J: Largest integer signed bit
+						G: Largest integer signed bit
+						H: B signed bit
+						J: Largest integer index
 					*/
 					case 2:
 					{
@@ -374,11 +374,11 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 						uint16_t totalFlag = (r_c & 0x3) | ((r_b >> 12) & 0xC) | ((r_a << 4) & 0x10) | ((r_a >> 10) & 0x20);
 
 						// Split up totalFlag
-						uint16_t largestSign = totalFlag & 0x1;
-						uint16_t largest = (totalFlag >> 1) & 0x3;
 						uint16_t aSign = (totalFlag >> 5) & 1;
 						uint16_t cSign = (totalFlag >> 4) & 1;
-						uint16_t bSign = (totalFlag >> 3) & 1;
+						uint16_t largestSign = (totalFlag >> 3) & 1;
+						uint16_t bSign = (totalFlag >> 2) & 1;
+						uint16_t largest = totalFlag & 3;
 
 						// If these integers are signed...
 						//  - Create signed bit
@@ -387,8 +387,8 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 						if (!aSign)
 							c_a |= 0xC000;
 
-						uint16_t c_b = r_b & 0x3FFF;
-						if (bSign)
+						int16_t c_b = r_b & 0x3FFF;
+						if (!bSign)
 							c_b |= 0xC000;
 
 						int16_t c_c = (r_c >> 2)& 0x3FFF;
@@ -407,7 +407,7 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 						rot[map[2]] = c_c * int2Float;
 
 						float largestNum = sqrt(std::max(1.0f - rot[map[0]] * rot[map[0]] - rot[map[1]] * rot[map[1]] - rot[map[2]] * rot[map[2]], 0.0f));
-						rot[largest] = largestSign > 0 ? -largestNum : largestNum;
+						rot[largest] = largestSign > 0 ? largestNum : -largestNum;
 						
 						curTransform.rot.push_back(rot);
 

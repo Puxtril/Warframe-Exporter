@@ -1,6 +1,7 @@
 #pragma once
 
 #include "animation/AnimationReader.h"
+#include "animation/AnimationRotationDebugger.h"
 
 #include <bitset>
 
@@ -26,5 +27,21 @@ namespace WarframeExporter::Animation
 		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, AnimationHeaderExternal& outHeader) override;
 		void readBodyDebug(BinaryReaderBuffered* bodyReader, const AnimationHeaderExternal& extHeader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override;
 		void readBody(BinaryReaderBuffered* bodyReader, const AnimationHeaderExternal& extHeader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, AnimationBodyExternal& outBody) override;
+
+	protected:
+		/*
+			[    Short 1    ] [    Short 2    ] [    Short 3    ]
+			DAAAAAAA AAAAAAAE GHBBBBBB BBBBBBBB CCCCCCCC CCCCCCJJ
+
+			A: Split 15-bit signed integer
+			B: Split 15-bit signed integer
+			C: Split 15-bit signed integer
+			D: A signed bit
+			E: C signed bit
+			G: Largest integer signed bit
+			H: B signed bit
+			J: Largest integer index
+		*/
+		glm::quat unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC, bool flipSigns);
 	};
 }

@@ -351,72 +351,36 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 						curTransform.pos.push_back(vec);
 						break;
 					}
-					/*
-						[    Short 1    ] [    Short 2    ] [    Short 3    ]
-						DAAAAAAA AAAAAAAE GHBBBBBB BBBBBBBB CCCCCCCC CCCCCCJJ
-
-						A: Split 15-bit signed integer
-						B: Split 15-bit signed integer
-						C: Split 15-bit signed integer
-						D: A signed bit
-						E: C signed bit
-						G: Largest integer signed bit
-						H: B signed bit
-						J: Largest integer index
-					*/
 					case 2:
 					{
 						uint16_t r_a = bodyReader->readUInt16();
 						uint16_t r_b = bodyReader->readUInt16();
 						uint16_t r_c = bodyReader->readUInt16();
-						
-						// Move D, E, G, H, J into sequential order
-						uint16_t totalFlag = (r_c & 0x3) | ((r_b >> 12) & 0xC) | ((r_a << 4) & 0x10) | ((r_a >> 10) & 0x20);
+						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c, false);
 
-						// Split up totalFlag
-						uint16_t aSign = (totalFlag >> 5) & 1;
-						uint16_t cSign = (totalFlag >> 4) & 1;
-						uint16_t largestSign = (totalFlag >> 3) & 1;
-						uint16_t bSign = (totalFlag >> 2) & 1;
-						uint16_t largest = totalFlag & 3;
-
-						// If these integers are signed...
-						//  - Create signed bit
-						//  - Fill in missing bit with 1 (15bit -> 16bit conversion)
-						int16_t c_a = (r_a >> 1) & 0x3FFF;
-						if (!aSign)
-							c_a |= 0xC000;
-
-						int16_t c_b = r_b & 0x3FFF;
-						if (!bSign)
-							c_b |= 0xC000;
-
-						int16_t c_c = (r_c >> 2)& 0x3FFF;
-						if (!cSign)
-							c_c |= 0xC000;
-						
-						float cq_Sqrt2 = 1.4142135623730950488016887242097F;
-						float int2Float = 1.0f / (16384.f * cq_Sqrt2);
-						const int Mapping[4][3] = { {1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2} };
-
-						const int* map = Mapping[largest];
-
-						glm::quat rot;
-						rot[map[0]] = c_b * int2Float;
-						rot[map[1]] = c_a * int2Float;
-						rot[map[2]] = c_c * int2Float;
-
-						float largestNum = sqrt(std::max(1.0f - rot[map[0]] * rot[map[0]] - rot[map[1]] * rot[map[1]] - rot[map[2]] * rot[map[2]], 0.0f));
-						rot[largest] = largestSign > 0 ? largestNum : -largestNum;
-						
-						curTransform.rot.push_back(rot);
+						curTransform.rot.push_back(unpacked);
 
 						break;
 					}
+					// MeleeEmergeAndSwingLR_anim
 					case 3:
 					{
-						// type 1 + type 2
-						bodyReader->seek(12, std::ios_base::cur);
+						// Position
+						glm::vec3 vec = {
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F * -1,
+							bodyReader->readInt16() / 32767.0F,
+						};
+						curTransform.pos.push_back(vec);
+
+						// Rotation
+						uint16_t r_a = bodyReader->readUInt16();
+						uint16_t r_b = bodyReader->readUInt16();
+						uint16_t r_c = bodyReader->readUInt16();
+						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c, true);
+
+						curTransform.rot.push_back(unpacked);
+
 						break;
 					}
 					case 4:
@@ -461,4 +425,51 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 
 	if (bodyReader->tell() != bodyReader->getLength())
 		throw unknown_format_error("Did not reach end of body");
+}
+
+glm::quat
+AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC, bool flipSigns)
+{
+	float cq_Sqrt2 = 1.4142135623730950488016887242097F;
+	float int2Float = 1.0f / (16384.f * cq_Sqrt2);
+	const int Mapping[4][3] = { {1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2} };
+
+
+	// Move D, E, G, H, J into sequential order
+	uint16_t totalFlag = (rawC & 0x3) | ((rawB >> 12) & 0xC) | ((rawA << 4) & 0x10) | ((rawA >> 10) & 0x20);
+
+	// Split up totalFlag
+	std::array<int16_t, 4> signBits;
+	signBits[0] = (totalFlag >> 5) & 1;
+	signBits[1] = (totalFlag >> 4) & 1;
+	signBits[2] = (totalFlag >> 3) & 1;
+	signBits[3] = (totalFlag >> 2) & 1;
+	uint16_t largest = totalFlag & 3;
+
+	const int* map = Mapping[largest];
+
+	// If these integers are signed...
+	//  - Create signed bit
+	//  - Fill in missing bit with 1 (15bit -> 16bit conversion)
+	int16_t c_a = (rawA >> 1) & 0x3FFF;
+	if (!signBits[0])
+		c_a |= 0xC000;
+
+	int16_t c_b = rawB & 0x3FFF;
+	if (!signBits[3])
+		c_b |= 0xC000;
+
+	int16_t c_c = (rawC >> 2) & 0x3FFF;
+	if (!signBits[1])
+		c_c |= 0xC000;
+
+	glm::quat rot;
+	rot[map[0]] = signBits[3] > 0 && flipSigns ? -(c_b * int2Float) : (c_b * int2Float);
+	rot[map[1]] = signBits[0] > 0 && flipSigns ? -(c_a * int2Float) : (c_a * int2Float);
+	rot[map[2]] = signBits[1] > 0 && flipSigns ? -(c_c * int2Float) : (c_c * int2Float);
+
+	float largestNum = sqrt(std::max(1.0f - rot[map[0]] * rot[map[0]] - rot[map[1]] * rot[map[1]] - rot[map[2]] * rot[map[2]], 0.0f));
+	rot[largest] = signBits[2] > 0 ? largestNum : -largestNum;
+
+	return std::move(rot);
 }

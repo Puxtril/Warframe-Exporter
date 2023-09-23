@@ -42,6 +42,6 @@ namespace WarframeExporter::Animation
 			H: B signed bit
 			J: Largest integer index
 		*/
-		glm::quat unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC, bool flipSigns);
+		glm::quat unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC);
 	};
 }

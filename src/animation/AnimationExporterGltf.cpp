@@ -50,14 +50,15 @@ gltfAnimation::createBones(const std::vector<BoneTreeNodeExternal>& boneTree, co
 	int32_t rootIndex = -1;
 	if (boneTree.size() > 0)
 		rootIndex = (int32_t)m_document.nodes.size();
+
 	for (size_t x = 0; x < boneTree.size(); x++)
 	{
 		gltf::Node boneNode;
 		boneNode.name = boneTree[x].name;
 		findChildrenOfBone(boneTree, x, boneNode.children);
 
+		std::memcpy(&boneNode.translation[0], &action.initialTransform.pos[x][0], sizeof(float) * 3);
 		//std::memcpy(&boneNode.rotation[0], &action.initialTransform.rot[x][0], sizeof(float) * 4);
-		//std::memcpy(&boneNode.translation[0], &action.initialTransform.pos[x][0], sizeof(float) * 3);
 		//std::memcpy(&boneNode.scale[0], &action.initialTransform.scale[x][0], sizeof(float) * 3);
 
 		m_document.nodes.push_back(boneNode);
@@ -81,14 +82,25 @@ gltfAnimation::addActionData(const AnimationActionInternal& action, uint32_t roo
 	{
 		const BoneTransform& curTransform = action.transforms[x];
 
-		int32_t posAccIndex = addBufferData(curTransform.pos, -1);
-		addSamplerandChannel(curAnimIndex, posAccIndex, timescaleIndex, rootNodeOffset + x, "translation");
+		// TODO: remove this check
+		// Since the ChannelType is static for each bone, every keyframe for that bone will always contain the same Transform types.
+		if (curTransform.pos.size() > 0)
+		{
+			int32_t posAccIndex = addBufferData(curTransform.pos, -1);
+			addSamplerandChannel(curAnimIndex, posAccIndex, timescaleIndex, rootNodeOffset + x, "translation");
+		}
 
-		int32_t rotAccIndex = addBufferData(curTransform.rot, -1);
-		addSamplerandChannel(curAnimIndex, rotAccIndex, timescaleIndex, rootNodeOffset + x, "rotation");
+		if (curTransform.rot.size() > 0)
+		{
+			int32_t rotAccIndex = addBufferData(curTransform.rot, -1);
+			addSamplerandChannel(curAnimIndex, rotAccIndex, timescaleIndex, rootNodeOffset + x, "rotation");
+		}	
 
-		//int32_t scaleAccIndex = addBufferData(curTransform.scale, curBufViewIndex);
-		//addSamplerandChannel(curAnimIndex, scaleAccIndex, timescaleIndex, rootNodeOffset + x, "scale");
+		if (curTransform.scale.size() > 0)
+		{
+			int32_t scaleAccIndex = addBufferData(curTransform.scale, -1);
+			addSamplerandChannel(curAnimIndex, scaleAccIndex, timescaleIndex, rootNodeOffset + x, "scale");
+		}
 	}
 }
 

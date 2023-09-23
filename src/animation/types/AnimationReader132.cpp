@@ -173,7 +173,7 @@ AnimationReader132::isPureChannelType(uint16_t* channelTypes, int channelCount)
 	{
 		if (channelTypes[x] != 0)
 		{
-			if (channelTypes[x] == 2)
+			if (channelTypes[x] == 9)
 				channelTypeCounts[channelTypes[x]]++;
 		}
 		else
@@ -181,7 +181,7 @@ AnimationReader132::isPureChannelType(uint16_t* channelTypes, int channelCount)
 	}
 	for (const auto& x : channelTypeCounts)
 	{
-		if (x.second / correctedCount > .00 && channelTypes[0] != 0)
+		if (x.second > 1 && channelTypes[0] != 0)
 			throw std::runtime_error("Pure channel type " + std::to_string(x.first) + " (" + std::to_string(x.second) + "/" + std::to_string(correctedCount) + ")");
 	}
 }
@@ -313,7 +313,7 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 				bodyReader->readFloatArray(&initTransform.scale[x].x, 3);
 			}
 
-			uint16_t* channelCounts = bodyReader->readUInt16Array(curSkel.bones.size());
+			uint16_t* channelTypes = bodyReader->readUInt16Array(curSkel.bones.size());
 
 			// Channel Strides
 			bodyReader->seek(curSkel.bones.size() * 2, std::ios_base::cur);
@@ -331,10 +331,10 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 			{
 				for (size_t w = 0; w < curSkel.bones.size(); w++)
 				{
-					uint16_t curChannelType = channelCounts[w];
+					uint16_t curChannelType = channelTypes[w];
 					BoneTransform& curTransform = curActionBody.transforms[w];
 
-					// I think this can be re-written as binary flags.
+					//std::cout << curChannelType << std::endl;
 					switch (curChannelType)
 					{
 					case 0:
@@ -345,7 +345,7 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 					{
 						glm::vec3 vec = {
 							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F * -1,
+							bodyReader->readInt16() / 32767.0F,
 							bodyReader->readInt16() / 32767.0F,
 						};
 						curTransform.pos.push_back(vec);
@@ -356,19 +356,18 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 						uint16_t r_a = bodyReader->readUInt16();
 						uint16_t r_b = bodyReader->readUInt16();
 						uint16_t r_c = bodyReader->readUInt16();
-						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c, false);
+						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c);
 
 						curTransform.rot.push_back(unpacked);
 
 						break;
 					}
-					// MeleeEmergeAndSwingLR_anim
 					case 3:
 					{
 						// Position
 						glm::vec3 vec = {
 							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F * -1,
+							bodyReader->readInt16() / 32767.0F,
 							bodyReader->readInt16() / 32767.0F,
 						};
 						curTransform.pos.push_back(vec);
@@ -377,10 +376,9 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 						uint16_t r_a = bodyReader->readUInt16();
 						uint16_t r_b = bodyReader->readUInt16();
 						uint16_t r_c = bodyReader->readUInt16();
-						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c, true);
+						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c);
 
 						curTransform.rot.push_back(unpacked);
-
 						break;
 					}
 					case 4:
@@ -390,15 +388,31 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 					}
 					case 8:
 					{
-						// 3 half-floats
-						bodyReader->seek(6, std::ios_base::cur);
+						glm::vec3 scale = {
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F
+						};
+						curTransform.scale.push_back(scale);
+						
 						break;
 					}
 					case 9:
 					{
-						// 6 shorts (divide by SHORT_MAX)
-						// Lots of 0s. Scale/translation?
-						bodyReader->seek(12, std::ios_base::cur);
+						glm::vec3 vec = {
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F,
+						};
+						curTransform.pos.push_back(vec);
+
+						glm::vec3 scale = {
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F,
+							bodyReader->readInt16() / 32767.0F
+						};
+						curTransform.scale.push_back(scale);
+
 						break;
 					}
 					case 10:
@@ -419,7 +433,12 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 				}
 			}
 			bodyReader->seek(actionEndPos, std::ios_base::beg);
-			delete[] channelCounts;
+			delete[] channelTypes;
+		}
+	
+		for (size_t y = 0; y < curSkel.bones.size(); y++)
+		{
+			std::cout << y << " " << curSkel.bones[y].name << std::endl;
 		}
 	}
 
@@ -428,12 +447,11 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 }
 
 glm::quat
-AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC, bool flipSigns)
+AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC)
 {
-	float cq_Sqrt2 = 1.4142135623730950488016887242097F;
-	float int2Float = 1.0f / (16384.f * cq_Sqrt2);
+	constexpr float cq_Sqrt2 = 1.4142135623730950488016887242097F;
+	constexpr float int2Float = 1.0f / (16384.f * cq_Sqrt2);
 	const int Mapping[4][3] = { {1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2} };
-
 
 	// Move D, E, G, H, J into sequential order
 	uint16_t totalFlag = (rawC & 0x3) | ((rawB >> 12) & 0xC) | ((rawA << 4) & 0x10) | ((rawA >> 10) & 0x20);
@@ -464,9 +482,9 @@ AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB,
 		c_c |= 0xC000;
 
 	glm::quat rot;
-	rot[map[0]] = signBits[3] > 0 && flipSigns ? -(c_b * int2Float) : (c_b * int2Float);
-	rot[map[1]] = signBits[0] > 0 && flipSigns ? -(c_a * int2Float) : (c_a * int2Float);
-	rot[map[2]] = signBits[1] > 0 && flipSigns ? -(c_c * int2Float) : (c_c * int2Float);
+	rot[map[0]] = signBits[3] > 0 ? -(c_b * int2Float) : (c_b * int2Float);
+	rot[map[1]] = signBits[0] > 0 ? -(c_a * int2Float) : (c_a * int2Float);
+	rot[map[2]] = signBits[1] > 0 ? -(c_c * int2Float) : (c_c * int2Float);
 
 	float largestNum = sqrt(std::max(1.0f - rot[map[0]] * rot[map[0]] - rot[map[1]] * rot[map[1]] - rot[map[2]] * rot[map[2]], 0.0f));
 	rot[largest] = signBits[2] > 0 ? largestNum : -largestNum;

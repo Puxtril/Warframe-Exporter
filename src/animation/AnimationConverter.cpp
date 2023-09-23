@@ -27,8 +27,7 @@ AnimationConverter::convertAnimation(AnimationHeaderExternal& extHeader, Animati
 
 			std::vector<BoneTransform>& transforms = curBodyAction.transforms;
 			BoneTransform& initialTransform = curBodyAction.initialTransform;
-			//for (size_t x = 0; x < initialTransform.rot.size(); x++)
-			// 	initialTransform.rot[x] = glm::normalize(initialTransform.rot[x]);
+
 			applyInitialTransforms(transforms, initialTransform, curHeadAction.frameCount);
 			newAction.transforms = transforms;
 			newAction.initialTransform = initialTransform;
@@ -43,40 +42,51 @@ AnimationConverter::convertAnimation(AnimationHeaderExternal& extHeader, Animati
 }
 
 void
-AnimationConverter::applyInitialTransforms(std::vector<BoneTransform>& transforms, const BoneTransform& initial, int32_t frameCount)
+AnimationConverter::applyInitialTransforms(std::vector<BoneTransform>& transforms, BoneTransform& initial, int32_t frameCount)
 {
+	for (size_t x = 0; x < initial.pos.size(); x++)
+	{
+		initial.pos[x].x *= -1;
+
+		//initial.rot[x].x *= -1;
+		//initial.rot[x].y *= -1;
+
+		//initial.pos[x] = glm::rotate(initial.rot[x], initial.pos[x]);
+	}
+	
 	for (size_t x = 0; x < transforms.size(); x++)
 	{
 		BoneTransform& curTrans = transforms[x];
 		
-		const glm::vec3& curInitPos = initial.pos[x];
+		glm::vec3 curInitPos = initial.pos[x];
 		const glm::quat& curInitRot = initial.rot[x];
-		const glm::vec3& curInitScale = initial.scale[x];
+		//const glm::vec3& curInitScale = initial.scale[x];
+		const glm::vec3& curInitScale = glm::vec3(1.0, 1.0, 1.0);
 		
 		if (curTrans.pos.size() == 0)
 		{
-			auto newPos = std::vector<glm::vec3>(frameCount, curInitPos);
-			curTrans.pos = newPos;
-			for (size_t y = 0; y < curTrans.pos.size(); y++)
-				curTrans.pos[y].x *= -1;
+			//auto newPos = std::vector<glm::vec3>(frameCount, curInitPos);
+			//curTrans.pos = newPos;
+			//for (size_t y = 0; y < curTrans.pos.size(); y++)
+				//curTrans.pos[y].x *= -1;
 		}
 		else
 		{
 			for (size_t y = 0; y < curTrans.pos.size(); y++)
-				curTrans.pos[y] = curTrans.pos[y] * curInitPos;
+				curTrans.pos[y] = curTrans.pos[y] + curInitPos;
 		}
 		if (curTrans.rot.size() == 0)
 		{
-			auto newRot = std::vector<glm::quat>(frameCount, curInitRot);
-			curTrans.rot = newRot;
+			//auto newRot = std::vector<glm::quat>(frameCount, curInitRot);
+			//curTrans.rot = newRot;
 		}
 		else
 		{
 			for (size_t y = 0; y < curTrans.rot.size(); y++)
 			{
-				curTrans.rot[y] *= curInitRot;
-				curTrans.rot[y].x *= -1;
-				curTrans.rot[y].y *= -1;
+				//curTrans.rot[y] *= curInitRot;
+				//curTrans.rot[y].x *= -1;
+				//curTrans.rot[y].y *= -1;
 			}
 		}
 
@@ -91,4 +101,5 @@ AnimationConverter::applyInitialTransforms(std::vector<BoneTransform>& transform
 				curTrans.scale[y] = curTrans.scale[y] * curInitScale;
 		}
 	}
+	
 }

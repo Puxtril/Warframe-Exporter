@@ -63,8 +63,10 @@ AnimationReader132::readHeaderDebug(BinaryReaderBuffered* headerReader, const En
 		}
 		
 		headerReader->seek(0x1A, std::ios_base::cur);
+
 		// FrameData
 		headerReader->seek(0x4, std::ios_base::cur);
+
 		for (uint32_t x = 0; x < actionCount; x++)
 		{
 			const static std::string boneConstantsMsg = "Actions bone data - should be same as bone count";
@@ -213,24 +215,6 @@ AnimationReader132::readBodyDebug(BinaryReaderBuffered* bodyReader, const Animat
 			const static std::string timescaleMsg = "Timescale";
 			delete[] bodyReader->readFloatArray(curAction.frameCount, 0.0F, 1.00001F, CONV_ZERO | FAIL_SUBNORM, timescaleMsg);
 
-			/*
-			* Pure channel type 1 (9/9): /Lotus/Animations/FlightSuit/UnEquipSpaceSwordWEP
-			* Pure channel type 1 (15/15): /Lotus/Fx/PowersuitAbilities/Paladin/ReckoningAvatarAttach_anim.fbx
-			* Pure channel type 1 (5/5): /Lotus/Objects/Orokin/BaseSet/Props/ORKxObelisk/ORKxObeliskRepellent3Activated_anim.fbx
-			* Pure channel type 2 (4/4): /Lotus/Characters/Tenno/Caliban/CalibanFinsLLegSway_anim.fbx
-			* Pure channel type 2 (5/5): /Lotus/Objects/Orokin/BaseSet/Props/ORKxObelisk/ORKxObeliskRepellent2Idle_anim.fbx
-			* Pure channel type 3 (5/5): /Lotus/Objects/Orokin/BaseSet/Props/ORKxObelisk/ORKxObeliskRepellent5Collapsed_anim.fbx
-			* Pure channel type 3 (14/14): /Lotus/Animations/LevelEvents/GasCityRemastered/RopyBossArenaPlatformCollapse/Phase3_anim.fbx
-			* Pure channel type 3 (37/37): /Lotus/Animations/Infested/Golem/MeleeEmergeAndSwingLR_anim.fbx
-			* Pure channel type 8 (2/2): /Lotus/Animations/Tenno/Menu/Idles/Infestation/Ailerons/NeckClosedToOpen_anim.fbx
-			* Pure channel type 8 (1/1): /Lotus/Characters/Tenno/Priest/HarrowDeluxe/HarrowDeluxeHeart_anim.fbx
-			* Pure channel type 9 (1/1): /Lotus/Characters/Tenno/Antimatter/NovaDeluxeII/Canister_anim.fbx
-			* Pure channel type 9 (1/1): /Lotus/Characters/Tenno/Engineer/EngineerDeluxeValveAmbient_anim.fbx
-			* Pure channel type 10 (4/4): /Lotus/Characters/Tenno/Accessory/Scarves/GarudaCape/GarudaCapeBonesIdle_anim.fbx
-			* Pure channel type 11 (2/2): /Lotus/Weapons/Tenno/Melee/Tonfa/MagDeluxeTonfa/MagDeluxeTonfaEquip_anim.fbx
-			* Pure channel type 11 (5/5): /Lotus/Animations/Creatures/InfestationPod/HoldIdleA_anim.fbx
-			* Pure channel type 11 (19/19): /Lotus/Fx/Levels/SentientDevourer/RegrowthCatalysingPlatformB_anim.fbx
-			*/
 			for (size_t z = 0; z < curSkel.actions[y].frameCount; z++)
 			{
 				for (size_t w = 0; w < curSkel.bones.size() - 1; w++)
@@ -308,12 +292,13 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 			{
 				BoneTransform& initTransform = curActionBody.initialTransform;
 
-				bodyReader->readFloatArray(&initTransform.rot[x].w, 4);
-				bodyReader->readFloatArray(&initTransform.pos[x].x, 3);
-				bodyReader->readFloatArray(&initTransform.scale[x].x, 3);
+				bodyReader->readFloatArray(&initTransform.rot[x][0], 4);
+				bodyReader->readFloatArray(&initTransform.pos[x][0], 3);
+				bodyReader->readFloatArray(&initTransform.scale[x][0], 3);
 			}
 
-			uint16_t* channelTypes = bodyReader->readUInt16Array(curSkel.bones.size());
+			std::vector<uint16_t> channelTypes(curSkel.bones.size());
+			bodyReader->readUInt16Array(channelTypes.data(), curSkel.bones.size());
 
 			// Channel Strides
 			bodyReader->seek(curSkel.bones.size() * 2, std::ios_base::cur);
@@ -331,62 +316,42 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 			{
 				for (size_t w = 0; w < curSkel.bones.size(); w++)
 				{
-					uint16_t curChannelType = channelTypes[w];
+					uint16_t curChannelFlags = channelTypes[w];
 					BoneTransform& curTransform = curActionBody.transforms[w];
 
-					//std::cout << curChannelType << std::endl;
-					switch (curChannelType)
+					if (!curChannelFlags || curChannelFlags & 32)
+						continue;
+
+					// Position
+					if (curChannelFlags & 1)
 					{
-					case 0:
-					case 32:
-						//bodyReader->seek(0, std::ios_base::cur);
-						break;
-					case 1:
-					{
-						glm::vec3 vec = {
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-						};
-						curTransform.pos.push_back(vec);
-						break;
+						float f_x = bodyReader->readInt16() / 32767.0F;
+						float f_y = bodyReader->readInt16() / 32767.0F;
+						float f_z = bodyReader->readInt16() / 32767.0F;
+						glm::vec3 pos = { f_y, f_x, f_z };
+
+						curTransform.pos.push_back(pos);
 					}
-					case 2:
+
+					// Rotation
+					if (curChannelFlags & 2)
 					{
 						uint16_t r_a = bodyReader->readUInt16();
 						uint16_t r_b = bodyReader->readUInt16();
 						uint16_t r_c = bodyReader->readUInt16();
 						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c);
-
 						curTransform.rot.push_back(unpacked);
-
-						break;
 					}
-					case 3:
-					{
-						// Position
-						glm::vec3 vec = {
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-						};
-						curTransform.pos.push_back(vec);
 
-						// Rotation
-						uint16_t r_a = bodyReader->readUInt16();
-						uint16_t r_b = bodyReader->readUInt16();
-						uint16_t r_c = bodyReader->readUInt16();
-						glm::quat unpacked = unpackQuaternion(r_a, r_b, r_c);
-
-						curTransform.rot.push_back(unpacked);
-						break;
-					}
-					case 4:
+					// New War specific RGBA color data???
+					// /Lotus/Animations/Tenno/Operator/SunKillerClash/StruggleBeamIdle_anim.fbx
+					if (curChannelFlags & 4)
 					{
 						bodyReader->seek(4, std::ios_base::cur);
-						break;
 					}
-					case 8:
+
+					// Scale
+					if (curChannelFlags & 8)
 					{
 						glm::vec3 scale = {
 							bodyReader->readInt16() / 32767.0F,
@@ -394,51 +359,17 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 							bodyReader->readInt16() / 32767.0F
 						};
 						curTransform.scale.push_back(scale);
-						
-						break;
 					}
-					case 9:
-					{
-						glm::vec3 vec = {
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-						};
-						curTransform.pos.push_back(vec);
 
-						glm::vec3 scale = {
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F,
-							bodyReader->readInt16() / 32767.0F
-						};
-						curTransform.scale.push_back(scale);
-
-						break;
-					}
-					case 10:
+					// 11111111 11010000
+					if (curChannelFlags & 65488)
 					{
-						// 3 single-precision floats
-						bodyReader->seek(12, std::ios_base::cur);
-						break;
+						throw unknown_format_error("No case for channel flag " + std::to_string(curChannelFlags));
 					}
-					case 11:
-					{
-						// 3 shorts (divide by SHORT_MAX), 1 float, 1 ushort, 1 ushort, 1 float
-						bodyReader->seek(18, std::ios_base::cur);
-						break;
-					}
-					default:
-						throw unknown_format_error("No case for channel count " + std::to_string(curChannelType));
-					}
+					
 				}
 			}
 			bodyReader->seek(actionEndPos, std::ios_base::beg);
-			delete[] channelTypes;
-		}
-	
-		for (size_t y = 0; y < curSkel.bones.size(); y++)
-		{
-			std::cout << y << " " << curSkel.bones[y].name << std::endl;
 		}
 	}
 
@@ -447,12 +378,8 @@ AnimationReader132::readBody(BinaryReaderBuffered* bodyReader, const AnimationHe
 }
 
 glm::quat
-AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC)
+AnimationReader132::unpackQuaternion(uint16_t rawA, uint16_t rawB, uint16_t rawC)
 {
-	constexpr float cq_Sqrt2 = 1.4142135623730950488016887242097F;
-	constexpr float int2Float = 1.0f / (16384.f * cq_Sqrt2);
-	const int Mapping[4][3] = { {1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2} };
-
 	// Move D, E, G, H, J into sequential order
 	uint16_t totalFlag = (rawC & 0x3) | ((rawB >> 12) & 0xC) | ((rawA << 4) & 0x10) | ((rawA >> 10) & 0x20);
 
@@ -463,8 +390,6 @@ AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB,
 	signBits[2] = (totalFlag >> 3) & 1;
 	signBits[3] = (totalFlag >> 2) & 1;
 	uint16_t largest = totalFlag & 3;
-
-	const int* map = Mapping[largest];
 
 	// If these integers are signed...
 	//  - Create signed bit
@@ -480,6 +405,10 @@ AnimationReader132::unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB,
 	int16_t c_c = (rawC >> 2) & 0x3FFF;
 	if (!signBits[1])
 		c_c |= 0xC000;
+
+	constexpr float int2Float = 1.0f / (16384.f * 1.4142135623730950488016887242097F);
+	constexpr int mapping[4][3] = { {1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2} };
+	const int* map = mapping[largest];
 
 	glm::quat rot;
 	rot[map[0]] = signBits[3] > 0 ? -(c_b * int2Float) : (c_b * int2Float);

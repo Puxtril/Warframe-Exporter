@@ -58,8 +58,7 @@ gltfAnimation::createBones(const std::vector<BoneTreeNodeExternal>& boneTree, co
 		findChildrenOfBone(boneTree, x, boneNode.children);
 
 		std::memcpy(&boneNode.translation[0], &action.initialTransform.pos[x][0], sizeof(float) * 3);
-		//std::memcpy(&boneNode.rotation[0], &action.initialTransform.rot[x][0], sizeof(float) * 4);
-		//std::memcpy(&boneNode.scale[0], &action.initialTransform.scale[x][0], sizeof(float) * 3);
+		std::memcpy(&boneNode.rotation[0], &action.initialTransform.rot[x][0], sizeof(float) * 4);
 
 		m_document.nodes.push_back(boneNode);
 	}

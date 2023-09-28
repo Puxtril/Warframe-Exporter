@@ -28,7 +28,8 @@ AnimationConverter::convertAnimation(AnimationHeaderExternal& extHeader, Animati
 			std::vector<BoneTransform>& transforms = curBodyAction.transforms;
 			BoneTransform& initialTransform = curBodyAction.initialTransform;
 
-			applyInitialTransforms(transforms, initialTransform, curHeadAction.frameCount);
+			flipInitialTransforms(initialTransform);
+
 			newAction.transforms = transforms;
 			newAction.initialTransform = initialTransform;
 
@@ -42,64 +43,13 @@ AnimationConverter::convertAnimation(AnimationHeaderExternal& extHeader, Animati
 }
 
 void
-AnimationConverter::applyInitialTransforms(std::vector<BoneTransform>& transforms, BoneTransform& initial, int32_t frameCount)
+AnimationConverter::flipInitialTransforms(BoneTransform& initial)
 {
 	for (size_t x = 0; x < initial.pos.size(); x++)
 	{
 		initial.pos[x].x *= -1;
 
-		//initial.rot[x].x *= -1;
-		//initial.rot[x].y *= -1;
-
-		//initial.pos[x] = glm::rotate(initial.rot[x], initial.pos[x]);
+		initial.rot[x].x *= -1;
+		initial.rot[x].y *= -1;
 	}
-	
-	for (size_t x = 0; x < transforms.size(); x++)
-	{
-		BoneTransform& curTrans = transforms[x];
-		
-		glm::vec3 curInitPos = initial.pos[x];
-		const glm::quat& curInitRot = initial.rot[x];
-		//const glm::vec3& curInitScale = initial.scale[x];
-		const glm::vec3& curInitScale = glm::vec3(1.0, 1.0, 1.0);
-		
-		if (curTrans.pos.size() == 0)
-		{
-			//auto newPos = std::vector<glm::vec3>(frameCount, curInitPos);
-			//curTrans.pos = newPos;
-			//for (size_t y = 0; y < curTrans.pos.size(); y++)
-				//curTrans.pos[y].x *= -1;
-		}
-		else
-		{
-			for (size_t y = 0; y < curTrans.pos.size(); y++)
-				curTrans.pos[y] = curTrans.pos[y] + curInitPos;
-		}
-		if (curTrans.rot.size() == 0)
-		{
-			//auto newRot = std::vector<glm::quat>(frameCount, curInitRot);
-			//curTrans.rot = newRot;
-		}
-		else
-		{
-			for (size_t y = 0; y < curTrans.rot.size(); y++)
-			{
-				//curTrans.rot[y] *= curInitRot;
-				//curTrans.rot[y].x *= -1;
-				//curTrans.rot[y].y *= -1;
-			}
-		}
-
-		if (curTrans.scale.size() == 0)
-		{
-			auto newScale = std::vector<glm::vec3>(frameCount, curInitScale);
-			curTrans.scale = newScale;
-		}
-		else
-		{
-			for (size_t y = 0; y < curTrans.scale.size(); y++)
-				curTrans.scale[y] = curTrans.scale[y] * curInitScale;
-		}
-	}
-	
 }

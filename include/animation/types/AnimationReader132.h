@@ -22,7 +22,10 @@ namespace WarframeExporter::Animation
 			return extTypes;
 		}
 		
+		// Purely for debugging purposes
+		// When researching channel types, it's helpful to know what animations have many of 1 type
 		void isPureChannelType(uint16_t* channelTypes, int channelCount);
+
 		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override;
 		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, AnimationHeaderExternal& outHeader) override;
 		void readBodyDebug(BinaryReaderBuffered* bodyReader, const AnimationHeaderExternal& extHeader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override;
@@ -42,6 +45,6 @@ namespace WarframeExporter::Animation
 			H: B signed bit
 			J: Largest integer index
 		*/
-		glm::quat unpackQuaternion(const uint16_t& rawA, const uint16_t& rawB, const uint16_t rawC);
+		glm::quat unpackQuaternion(uint16_t rawA, uint16_t rawB, uint16_t rawC);
 	};
 }

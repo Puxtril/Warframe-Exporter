@@ -9,6 +9,7 @@ namespace WarframeExporter::Animation
 	{
 	public:
 		static void convertAnimation(AnimationHeaderExternal& extHeader, AnimationBodyExternal& extBody, AnimationData& outData);
-		static void applyInitialTransforms(std::vector<BoneTransform>& transforms, BoneTransform &initial, int32_t frameCount);
+		// Not very useful, as the initial transform doesn't usually match the model rest pose...
+		static void flipInitialTransforms(BoneTransform &initial);
 	};
 }

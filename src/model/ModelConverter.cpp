@@ -270,4 +270,9 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, Sc
             }
         }
     }
+	
+	// Because the scale might be 0...
+	outScale.x = (outScale.x == 0.0f) ? 1.0f : outScale.x;
+	outScale.y = (outScale.y == 0.0f) ? 1.0f : outScale.y;
+	outScale.z = (outScale.z == 0.0f) ? 1.0f : outScale.z;
 }

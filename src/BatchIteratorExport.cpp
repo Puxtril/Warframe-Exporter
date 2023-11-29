@@ -57,14 +57,13 @@ bool
 BatchIteratorExport::existingFileIdentical(const LotusLib::LotusPath& internalPath, const std::filesystem::path& outputPath, const std::shared_ptr<LotusLib::CachePairReader> curPair, const std::string& packageName)
 {
 	const LotusLib::FileEntries::FileNode* internalNode = curPair->getFileEntry(internalPath);
-	std::filesystem::path p(outputPath);
 	
-	if (!std::filesystem::exists(p))
+	if (!std::filesystem::exists(outputPath))
 		return false;
 
-	int64_t existingTime = FileProperties::readWinTimeMod(p);
-	// TODO: Update timestamp to int64_t
-	if ((int64_t)internalNode->getTimeStamp() != existingTime)
+	FileProperties::TimeDos existingTime = FileProperties::readDos(outputPath, true);
+
+	if (FileProperties::wipeNanoseconds(internalNode->getTimeStamp()) != existingTime)
 		return false;
 
 	return true;
@@ -78,6 +77,6 @@ BatchIteratorExport::writeFileProperties(const std::filesystem::path filePath, c
 	{
 		const LotusLib::FileEntries::FileNode* fileNode = pkg->getFileEntry(internalPath);
 		uint64_t timeRaw = fileNode->getTimeStamp();
-		FileProperties::writeWinTime(std::filesystem::path(filePath), timeRaw, timeRaw, timeRaw);
+		FileProperties::writeDos(std::filesystem::path(filePath), timeRaw, timeRaw, timeRaw);
 	}
 }

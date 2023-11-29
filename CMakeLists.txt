@@ -1,7 +1,9 @@
 ##################################################
-# Set these appropriately!
+# Set these appropriately
 
-set(ENABLE_EXE_COMPILATION ON BOOL)
+option(COMPILE_WF_EXE "Compile the standard executable" OFF)
+option(COMPILE_WF_EXE_ADVANCED "Compile the standard executable with more advanced options" ON)
+option(COMPILE_WF_LIB "Compile a static library" OFF)
 
 ##################################################
 # Project stuff
@@ -12,17 +14,24 @@ project(Warframe-Exporter)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# For clangd (linting)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(NOT CMAKE_BUILD_TYPE)
+	message(STATUS "Setting build type to Release.")
+	message(STATUS "To Debug, run `cmake -DCMAKE_BUILD_TYPE=Debug`")
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 ##################################################
 # OS-based flags
 
 if(MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /sdl /Oi /W3 /std:c++17")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} /O2 /sdl /Oi /W3 /std:c++17")
 	add_definitions(-DUNICODE -D_UNICODE)
 elseif(UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
-endif()
-if(ANDROID)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -Wall")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -ggdb")
 endif()
 
 ##################################################
@@ -43,7 +52,6 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioPCM/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/types/*.cpp
->>>>>>> master
 )
 
 ##################################################
@@ -65,10 +73,8 @@ include_directories(
 ##################################################
 # Executable compile commands
 
-if(ENABLE_EXE_COMPILATION)
-	add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES})
-	add_executable(Warframe-Exporter-Advanced ${WARFRAME_EXPORTER_SOURCES})
-	
+if(COMPILE_WF_EXE OR COMPILE_WF_EXE_ADVANCED)
+
 	# Compile subprojects
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader")
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
@@ -78,20 +84,29 @@ if(ENABLE_EXE_COMPILATION)
 		find_library(OODLE_CORE NAMES oo2core_win64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Win64)	
 	elseif(APPLE)
 		find_library(OODLE_CORE NAMES oo2core64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Mac)
-	elseif(ANDROID)
-		find_library(OODLE_CORE NAMES oo2coreandroid64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Android/arm64-v8a)
-	elseif(UNIX)
+	elseif(UNIX AND CMAKE_BUILD_TYPE STREQUAL "Release")
 		find_library(OODLE_CORE NAMES oo2corelinux64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux)
+	elseif(UNIX AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+		find_library(OODLE_CORE NAMES oo2corelinux64_debug PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux)
 	endif()
-	target_link_libraries(Warframe-Exporter Binary-Reader LotusLib ${OODLE_CORE})
-	target_link_libraries(Warframe-Exporter-Advanced Binary-Reader LotusLib ${OODLE_CORE})
-	
-	# Set CLI options
-	target_compile_definitions(Warframe-Exporter PUBLIC WF_EXTRACT)
-	target_compile_definitions(Warframe-Exporter-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
+
+	if(COMPILE_WF_EXE)
+		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES})
+		target_link_libraries(Warframe-Exporter Binary-Reader LotusLib ${OODLE_CORE})
+		target_compile_definitions(Warframe-Exporter PUBLIC WF_EXTRACT)
+	endif()
+		
+	if(COMPILE_WF_EXE_ADVANCED)
+		add_executable(Warframe-Exporter-Advanced ${WARFRAME_EXPORTER_SOURCES})
+		target_link_libraries(Warframe-Exporter-Advanced Binary-Reader LotusLib ${OODLE_CORE})
+		target_compile_definitions(Warframe-Exporter-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
+	endif()
+
 endif()
 
 ##################################################
 # Library target
 
-add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
+if (COMPILE_WF_LIB)
+	add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
+endif()

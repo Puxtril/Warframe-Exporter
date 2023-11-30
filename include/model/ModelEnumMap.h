@@ -8,9 +8,11 @@
 #include "model/types/ModelReader102.hpp"
 #include "model/types/ModelReader103.hpp"
 #include "model/types/ModelReader159.hpp"
+#include "model/types/ModelReader160.hpp"
 #include "model/types/ModelReader269.hpp"
 #include "model/types/ModelReader272.hpp"
 #include "model/types/ModelReader289.hpp"
+#include "model/types/ModelReader290.hpp"
 
 namespace WarframeExporter::Model
 {
@@ -22,7 +24,9 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader102::getInstance())
 		.registerClass(ModelReader103::getInstance())
 		.registerClass(ModelReader159::getInstance())
+		.registerClass(ModelReader160::getInstance())
 		.registerClass(ModelReader269::getInstance())
 		.registerClass(ModelReader272::getInstance())
-		.registerClass(ModelReader289::getInstance());
+		.registerClass(ModelReader289::getInstance())
+		.registerClass(ModelReader290::getInstance());
 }

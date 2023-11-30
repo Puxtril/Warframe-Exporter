@@ -10,7 +10,8 @@ namespace WarframeExporter::Material
 		MATERIAL_203 = 203,
 		MATERIAL_204 = 204,
 		MATERIAL_205 = 205,
-		MATERIAL_206 = 206
+		MATERIAL_206 = 206,
+		MATERIAL_214 = 214
 	};
 
 	class MaterialExtractor : public Extractor
@@ -45,13 +46,15 @@ namespace WarframeExporter::Material
 				(int)MaterialType::MATERIAL_203,
 				(int)MaterialType::MATERIAL_204,
 				(int)MaterialType::MATERIAL_205,
-				(int)MaterialType::MATERIAL_206
+				(int)MaterialType::MATERIAL_206,
+				(int)MaterialType::MATERIAL_214
 			};
 			return extTypes;
 		}
 
 		static MaterialExtractor* getInstance();
 
+		std::vector<std::string> getHlm3Textures(BinaryReaderBuffered* headerReader);
 		void getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths);
 		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData) override;

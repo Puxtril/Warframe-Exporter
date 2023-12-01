@@ -73,6 +73,15 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	else
 		pkgNames = { pkg };
 
+	if (internalPath == "/")
+	{
+		std::cout << "WARNING" << std::endl;
+		std::cout << "You didn't specify a path, so this will proceed to extract every asset you specified." << std::endl;
+		std::cout << "Consider using --internal-path to extract a specific folder" << std::endl;
+		std::cout << "Press ENTER to continue. CTRL+C to quit.";
+		std::cin.get();
+	}
+
 	extract(cache, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
 }
 

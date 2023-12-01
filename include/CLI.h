@@ -14,6 +14,7 @@
 #include "CLI-Debug.h"
 #include "CLI-Main.h"
 #include "CLI-Advanced.h"
+#include "CLI-Output.h"
 
 #include <filesystem>
 #include <string>

@@ -12,6 +12,10 @@ main(int argc, char** argv)
 	TCLAP::CmdLine cmd(g_description.data(), ' ', displayVersion);
 	TCLAP::OneOf cmds;
 
+	// Set custom output
+	ExporterStdOutput StdOutput;
+	cmd.setOutput(&StdOutput);
+
 	for (CLIFeature* feat : g_features)
 		feat->addMainCmds(cmds);
 

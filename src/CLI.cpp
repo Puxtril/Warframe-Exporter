@@ -45,6 +45,7 @@ main(int argc, char** argv)
 	// Basic checks
 	checkDirs(cacheDirCmd.getValue(), outPathCmd.getValue());
 	createLoggers(g_logLevel, outPathCmd.getValue());
+	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
 
 	LotusLib::PackageCollection<LotusLib::CachePairReader>* cacheDir = new LotusLib::PackageCollection<LotusLib::CachePairReader>(cacheDirCmd.getValue(), true);
 	WarframeExporter::Ensmallening ensmallening(true, true, true);
@@ -66,21 +67,48 @@ addMainCommands(TCLAP::OneOf& oneOfCmd, TCLAP::CmdLine& cmdLine)
 void
 checkDirs(const std::filesystem::path& cacheDir, const std::filesystem::path& outPath)
 {
-	if (std::filesystem::exists(outPath) && !std::filesystem::is_directory(outPath))
+	if (!std::filesystem::is_directory(outPath))
 	{
-		std::cout << "Output directory is not valid" << std::endl;
-		exit(1);
-	}
-	if (std::filesystem::is_regular_file(cacheDir))
-	{
-		std::cout << "Do not select a file, please select the Cache.Windows directory" << std::endl;
+		std::cout << "Output directory is not valid" << std::endl << std::endl;
+
+		std::cout << "It's possible the output path contains a space. In which case, put quotes around the path." << std::endl << std::endl;
+
+		std::cout << "C:\\Users\\Warframe\\My Documents\\RippedModels" << std::endl;
+		std::cout << "Should be..." << std::endl;
+		std::cout << "\"C:\\Users\\Warframe\\My Documents\\RippedModels\"" << std::endl;
 		exit(1);
 	}
 	if (!std::filesystem::is_directory(cacheDir))
 	{
-		std::cout << "Not valid, please select the Cache.Windows directory" << std::endl;
+		std::cout << "Not valid, please select the Cache.Windows directory" << std::endl << std::endl;
+
+		std::cout << "It's possible the path to Cache.Windows contains a space. In which case, put quotes around the path." << std::endl << std::endl;
+
+		std::cout << "C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows" << std::endl;
+		std::cout << "Should be..." << std::endl;
+		std::cout << "\"C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows\"" << std::endl;
 		exit(1);
 	}
+}
+
+LotusLib::LotusPath
+forgiveLotusPath(LotusLib::LotusPath inPath)
+{
+	if (inPath.string().size() == 1)
+		return inPath;
+
+	std::stringstream fixedPath;
+	for(std::string token : inPath)
+	{
+		if (token.find_first_of(':') != std::string::npos)
+			continue;
+		if (token.size() == 1 && token[0] == '/')
+			continue;
+		if (token.size() == 0)
+			continue;
+		fixedPath << "/" << token;
+	}
+	return fixedPath.str();
 }
 
 void

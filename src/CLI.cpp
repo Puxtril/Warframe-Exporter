@@ -54,9 +54,18 @@ main(int argc, char** argv)
 	LotusLib::PackageCollection<LotusLib::CachePairReader>* cacheDir = new LotusLib::PackageCollection<LotusLib::CachePairReader>(cacheDirCmd.getValue(), true);
 	WarframeExporter::Ensmallening ensmallening(true, true, true);
 
-	// Parse command
-	for (CLIFeature* feat : g_features)
-		feat->processCmd(outPathCmd.getValue(), intPathCmd.getValue(), pkgCmd.getValue(), cacheDir, ensmallening);
+	// Parse commands
+	try
+	{
+		for (CLIFeature* feat : g_features)
+			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDir, ensmallening);
+	}
+	catch (std::exception& e)
+	{
+		std::cout << std::endl;
+		std::cerr << "Error: " << e.what() << std::endl;
+		exit(1);
+	}
 
 	delete cacheDir;
 }

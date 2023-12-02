@@ -108,8 +108,8 @@ forgiveLotusPath(LotusLib::LotusPath inPath)
 	if (inPath.string().size() == 1)
 		return inPath;
 
-	std::stringstream fixedPath;
-	for(std::string token : inPath)
+	std::basic_stringstream<std::filesystem::path::value_type> fixedPath;
+	for(std::filesystem::path::string_type token : inPath)
 	{
 		if (token.find_first_of(':') != std::string::npos)
 			continue;

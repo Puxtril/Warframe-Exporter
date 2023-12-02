@@ -47,7 +47,7 @@ main(int argc, char** argv)
 	}
 
 	// Basic checks
-	checkDirs(cacheDirCmd.getValue(), outPathCmd.getValue());
+	checkDirs(cacheDirCmd.getValue());
 	createLoggers(g_logLevel, outPathCmd.getValue());
 	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
 
@@ -76,19 +76,8 @@ addMainCommands(TCLAP::OneOf& oneOfCmd, TCLAP::CmdLine& cmdLine)
 }
 
 void
-checkDirs(const std::filesystem::path& cacheDir, const std::filesystem::path& outPath)
+checkDirs(const std::filesystem::path& cacheDir)
 {
-	if (!std::filesystem::is_directory(outPath))
-	{
-		std::cout << "Output directory is not valid" << std::endl << std::endl;
-
-		std::cout << "It's possible the output path contains a space. In which case, put quotes around the path." << std::endl << std::endl;
-
-		std::cout << "C:\\Users\\Warframe\\My Documents\\RippedModels" << std::endl;
-		std::cout << "Should be..." << std::endl;
-		std::cout << "\"C:\\Users\\Warframe\\My Documents\\RippedModels\"" << std::endl;
-		exit(1);
-	}
 	if (!std::filesystem::is_directory(cacheDir))
 	{
 		std::cout << "Not valid, please select the Cache.Windows directory" << std::endl << std::endl;

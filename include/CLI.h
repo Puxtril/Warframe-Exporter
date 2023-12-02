@@ -21,6 +21,13 @@
 #include <string_view>
 #include <sstream>
 
+#if defined WIN32 || defined MINGW
+	// I hate Windows
+	#define WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#endif
+
 const static std::string_view g_version = "2.4.1";
 const static std::string_view g_description = "https://github.com/Puxtril/Warframe-Exporter";
 const static spdlog::level::level_enum g_logLevel = spdlog::level::debug;
@@ -42,4 +49,5 @@ int main(int argc, char** argv);
 
 void checkDirs(const std::filesystem::path& cacheDir);
 LotusLib::LotusPath forgiveLotusPath(LotusLib::LotusPath inPath);
+bool checkIfDoubleClicked();
 void createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath);

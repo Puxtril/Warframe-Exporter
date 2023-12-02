@@ -3,6 +3,9 @@
 int
 main(int argc, char** argv)
 {
+	if (checkIfDoubleClicked())
+		exit(1);
+	
 	// Version string + features
 	std::string displayVersion = g_version.data();
 	for (CLIFeature* feat : g_features)
@@ -89,6 +92,29 @@ checkDirs(const std::filesystem::path& cacheDir)
 		std::cout << "\"C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows\"" << std::endl;
 		exit(1);
 	}
+}
+
+bool
+checkIfDoubleClicked()
+{
+	#ifdef WINDOWS
+
+	DWORD procIDs[2];
+    DWORD maxCount = 2;
+    DWORD result = GetConsoleProcessList((LPDWORD)procIDs, maxCount);
+
+	constexpr LPCWSTR msg = L"This is a console program. It needs to be executed inside a terminal (like Powershell).";
+	constexpr LPCWSTR title = L"Error";
+
+	if (result == 1)
+	{
+		MessageBox(NULL, msg, title, MB_ICONERROR | MB_OK);
+		return true;
+	}
+
+	#endif
+
+	return false;
 }
 
 LotusLib::LotusPath

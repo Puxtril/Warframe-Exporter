@@ -36,7 +36,10 @@ CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusP
 	if (m_lsCmd->getValue())
 	{
 		if (pkg.empty())
+		{
 			WarframeExporter::Logger::getInstance().error("Must specify package with --ls");
+			exit(1);
+		}
 		(*cache)[pkg][LotusLib::PackageTrioType::H]->readToc();
 		(*cache)[pkg][LotusLib::PackageTrioType::H]->lsDir(internalPath);
 		(*cache)[pkg][LotusLib::PackageTrioType::H]->unReadToc();

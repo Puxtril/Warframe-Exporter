@@ -51,14 +51,14 @@ main(int argc, char** argv)
 	createLoggers(g_logLevel, outPathCmd.getValue());
 	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
 
-	LotusLib::PackageCollection<LotusLib::CachePairReader>* cacheDir = new LotusLib::PackageCollection<LotusLib::CachePairReader>(cacheDirCmd.getValue(), true);
+	LotusLib::PackageCollection<LotusLib::CachePairReader> cacheDir(cacheDirCmd.getValue(), true);
 	WarframeExporter::Ensmallening ensmallening(true, true, true);
 
 	// Parse commands
 	try
 	{
 		for (CLIFeature* feat : g_features)
-			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDir, ensmallening);
+			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), &cacheDir, ensmallening);
 	}
 	catch (std::exception& e)
 	{
@@ -66,8 +66,6 @@ main(int argc, char** argv)
 		std::cerr << "Error: " << e.what() << std::endl;
 		exit(1);
 	}
-
-	delete cacheDir;
 }
 
 void

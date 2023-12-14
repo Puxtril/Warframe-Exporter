@@ -42,7 +42,8 @@ MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuf
 	
 	out.write(header.attributes.c_str(), header.attributes.length());
 
-	if (header.type == (int)MaterialType::MATERIAL_214)
+	if (header.type == (int)MaterialType::MATERIAL_214 ||
+		header.type == (int)MaterialType::MATERIAL_216)
 	{
 		std::vector<std::string> threeTextures = getHlm3Textures(hReader);
 		out.write("\nHLM Textures:\n", 15);

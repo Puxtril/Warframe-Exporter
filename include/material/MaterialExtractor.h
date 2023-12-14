@@ -11,7 +11,9 @@ namespace WarframeExporter::Material
 		MATERIAL_204 = 204,
 		MATERIAL_205 = 205,
 		MATERIAL_206 = 206,
-		MATERIAL_214 = 214
+		MATERIAL_208 = 208,
+		MATERIAL_214 = 214,
+		MATERIAL_216 = 216
 	};
 
 	class MaterialExtractor : public Extractor
@@ -47,7 +49,9 @@ namespace WarframeExporter::Material
 				(int)MaterialType::MATERIAL_204,
 				(int)MaterialType::MATERIAL_205,
 				(int)MaterialType::MATERIAL_206,
-				(int)MaterialType::MATERIAL_214
+				(int)MaterialType::MATERIAL_208,
+				(int)MaterialType::MATERIAL_214,
+				(int)MaterialType::MATERIAL_216
 			};
 			return extTypes;
 		}

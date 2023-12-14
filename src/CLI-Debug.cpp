@@ -1,4 +1,6 @@
 #include "CLI-Debug.h"
+#include <exception>
+#include <stdexcept>
 
 CLIDebug::CLIDebug()
 {
@@ -121,7 +123,7 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 			debugger.writeAllDebugs(pkg, (*iter)->getFullPath());
 		}
 	}
-	catch (std::filesystem::filesystem_error&)
+	catch (std::exception&)
 	{
 		debugger.writeAllDebugs(pkg, internalPath);
 	}

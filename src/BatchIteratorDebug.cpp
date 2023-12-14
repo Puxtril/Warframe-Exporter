@@ -129,7 +129,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 			out.close();
 		}
 	}
-	catch (std::filesystem::filesystem_error&) {}
+	catch (std::runtime_error&) {}
 
 	if ((*m_package)[packageName][LotusLib::PackageTrioType::B])
 	{
@@ -146,7 +146,7 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 				out.close();
 			}
 		}
-		catch (std::filesystem::filesystem_error&) {}
+		catch (std::runtime_error&) {}
 	}
 
 	if ((*m_package)[packageName][LotusLib::PackageTrioType::F])
@@ -164,6 +164,6 @@ BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLi
 				out.close();
 			}
 		}
-		catch (std::filesystem::filesystem_error&) {}
+		catch (std::runtime_error&) {}
 	}
 }

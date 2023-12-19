@@ -22,7 +22,7 @@ struct meshPhysX {
     } else {
         padding[0x50];
     }
-    
+
     vec4Float vec1;
     vec4Float vec2;
     if (meshType != 3 && meshType != 2 && meshType != 0) {
@@ -34,25 +34,50 @@ struct meshPhysX {
     u32 unkNum;
 };
 
+struct PhysicsPath {
+    u32 type;
+    u32 subType;
+    if (type == 0)
+	{
+		if (subType == 0 || subType == 4) {
+		   u32 pathLen;
+	       padding[pathLen];
+		}
+	}
+	else if (type == 1)
+	{
+		if (subType == 0 || subType == 1)
+		{
+			u32 pathLen;
+			padding[pathLen];
+		}
+		else if (subType == 8)
+		{
+			padding[2];
+			u32 pathLen;
+			padding[pathLen];
+		}
+	}
+	else if (type == 2) {
+	   if (subType == 5) {
+	       u32 pathLen;
+		   padding[pathLen];
+	   }
+	}
+};
+
 /****************************************************************/
 // Main struct
 
 struct Model102 {
     padding[0x1C];
     u32 LODs[5];
-    u32 unkScalar1;
-    u32 unkScalar2;
 
-    u32 physicsPath1Len;
-    if (physicsPath1Len != 0) {
-        u16 strCheck;
-        if (strCheck != 0) {
-            char physPath1[physicsPath1Len-2];
-        }
-    }
-    
+    PhysicsPath physPath1;
+
     padding[0x18];
     float randomFloatTest;
+
     padding[0x12];
     vec4Float vec1;
     vec4Float vec2;
@@ -62,38 +87,31 @@ struct Model102 {
     u32 morphCount;
     u32 boneCount;
 
-    padding[0xC];
-    
-    u32 skipArrayCount;
-    
-    padding[0x8];
-    u32 randomAlways1Int;
-    padding[0x59];
+    padding[0x18];
+
+    u32 skipArrayCount2;
+    padding[8 * skipArrayCount2];
+
+    padding[0x51];
 
     u32 meshInfoCount;
     meshInfo meshInfos[meshInfoCount];
 
-    u32 unkWordCount;
-    padding[unkWordCount * 2];
+    u32 idkSomeCheck;
 
-    str32Arr32 materials;
-
-    padding[0x8];
-
-    u32 physicsPath2Len;
-    if (physicsPath2Len != 0) {
-        u16 strCheck;
-        if (strCheck != 0) {
-            char physPath2[physicsPath2Len-2];
-        }
+    if (idkSomeCheck == 2) {
+        padding[4];
+    } else if (idkSomeCheck == 3) {
+        padding[6];
     }
-    
+
+    // HLOD is 4, DCM is 5
+    padding[0x4];
+
+    PhysicsPath physPath2;
+
     u32 physXArrLen;
     meshPhysX physXArray[physXArrLen];
-    
-    str32 materialPath;
-    
-    str32Arr32 errors;
 };
 
 /****************************************************************/

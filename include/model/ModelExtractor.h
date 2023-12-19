@@ -50,7 +50,7 @@ namespace WarframeExporter::Model
 				(int)ModelType::MODEL_STATIC_96,
 				(int)ModelType::MODEL_LEVEL_99,
 				(int)ModelType::MODEL_DCM_101,
-				(int)ModelType::MODEL_HLOD_102,
+				(int)ModelType::MODEL_HLOD_OR_DCM_102,
 				(int)ModelType::MODEL_LEVEL_103,
 				(int)ModelType::MODEL_TERRAIN_159,
 				(int)ModelType::MODEL_TERRAIN_160,

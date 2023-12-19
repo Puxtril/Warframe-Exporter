@@ -9,7 +9,9 @@
 #include "ExporterExceptions.h"
 
 #include <cassert>
+#include <cstring>
 #include <iomanip>
+#include <string_view>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -30,7 +32,7 @@ namespace WarframeExporter::Model
 
 		inline std::vector<int> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = { (int)ModelType::MODEL_HLOD_102 };
+			std::vector<int> extTypes = { (int)ModelType::MODEL_HLOD_OR_DCM_102 };
 			return extTypes;
 		}
 
@@ -39,42 +41,50 @@ namespace WarframeExporter::Model
 			return ScaleType::XYZ;
 		}
 
+		// Hahahaha
+		// This sucks, man
+		// True for DCM, False for HLOD
+		inline bool isDCM(const LotusLib::CommonHeader& header)
+		{
+			if (header.paths.size() != 1)
+				return false;
+
+			const std::string& filePath = header.paths[0];
+
+			constexpr std::string_view dcmExt1 = "_dcm.fbx";
+			constexpr std::string_view dcmExt2 = "_dcm";
+
+			std::string_view ext1 = std::string_view(filePath.data() + (filePath.length() - 8), 8);
+			std::string_view ext2 = std::string_view(filePath.data() + (filePath.length() - 4), 4);
+
+			if (dcmExt1 == ext1 || dcmExt2 == ext2)
+				return true;
+			
+			return false;
+		}
+
+		inline void skipPhysicsPath(BinaryReaderBuffered* headerReader) const
+		{
+			uint32_t structType = headerReader->readUInt32();
+			uint32_t subType = headerReader->readUInt32();
+
+			// Perhaps these 2 numbers are flags?
+			// Doesn't matter... debugging this took long enough. It works.
+			if (subType & 8)
+			{
+				headerReader->seek(2, std::ios::cur);
+			}
+
+			uint32_t pathLen = headerReader->readUInt32();
+			headerReader->seek(pathLen, std::ios::cur);
+		}
+
 		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
 		{
 			headerReader->seek(0x1C, std::ios_base::cur);
-			delete headerReader->readUInt32Array(5); // Possible LOD Data
-			headerReader->readUInt32(); // Not an array
-			headerReader->readUInt32(); // Not an array
-
-			// Missing pre-check, len is non-zero, path doesn't exist: /Lotus/Characters/Orokin/OrokinStatue/OrokinStatueDestroyedHead.fbx
-			// Missing pre-check, len is non-zero, path exists:        /Lotus/Characters/Grineer/GrineerTwinQueens/GrineerQueenSceptreBrokenVesselB.fbx
-			// Has pre-check,     len is zero,     path doesn't exist: /Lotus/Characters/NewWar/Tefillah/TefillahDamaged.fbx
-			// Has pre-check,     len is non-zero, path exists:        /Lotus/Objects/SolarisUnited/ExteriorKit/SUExtPipe90Corner.fbx
-			static const std::string physicsPath1 = "First physics path Check";
-			uint32_t physicsPathCheck = headerReader->readUInt16(0, (int)UINT8_MAX + 1, physicsPath1);
-			if (physicsPathCheck > 0)
-			{
-				uint32_t physPathLen;
-				if (physicsPathCheck == 255)
-				{
-					physPathLen = headerReader->readUInt32();
-				}
-				else
-				{
-					physPathLen = physicsPathCheck;
-					headerReader->seek(0x2, std::ios_base::cur);
-				}
+			delete[] headerReader->readUInt32Array(5); // Possible LOD Data
 			
-				// Because the path may not actually exist...
-				if (physPathLen > 0)
-				{
-					uint16_t nullCheck = headerReader->readUInt16();
-					if (nullCheck != 0)
-						headerReader->seek(physPathLen - 2, std::ios_base::cur);
-				}
-			}
-			else
-				headerReader->seek(0x2, std::ios_base::cur);
+			this->skipPhysicsPath(headerReader);
 		
 			headerReader->seek(0x18, std::ios_base::cur);
 
@@ -102,16 +112,12 @@ namespace WarframeExporter::Model
 			headerReader->readUInt32(); // morph count
 			headerReader->readUInt32(); // bone count
 
-			headerReader->seek(0xC, std::ios_base::cur);
+			headerReader->seek(0x18, std::ios_base::cur);
 
-			headerReader->readUInt32();
+			uint32_t arrSkip2 = headerReader->readUInt32();
+			headerReader->seek(8 * arrSkip2, std::ios_base::cur);
 
-			headerReader->seek(0x8, std::ios_base::cur);
-
-			static const std::string always1IntMsg = "Always 1 integer";
-			headerReader->readUInt32(1, 1, always1IntMsg);
-
-			headerReader->seek(0x59, std::ios_base::cur);
+			headerReader->seek(0x51, std::ios_base::cur);
 
 			const static std::string meshInfoMsg = "Mesh Info Count";
 			uint32_t minMeshInfo = vertexCount > 0 ? 1 : 0;
@@ -160,45 +166,32 @@ namespace WarframeExporter::Model
 
 				headerReader->seek(0x34, std::ios_base::cur);
 			}
-		
-			uint32_t shortCount = headerReader->readUInt32();
-			headerReader->seek(shortCount * 2U, std::ios_base::cur);
-		
-			static const std::string materialPathArrayMsg = "Material path array length";
-			headerReader->readUInt32(0, 0, materialPathArrayMsg);
 
-			headerReader->seek(0x8, std::ios::cur);
+			uint32_t someSkip = headerReader->readUInt32();
+			if (someSkip == 2)
+				headerReader->seek(4, std::ios::cur);
+			else if (someSkip == 3)
+				headerReader->seek(6, std::ios::cur);
 
-			static const std::string physicsPath2 = "Second physics path";
-			int32_t physicsPath2Check = headerReader->readUInt16(0, (int)UINT8_MAX + 1, physicsPath2);
-			if (physicsPath2Check > 0)
+			bool isDCM = this->isDCM(header);
+
+			if (isDCM)
 			{
-				uint32_t physPath2Len;
-				if (physicsPath2Check == 255)
-				{
-					physPath2Len = headerReader->readUInt32();
-				}
-				else
-				{
-					physPath2Len = physicsPath2Check;
-					headerReader->seek(0x2, std::ios_base::cur);
-				}
-
-				// Because the path may not actually exist...
-				if (physPath2Len > 0)
-				{
-					uint16_t nullCheck = headerReader->readUInt16();
-					if (nullCheck != 0)
-						headerReader->seek(physPath2Len - 2, std::ios_base::cur);
-				}
+				headerReader->seek(0x5, std::ios::cur);
 			}
 			else
-				headerReader->seek(0x2, std::ios_base::cur);
+			{
+				headerReader->seek(0x4, std::ios::cur);
+			}
+
+			this->skipPhysicsPath(headerReader);
 
 			uint32_t physXMeshCount = headerReader->readUInt32();
 			for (uint32_t x = 0; x < physXMeshCount; x++)
 			{
-				uint32_t meshTypeEnum = headerReader->readUInt32();
+				static const std::string meshTypeMsg = "PhysX Mesh Type";
+				uint32_t meshTypeEnum = headerReader->readUInt32(0, 20, meshTypeMsg);
+
 				if (meshTypeEnum == 1)
 					headerReader->seek(0x4C, std::ios_base::cur);
 				else
@@ -218,49 +211,13 @@ namespace WarframeExporter::Model
 				headerReader->readUInt32();
 				headerReader->seek(0x8, std::ios_base::cur);
 			}
-
-			uint32_t materialPathLen = headerReader->readUInt32();
-			headerReader->seek(materialPathLen, std::ios::cur);
-
-			uint32_t errorCount = headerReader->readUInt32();
-			for (uint32_t x = 0; x < errorCount; x++)
-			{
-				uint32_t errorCountStrLen = headerReader->readUInt32();
-				headerReader->seek(errorCountStrLen, std::ios_base::cur);
-			}
-
-			if (headerReader->tell() != headerReader->getLength())
-				throw unknown_format_error("Did not reach end of file");
 		}
 
 		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override
 		{
-			headerReader->seek(0x38, std::ios_base::cur);
+			headerReader->seek(0x30, std::ios_base::cur);
 
-			uint32_t physicsPathCheck = headerReader->readUInt16();
-			if (physicsPathCheck > 0)
-			{
-				uint32_t physPathLen;
-				if (physicsPathCheck == 255)
-				{
-					physPathLen = headerReader->readUInt32();
-				}
-				else
-				{
-					physPathLen = physicsPathCheck;
-					headerReader->seek(0x2, std::ios_base::cur);
-				}
-
-				// Because the path may not actually exist...
-				if (physPathLen > 0)
-				{
-					uint16_t nullCheck = headerReader->readUInt16();
-					if (nullCheck != 0)
-						headerReader->seek(physPathLen - 2, std::ios_base::cur);
-				}
-			}
-			else
-				headerReader->seek(0x2, std::ios_base::cur);
+			this->skipPhysicsPath(headerReader);
 
 			headerReader->seek(0x4E, std::ios_base::cur);
 
@@ -269,7 +226,12 @@ namespace WarframeExporter::Model
 			outHeader.morphCount = headerReader->readUInt32();
 			outHeader.boneCount = headerReader->readUInt32();
 
-			headerReader->seek(0x75, std::ios_base::cur);
+			headerReader->seek(0x18, std::ios_base::cur);
+
+			uint32_t arrSkip2 = headerReader->readUInt32();
+			headerReader->seek(8 * arrSkip2, std::ios_base::cur);
+
+			headerReader->seek(0x51, std::ios_base::cur);
 
 			uint32_t meshInfoCount = headerReader->readUInt32();
 			outHeader.meshInfos.resize(meshInfoCount);
@@ -289,38 +251,24 @@ namespace WarframeExporter::Model
 				headerReader->seek(0x34, std::ios_base::cur);
 			}
 
-			uint32_t shortCount = headerReader->readUInt32();
-			headerReader->seek(shortCount * 2U, std::ios_base::cur);
+			uint32_t someSkip = headerReader->readUInt32();
+			if (someSkip == 2)
+				headerReader->seek(4, std::ios::cur);
+			else if (someSkip == 3)
+				headerReader->seek(6, std::ios::cur);
 
-			headerReader->readUInt32();
+			bool isDCM = this->isDCM(header);
 
-			headerReader->seek(0x8, std::ios::cur);
-
-			static const std::string physicsPath2 = "Second physics path";
-			int32_t physicsPath2Check = headerReader->readUInt16(0, (int)UINT8_MAX + 1, physicsPath2);
-			if (physicsPath2Check > 0)
+			if (isDCM)
 			{
-				uint32_t physPath2Len;
-				if (physicsPath2Check == 255)
-				{
-					physPath2Len = headerReader->readUInt32();
-				}
-				else
-				{
-					physPath2Len = physicsPath2Check;
-					headerReader->seek(0x2, std::ios_base::cur);
-				}
-
-				// Because the path may not actually exist...
-				if (physPath2Len > 0)
-				{
-					uint16_t nullCheck = headerReader->readUInt16();
-					if (nullCheck != 0)
-						headerReader->seek(physPath2Len - 2, std::ios_base::cur);
-				}
+				headerReader->seek(0x5, std::ios::cur);
 			}
 			else
-				headerReader->seek(0x2, std::ios_base::cur);
+			{
+				headerReader->seek(0x4, std::ios::cur);
+			}
+
+			this->skipPhysicsPath(headerReader);
 
 			uint32_t physXMeshCount = headerReader->readUInt32();
 			outHeader.physXMeshes.resize(physXMeshCount);
@@ -345,19 +293,6 @@ namespace WarframeExporter::Model
 				curPhysXMesh.dataLength = headerReader->readUInt32();
 				headerReader->seek(0x8, std::ios_base::cur);
 			}
-
-			uint32_t materialPathLen = headerReader->readUInt32();
-			outHeader.materialPaths.push_back(headerReader->readAsciiString(materialPathLen));
-
-			uint32_t errorCount = headerReader->readUInt32();
-			for (uint32_t x = 0; x < errorCount; x++)
-			{
-				uint32_t errorCountStrLen = headerReader->readUInt32();
-				outHeader.errorMsgs.push_back(headerReader->readAsciiString(errorCountStrLen));
-			}
-
-			if (headerReader->tell() != headerReader->getLength())
-				throw unknown_format_error("Did not reach end of file");
 		}
 
 		void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) override
@@ -372,6 +307,15 @@ namespace WarframeExporter::Model
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 			{
 				bodyReader->seek(24, std::ios_base::cur);
+			}
+
+			size_t remainingBytes = bodyReader->getLength() - bodyReader->tell();
+			size_t indicesSize = static_cast<size_t>(extHeader.faceCount) * 2;
+			
+			// DCM Model
+			if (remainingBytes > indicesSize)
+			{
+				bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
 			}
 
 			static const std::string facesIndiciesMsg = "Face Indices";
@@ -409,10 +353,17 @@ namespace WarframeExporter::Model
 				outBody.UV2[x][1] = bodyReader->readHalf();
 			}
 
+			size_t remainingBytes = bodyReader->getLength() - bodyReader->tell();
+			size_t indicesSize = static_cast<size_t>(extHeader.faceCount) * 2;
+			
+			// DCM Model
+			if (remainingBytes > indicesSize)
+			{
+				bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
+			}
+
 			outBody.indices.resize(extHeader.faceCount);
 			bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 		}
 };
-
-	
-}
+};

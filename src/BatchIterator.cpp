@@ -1,4 +1,5 @@
 #include "BatchIterator.h"
+#include "LotusExceptions.h"
 
 using namespace WarframeExporter;
 
@@ -28,32 +29,40 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 		{
 			const LotusLib::FileEntries::FileNode* curFile = *iter;
 
-			std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
-			BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release (), curFile->getLen());
-			std::string curFilePath = curFile->getFullPath();
-
-			LotusLib::CommonHeader header;
-			if (!tryReadHeader(rawDataReader, header))
+			try
 			{
-				m_logger.debug("Common header error: " + curFilePath);
+				std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
+				BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release (), curFile->getLen());
+				std::string curFilePath = curFile->getFullPath();
+
+				LotusLib::CommonHeader header;
+				if (!tryReadHeader(rawDataReader, header))
+				{
+					m_logger.debug("Common header error: " + curFilePath);
+					continue;
+				}
+
+				Extractor* extractor = g_enumMapExtractor[header.type];
+
+				if (extractor == nullptr)
+				{
+					processUnknownFile(curFilePath, header, curFile);
+					continue;
+				}
+
+				if (((int)extractor->getExtractorType() & (int)types) == 0)
+				{
+					processSkipFile(curFilePath, header, curFile, extractor);
+					continue;
+				}
+
+				processKnownFile(curPackageName, curFilePath, &rawDataReader, header, extractor);
+			}
+			catch (LotusLib::DecompressionException& ex)
+			{
+				m_logger.error("Decompression error, skipping");
 				continue;
 			}
-
-			Extractor* extractor = g_enumMapExtractor[header.type];
-
-			if (extractor == nullptr)
-			{
-				processUnknownFile(curFilePath, header, curFile);
-				continue;
-			}
-
-			if (((int)extractor->getExtractorType() & (int)types) == 0)
-			{
-				processSkipFile(curFilePath, header, curFile, extractor);
-				continue;
-			}
-
-			processKnownFile(curPackageName, curFilePath, &rawDataReader, header, extractor);
 		}
 
 		curPair->unReadToc();

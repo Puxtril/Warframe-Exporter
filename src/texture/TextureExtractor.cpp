@@ -33,7 +33,7 @@ TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuff
 	{
 		entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);
 	}
-	catch (std::filesystem::filesystem_error&)
+	catch (std::runtime_error&)
 	{
 		bodyTrioType = LotusLib::PackageTrioType::B;
 		entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);

@@ -25,7 +25,7 @@ FileProperties::wipeNanoseconds(TimeDos dosTime)
 /////////////////////////////////////////////////////
 // Windows overrides of cross-platform interface
 
-FileProperties::imeDos
+FileProperties::TimeDos
 FileProperties::filetimeStructToUint64(const FILETIME& dosTime)
 {
     return (TimeDos(dosTime.dwHighDateTime) << 32) | TimeDos(dosTime.dwLowDateTime);

@@ -26,10 +26,6 @@ ModelExtractor::extractExternal(const LotusLib::CommonHeader& header, BinaryRead
 	modelReader->readBody(outHeaderExt, &bReader, outBodyExt);
 
 	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", outHeaderExt.boneTree.size(), outHeaderExt.weightedBoneNames.size(), outHeaderExt.meshInfos.size(), outHeaderExt.vertexCount, outHeaderExt.faceCount, outHeaderExt.morphCount, outHeaderExt.physXMeshes.size()));
-
-	// Error checking. Properly extracted models will never trigger this.
-	if (outHeaderExt.meshInfos.size() == 0)
-		throw unknown_format_error("Mesh has zero MeshInfos");
 }
 
 std::vector<std::vector<glm::u8vec4>>
@@ -49,6 +45,9 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
 	extractExternal(header, hReader, pkgDir, package, internalPath, ensmalleningData, headerExt, bodyExt);
+
+	if (headerExt.meshInfos.size() == 0)
+		throw unknown_format_error("Mesh has zero MeshInfos");
 
 	auto vertexColors = getVertexColors(internalPath, pkgDir["Misc"]);
 

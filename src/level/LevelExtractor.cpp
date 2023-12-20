@@ -72,6 +72,9 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 			WarframeExporter::Model::ModelBodyExternal bodyExt;
 			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(commonHeader, &hReader, pkgDir, "Misc", curLevelObj.meshPath, ensmalleningData, headerExt, bodyExt);
 
+			if (headerExt.meshInfos.size() == 0)
+				continue;
+
 			// My Gltf exporter doesn't like multiple rigged models
 			// These are levels anyway, so no big deal right?
 			// ...

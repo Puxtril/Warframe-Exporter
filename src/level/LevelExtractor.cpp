@@ -64,7 +64,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 
 			if (WarframeExporter::Model::g_enumMapModel[commonHeader.type] == nullptr)
 			{
-				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported mesh: {}", curLevelObj.meshPath));
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", commonHeader.type, curLevelObj.meshPath));
 				continue;
 			}
 
@@ -73,12 +73,12 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(commonHeader, &hReader, pkgDir, "Misc", curLevelObj.meshPath, ensmalleningData, headerExt, bodyExt);
 
 			if (headerExt.meshInfos.size() == 0)
+			{
+				m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", curLevelObj.meshPath));
 				continue;
+			}
 
-			// My Gltf exporter doesn't like multiple rigged models
-			// These are levels anyway, so no big deal right?
-			// ...
-			// Right?
+			// Gltf exporter doesn't like multiple rigged models
 			headerExt.boneTree.clear();
 
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
@@ -89,10 +89,12 @@ LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePa
 			LevelConverter::applyTransformation(curLevelObj, bodyInt.positions);
 			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
 
+			m_logger.debug(spdlog::fmt_lib::format("Pos={},{},{} Scale={},{},{} Colors={} {}", curLevelObj.pos.x, curLevelObj.pos.y, curLevelObj.pos.z, headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z, vertexColors.size(), curLevelObj.meshPath));
+
 			outGltf.addModelData(headerInt, bodyInt, curLevelObj);
 		} catch (std::exception& ex) {
 			if (curLevelObj.meshPath.length() > 5)
-				m_logger.error(spdlog::fmt_lib::format("{}::{}: {}", curLevelObj.meshPath, curLevelObj.objName, ex.what()));
+				m_logger.error(spdlog::fmt_lib::format("{}: {}", ex.what(), curLevelObj.meshPath));
 			continue;
 		}
 	}

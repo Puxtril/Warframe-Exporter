@@ -54,6 +54,15 @@ main(int argc, char** argv)
 	createLoggers(g_logLevel, outPathCmd.getValue());
 	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
 
+	// Basic logs
+	WarframeExporter::Logger::getInstance().debug(("Version: " + std::string(g_version)));
+
+	std::stringstream args;
+	for (int i = 0; i < argc; i++)
+		args << (argv[i]) << " ";
+	WarframeExporter::Logger::getInstance().debug(("Args: " + args.str()));
+
+	// Create base objects
 	LotusLib::PackageCollection<LotusLib::CachePairReader> cacheDir(cacheDirCmd.getValue(), true);
 	WarframeExporter::Ensmallening ensmallening(true, true, true);
 

@@ -24,8 +24,6 @@ ModelExtractor::extractExternal(const LotusLib::CommonHeader& header, BinaryRead
 
 	modelReader->readHeader(hReader, ensmalleningData, header, outHeaderExt);
 	modelReader->readBody(outHeaderExt, &bReader, outBodyExt);
-
-	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", outHeaderExt.boneTree.size(), outHeaderExt.weightedBoneNames.size(), outHeaderExt.meshInfos.size(), outHeaderExt.vertexCount, outHeaderExt.faceCount, outHeaderExt.morphCount, outHeaderExt.physXMeshes.size()));
 }
 
 std::vector<std::vector<glm::u8vec4>>
@@ -34,8 +32,6 @@ ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::
 	std::vector<std::vector<glm::u8vec4>> vertexColors;
 	if (m_indexVertexColors)
 		m_vertexColorIndexer.getModelColors(modelPath, vertexColors, pkg);
-	if (vertexColors.size() > 0)
-		m_logger.debug("Found " + std::to_string(vertexColors.size()) + "vertex colors");
 	return vertexColors;
 }
 
@@ -56,7 +52,7 @@ ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffer
 	ModelBodyInternal bodyInt;
 	ModelConverter::convertToInternal(headerExt, bodyExt, header.attributes, vertexColors, headerInt, bodyInt, g_enumMapModel[header.type]->ensmalleningScale());
 
-	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
+	m_logger.debug(spdlog::fmt_lib::format("Bones={} Verts={} Faces={} Morphs={} PhysXMeshes={} Colors={} Scale={},{},{}", headerExt.boneTree.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size(), vertexColors.size(), headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
 	// Convert body/header into exportable format
 	ModelExporterGltf outModel;

@@ -46,8 +46,7 @@ TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuff
 	TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, ensmalleningData);
 	TextureHeaderInternal headerInt = TextureConverter::convertHeader(extHeader, entry->getLen());
 
-	m_logger.debug(spdlog::fmt_lib::format("Raw texture data: Format={} Resolution={}x{} Enum1={} Enum2={} Enum3={}", extHeader.format, extHeader.widthBase, extHeader.heightBase, extHeader.unkEnum1, extHeader.unkEnum2, extHeader.unkEnum3));
-	m_logger.debug(spdlog::fmt_lib::format("Converted texture data: Resolution={}x{} Mip0Size={}", headerInt.width, headerInt.height, headerInt.mip0Len));
+	m_logger.debug(spdlog::fmt_lib::format("Cache={} Format={} ResRaw={}x{} ResConv={}x{} Mip0Size={}", (int)bodyTrioType, extHeader.format, extHeader.widthBase, extHeader.heightBase, headerInt.width, headerInt.height, headerInt.mip0Len));
 
 	// Read body
 	TextureBodyInternal body = TextureReader::readBody(&reader, headerInt, ensmalleningData);

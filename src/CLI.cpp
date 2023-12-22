@@ -75,7 +75,7 @@ main(int argc, char** argv)
 	catch (std::exception& e)
 	{
 		std::cout << std::endl;
-		std::cerr << "Error: " << e.what() << std::endl;
+		WarframeExporter::Logger::getInstance().error(e.what());
 		exit(1);
 	}
 }

@@ -28,7 +28,7 @@
 	#include <windows.h>
 #endif
 
-const static std::string_view g_version = "2.5";
+const static std::string_view g_version = "2.5.1";
 const static std::string_view g_description = "https://github.com/Puxtril/Warframe-Exporter";
 const static spdlog::level::level_enum g_logLevel = spdlog::level::debug;
 

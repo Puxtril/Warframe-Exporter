@@ -388,13 +388,27 @@ namespace WarframeExporter::Model
 			outBody.UV2.resize(extHeader.vertexCount);
 			outBody.boneIndices.resize(extHeader.vertexCount);
 			outBody.boneWeights.resize(extHeader.vertexCount);
+			outBody.colors.resize(2);
+			outBody.colors[0].resize(extHeader.vertexCount);
+			outBody.colors[1].resize(extHeader.vertexCount);
 			for (uint32_t x = 0; x < extHeader.vertexCount; x++)
 			{
 				outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
 				outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
 				outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
 
-				bodyReader->seek(10, std::ios_base::cur); // No idea
+				bodyReader->seek(6, std::ios_base::cur); // Normals?
+
+				// Tangent or Vertex Colors?
+				outBody.colors[1][x][0] = bodyReader->readUInt8();
+				outBody.colors[1][x][1] = bodyReader->readUInt8();
+				outBody.colors[1][x][2] = bodyReader->readUInt8();
+
+				// Ambient Occlusion?
+				uint8_t col = bodyReader->readUInt8();
+				outBody.colors[0][x][0] = col;
+				outBody.colors[0][x][1] = col;
+				outBody.colors[0][x][2] = col;
 
 				outBody.UV1[x][0] = bodyReader->readHalf();
 				outBody.UV1[x][1] = bodyReader->readHalf();

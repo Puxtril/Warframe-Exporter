@@ -7,9 +7,6 @@
 [submodule "lib/lib/json"]
 	path = lib/json
 	url = https://github.com/nlohmann/json.git
-[submodule "lib/Binary-Reader"]
-	path = lib/Binary-Reader
-	url = https://github.com/Protinon/Binary-Reader.git
 [submodule "lib/spdlog"]
 	path = lib/spdlog
 	url = https://github.com/gabime/spdlog.git
@@ -22,3 +19,6 @@
 [submodule "lib/ddspp"]
 	path = lib/ddspp
 	url = https://github.com/Puxtril/ddspp.git
+[submodule "Binary-reader"]
+	path = lib/Binary-Reader
+	url = https://github.com/Puxtril/Binary-Reader.git

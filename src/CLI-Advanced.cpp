@@ -37,7 +37,7 @@ CLIAdvanced::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIAdvanced::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
+CLIAdvanced::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	WarframeExporter::Ensmallening& ensmalleningMutable = const_cast<WarframeExporter::Ensmallening&>(ensmallening);
 
@@ -51,12 +51,6 @@ CLIAdvanced::processCmd(const std::filesystem::path& outPath, const LotusLib::Lo
 	}
 	else if (m_isPreEnsmallening1->getValue())
 	{
-		// Sooo hacky
-		// :(
-		std::filesystem::path cacheDir = cache->getPath();
-		delete cache;
-		cache = new LotusLib::PackageCollection<LotusLib::CachePairReader>(cacheDir, false);
-
 		ensmalleningMutable = WarframeExporter::Ensmallening(false, false, false);
 	}
 }

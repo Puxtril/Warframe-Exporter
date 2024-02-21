@@ -23,15 +23,15 @@ namespace WarframeExporter
 		std::filesystem::path m_outDebugPath;
 
 	public:
-		BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath);
+		BatchIteratorDebug(const std::filesystem::path& pkgsDir, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath);
 
 		void printEnumCounts(const std::string& package, const LotusLib::LotusPath& internalPath);
-		void writeAllDebugs(const std::string& packageName, const LotusLib::LotusPath& internalPath);
+		void writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry);
 
 	protected:
-		void processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor) override;
-		void processUnknownFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file) override;
-		void processSkipFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor) override;
+		void processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor) override;
+		void processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry) override;
+		void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor) override;
 
 	};
 }

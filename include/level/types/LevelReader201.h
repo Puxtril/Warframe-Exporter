@@ -2,7 +2,7 @@
 
 #include "level/LevelStructs.h"
 #include "level/LevelReader.h"
-#include "BinaryReaderBase.h"
+#include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 
 #include <string>
@@ -30,10 +30,10 @@ namespace WarframeExporter::Level
 			return extTypes;
 		}
 	
-		void readHeaderDebug(BinaryReaderBase& reader) const override;
-		void readBodyDebug(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader) const override;
-		void readHeader(BinaryReaderBase& reader, LevelHeaderExternal& outHeader) const override;
-		void readBody(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const override;
+		void readHeaderDebug(BinaryReader::BinaryReaderBuffered& reader) const override;
+		void readBodyDebug(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader) const override;
+		void readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHeaderExternal& outHeader) const override;
+		void readBody(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const override;
 
 	};
 };

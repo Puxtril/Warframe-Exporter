@@ -39,10 +39,10 @@ namespace WarframeExporter::Model
 			return ScaleType::NONE;
 		}
 
-		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
+		void readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
 		{
 			headerReader->seek(0x1C, std::ios_base::cur);
-			delete headerReader->readUInt32Array(5); // Possible LOD Data
+			headerReader->readUInt32Array(5); // Possible LOD Data
 			headerReader->readUInt32(); // Not an array
 			headerReader->readUInt32(); // Not an array
 
@@ -151,11 +151,11 @@ namespace WarframeExporter::Model
 
 					static const std::string LODOffsetMsg = "MeshInfo LOD Offset edge case";
 					headerReader->readUInt32(0, UINT32_MAX, LODOffsetMsg);
-					delete headerReader->readUInt32Array(4, 0, 1, LODOffsetMsg);
+					headerReader->readUInt32Array(4, 0, 1, LODOffsetMsg);
 
 					static const std::string LODFaceCountMsg = "MeshInfo LOD Face count edge case";
 					headerReader->readUInt32(0, UINT32_MAX, LODFaceCountMsg);
-					delete headerReader->readUInt32Array(4, 0, 1, LODFaceCountMsg);
+					headerReader->readUInt32Array(4, 0, 1, LODFaceCountMsg);
 				}
 
 				headerReader->seek(0x34, std::ios_base::cur);
@@ -234,7 +234,7 @@ namespace WarframeExporter::Model
 				throw unknown_format_error("Did not reach end of file");
 		}
 
-		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override
+		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override
 		{
 			headerReader->seek(0x38, std::ios_base::cur);
 
@@ -278,8 +278,8 @@ namespace WarframeExporter::Model
 			{
 				MeshInfoExternal& meshInfo = outHeader.meshInfos[x];
 
-				headerReader->readFloatArray(&meshInfo.vector1.x, 4);
-				headerReader->readFloatArray(&meshInfo.vector2.x, 4);
+				headerReader->readSingleArray(&meshInfo.vector1.x, 4);
+				headerReader->readSingleArray(&meshInfo.vector2.x, 4);
 
 				uint32_t meshInfoNameLen = headerReader->readUInt32();
 				meshInfo.name = headerReader->readAsciiString(meshInfoNameLen);
@@ -340,8 +340,8 @@ namespace WarframeExporter::Model
 				else
 					headerReader->seek(0x50, std::ios_base::cur);
 
-				headerReader->readFloatArray(&curPhysXMesh.vector1.x, 4);
-				headerReader->readFloatArray(&curPhysXMesh.vector2.x, 4);
+				headerReader->readSingleArray(&curPhysXMesh.vector1.x, 4);
+				headerReader->readSingleArray(&curPhysXMesh.vector2.x, 4);
 
 				if (curPhysXMesh.typeEnum != 0 && curPhysXMesh.typeEnum != 2 && curPhysXMesh.typeEnum != 3)
 					headerReader->seek(0x4, std::ios_base::cur);
@@ -363,7 +363,7 @@ namespace WarframeExporter::Model
 				throw unknown_format_error("Did not reach end of file");
 		}
 
-		void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) override
+		void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader) override
 		{
 			for (const auto& x : extHeader.physXMeshes)
 				bodyReader->seek(x.dataLength, std::ios_base::cur);
@@ -383,13 +383,13 @@ namespace WarframeExporter::Model
 			}
 
 			static const std::string facesIndiciesMsg = "Face Indices";
-			delete bodyReader->readUInt16Array(extHeader.faceCount, 0, extHeader.vertexCount + 1, facesIndiciesMsg);
+			bodyReader->readUInt16Array(extHeader.faceCount, 0, extHeader.vertexCount + 1, facesIndiciesMsg);
 
 			if (bodyReader->tell() != bodyReader->getLength())
 				throw unknown_format_error("Did not reach end of file");
 		}
 
-		void readBody(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override
+		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override
 		{
 			for (const auto& x : extHeader.physXMeshes)
 				bodyReader->seek(x.dataLength, std::ios_base::cur);
@@ -427,7 +427,7 @@ namespace WarframeExporter::Model
 		}
 	
 		// This is 100% a workaround
-		bool isMorePhysX(BinaryReaderBuffered* bodyReader)
+		bool isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader)
 		{
 			// Some models have no actual vertices, so this can hit EOF
 			if (bodyReader->tell() + 0x120 > bodyReader->getLength())

@@ -1,10 +1,9 @@
 #include "BatchIterator.h"
-#include "LotusExceptions.h"
 
 using namespace WarframeExporter;
 
-BatchIterator::BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
-	: m_package(package),
+BatchIterator::BatchIterator(const std::filesystem::path& pkgsDir, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
+	: m_package(pkgsDir),
 	m_ensmalleningData(ensmallData),
 	m_baseOutPath(baseOutputPath),
 	m_logger(Logger::getInstance())
@@ -18,45 +17,29 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 
 	for (const std::string& curPackageName : packages)
 	{
-		auto curPair = (*m_package)[curPackageName][LotusLib::PackageTrioType::H];
-		curPair->readToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::B])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->readToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::F])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->readToc();
+		LotusLib::PackageReader curPkg = m_package.getPackage(curPackageName);
 
-		for (auto iter = curPair->getIter(basePath); iter != curPair->getIter(); iter++)
+		for (auto iter = curPkg.getIter(basePath); iter != curPkg.getIter(); iter++)
 		{
-			const LotusLib::FileEntries::FileNode* curFile = *iter;
-
 			try
 			{
-				std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
-				BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release (), curFile->getLen());
-				std::string curFilePath = curFile->getFullPath();
+				LotusLib::FileEntry curEntry = curPkg.getFile(iter.getFullPath());
 
-				LotusLib::CommonHeader header;
-				if (!tryReadHeader(rawDataReader, header))
-				{
-					m_logger.debug("Common header error: " + curFilePath);
-					continue;
-				}
-
-				Extractor* extractor = g_enumMapExtractor[header.type];
+				Extractor* extractor = g_enumMapExtractor[curEntry.commonHeader.type];
 
 				if (extractor == nullptr)
 				{
-					processUnknownFile(curFilePath, header, curFile);
+					processUnknownFile(curPkg, curEntry);
 					continue;
 				}
 
 				if (((int)extractor->getExtractorType() & (int)types) == 0)
 				{
-					processSkipFile(curFilePath, header, curFile, extractor);
+					processSkipFile(curPkg, curEntry, extractor);
 					continue;
 				}
 
-				processKnownFile(curPackageName, curFilePath, &rawDataReader, header, extractor);
+				processKnownFile(curPkg, curEntry, extractor);
 			}
 			catch (LotusLib::DecompressionException& ex)
 			{
@@ -64,23 +47,17 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 				continue;
 			}
 		}
-
-		curPair->unReadToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::B])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->unReadToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::F])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->unReadToc();
 	}
 }
 
 void
-BatchIterator::validatePackages(const std::vector<std::string>& packages) const
+BatchIterator::validatePackages(const std::vector<std::string>& packages)
 {
 	for (auto& curPkgStr : packages)
 	{
 		try
 		{
-			(*m_package)[curPkgStr][LotusLib::PackageTrioType::H];
+			m_package.getPackage(curPkgStr);
 		}
 		catch (std::exception&)
 		{
@@ -88,19 +65,4 @@ BatchIterator::validatePackages(const std::vector<std::string>& packages) const
 			throw std::runtime_error("Package does not exist: " + curPkgStr);
 		}
 	}
-}
-
-bool
-BatchIterator::tryReadHeader(BinaryReaderBuffered& rawData, LotusLib::CommonHeader& outHeader) const
-{
-	try
-	{
-		int headerLen = LotusLib::CommonHeaderReader::readHeader(rawData.getPtr(), outHeader);
-		rawData.seek(headerLen, std::ios::beg);
-	}
-	catch (LotusLib::LotusException&)
-	{
-		return false;
-	}
-	return true;
 }

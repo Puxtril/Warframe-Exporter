@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelReader201::readHeaderDebug(BinaryReaderBase& reader) const
+LevelReader201::readHeaderDebug(BinaryReader::BinaryReaderBuffered& reader) const
 {
 	const static std::string pathLenMsg = "Internal path length Level header";
 	uint32_t pathCount1 = reader.readUInt32();
@@ -43,7 +43,7 @@ LevelReader201::readHeaderDebug(BinaryReaderBase& reader) const
 }
 
 void
-LevelReader201::readBodyDebug(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader) const
+LevelReader201::readBodyDebug(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader) const
 {
 	std::vector<uint32_t> indices(extHeader.levelObjs.size());
 	for (int x = 0; x < extHeader.levelObjs.size(); x++)
@@ -51,7 +51,7 @@ LevelReader201::readBodyDebug(BinaryReaderBase& reader, const LevelHeaderExterna
 }
 
 void
-LevelReader201::readHeader(BinaryReaderBase& reader, LevelHeaderExternal& outHeader) const
+LevelReader201::readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHeaderExternal& outHeader) const
 {	
 	uint32_t pathCount1 = reader.readUInt32();
 	outHeader.paths.resize(pathCount1);
@@ -105,7 +105,7 @@ LevelReader201::readHeader(BinaryReaderBase& reader, LevelHeaderExternal& outHea
 }
 
 void
-LevelReader201::readBody(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const
+LevelReader201::readBody(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const
 {
 	std::vector<uint32_t> attributeLens(extHeader.levelObjs.size());
 	reader.readUInt32Array(attributeLens.data(), extHeader.levelObjs.size());

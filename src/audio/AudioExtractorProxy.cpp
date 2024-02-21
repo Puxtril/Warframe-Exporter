@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Audio;
 
 const std::string&
-AudioExtractorProxy::getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const
+AudioExtractorProxy::getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const
 {
 	AudioCompression compressionEnum = peekCompressionFormat(hReader);
 	Extractor* extractor = g_enumMapAudioExtractor[(int)compressionEnum];
@@ -18,23 +18,23 @@ AudioExtractorProxy::getInstance()
 }
 
 void
-AudioExtractorProxy::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
-	AudioCompression compressionEnum = peekCompressionFormat(hReader);
+	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.headerData);
 	Extractor* extractor = g_enumMapAudioExtractor[(int)compressionEnum];
-	extractor->extract(header, hReader, pkgDir, package, internalpath, ensmalleningData, outputPath);
+	extractor->extract(fileEntry, pkgs, ensmalleningData, outputPath);
 }
 
 void
-AudioExtractorProxy::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData)
+AudioExtractorProxy::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
 {
-	AudioCompression compressionEnum = peekCompressionFormat(hReader);
+	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.headerData);
 	Extractor* extractor = g_enumMapAudioExtractor[(int)compressionEnum];
-	extractor->extractDebug(header, hReader, pkgDir, package, internalpath, ensmalleningData);
+	extractor->extractDebug(fileEntry, pkgs, ensmalleningData);
 }
 
 AudioCompression
-AudioExtractorProxy::peekCompressionFormat(BinaryReaderBuffered* headerReader) const
+AudioExtractorProxy::peekCompressionFormat(BinaryReader::BinaryReaderBuffered* headerReader) const
 {
 	int compressionFormat = headerReader->readUInt32();
 	headerReader->seek(-4, std::ios::cur);

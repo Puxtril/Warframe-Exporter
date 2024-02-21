@@ -6,6 +6,7 @@
 #include "Ensmallening.hpp"
 #include "PackageCollection.h"
 #include "ExporterLogger.h"
+#include "LotusLib.h"
 
 #include <string>
 #include <vector>
@@ -31,9 +32,9 @@ namespace WarframeExporter
 	
 	public:
 		virtual const std::string& getFriendlyName() const = 0;
-		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const = 0;
+		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const = 0;
 		virtual ExtractorType getExtractorType() const = 0;
-		virtual void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) = 0;
-		virtual void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData) = 0;
+		virtual void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) = 0;
+		virtual void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) = 0;
 	};
 }

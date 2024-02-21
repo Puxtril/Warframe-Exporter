@@ -48,7 +48,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
  
 void
-CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
+CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	if (!m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
@@ -69,7 +69,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
-		pkgNames = getPkgsNames((WarframeExporter::ExtractorType)types, cache);
+		pkgNames = getPkgsNames((WarframeExporter::ExtractorType)types, cacheDirPath);
 	else
 		pkgNames = { pkg };
 
@@ -89,7 +89,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		pkgs << (pkgNames[i]) << " ";
 	WarframeExporter::Logger::getInstance().debug("Loading packages: " + pkgs.str());
 
-	extract(cache, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
+	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
 }
 
 void
@@ -103,21 +103,23 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
+CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
 {
-	WarframeExporter::BatchIteratorExport extractor(cache, ensmallening, outPath);
+	WarframeExporter::BatchIteratorExport extractor(cacheDirPath, ensmallening, outPath);
 	extractor.batchIterate(intPath, pkgs, types);
 }
 
 std::vector<std::string>
-CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath)
 {
+	LotusLib::PackagesReader pkgs(cacheDirPath);
+
 	std::vector<std::string> pkgNames;
 	if ((int)types & (int)WarframeExporter::ExtractorType::Texture)
 	{
 		try
 		{
-			(*cache)["Texture"];
+			pkgs.getPackage("Texture");
 			pkgNames.push_back("Texture");
 		}
 		catch (std::out_of_range&)

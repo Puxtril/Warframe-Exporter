@@ -1,52 +1,51 @@
 #include "BatchIteratorDebug.h"
-#include "FileNode.h"
 
 using namespace WarframeExporter;
 
-BatchIteratorDebug::BatchIteratorDebug(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
-	: BatchIterator(package, ensmallData, baseOutputPath), m_outDebugPath(m_baseOutPath / "Debug")
+BatchIteratorDebug::BatchIteratorDebug(const std::filesystem::path& pkgsDir, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
+	: BatchIterator(pkgsDir, ensmallData, baseOutputPath), m_outDebugPath(m_baseOutPath / "Debug")
 {
 }
 
 void
-BatchIteratorDebug::processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor)
+BatchIteratorDebug::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor)
 {
 	try
 	{
-		extractor->extractDebug(header, hReader, *m_package, packageName, internalPath, m_ensmalleningData);
-		m_logger.info("Successfully processed: " + internalPath.string());
+		extractor->extractDebug(fileEntry, m_package, m_ensmalleningData);
+		m_logger.info("Successfully processed: " + fileEntry.internalPath.string());
 	}
 	catch (LotusLib::DecompressionException& err)
 	{
-		m_logger.warn("Decompression exception: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.warn("Decompression exception: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
-		writeAllDebugs(packageName, internalPath);
+		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
+		writeAllDebugs(pkg, fileEntry);
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
-		writeAllDebugs(packageName, internalPath);
+		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
+		writeAllDebugs(pkg, fileEntry);
 	}
 	catch (std::runtime_error& err)
 	{
-		m_logger.error(std::string(err.what()) + ": " + internalPath.string());
-		writeAllDebugs(packageName, internalPath);
+		m_logger.error(std::string(err.what()) + ": " + fileEntry.internalPath.string());
+		writeAllDebugs(pkg, fileEntry);
 	}
 }
 
 void
-BatchIteratorDebug::processUnknownFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file)
+BatchIteratorDebug::processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry)
 {
-	m_logger.debug("Unknown file type " + std::to_string(header.type) + ": " + internalPath.string());
+	m_logger.debug("Unknown file type " + std::to_string(fileEntry.commonHeader.type) + ": " + fileEntry.internalPath.string());
 }
 
 void
-BatchIteratorDebug::processSkipFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor)
+BatchIteratorDebug::processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
 {
-	m_logger.debug("Skipping file type " + std::to_string(header.type) + " (" + extractor->getFriendlyName() + "): " + internalPath.string());
+	m_logger.debug("Skipping file type " + std::to_string(fileEntry.commonHeader.type) + " (" + extractor->getFriendlyName() + "): " + fileEntry.internalPath.string());
 }
 
 void
@@ -55,51 +54,44 @@ BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::
 	std::map<uint32_t, int> enumCounts;
 	std::map<uint32_t, std::vector<std::string>> enumExamples;
 
-	std::shared_ptr<LotusLib::CachePairReader> curPair = (*m_package)[package][LotusLib::PackageTrioType::H];
-	curPair->readToc();
+	LotusLib::PackageReader pkg = m_package.getPackage(package);
+
 	m_logger.info("Collecting Common Header Format stats");
-	for (auto iter = curPair->getIter(internalPath); iter != curPair->getIter(); iter++)
+	for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
 	{
-		const LotusLib::FileEntries::FileNode* curFile = *iter;
 		try
 		{
-			std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
-			BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release(), curFile->getLen());
-			
-			LotusLib::CommonHeader header;
-			if (!tryReadHeader(rawDataReader, header))
-				continue;
+			LotusLib::FileEntry curFile = pkg.getFile(**iter);
 
-			enumCounts[header.type]++;
+			enumCounts[curFile.commonHeader.type]++;
 			
 			// For the first 10 files, add directly into examples
-			if (enumExamples[header.type].size() < 10)
-				enumExamples[header.type].push_back(curFile->getFullPath());
+			if (enumExamples[curFile.commonHeader.type].size() < 10)
+				enumExamples[curFile.commonHeader.type].push_back(curFile.internalPath);
 			
 			// Every 10 new files, replace an existing example
-			else if (enumCounts[header.type] % 10 == 0)
+			else if (enumCounts[curFile.commonHeader.type] % 10 == 0)
 			{
-				int newIndex = enumCounts[header.type] % 100 / 10;
-				enumExamples[header.type][newIndex] = curFile->getFullPath();
+				int newIndex = enumCounts[curFile.commonHeader.type] % 100 / 10;
+				enumExamples[curFile.commonHeader.type][newIndex] = curFile.internalPath;
 			}
 		}
 		catch (LotusLib::DecompressionException&)
 		{
-			m_logger.warn("Decompress error: " + curFile->getFullPath());
+			m_logger.warn("Decompress error: " + internalPath.string());
 			continue;
 		}
 		catch (LimitException& ex)
 		{
-			m_logger.warn(std::string(ex.what()) + curFile->getFullPath());
+			m_logger.warn(std::string(ex.what()) + internalPath.string());
 			continue;
 		}
 		catch (std::exception& ex)
 		{
-			m_logger.error(std::string(ex.what()) + ": " + curFile->getFullPath());
+			m_logger.error(std::string(ex.what()) + ": " + internalPath.string());
 			continue;
 		}
 	}
-	curPair->unReadToc();
 
 	for (auto& x : enumCounts)
 	{
@@ -110,60 +102,36 @@ BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::
 }
 
 void
-BatchIteratorDebug::writeAllDebugs(const std::string& packageName, const LotusLib::LotusPath& internalPath)
+BatchIteratorDebug::writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry)
 {
-	std::filesystem::path debugPath = m_outDebugPath / internalPath.getPreferredPath().relative_path();
+	std::filesystem::path debugPath = m_outDebugPath / fileEntry.internalPath.getPreferredPath().relative_path();
 	if (!std::filesystem::exists(debugPath.parent_path()))
 		std::filesystem::create_directories(debugPath.parent_path());
 
-	try
+	if (fileEntry.headerData.getLength() > 0)
 	{
-		const LotusLib::FileEntries::FileNode* hFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getFileEntry(internalPath);
-		std::unique_ptr<char[]> hDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::H]->getDataAndDecompress(hFileEntry);
-		if (hDataRaw)
-		{
-			debugPath.replace_filename(internalPath.filename().string() + "_H");
-			std::ofstream out;
-			out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-			out.write(hDataRaw.get(), hFileEntry->getLen());
-			out.close();
-		}
-	}
-	catch (std::runtime_error&) {}
-
-	if ((*m_package)[packageName][LotusLib::PackageTrioType::B])
-	{
-		try
-		{
-			const LotusLib::FileEntries::FileNode* bFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
-			std::unique_ptr<char[]> bDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::B]->getDataAndDecompress(bFileEntry);
-			if (bDataRaw)
-			{
-				debugPath.replace_filename(internalPath.filename().string() + "_B");
-				std::ofstream out;
-				out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-				out.write(bDataRaw.get(), bFileEntry->getLen());
-				out.close();
-			}
-		}
-		catch (std::runtime_error&) {}
+		debugPath.replace_filename(fileEntry.internalPath.filename().string() + "_H");
+		std::ofstream out;
+		out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write((char*)fileEntry.headerData.getPtr().data(), fileEntry.headerData.getLength());
+		out.close();
 	}
 
-	if ((*m_package)[packageName][LotusLib::PackageTrioType::F])
+	if (fileEntry.bData.getLength() > 0)
 	{
-		try
-		{
-			const LotusLib::FileEntries::FileNode* fFileEntry = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getFileEntry(internalPath);
-			std::unique_ptr<char[]> fDataRaw = (*m_package)[packageName][LotusLib::PackageTrioType::F]->getDataAndDecompress(fFileEntry);
-			if (fDataRaw)
-			{
-				debugPath.replace_filename(internalPath.filename().string() + "_F");
-				std::ofstream out;
-				out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-				out.write(fDataRaw.get(), fFileEntry->getLen());
-				out.close();
-			}
-		}
-		catch (std::runtime_error&) {}
+		debugPath.replace_filename(fileEntry.internalPath.filename().string() + "_B");
+		std::ofstream out;
+		out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write((char*)fileEntry.bData.getPtr().data(), fileEntry.bData.getLength());
+		out.close();
+	}
+
+	if (fileEntry.fData.getLength() > 0)
+	{
+		debugPath.replace_filename(fileEntry.internalPath.filename().string() + "_F");
+		std::ofstream out;
+		out.open(debugPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write((char*)fileEntry.fData.getPtr().data(), fileEntry.fData.getLength());
+		out.close();
 	}
 }

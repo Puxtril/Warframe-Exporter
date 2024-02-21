@@ -1,7 +1,7 @@
 #pragma once
 
 #include "LevelStructs.h"
-#include "BinaryReaderBase.h"
+#include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 #include "EnumMapValue.h"
 
@@ -21,9 +21,9 @@ namespace WarframeExporter::Level
 		LevelReader() = default;
 		
 	public:	
-		virtual void readHeaderDebug(BinaryReaderBase& reader) const = 0;
-		virtual void readHeader(BinaryReaderBase& reader, LevelHeaderExternal& outHeader) const = 0;
-		virtual void readBodyDebug(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader) const = 0;
-		virtual void readBody(BinaryReaderBase& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const = 0;
+		virtual void readHeaderDebug(BinaryReader::BinaryReaderBuffered& reader) const = 0;
+		virtual void readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHeaderExternal& outHeader) const = 0;
+		virtual void readBodyDebug(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader) const = 0;
+		virtual void readBody(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const = 0;
 	};
 };

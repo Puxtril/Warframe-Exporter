@@ -1,8 +1,7 @@
 #pragma once
 
 #include "tclap/CmdLine.h"
-#include "PackageCollection.h"
-#include "CachePairReader.h"
+#include "LotusLib.h"
 #include "LotusPath.h"
 #include "Ensmallening.hpp"
 
@@ -20,5 +19,5 @@ protected:
 		virtual const std::string& getFeatureName() = 0;
 		virtual void addMainCmds(TCLAP::OneOf& oneOfCmd) = 0;
 		virtual void addMiscCmds(TCLAP::CmdLine& cmdLine) = 0;
-		virtual void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening) = 0;
+		virtual void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening) = 0;
 };

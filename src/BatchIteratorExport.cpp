@@ -2,20 +2,20 @@
 
 using namespace WarframeExporter;
 
-BatchIteratorExport::BatchIteratorExport(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath)
-	: BatchIterator(package, ensmalleningData, baseOutputPath), m_outExportPath(m_baseOutPath / "Export")
+BatchIteratorExport::BatchIteratorExport(const std::filesystem::path& pkgsDir, const Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath)
+	: BatchIterator(pkgsDir, ensmalleningData, baseOutputPath), m_outExportPath(m_baseOutPath / "Export")
 {
 }
 
 void
-BatchIteratorExport::processKnownFile(const std::string& packageName, const LotusLib::LotusPath& internalPath, BinaryReaderBuffered* hReader, const LotusLib::CommonHeader& header, Extractor* extractor)
+BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor)
 {
-	std::filesystem::path savePath = m_outExportPath / internalPath.getPreferredPath().relative_path();
-	savePath.replace_extension(extractor->getOutputExtension(header, hReader));
+	std::filesystem::path savePath = m_outExportPath / fileEntry.internalPath.getPreferredPath().relative_path();
+	savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
 
-	if (existingFileIdentical(internalPath, savePath, (*m_package)[packageName][LotusLib::PackageTrioType::H], packageName))
+	if (existingFileIdentical(fileEntry, savePath))
 	{
-		m_logger.info("Identical file time, skipping: " + internalPath.string());
+		m_logger.info("Identical file time, skipping: " + fileEntry.internalPath.string());
 		return;
 	}
 
@@ -24,59 +24,52 @@ BatchIteratorExport::processKnownFile(const std::string& packageName, const Lotu
 
 	try
 	{
-		m_logger.info("Extracting " + internalPath.string());
-		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), header.type));
-		extractor->extract(header, hReader, *m_package, packageName, internalPath, m_ensmalleningData, savePath);
-		writeFileProperties(savePath, internalPath, packageName);
+		m_logger.info("Extracting " + fileEntry.internalPath.string());
+		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fileEntry.commonHeader.type));
+		extractor->extract(fileEntry, m_package, m_ensmalleningData, savePath);
+		writeFileProperties(savePath, fileEntry);
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + internalPath.string());
+		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
 	}
 	catch (std::exception& err)
 	{
-		m_logger.error(std::string(err.what()) + ": " + internalPath.string());
+		m_logger.error(std::string(err.what()) + ": " + fileEntry.internalPath.string());
 	}
 }
 
 void
-BatchIteratorExport::processUnknownFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file)
+BatchIteratorExport::processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry)
 {
 }
 
 void
-BatchIteratorExport::processSkipFile(const LotusLib::LotusPath& internalPath, const LotusLib::CommonHeader& header, const LotusLib::FileEntries::FileNode* file, const Extractor* extractor)
+BatchIteratorExport::processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
 {
 }
 
 bool
-BatchIteratorExport::existingFileIdentical(const LotusLib::LotusPath& internalPath, const std::filesystem::path& outputPath, const std::shared_ptr<LotusLib::CachePairReader> curPair, const std::string& packageName)
+BatchIteratorExport::existingFileIdentical(LotusLib::FileEntry& fileEntry, const std::filesystem::path& outputPath)
 {
-	const LotusLib::FileEntries::FileNode* internalNode = curPair->getFileEntry(internalPath);
-	
 	if (!std::filesystem::exists(outputPath))
 		return false;
 
 	FileProperties::TimeDos existingTime = FileProperties::readDos(outputPath, true);
 
-	if (FileProperties::wipeNanoseconds(internalNode->getTimeStamp()) != existingTime)
+	if (FileProperties::wipeNanoseconds(fileEntry.metadata.getTimeStamp()) != existingTime)
 		return false;
 
 	return true;
 }
 
 void
-BatchIteratorExport::writeFileProperties(const std::filesystem::path filePath, const LotusLib::LotusPath internalPath, const std::string& packageName)
+BatchIteratorExport::writeFileProperties(const std::filesystem::path filePath, LotusLib::FileEntry& fileEntry)
 {
-	std::shared_ptr<LotusLib::CachePairReader> pkg = (*m_package)[packageName][LotusLib::PackageTrioType::H];
-	if (pkg != nullptr)
-	{
-		const LotusLib::FileEntries::FileNode* fileNode = pkg->getFileEntry(internalPath);
-		uint64_t timeRaw = fileNode->getTimeStamp();
-		FileProperties::writeDos(std::filesystem::path(filePath), timeRaw, timeRaw, timeRaw);
-	}
+	uint64_t timeRaw = fileEntry.metadata.getTimeStamp();
+	FileProperties::writeDos(std::filesystem::path(filePath), timeRaw, timeRaw, timeRaw);
 }

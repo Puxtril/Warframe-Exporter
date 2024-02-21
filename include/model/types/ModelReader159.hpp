@@ -39,7 +39,7 @@ namespace WarframeExporter::Model
 			return ScaleType::XZ;
 		}
 
-		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
+		void readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override
 		{
 			uint32_t strLen = headerReader->readUInt32();
 			headerReader->seek(strLen, std::ios::cur);
@@ -146,7 +146,7 @@ namespace WarframeExporter::Model
 				throw unknown_format_error("Did not reach end of file");
 		}
 
-		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override
+		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override
 		{
 			uint32_t strLen = headerReader->readUInt32();
 			headerReader->seek(strLen, std::ios::cur);
@@ -164,8 +164,8 @@ namespace WarframeExporter::Model
 			{
 				MeshInfoExternal& curMeshInfo = outHeader.meshInfos[x];
 
-				headerReader->readFloatArray(&curMeshInfo.vector1.x, 4);
-				headerReader->readFloatArray(&curMeshInfo.vector2.x, 4);
+				headerReader->readSingleArray(&curMeshInfo.vector1.x, 4);
+				headerReader->readSingleArray(&curMeshInfo.vector2.x, 4);
 
 				uint32_t meshNameLen = headerReader->readUInt32();
 				curMeshInfo.name = headerReader->readAsciiString(meshNameLen);
@@ -229,7 +229,7 @@ namespace WarframeExporter::Model
 			}
 		}
 
-		void readBody(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override
+		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override
 		{
 			for (const auto& x : extHeader.physXMeshes)
 				bodyReader->seek(x.dataLength, std::ios_base::cur);
@@ -258,7 +258,7 @@ namespace WarframeExporter::Model
 			bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 		}
 
-		void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) override
+		void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader) override
 		{
 
 		}

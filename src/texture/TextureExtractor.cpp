@@ -24,38 +24,25 @@ TextureExtractor::writeData(const std::filesystem::path& outputFile, const Textu
 }
 
 void
-TextureExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
 	// Typically, textures above 256x256 are in F. Textures below are in B
-	LotusLib::PackageTrioType bodyTrioType = LotusLib::PackageTrioType::F;
-	const LotusLib::FileEntries::FileNode* entry;
-	try
-	{
-		entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);
-	}
-	catch (std::runtime_error&)
-	{
-		bodyTrioType = LotusLib::PackageTrioType::B;
-		entry = pkgDir[package][bodyTrioType]->getFileEntry(internalPath);
-	}
-
-	std::unique_ptr<char[]> rawData = pkgDir[package][bodyTrioType]->getDataAndDecompress(entry);
-	BinaryReaderBuffered reader((uint8_t*)rawData.release(), entry->getLen());
+	BinaryReader::BinaryReaderBuffered& entry = fileEntry.fData.getLength() != 0 ? fileEntry.fData : fileEntry.bData;
 
 	// Read header
-	TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, ensmalleningData);
-	TextureHeaderInternal headerInt = TextureConverter::convertHeader(extHeader, entry->getLen());
+	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, ensmalleningData);
+	TextureHeaderInternal headerInt = TextureConverter::convertHeader(extHeader, entry.getLength());
 
-	m_logger.debug(spdlog::fmt_lib::format("Cache={} Format={} ResRaw={}x{} ResConv={}x{} Mip0Size={}", (int)bodyTrioType, extHeader.format, extHeader.widthBase, extHeader.heightBase, headerInt.width, headerInt.height, headerInt.mip0Len));
+	m_logger.debug(spdlog::fmt_lib::format("Format={} ResRaw={}x{} ResConv={}x{} Mip0Size={}", extHeader.format, extHeader.widthBase, extHeader.heightBase, headerInt.width, headerInt.height, headerInt.mip0Len));
 
 	// Read body
-	TextureBodyInternal body = TextureReader::readBody(&reader, headerInt, ensmalleningData);
+	TextureBodyInternal body = TextureReader::readBody(&entry, headerInt, ensmalleningData);
 
-	writeData(outputPath, headerInt, body, header);
+	writeData(outputPath, headerInt, body, fileEntry.commonHeader);
 }
 
 void
-TextureExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData)
+TextureExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
 {
 	/*
 	BinaryReaderBuffered* fReader = pkgDir.getFileReader(package, PackageReader::PackageTrioType::F, internalpath);

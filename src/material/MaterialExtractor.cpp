@@ -10,7 +10,7 @@ MaterialExtractor::getInstance()
 }
 
 void
-MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths)
+MaterialExtractor::getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths)
 {
 	uint32_t pathCount = headerReader->readUInt32();
 	for (uint32_t x = 0; x < pathCount; x++)
@@ -22,7 +22,7 @@ MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector
 }
 
 std::vector<std::string>
-MaterialExtractor::getHlm3Textures(BinaryReaderBuffered* headerReader)
+MaterialExtractor::getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader)
 {
 	std::vector<std::string> outPaths;
 	for (int x = 0; x < 3; x++)
@@ -35,17 +35,17 @@ MaterialExtractor::getHlm3Textures(BinaryReaderBuffered* headerReader)
 }
 
 void
-MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
 	std::ofstream out;
 	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
 	
-	out.write(header.attributes.c_str(), header.attributes.length());
+	out.write(fileEntry.commonHeader.attributes.c_str(), fileEntry.commonHeader.attributes.length());
 
-	if (header.type == (int)MaterialType::MATERIAL_214 ||
-		header.type == (int)MaterialType::MATERIAL_216)
+	if (fileEntry.commonHeader.type == (int)MaterialType::MATERIAL_214 ||
+		fileEntry.commonHeader.type == (int)MaterialType::MATERIAL_216)
 	{
-		std::vector<std::string> threeTextures = getHlm3Textures(hReader);
+		std::vector<std::string> threeTextures = getHlm3Textures(&fileEntry.headerData);
 		out.write("\nHLM Textures:\n", 15);
 		for (const auto& name : threeTextures)
 		{
@@ -55,7 +55,7 @@ MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuf
 	}
 	
 	std::vector<std::string> extraNames;
-	getExtraNames(hReader, extraNames);
+	getExtraNames(&fileEntry.headerData, extraNames);
 
 	out.write("\n", 1);
 	for (const auto& name : extraNames)
@@ -68,7 +68,7 @@ MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuf
 }
 
 void
-MaterialExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData)
+MaterialExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
 {
 
 }

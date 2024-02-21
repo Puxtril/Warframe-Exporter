@@ -1,6 +1,4 @@
 #include "CLI-Debug.h"
-#include <exception>
-#include <stdexcept>
 
 CLIDebug::CLIDebug()
 {
@@ -46,24 +44,24 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
+CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	if (m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
 	{
-		debug(cache, pkg, internalPath, outPath, ensmallening);
+		debug(cacheDirPath, pkgName, internalPath, outPath, ensmallening);
 	}
 	else if (m_printEnums->getValue())
 	{
-		if (pkg.empty())
+		if (pkgName.empty())
 		{
 			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
 			return;
 		}
-		printEnums(outPath, internalPath, pkg, cache);
+		printEnums(outPath, internalPath, pkgName, cacheDirPath);
 	}
 	else if (m_writeRaw->getValue())
 	{
-		if (pkg.empty())
+		if (pkgName.empty())
 		{
 			WarframeExporter::Logger::getInstance().error("Must use --package with --write-raw");
 			return;
@@ -73,64 +71,56 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 			WarframeExporter::Logger::getInstance().error("Must use --internal-path with --write-raw");
 			return;
 		}
-		writeRaw(outPath, internalPath, pkg, cache);
+		writeRaw(outPath, internalPath, pkgName, cacheDirPath);
 	}
 }
 
 void
-CLIDebug::printEnums(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIDebug::printEnums(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath)
 {
 	static WarframeExporter::Ensmallening ensmall(true, true, true);
 
-	if (m_printEnums->getValue() && pkg.empty())
+	if (m_printEnums->getValue())
 	{
-		WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
-		for (LotusLib::Package<LotusLib::CachePairReader>& x : (*cache))
+		if (pkgName.empty())
 		{
-			std::cout << "Package: " << x.getName() << std::endl;
-			debugger.printEnumCounts(x.getName(), internalPath);
-			std::cout << std::endl;
+			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
+			return;
 		}
-	}
-
-	else if (m_printEnums->getValue())
-	{
-		WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
-		debugger.printEnumCounts(pkg, internalPath);
+		WarframeExporter::BatchIteratorDebug debugger(cacheDirPath, ensmall, outPath);
+		debugger.printEnumCounts(pkgName, internalPath);
 	}
 }
 
 void
-CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath)
 {
 	WarframeExporter::Ensmallening ensmall(true, true, true);
-	WarframeExporter::BatchIteratorDebug debugger(cache, ensmall, outPath);
+	WarframeExporter::BatchIteratorDebug debugger(cacheDirPath, ensmall, outPath);
 
-	(*cache)[pkg][LotusLib::PackageTrioType::H]->readToc();
-	if ((*cache)[pkg][LotusLib::PackageTrioType::B])
-		(*cache)[pkg][LotusLib::PackageTrioType::B]->readToc();
-	if ((*cache)[pkg][LotusLib::PackageTrioType::F])
-		(*cache)[pkg][LotusLib::PackageTrioType::F]->readToc();
+	LotusLib::PackagesReader pkgs(cacheDirPath);
+	LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
 
 	try
 	{
 		// Test if `internalPath` is a directory
-		(*cache)[pkg][LotusLib::PackageTrioType::H]->getDirEntry(internalPath);
+		pkg.getDirMeta(internalPath);
 
-		auto curPair = (*cache)[pkg][LotusLib::PackageTrioType::H];
-		for (auto iter = curPair->getIter(internalPath); iter != curPair->getIter(); iter++)
+		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
 		{
-			debugger.writeAllDebugs(pkg, (*iter)->getFullPath());
+			LotusLib::FileEntry fileEntry = pkg.getFile(**iter);
+			debugger.writeAllDebugs(pkg, fileEntry);
 		}
 	}
 	catch (std::exception&)
 	{
-		debugger.writeAllDebugs(pkg, internalPath);
+		LotusLib::FileEntry fileEntry = pkg.getFile(internalPath);
+		debugger.writeAllDebugs(pkg, fileEntry);
 	}
 }
 
 void
-CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const std::string& pkg, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, const WarframeExporter::Ensmallening& ensmallening)
+CLIDebug::debug(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	int types = 0;
 	if (m_debugTextCmd->getValue())
@@ -145,24 +135,26 @@ CLIDebug::debug(LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, c
 		types |= (int)WarframeExporter::ExtractorType::Audio;
 
 	std::vector<std::string> pkgNames;
-	if (pkg.empty())
-		pkgNames = getPkgsNames((WarframeExporter::ExtractorType)types, cache);
+	if (pkgName.empty())
+		pkgNames = getPkgsNames((WarframeExporter::ExtractorType)types, cacheDirPath);
 	else
-		pkgNames = { pkg };
+		pkgNames = { pkgName };
 
-	WarframeExporter::BatchIteratorDebug debugger(cache, ensmallening, outPath);
+	WarframeExporter::BatchIteratorDebug debugger(cacheDirPath, ensmallening, outPath);
 	debugger.batchIterate(intPath, pkgNames, (WarframeExporter::ExtractorType)types);
 }
 
 std::vector<std::string>
-CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache)
+CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath)
 {
+	LotusLib::PackagesReader pkgs(cacheDirPath);
+
 	std::vector<std::string> pkgNames;
 	if ((int)types & (int)WarframeExporter::ExtractorType::Texture)
 	{
 		try
 		{
-			(*cache)["Texture"];
+			pkgs.getPackage("Texture");
 			pkgNames.push_back("Texture");
 		}
 		catch (std::out_of_range&)

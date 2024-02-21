@@ -22,7 +22,7 @@ namespace WarframeExporter::Level
 		LevelExtractor(const LevelExtractor&) = delete;
 		LevelExtractor operator=(const LevelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;
@@ -50,10 +50,10 @@ namespace WarframeExporter::Level
 
 		static LevelExtractor* getInstance();
 
-		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
+		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
 	
 	private:
-		void createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf);
+		void createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf);
 	};
 }

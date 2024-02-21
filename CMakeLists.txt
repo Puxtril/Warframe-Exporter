@@ -76,7 +76,6 @@ include_directories(
 if(COMPILE_WF_EXE OR COMPILE_WF_EXE_ADVANCED)
 
 	# Compile subprojects
-	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader")
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
 	
 	# Link Oodle static library
@@ -92,13 +91,13 @@ if(COMPILE_WF_EXE OR COMPILE_WF_EXE_ADVANCED)
 
 	if(COMPILE_WF_EXE)
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES})
-		target_link_libraries(Warframe-Exporter Binary-Reader LotusLib ${OODLE_CORE})
+		target_link_libraries(Warframe-Exporter LotusLib ${OODLE_CORE})
 		target_compile_definitions(Warframe-Exporter PUBLIC WF_EXTRACT)
 	endif()
 		
 	if(COMPILE_WF_EXE_ADVANCED)
 		add_executable(Warframe-Exporter-Advanced ${WARFRAME_EXPORTER_SOURCES})
-		target_link_libraries(Warframe-Exporter-Advanced Binary-Reader LotusLib ${OODLE_CORE})
+		target_link_libraries(Warframe-Exporter-Advanced LotusLib ${OODLE_CORE})
 		target_compile_definitions(Warframe-Exporter-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
 	endif()
 

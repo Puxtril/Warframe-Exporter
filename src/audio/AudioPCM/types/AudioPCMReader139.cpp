@@ -10,7 +10,7 @@ AudioPCMReader139::getInstance()
 }
 
 void
-AudioPCMReader139::readBody(const AudioHeader& extHeader, BinaryReaderBuffered* fReader, BinaryReaderBuffered* bReader, AudioBody& outBody)
+AudioPCMReader139::readBody(const AudioHeader& extHeader, BinaryReader::BinaryReaderBuffered* fReader, BinaryReader::BinaryReaderBuffered* bReader, AudioBody& outBody)
 {
 	std::vector<char>& data = outBody.data;
 

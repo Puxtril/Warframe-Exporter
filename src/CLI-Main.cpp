@@ -1,4 +1,5 @@
 #include "CLI-Main.h"
+#include "LotusLib.h"
 
 CLIMain::CLIMain()
 {
@@ -31,17 +32,18 @@ CLIMain::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, LotusLib::PackageCollection<LotusLib::CachePairReader>* cache, const WarframeExporter::Ensmallening& ensmallening)
+CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
 {
 	if (m_lsCmd->getValue())
 	{
-		if (pkg.empty())
+		if (pkgName.empty())
 		{
 			WarframeExporter::Logger::getInstance().error("Must specify package with --ls");
 			exit(1);
 		}
-		(*cache)[pkg][LotusLib::PackageTrioType::H]->readToc();
-		(*cache)[pkg][LotusLib::PackageTrioType::H]->lsDir(internalPath);
-		(*cache)[pkg][LotusLib::PackageTrioType::H]->unReadToc();
+		LotusLib::PackagesReader pkgs(cacheDirPath);
+		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+
+		pkg.lsDir(internalPath);
 	}
 }

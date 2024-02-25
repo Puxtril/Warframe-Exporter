@@ -1,4 +1,4 @@
-#include "CLI-Debug.h"
+#include "cli/CLI-Debug.h"
 
 CLIDebug::CLIDebug()
 {

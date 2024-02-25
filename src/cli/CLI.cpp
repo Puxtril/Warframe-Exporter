@@ -1,4 +1,4 @@
-#include "CLI.h"
+#include "cli/CLI.h"
 
 int
 main(int argc, char** argv)

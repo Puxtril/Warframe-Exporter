@@ -1,8 +1,9 @@
 ##################################################
 # Set these appropriately
 
-option(COMPILE_WF_EXE "Compile the standard executable" OFF)
-option(COMPILE_WF_EXE_ADVANCED "Compile the standard executable with more advanced options" ON)
+option(COMPILE_WF_UI_EXE "Compile the standard UI executable" ON)
+option(COMPILE_WF_CLI_EXE "Compile the standard CLI executable" OFF)
+option(COMPILE_WF_CLI_EXE_ADVANCED "Compile the standard CLI executable with more advanced options" OFF)
 option(COMPILE_WF_LIB "Compile a static library" OFF)
 
 ##################################################
@@ -54,6 +55,14 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/audio/AudioOpus/types/*.cpp
 )
 
+file(GLOB WARFRAME_EXPORTER_CLI_SOURCES CONFIGURE_DEPENDS 
+	${CMAKE_CURRENT_SOURCE_DIR}/src/cli/*.cpp
+)
+
+file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS 
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cpp
+)
+
 ##################################################
 # Include dirs
 
@@ -73,7 +82,7 @@ include_directories(
 ##################################################
 # Executable compile commands
 
-if(COMPILE_WF_EXE OR COMPILE_WF_EXE_ADVANCED)
+if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 
 	# Compile subprojects
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
@@ -89,16 +98,24 @@ if(COMPILE_WF_EXE OR COMPILE_WF_EXE_ADVANCED)
 		find_library(OODLE_CORE NAMES oo2corelinux64_debug PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux)
 	endif()
 
-	if(COMPILE_WF_EXE)
-		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES})
-		target_link_libraries(Warframe-Exporter LotusLib ${OODLE_CORE})
-		target_compile_definitions(Warframe-Exporter PUBLIC WF_EXTRACT)
+	if(COMPILE_WF_UI_EXE)
+		find_package(OpenGL REQUIRED)
+		find_package(Qt6 COMPONENTS Widgets Core Gui OpenGLWidgets REQUIRED)
+
+		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_UI_SOURCES})
+		target_link_libraries(Warframe-Exporter Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets LotusLib ${OODLE_CORE})
+	endif()
+
+	if(COMPILE_WF_CLI_EXE)
+		add_executable(Warframe-Exporter-CLI ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_CLI_SOURCES})
+		target_link_libraries(Warframe-Exporter-CLI LotusLib ${OODLE_CORE})
+		target_compile_definitions(Warframe-Exporter-CLI PUBLIC WF_EXTRACT)
 	endif()
 		
-	if(COMPILE_WF_EXE_ADVANCED)
-		add_executable(Warframe-Exporter-Advanced ${WARFRAME_EXPORTER_SOURCES})
-		target_link_libraries(Warframe-Exporter-Advanced LotusLib ${OODLE_CORE})
-		target_compile_definitions(Warframe-Exporter-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
+	if(COMPILE_WF_CLI_EXE_ADVANCED)
+		add_executable(Warframe-Exporter-CLI-Advanced ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_CLI_SOURCES})
+		target_link_libraries(Warframe-Exporter-CLI-Advanced LotusLib ${OODLE_CORE})
+		target_compile_definitions(Warframe-Exporter-CLI-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
 	endif()
 
 endif()

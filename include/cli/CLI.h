@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Meta.h"
 #include "tclap/CmdLine.h"
 #include "tclap/ArgException.h"
 #include "tclap/UnlabeledValueArg.h"
@@ -7,12 +8,12 @@
 #include "LotusLib.h"
 #include "BatchIteratorExport.h"
 #include "LotusPath.h"
-#include "CLI-Feature.h"
-#include "CLI-Extract.h"
-#include "CLI-Debug.h"
-#include "CLI-Main.h"
-#include "CLI-Advanced.h"
-#include "CLI-Output.h"
+#include "cli/CLI-Feature.h"
+#include "cli/CLI-Extract.h"
+#include "cli/CLI-Debug.h"
+#include "cli/CLI-Main.h"
+#include "cli/CLI-Advanced.h"
+#include "cli/CLI-Output.h"
 
 #include <filesystem>
 #include <string>
@@ -26,9 +27,7 @@
 	#include <windows.h>
 #endif
 
-const static std::string_view g_version = "2.5.1";
 const static std::string_view g_description = "https://github.com/Puxtril/Warframe-Exporter";
-const static spdlog::level::level_enum g_logLevel = spdlog::level::debug;
 
 const std::vector<CLIFeature*> g_features = {
 #ifdef WF_ADVANCED

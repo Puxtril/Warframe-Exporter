@@ -1,12 +1,21 @@
 #include "ui/ui.h"
-#include <qapplication.h>
+#include "ui/UIPicker.h"
+
+#include <qdialog.h>
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
-    Ui_MainWindow window;
+    
     QMainWindow mainWindow;
-    window.setupUi(&mainWindow);
-    mainWindow.show();
+    UiExporter window;
+    window.setup(&mainWindow);
+    
+    QDialog dialog;
+    UiPicker picker;
+    picker.setupUi(&dialog);
+    picker.connect(&dialog, &mainWindow, &window);
+    dialog.show();
+    
     return app.exec();
 }

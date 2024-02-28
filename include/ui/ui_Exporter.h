@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExporterOekCDg.ui'
+** Form generated from reading UI file 'ExportersolGAt.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTEROEKCDG_H
-#define EXPORTEROEKCDG_H
+#ifndef EXPORTERSOLGAT_H
+#define EXPORTERSOLGAT_H
 
 #include <QtCore/QVariant>
 #include <QtOpenGLWidgets/QOpenGLWidget>
@@ -16,9 +16,10 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTreeView>
+#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -29,37 +30,44 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
-    QTreeView *treeView;
+    QTreeWidget *treeWidget;
     QTabWidget *tabWidget;
     QWidget *Preview;
     QOpenGLWidget *openGLWidget;
     QWidget *Details;
-    QWidget *verticalLayoutWidget;
-    QVBoxLayout *verticalLayout_2;
+    QVBoxLayout *verticalLayout;
+    QSpacerItem *verticalSpacer_2;
+    QHBoxLayout *NameContainer;
+    QLabel *NameLabel;
+    QLabel *NameData;
     QHBoxLayout *FullPathContainer;
     QLabel *FullPathLabel;
     QLabel *FullPathData;
-    QHBoxLayout *TimestampContainer;
-    QLabel *TimestampLabel;
-    QLabel *TimestampData;
+    QHBoxLayout *SizeContainer;
+    QLabel *SizeLabel;
+    QLabel *SizeData;
     QHBoxLayout *CompressedLengthContainer;
     QLabel *CompressedLengthLabel;
     QLabel *CompressedLengthData;
+    QHBoxLayout *TimestampContainer;
+    QLabel *TimestampLabel;
+    QLabel *TimestampData;
+    QSpacerItem *verticalSpacer;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(818, 634);
+        MainWindow->resize(720, 534);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         horizontalLayout = new QHBoxLayout(centralwidget);
         horizontalLayout->setObjectName("horizontalLayout");
-        treeView = new QTreeView(centralwidget);
-        treeView->setObjectName("treeView");
+        treeWidget = new QTreeWidget(centralwidget);
+        treeWidget->setObjectName("treeWidget");
 
-        horizontalLayout->addWidget(treeView);
+        horizontalLayout->addWidget(treeWidget);
 
         tabWidget = new QTabWidget(centralwidget);
         tabWidget->setObjectName("tabWidget");
@@ -76,59 +84,131 @@ public:
         tabWidget->addTab(Preview, QString());
         Details = new QWidget();
         Details->setObjectName("Details");
-        verticalLayoutWidget = new QWidget(Details);
-        verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(0, 100, 291, 231));
-        verticalLayout_2 = new QVBoxLayout(verticalLayoutWidget);
-        verticalLayout_2->setObjectName("verticalLayout_2");
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout = new QVBoxLayout(Details);
+        verticalLayout->setObjectName("verticalLayout");
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_2);
+
+        NameContainer = new QHBoxLayout();
+        NameContainer->setObjectName("NameContainer");
+        NameLabel = new QLabel(Details);
+        NameLabel->setObjectName("NameLabel");
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(NameLabel->sizePolicy().hasHeightForWidth());
+        NameLabel->setSizePolicy(sizePolicy1);
+        NameLabel->setMinimumSize(QSize(80, 30));
+        NameLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        NameContainer->addWidget(NameLabel);
+
+        NameData = new QLabel(Details);
+        NameData->setObjectName("NameData");
+        QSizePolicy sizePolicy2(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(NameData->sizePolicy().hasHeightForWidth());
+        NameData->setSizePolicy(sizePolicy2);
+        NameData->setAlignment(Qt::AlignCenter);
+
+        NameContainer->addWidget(NameData);
+
+
+        verticalLayout->addLayout(NameContainer);
+
         FullPathContainer = new QHBoxLayout();
         FullPathContainer->setObjectName("FullPathContainer");
-        FullPathLabel = new QLabel(verticalLayoutWidget);
+        FullPathLabel = new QLabel(Details);
         FullPathLabel->setObjectName("FullPathLabel");
+        sizePolicy1.setHeightForWidth(FullPathLabel->sizePolicy().hasHeightForWidth());
+        FullPathLabel->setSizePolicy(sizePolicy1);
+        FullPathLabel->setMinimumSize(QSize(80, 30));
+        FullPathLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         FullPathContainer->addWidget(FullPathLabel);
 
-        FullPathData = new QLabel(verticalLayoutWidget);
+        FullPathData = new QLabel(Details);
         FullPathData->setObjectName("FullPathData");
-        FullPathData->setAlignment(Qt::AlignCenter);
+        sizePolicy2.setHeightForWidth(FullPathData->sizePolicy().hasHeightForWidth());
+        FullPathData->setSizePolicy(sizePolicy2);
+        FullPathData->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         FullPathContainer->addWidget(FullPathData);
 
 
-        verticalLayout_2->addLayout(FullPathContainer);
+        verticalLayout->addLayout(FullPathContainer);
 
-        TimestampContainer = new QHBoxLayout();
-        TimestampContainer->setObjectName("TimestampContainer");
-        TimestampLabel = new QLabel(verticalLayoutWidget);
-        TimestampLabel->setObjectName("TimestampLabel");
+        SizeContainer = new QHBoxLayout();
+        SizeContainer->setObjectName("SizeContainer");
+        SizeLabel = new QLabel(Details);
+        SizeLabel->setObjectName("SizeLabel");
+        sizePolicy1.setHeightForWidth(SizeLabel->sizePolicy().hasHeightForWidth());
+        SizeLabel->setSizePolicy(sizePolicy1);
+        SizeLabel->setMinimumSize(QSize(80, 30));
+        SizeLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        TimestampContainer->addWidget(TimestampLabel);
+        SizeContainer->addWidget(SizeLabel);
 
-        TimestampData = new QLabel(verticalLayoutWidget);
-        TimestampData->setObjectName("TimestampData");
-        TimestampData->setAlignment(Qt::AlignCenter);
+        SizeData = new QLabel(Details);
+        SizeData->setObjectName("SizeData");
+        sizePolicy2.setHeightForWidth(SizeData->sizePolicy().hasHeightForWidth());
+        SizeData->setSizePolicy(sizePolicy2);
+        SizeData->setAlignment(Qt::AlignCenter);
 
-        TimestampContainer->addWidget(TimestampData);
+        SizeContainer->addWidget(SizeData);
 
 
-        verticalLayout_2->addLayout(TimestampContainer);
+        verticalLayout->addLayout(SizeContainer);
 
         CompressedLengthContainer = new QHBoxLayout();
         CompressedLengthContainer->setObjectName("CompressedLengthContainer");
-        CompressedLengthLabel = new QLabel(verticalLayoutWidget);
+        CompressedLengthLabel = new QLabel(Details);
         CompressedLengthLabel->setObjectName("CompressedLengthLabel");
+        sizePolicy1.setHeightForWidth(CompressedLengthLabel->sizePolicy().hasHeightForWidth());
+        CompressedLengthLabel->setSizePolicy(sizePolicy1);
+        CompressedLengthLabel->setMinimumSize(QSize(80, 30));
+        CompressedLengthLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         CompressedLengthContainer->addWidget(CompressedLengthLabel);
 
-        CompressedLengthData = new QLabel(verticalLayoutWidget);
+        CompressedLengthData = new QLabel(Details);
         CompressedLengthData->setObjectName("CompressedLengthData");
+        sizePolicy2.setHeightForWidth(CompressedLengthData->sizePolicy().hasHeightForWidth());
+        CompressedLengthData->setSizePolicy(sizePolicy2);
         CompressedLengthData->setAlignment(Qt::AlignCenter);
 
         CompressedLengthContainer->addWidget(CompressedLengthData);
 
 
-        verticalLayout_2->addLayout(CompressedLengthContainer);
+        verticalLayout->addLayout(CompressedLengthContainer);
+
+        TimestampContainer = new QHBoxLayout();
+        TimestampContainer->setObjectName("TimestampContainer");
+        TimestampLabel = new QLabel(Details);
+        TimestampLabel->setObjectName("TimestampLabel");
+        sizePolicy1.setHeightForWidth(TimestampLabel->sizePolicy().hasHeightForWidth());
+        TimestampLabel->setSizePolicy(sizePolicy1);
+        TimestampLabel->setMinimumSize(QSize(80, 30));
+        TimestampLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        TimestampContainer->addWidget(TimestampLabel);
+
+        TimestampData = new QLabel(Details);
+        TimestampData->setObjectName("TimestampData");
+        sizePolicy2.setHeightForWidth(TimestampData->sizePolicy().hasHeightForWidth());
+        TimestampData->setSizePolicy(sizePolicy2);
+        TimestampData->setAlignment(Qt::AlignCenter);
+
+        TimestampContainer->addWidget(TimestampData);
+
+
+        verticalLayout->addLayout(TimestampContainer);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
 
         tabWidget->addTab(Details, QString());
 
@@ -150,13 +230,19 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Warframe Extractor", nullptr));
+        QTreeWidgetItem *___qtreewidgetitem = treeWidget->headerItem();
+        ___qtreewidgetitem->setText(0, QCoreApplication::translate("MainWindow", "Name", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(Preview), QCoreApplication::translate("MainWindow", "Preview", nullptr));
+        NameLabel->setText(QCoreApplication::translate("MainWindow", "Name", nullptr));
+        NameData->setText(QString());
         FullPathLabel->setText(QCoreApplication::translate("MainWindow", "Full Path", nullptr));
         FullPathData->setText(QString());
+        SizeLabel->setText(QCoreApplication::translate("MainWindow", "Size", nullptr));
+        SizeData->setText(QString());
+        CompressedLengthLabel->setText(QCoreApplication::translate("MainWindow", "Compressed", nullptr));
+        CompressedLengthData->setText(QString());
         TimestampLabel->setText(QCoreApplication::translate("MainWindow", "Timestamp", nullptr));
         TimestampData->setText(QString());
-        CompressedLengthLabel->setText(QCoreApplication::translate("MainWindow", "Compressed Length", nullptr));
-        CompressedLengthData->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(Details), QCoreApplication::translate("MainWindow", "Metadata", nullptr));
     } // retranslateUi
 
@@ -168,4 +254,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTEROEKCDG_H
+#endif // EXPORTERSOLGAT_H

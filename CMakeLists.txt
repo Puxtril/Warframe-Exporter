@@ -25,6 +25,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 ##################################################
+# Dumb Qt stuff
+
+if(COMPILE_WF_UI_EXE)
+	set(CMAKE_AUTOMOC ON)
+endif()
+
+##################################################
 # OS-based flags
 
 if(MSVC)
@@ -61,6 +68,10 @@ file(GLOB WARFRAME_EXPORTER_CLI_SOURCES CONFIGURE_DEPENDS
 
 file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cpp
+	# Since these objects define signals, they need the Q_OBJECT macro
+	#   And since they have this macro, they need to be picked up by Moc (Auto mode)
+	#   And since they need to be picked up by Moc, they need to be treated as a source file
+	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/UIPicker.h
 )
 
 ##################################################

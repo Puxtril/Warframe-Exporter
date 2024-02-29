@@ -6,33 +6,37 @@
 
 class TreeItemDirectory : public QTreeWidgetItem
 {
-    LotusLib::DirMeta m_dir;
+    std::string m_fullInternalPath;
 
 public:
     static constexpr int QTreeWidgetItemType = 1005;
 
-    TreeItemDirectory(LotusLib::DirMeta dirMeta);
-    TreeItemDirectory(QTreeWidgetItem* parentWidget, LotusLib::DirMeta dirMeta);
+    TreeItemDirectory(std::string fullInternalPath);
+    TreeItemDirectory(QTreeWidgetItem* parentWidget, std::string fullInternalPath);
 
-    const LotusLib::DirMeta& getDir();
+    const std::string& getFullInternalPath() const;
 };
 
 class TreeItemFile : public QTreeWidgetItem
 {
     LotusLib::FileMeta m_file;
+    const std::string& m_pkg;
 
 public:
     static constexpr int QTreeWidgetItemType = 1006;
 
-    TreeItemFile(LotusLib::FileMeta fileMeta);
-    TreeItemFile(QTreeWidgetItem* parentWidget, LotusLib::FileMeta fileMeta);
+    TreeItemFile(LotusLib::FileMeta fileMeta, const std::string& pkgName);
+    TreeItemFile(QTreeWidgetItem* parentWidget, LotusLib::FileMeta fileMeta, const std::string& pkgName);
 
-    QString getName();
-    QString getFullpath();
-    QString getSize();
-    QString getCompressedSize();
-    QString getTimestamp();
+    QString getQName() const;
+    QString getQFullpath() const;
+    QString getQSize() const;
+    QString getQCompressedSize() const;
+    QString getQTimestamp() const;
+
+    const std::string& getPkg() const;
+    QString getQPkg() const;
 
 private:
-    std::string bytesToHumanReadable(int32_t size);
+    std::string bytesToHumanReadable(int32_t size) const;
 };

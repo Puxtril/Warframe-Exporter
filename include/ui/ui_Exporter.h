@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExportersolGAt.ui'
+** Form generated from reading UI file 'ExporteryhojPv.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTERSOLGAT_H
-#define EXPORTERSOLGAT_H
+#ifndef EXPORTERYHOJPV_H
+#define EXPORTERYHOJPV_H
 
 #include <QtCore/QVariant>
 #include <QtOpenGLWidgets/QOpenGLWidget>
@@ -52,6 +52,9 @@ public:
     QHBoxLayout *TimestampContainer;
     QLabel *TimestampLabel;
     QLabel *TimestampData;
+    QHBoxLayout *PackageContainer;
+    QLabel *PackageLabel;
+    QLabel *PackageData;
     QSpacerItem *verticalSpacer;
     QStatusBar *statusbar;
 
@@ -206,6 +209,28 @@ public:
 
         verticalLayout->addLayout(TimestampContainer);
 
+        PackageContainer = new QHBoxLayout();
+        PackageContainer->setObjectName("PackageContainer");
+        PackageLabel = new QLabel(Details);
+        PackageLabel->setObjectName("PackageLabel");
+        sizePolicy1.setHeightForWidth(PackageLabel->sizePolicy().hasHeightForWidth());
+        PackageLabel->setSizePolicy(sizePolicy1);
+        PackageLabel->setMinimumSize(QSize(80, 30));
+        PackageLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        PackageContainer->addWidget(PackageLabel);
+
+        PackageData = new QLabel(Details);
+        PackageData->setObjectName("PackageData");
+        sizePolicy2.setHeightForWidth(PackageData->sizePolicy().hasHeightForWidth());
+        PackageData->setSizePolicy(sizePolicy2);
+        PackageData->setAlignment(Qt::AlignCenter);
+
+        PackageContainer->addWidget(PackageData);
+
+
+        verticalLayout->addLayout(PackageContainer);
+
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout->addItem(verticalSpacer);
@@ -243,6 +268,8 @@ public:
         CompressedLengthData->setText(QString());
         TimestampLabel->setText(QCoreApplication::translate("MainWindow", "Timestamp", nullptr));
         TimestampData->setText(QString());
+        PackageLabel->setText(QCoreApplication::translate("MainWindow", "Package", nullptr));
+        PackageData->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(Details), QCoreApplication::translate("MainWindow", "Metadata", nullptr));
     } // retranslateUi
 
@@ -254,4 +281,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTERSOLGAT_H
+#endif // EXPORTERYHOJPV_H

@@ -34,7 +34,7 @@ UiPicker::sendDataToExporter()
         return;
     }
 
-    int extractTypes;
+    int extractTypes = 0;
 
     if (this->CheckboxAudio->isChecked())
         extractTypes |= (int)WarframeExporter::ExtractorType::Audio;

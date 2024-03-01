@@ -3,6 +3,7 @@
 #include "ui/ui_Picker.h"
 #include "ui/UIExporter.h"
 #include "Extractor.h"
+#include "ui/Settings.h"
 
 #include <qdialog.h>
 #include <qmainwindow.h>
@@ -20,6 +21,9 @@ public:
 
     void setupUi(QDialog *WindowPicker);
     void connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* exporter);
+
+private:
+    void loadSettings();
 
 signals:
     void pickerDone(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);

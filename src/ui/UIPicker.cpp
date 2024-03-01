@@ -1,5 +1,4 @@
 #include "ui/UIPicker.h"
-#include <qnamespace.h>
 
 UiPicker::UiPicker(QObject *parent)
     : QObject(parent)
@@ -11,6 +10,7 @@ UiPicker::setupUi(QDialog *WindowPicker)
 {
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
+    loadSettings();
 }
 
 void
@@ -20,8 +20,30 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
     QObject::connect(this, &UiPicker::pickerDone, WindowPicker, &QDialog::hide);
     QObject::connect(this, &UiPicker::pickerDone, mainWindow, &QMainWindow::show);
     QObject::connect(this, &UiPicker::pickerDone, exporter, &UiExporter::setData);
+    QObject::connect(this, &UiPicker::pickerDone, &UiSettings::getInstance(), &UiSettings::setSettings);
     QObject::connect(this->CacheWindowsBrowse, &QPushButton::clicked, this, &UiPicker::browseCacheWindows);
     QObject::connect(this->ExportPathBrowse, &QPushButton::clicked, this, &UiPicker::browseExportPath);
+}
+
+void
+UiPicker::loadSettings()
+{
+    UiSettings& settings = UiSettings::getInstance();
+
+    this->CacheWindowsInput->setText(settings.getCacheWindowsPath());
+    this->ExportPathInput->setText(settings.getExportPath());
+    
+    this->CheckboxViewTextures->setCheckState(settings.getViewTextures() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxViewModels->setCheckState(settings.getViewModels() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxViewLevels->setCheckState(settings.getViewLevels() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxViewMaterials->setCheckState(settings.getViewMaterials() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxViewAudio->setCheckState(settings.getViewAudio() ? Qt::Checked : Qt::Unchecked);
+
+    this->CheckboxExportTextures->setCheckState(settings.getExportTextures() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxExportModels->setCheckState(settings.getExportModels() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxExportLevels->setCheckState(settings.getExportLevels() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxExportMaterials->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxExportAudio->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
 }
 
 void

@@ -8,6 +8,7 @@
 #include <qmainwindow.h>
 #include <QMessageBox>
 #include <qtmetamacros.h>
+#include <qfiledialog.h>
 
 class UiPicker : public QObject, private Ui_WindowPicker
 {
@@ -21,8 +22,10 @@ public:
     void connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* exporter);
 
 signals:
-    void pickerDone(std::filesystem::path cachePath, WarframeExporter::ExtractorType extractTypes);
+    void pickerDone(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);
 
 public slots:
-    void sendDataToExporter();
+    void parsePickerOptions();
+    void browseCacheWindows();
+    void browseExportPath();
 };

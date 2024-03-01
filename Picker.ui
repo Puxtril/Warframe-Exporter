@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Exporter Options</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -21,6 +21,9 @@
        <width>16777215</width>
        <height>70</height>
       </size>
+     </property>
+     <property name="whatsThis">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Inside the Warframe installation directory, there is a folder &lt;span style=&quot; font-style:italic;&quot;&gt;Cache.Windows&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Typically Warframe is installed in &lt;span style=&quot; font-weight:700;&quot;&gt;C:\Steam\steamapps\common\Warframe&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="title">
       <string>Cache.Windows Path</string>
@@ -46,6 +49,9 @@
        <width>16777215</width>
        <height>70</height>
       </size>
+     </property>
+     <property name="whatsThis">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exported files will be saved to the folder specified here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="title">
       <string>Export Path</string>
@@ -95,6 +101,9 @@
          <width>0</width>
          <height>100</height>
         </size>
+       </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Once &amp;quot;Load&amp;quot; is pressed, you will be able to browse the internal files. This determines which packages are loaded and presented. There may be some overlap, so picking Models, Materials, or Audio will all load the &amp;quot;Misc&amp;quot; package. In esence, those 3 checkboxes do the same thing... but don't worry about that, just pick what you want to see!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="title">
         <string>View</string>
@@ -189,6 +198,9 @@
          <height>100</height>
         </size>
        </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a folder is selected for export, this determines which file types are exported to your computer. The general order from smallest -&amp;gt; largest:&lt;/p&gt;&lt;p&gt;Materials -&amp;gt; Models -&amp;gt; Audio -&amp;gt; Textures -&amp;gt; Levels (very big)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="title">
         <string>Export</string>
        </property>
@@ -281,11 +293,17 @@
        <height>60</height>
       </size>
      </property>
+     <property name="whatsThis">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load the main window and begin browsing the internal files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>

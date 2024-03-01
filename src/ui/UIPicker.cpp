@@ -1,4 +1,5 @@
 #include "ui/UIPicker.h"
+#include <qnamespace.h>
 
 UiPicker::UiPicker(QObject *parent)
     : QObject(parent)
@@ -9,6 +10,7 @@ void
 UiPicker::setupUi(QDialog *WindowPicker)
 {
     Ui_WindowPicker::setupUi(WindowPicker);
+    WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
 }
 
 void

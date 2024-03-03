@@ -6,14 +6,14 @@ ExporterThread::ExporterThread()
 }
 
 void
-ExporterThread::setData(std::filesystem::path cacheDirPath, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, std::vector<std::string> pkgNames)
+ExporterThread::setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, std::vector<std::string> pkgNames)
 {
-    m_cacheDirPath = cacheDirPath;
+    m_pkgsReader = pkgsReader;
     m_exportPath = exportPath;
     m_extractTypes = extractTypes;
     m_exportPkgNames = pkgNames;
 
-    m_exporter = std::make_shared<BatchIteratorExportQt>(cacheDirPath, WarframeExporter::Ensmallening(true, true, true), exportPath);
+    m_exporter = std::make_shared<BatchIteratorExportQt>();
 }
 
 void
@@ -29,8 +29,8 @@ ExporterThread::run()
 
     WarframeExporter::Ensmallening ensmalleningData(true, true, true);
 
-    auto totalItemsIter = BatchIteratorCountQt(m_cacheDirPath, ensmalleningData);
-    totalItemsIter.batchIterate(m_internalPath, m_exportPkgNames, m_extractTypes);
+    BatchIteratorCountQt totalItemsIter;
+    totalItemsIter.batchIterate(*m_pkgsReader, ensmalleningData, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes);
     size_t totalItems = totalItemsIter.getFileCount();
 
     emit ExporterThread::extractStart(totalItems);
@@ -40,7 +40,7 @@ ExporterThread::run()
 
     try
     {
-        m_exporter->batchIterate(m_internalPath, m_exportPkgNames, m_extractTypes);
+        m_exporter->batchIterate(*m_pkgsReader, ensmalleningData, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes);
     }
     catch (ExtractionCancelled& ex)
     {

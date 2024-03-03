@@ -271,7 +271,7 @@ UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path expor
     m_extractTypes = extractTypes;
     m_viewPkgNames = getPackageNames(viewTypes);
     m_exportPkgNames = getPackageNames(extractTypes);
-    m_exporterThread.setData(cachePath, exportPath, extractTypes, m_exportPkgNames);
+    m_exporterThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
 
     setupTree();
 }
@@ -318,7 +318,6 @@ UiExporter::extractButtonClicked()
 void
 UiExporter::extractCancelButtonClicked()
 {
-    //m_exporterThread.exit();
     m_exporterThread.extractCancelled();
     m_exporterThread.wait();
     this->ExtractProgressBar->setFormat("Cancelled %v/%m");

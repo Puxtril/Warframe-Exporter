@@ -1,12 +1,12 @@
 #include "ui/BatchIteratorExportQt.h"
 
-BatchIteratorExportQt::BatchIteratorExportQt(const std::filesystem::path& pkgsDir, const WarframeExporter::Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath)
-    : m_fileCountExtracted(0), m_killExtraction(false), WarframeExporter::BatchIteratorExport(pkgsDir, ensmalleningData, baseOutputPath)
+BatchIteratorExportQt::BatchIteratorExportQt()
+    : m_fileCountExtracted(0), m_killExtraction(false), WarframeExporter::BatchIteratorExport()
 {
 }
 
 void
-BatchIteratorExportQt::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor)
+BatchIteratorExportQt::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor, const WarframeExporter::Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
     if (m_killExtraction)
     {
@@ -14,7 +14,7 @@ BatchIteratorExportQt::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::
         resetFileCount();
         throw ExtractionCancelled();
     }
-    BatchIteratorExport::processKnownFile(pkg, fileEntry, extractor);
+    BatchIteratorExport::processKnownFile(pkgs, pkgName, fileEntry, extractor, ensmalleningData, outputPath);
     emit extractedFileCount(++m_fileCountExtracted);
 }
 
@@ -30,8 +30,8 @@ BatchIteratorExportQt::resetFileCount()
     m_fileCountExtracted = 0;
 }
 
-BatchIteratorCountQt::BatchIteratorCountQt(const std::filesystem::path& pkgsDir, const WarframeExporter::Ensmallening& ensmalleningData)
-    : m_fileCount(0), WarframeExporter::BatchIterator(pkgsDir, ensmalleningData, "")
+BatchIteratorCountQt::BatchIteratorCountQt()
+    : m_fileCount(0), WarframeExporter::BatchIterator()
 {
 }
 
@@ -42,7 +42,7 @@ BatchIteratorCountQt::getFileCount() const
 }
 
 void
-BatchIteratorCountQt::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor)
+BatchIteratorCountQt::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor, const WarframeExporter::Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
     m_fileCount++;
 }

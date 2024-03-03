@@ -2,15 +2,15 @@
 
 using namespace WarframeExporter;
 
-BatchIteratorExport::BatchIteratorExport(const std::filesystem::path& pkgsDir, const Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath)
-	: BatchIterator(pkgsDir, ensmalleningData, baseOutputPath), m_outExportPath(m_baseOutPath / "Export")
+BatchIteratorExport::BatchIteratorExport()
+	: BatchIterator()
 {
 }
 
 void
-BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor)
+BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
-	std::filesystem::path savePath = m_outExportPath / fileEntry.internalPath.getPreferredPath().relative_path();
+	std::filesystem::path savePath = outputPath / "Export" / fileEntry.internalPath.getPreferredPath().relative_path();
 	savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
 
 	if (existingFileIdentical(fileEntry.metadata.getTimeStamp(), savePath))
@@ -24,12 +24,12 @@ BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::Fi
 
 	try
 	{
-		LotusLib::FileEntry fullFileEntry = pkg.getFile(fileEntry.metadata);
+		LotusLib::FileEntry fullFileEntry = pkgs.getPackage(pkgName).getFile(fileEntry.metadata);
 		
 		m_logger.info("Extracting " + fullFileEntry.internalPath.string());
 		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fullFileEntry.commonHeader.type));
 
-		extractor->extract(fullFileEntry, m_package, m_ensmalleningData, savePath);
+		extractor->extract(fullFileEntry, pkgs, ensmalleningData, savePath);
 		writeFileProperties(savePath, fullFileEntry);
 	}
 	catch (not_imeplemented_error& err)
@@ -47,12 +47,12 @@ BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::Fi
 }
 
 void
-BatchIteratorExport::processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry)
+BatchIteratorExport::processUnknownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
 }
 
 void
-BatchIteratorExport::processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
+BatchIteratorExport::processSkipFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
 {
 }
 

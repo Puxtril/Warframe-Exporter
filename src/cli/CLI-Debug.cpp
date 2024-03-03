@@ -57,7 +57,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
 			return;
 		}
-		printEnums(outPath, internalPath, pkgName, cacheDirPath);
+		printEnums(cacheDirPath, pkgName, internalPath);
 	}
 	else if (m_writeRaw->getValue())
 	{
@@ -76,7 +76,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 }
 
 void
-CLIDebug::printEnums(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath)
+CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
 	static WarframeExporter::Ensmallening ensmall(true, true, true);
 
@@ -87,8 +87,10 @@ CLIDebug::printEnums(const std::filesystem::path outPath, const LotusLib::LotusP
 			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
 			return;
 		}
-		WarframeExporter::BatchIteratorDebug debugger(cacheDirPath, ensmall, outPath);
-		debugger.printEnumCounts(pkgName, internalPath);
+		WarframeExporter::BatchIteratorDebug debugger;
+		LotusLib::PackagesReader pkgs(cacheDirPath);
+		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+		debugger.printEnumCounts(pkg, internalPath);
 	}
 }
 
@@ -96,7 +98,7 @@ void
 CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath)
 {
 	WarframeExporter::Ensmallening ensmall(true, true, true);
-	WarframeExporter::BatchIteratorDebug debugger(cacheDirPath, ensmall, outPath);
+	WarframeExporter::BatchIteratorDebug debugger;
 
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 	LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
@@ -109,13 +111,13 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
 		{
 			LotusLib::FileEntry fileEntry = pkg.getFile(**iter);
-			debugger.writeAllDebugs(pkg, fileEntry);
+			debugger.writeAllDebugs(pkg, fileEntry, outPath);
 		}
 	}
 	catch (std::exception&)
 	{
 		LotusLib::FileEntry fileEntry = pkg.getFile(internalPath);
-		debugger.writeAllDebugs(pkg, fileEntry);
+		debugger.writeAllDebugs(pkg, fileEntry, outPath);
 	}
 }
 
@@ -140,8 +142,11 @@ CLIDebug::debug(const std::filesystem::path& cacheDirPath, const std::string& pk
 	else
 		pkgNames = { pkgName };
 
-	WarframeExporter::BatchIteratorDebug debugger(cacheDirPath, ensmallening, outPath);
-	debugger.batchIterate(intPath, pkgNames, (WarframeExporter::ExtractorType)types);
+	WarframeExporter::BatchIteratorDebug debugger;
+	LotusLib::PackagesReader pkgs(cacheDirPath);
+	LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+
+	debugger.batchIterate(pkgs, ensmallening, outPath, intPath, {pkgName}, (WarframeExporter::ExtractorType)types);
 }
 
 std::vector<std::string>

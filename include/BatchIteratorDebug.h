@@ -19,19 +19,36 @@ namespace WarframeExporter
 {
 	class BatchIteratorDebug : public BatchIterator
 	{
-	protected:
-		std::filesystem::path m_outDebugPath;
-
 	public:
-		BatchIteratorDebug(const std::filesystem::path& pkgsDir, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath);
+		BatchIteratorDebug();
 
-		void printEnumCounts(const std::string& package, const LotusLib::LotusPath& internalPath);
-		void writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry);
+		void printEnumCounts(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& internalPath);
+		void writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const std::filesystem::path& baseOutputPath);
 
 	protected:
-		void processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor) override;
-		void processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry) override;
-		void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor) override;
+		void processKnownFile(
+			LotusLib::PackagesReader& pkgs,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			Extractor* extractor,
+			const Ensmallening& ensmalleningData,
+			const std::filesystem::path& outputPath
+		) override;
+		
+		void processUnknownFile(
+			LotusLib::PackagesReader& pkgs,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			const Ensmallening& ensmalleningData,
+			const std::filesystem::path& outputPath
+		) override;
+		
+		void processSkipFile(
+			LotusLib::PackagesReader& pkgs,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			const Extractor* extractor
+		) override;
 
 	};
 }

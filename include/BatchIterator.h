@@ -19,22 +19,39 @@ namespace WarframeExporter
 	class BatchIterator
 	{
 	protected:
-		LotusLib::PackagesReader m_package;
-		const Ensmallening m_ensmalleningData;
-		std::filesystem::path m_baseOutPath;
 		Logger& m_logger;
 
 	public:
-		BatchIterator(const std::filesystem::path& pkgsDir, const Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath);
+		BatchIterator();
 
-		void batchIterate(const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types);
+		void batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types);
 
 	protected:
 		// fileEntry will only contain the Common Header and H package header
-		virtual void processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor) = 0;
-		virtual void processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry) = 0;
-		virtual void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor) = 0;
+		virtual void processKnownFile(
+			LotusLib::PackagesReader& pkg,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			Extractor* extractor,
+			const Ensmallening& ensmalleningData,
+			const std::filesystem::path& outputPath
+		) = 0;
+		
+		virtual void processUnknownFile(
+			LotusLib::PackagesReader& pkg,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			const Ensmallening& ensmalleningData,
+			const std::filesystem::path& outputPath
+		) = 0;
+		
+		virtual void processSkipFile(
+			LotusLib::PackagesReader& pkg,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			const Extractor* extractor
+		) = 0;
 
-		void validatePackages(const std::vector<std::string>& packages);
+		void validatePackages(LotusLib::PackagesReader& pkgsDir, const std::vector<std::string>& packages);
 	};
 }

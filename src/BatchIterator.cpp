@@ -2,22 +2,19 @@
 
 using namespace WarframeExporter;
 
-BatchIterator::BatchIterator(const std::filesystem::path& pkgsDir, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
-	: m_package(pkgsDir),
-	m_ensmalleningData(ensmallData),
-	m_baseOutPath(baseOutputPath),
-	m_logger(Logger::getInstance())
+BatchIterator::BatchIterator()
+	: m_logger(Logger::getInstance())
 {
 }
 
 void
-BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types)
+BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types)
 {
-	this->validatePackages(packages);
+	this->validatePackages(pkgsDir, packages);
 
 	for (const std::string& curPackageName : packages)
 	{
-		LotusLib::PackageReader curPkg = m_package.getPackage(curPackageName);
+		LotusLib::PackageReader curPkg = pkgsDir.getPackage(curPackageName);
 
 		for (auto iter = curPkg.getIter(basePath); iter != curPkg.getIter(); iter++)
 		{
@@ -29,17 +26,17 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 
 				if (extractor == nullptr)
 				{
-					processUnknownFile(curPkg, curEntry);
+					processUnknownFile(pkgsDir, curPackageName, curEntry, ensmalleningData, outputPath);
 					continue;
 				}
 
 				if (((int)extractor->getExtractorType() & (int)types) == 0)
 				{
-					processSkipFile(curPkg, curEntry, extractor);
+					processSkipFile(pkgsDir, curPackageName, curEntry, extractor);
 					continue;
 				}
 
-				processKnownFile(curPkg, curEntry, extractor);
+				processKnownFile(pkgsDir, curPackageName, curEntry, extractor, ensmalleningData, outputPath);
 			}
 			catch (LotusLib::DecompressionException& ex)
 			{
@@ -55,13 +52,13 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 }
 
 void
-BatchIterator::validatePackages(const std::vector<std::string>& packages)
+BatchIterator::validatePackages(LotusLib::PackagesReader& pkgsDir, const std::vector<std::string>& packages)
 {
 	for (auto& curPkgStr : packages)
 	{
 		try
 		{
-			m_package.getPackage(curPkgStr);
+			pkgsDir.getPackage(curPkgStr);
 		}
 		catch (std::exception&)
 		{

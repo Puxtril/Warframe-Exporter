@@ -15,16 +15,33 @@ namespace WarframeExporter
 {
 	class BatchIteratorExport : public BatchIterator
 	{
-	protected:
-		std::filesystem::path m_outExportPath;
-
 	public:
-		BatchIteratorExport(const std::filesystem::path& pkgsDir, const Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath);
+		BatchIteratorExport();
 
 	protected:
-		void processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor) override;
-		void processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry) override;
-		void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor) override;
+		void processKnownFile(
+			LotusLib::PackagesReader& pkgs,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			Extractor* extractor,
+			const Ensmallening& ensmalleningData,
+			const std::filesystem::path& outputPath
+		) override;
+		
+		void processUnknownFile(
+			LotusLib::PackagesReader& pkgs,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			const Ensmallening& ensmalleningData,
+			const std::filesystem::path& outputPath
+		) override;
+		
+		void processSkipFile(
+			LotusLib::PackagesReader& pkgs,
+			const std::string& pkgName,
+			LotusLib::FileEntry& fileEntry,
+			const Extractor* extractor
+		) override;
 
 		bool existingFileIdentical(int64_t timestamp, const std::filesystem::path& outputPath);
 		void writeFileProperties(const std::filesystem::path filePath, LotusLib::FileEntry& fileEntry);

@@ -36,6 +36,6 @@ public:
 
 private:
 	void checkOutputDir(const std::string& outPath);
-	void extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening);
+	void extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening);
 	std::vector<std::string> getPkgsNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath);
 };

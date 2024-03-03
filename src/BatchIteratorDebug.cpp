@@ -2,18 +2,18 @@
 
 using namespace WarframeExporter;
 
-BatchIteratorDebug::BatchIteratorDebug(const std::filesystem::path& pkgsDir, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
-	: BatchIterator(pkgsDir, ensmallData, baseOutputPath), m_outDebugPath(m_baseOutPath / "Debug")
+BatchIteratorDebug::BatchIteratorDebug()
+	: BatchIterator()
 {
 }
 
 void
-BatchIteratorDebug::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor)
+BatchIteratorDebug::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
-	LotusLib::FileEntry fullFileEntry = pkg.getFile(fileEntry.metadata);
+	LotusLib::FileEntry fullFileEntry = pkgs.getPackage(pkgName).getFile(fileEntry.metadata);
 	try
 	{
-		extractor->extractDebug(fullFileEntry, m_package, m_ensmalleningData);
+		extractor->extractDebug(fullFileEntry, pkgs, ensmalleningData);
 		m_logger.info("Successfully processed: " + fullFileEntry.internalPath.string());
 	}
 	catch (LotusLib::DecompressionException& err)
@@ -27,39 +27,40 @@ BatchIteratorDebug::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::Fil
 	catch (not_imeplemented_error& err)
 	{
 		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + fullFileEntry.internalPath.string());
-		writeAllDebugs(pkg, fullFileEntry);
+		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+		writeAllDebugs(pkg, fullFileEntry, outputPath);
 	}
 	catch (unknown_format_error& err)
 	{
 		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + fullFileEntry.internalPath.string());
-		writeAllDebugs(pkg, fullFileEntry);
+		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+		writeAllDebugs(pkg, fullFileEntry, outputPath);
 	}
 	catch (std::runtime_error& err)
 	{
 		m_logger.error(std::string(err.what()) + ": " + fullFileEntry.internalPath.string());
-		writeAllDebugs(pkg, fullFileEntry);
+		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+		writeAllDebugs(pkg, fullFileEntry, outputPath);
 	}
 }
 
 void
-BatchIteratorDebug::processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry)
+BatchIteratorDebug::processUnknownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
 	m_logger.debug("Unknown file type " + std::to_string(fileEntry.commonHeader.type) + ": " + fileEntry.internalPath.string());
 }
 
 void
-BatchIteratorDebug::processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
+BatchIteratorDebug::processSkipFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
 {
 	m_logger.debug("Skipping file type " + std::to_string(fileEntry.commonHeader.type) + " (" + extractor->getFriendlyName() + "): " + fileEntry.internalPath.string());
 }
 
 void
-BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::LotusPath& internalPath)
+BatchIteratorDebug::printEnumCounts(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& internalPath)
 {
 	std::map<uint32_t, int> enumCounts;
 	std::map<uint32_t, std::vector<std::string>> enumExamples;
-
-	LotusLib::PackageReader pkg = m_package.getPackage(package);
 
 	m_logger.info("Collecting Common Header Format stats");
 	for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
@@ -112,9 +113,9 @@ BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::
 }
 
 void
-BatchIteratorDebug::writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry)
+BatchIteratorDebug::writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const std::filesystem::path& baseOutputPath)
 {
-	std::filesystem::path debugPath = m_outDebugPath / fileEntry.internalPath.getPreferredPath().relative_path();
+	std::filesystem::path debugPath = baseOutputPath / "Debug" / fileEntry.internalPath.getPreferredPath().relative_path();
 	if (!std::filesystem::exists(debugPath.parent_path()))
 		std::filesystem::create_directories(debugPath.parent_path());
 

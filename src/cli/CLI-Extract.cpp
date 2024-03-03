@@ -1,7 +1,4 @@
 #include "cli/CLI-Extract.h"
-#include "model/ModelExtractor.h"
-#include "tclap/SwitchArg.h"
-
 
 CLIExtract::CLIExtract()
 {
@@ -103,10 +100,12 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
+CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
 {
-	WarframeExporter::BatchIteratorExport extractor(cacheDirPath, ensmallening, outPath);
-	extractor.batchIterate(intPath, pkgs, types);
+	WarframeExporter::BatchIteratorExport extractor;
+	LotusLib::PackagesReader pkgs(cacheDirPath);
+
+	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types);
 }
 
 std::vector<std::string>

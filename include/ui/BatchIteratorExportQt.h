@@ -17,9 +17,17 @@ class BatchIteratorExportQt : public QObject, public WarframeExporter::BatchIter
     bool m_killExtraction;
 
 public:
-    BatchIteratorExportQt(const std::filesystem::path& pkgsDir, const WarframeExporter::Ensmallening& ensmalleningData, std::filesystem::path baseOutputPath);
+    BatchIteratorExportQt();
 
-    void processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor) override;
+    void processKnownFile(
+        LotusLib::PackagesReader& pkgs,
+        const std::string& pkgName,
+        LotusLib::FileEntry& fileEntry,
+        WarframeExporter::Extractor* extractor,
+        const WarframeExporter::Ensmallening& ensmalleningData,
+        const std::filesystem::path& outputPath
+    ) override;
+
     void cancelExtraction();
     void resetFileCount();
 
@@ -32,11 +40,33 @@ class BatchIteratorCountQt : public WarframeExporter::BatchIterator
     int m_fileCount;
 
 public:
-    BatchIteratorCountQt(const std::filesystem::path& pkgsDir, const WarframeExporter::Ensmallening& ensmalleningData);
+    BatchIteratorCountQt();
 
     int getFileCount() const;
 
-    void processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor) override;
-    void processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry) override {}
-    void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const WarframeExporter::Extractor* extractor) override {}
+    void processKnownFile(
+        LotusLib::PackagesReader& pkgs,
+        const std::string& pkgName,
+        LotusLib::FileEntry& fileEntry,
+        WarframeExporter::Extractor* extractor,
+        const WarframeExporter::Ensmallening& ensmalleningData,
+        const std::filesystem::path& outputPath
+    ) override;
+		
+    void processUnknownFile(
+        LotusLib::PackagesReader& pkgs,
+        const std::string& pkgName,
+        LotusLib::FileEntry& fileEntry,
+        const WarframeExporter::Ensmallening& ensmalleningData,
+        const std::filesystem::path& outputPath
+    ) override
+    {}
+		
+    void processSkipFile(
+        LotusLib::PackagesReader& pkgs,
+        const std::string& pkgName,
+        LotusLib::FileEntry& fileEntry,
+        const WarframeExporter::Extractor* extractor
+    ) override
+    {}
 };

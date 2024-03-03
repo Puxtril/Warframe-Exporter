@@ -1,21 +1,24 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExporteryhojPv.ui'
+** Form generated from reading UI file 'ExporterKtMZna.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTERYHOJPV_H
-#define EXPORTERYHOJPV_H
+#ifndef EXPORTERKTMZNA_H
+#define EXPORTERKTMZNA_H
 
 #include <QtCore/QVariant>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -29,6 +32,7 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralwidget;
+    QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout;
     QTreeWidget *treeWidget;
     QTabWidget *tabWidget;
@@ -56,16 +60,24 @@ public:
     QLabel *PackageLabel;
     QLabel *PackageData;
     QSpacerItem *verticalSpacer;
+    QHBoxLayout *horizontalLayout_3;
+    QFrame *frame;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *ExtractButton;
+    QProgressBar *ExtractProgressBar;
+    QSpacerItem *horizontalSpacer;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(720, 534);
+        MainWindow->resize(649, 562);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
-        horizontalLayout = new QHBoxLayout(centralwidget);
+        verticalLayout_2 = new QVBoxLayout(centralwidget);
+        verticalLayout_2->setObjectName("verticalLayout_2");
+        horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
         treeWidget = new QTreeWidget(centralwidget);
         treeWidget->setObjectName("treeWidget");
@@ -239,6 +251,44 @@ public:
 
         horizontalLayout->addWidget(tabWidget);
 
+
+        verticalLayout_2->addLayout(horizontalLayout);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        frame = new QFrame(centralwidget);
+        frame->setObjectName("frame");
+        frame->setFrameShape(QFrame::NoFrame);
+        frame->setFrameShadow(QFrame::Raised);
+        horizontalLayout_2 = new QHBoxLayout(frame);
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setContentsMargins(-1, -1, 0, -1);
+        ExtractButton = new QPushButton(frame);
+        ExtractButton->setObjectName("ExtractButton");
+        sizePolicy1.setHeightForWidth(ExtractButton->sizePolicy().hasHeightForWidth());
+        ExtractButton->setSizePolicy(sizePolicy1);
+        ExtractButton->setCheckable(false);
+        ExtractButton->setChecked(false);
+        ExtractButton->setFlat(false);
+
+        horizontalLayout_2->addWidget(ExtractButton);
+
+        ExtractProgressBar = new QProgressBar(frame);
+        ExtractProgressBar->setObjectName("ExtractProgressBar");
+        ExtractProgressBar->setValue(0);
+
+        horizontalLayout_2->addWidget(ExtractProgressBar);
+
+
+        horizontalLayout_3->addWidget(frame);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_3);
+
         MainWindow->setCentralWidget(centralwidget);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -247,6 +297,7 @@ public:
         retranslateUi(MainWindow);
 
         tabWidget->setCurrentIndex(1);
+        ExtractButton->setDefault(false);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -271,6 +322,10 @@ public:
         PackageLabel->setText(QCoreApplication::translate("MainWindow", "Package", nullptr));
         PackageData->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(Details), QCoreApplication::translate("MainWindow", "Metadata", nullptr));
+        ExtractButton->setText(QCoreApplication::translate("MainWindow", "Extract", nullptr));
+#if QT_CONFIG(shortcut)
+        ExtractButton->setShortcut(QString());
+#endif // QT_CONFIG(shortcut)
     } // retranslateUi
 
 };
@@ -281,4 +336,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTERYHOJPV_H
+#endif // EXPORTERKTMZNA_H

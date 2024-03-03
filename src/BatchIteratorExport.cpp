@@ -13,7 +13,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::Fi
 	std::filesystem::path savePath = m_outExportPath / fileEntry.internalPath.getPreferredPath().relative_path();
 	savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
 
-	if (existingFileIdentical(fileEntry, savePath))
+	if (existingFileIdentical(fileEntry.metadata.getTimeStamp(), savePath))
 	{
 		m_logger.info("Identical file time, skipping: " + fileEntry.internalPath.string());
 		return;
@@ -24,10 +24,13 @@ BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::Fi
 
 	try
 	{
-		m_logger.info("Extracting " + fileEntry.internalPath.string());
-		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fileEntry.commonHeader.type));
-		extractor->extract(fileEntry, m_package, m_ensmalleningData, savePath);
-		writeFileProperties(savePath, fileEntry);
+		LotusLib::FileEntry fullFileEntry = pkg.getFile(fileEntry.metadata);
+		
+		m_logger.info("Extracting " + fullFileEntry.internalPath.string());
+		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fullFileEntry.commonHeader.type));
+
+		extractor->extract(fullFileEntry, m_package, m_ensmalleningData, savePath);
+		writeFileProperties(savePath, fullFileEntry);
 	}
 	catch (not_imeplemented_error& err)
 	{
@@ -54,14 +57,14 @@ BatchIteratorExport::processSkipFile(LotusLib::PackageReader& pkg, LotusLib::Fil
 }
 
 bool
-BatchIteratorExport::existingFileIdentical(LotusLib::FileEntry& fileEntry, const std::filesystem::path& outputPath)
+BatchIteratorExport::existingFileIdentical(int64_t timestamp, const std::filesystem::path& outputPath)
 {
 	if (!std::filesystem::exists(outputPath))
 		return false;
 
 	FileProperties::TimeDos existingTime = FileProperties::readDos(outputPath, true);
 
-	if (FileProperties::wipeNanoseconds(fileEntry.metadata.getTimeStamp()) != existingTime)
+	if (FileProperties::wipeNanoseconds(timestamp) != existingTime)
 		return false;
 
 	return true;

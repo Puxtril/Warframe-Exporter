@@ -43,7 +43,7 @@ VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
 		// Just skip these.
 		try
 		{
-			LotusLib::FileEntry curFileEntry = pkg.getFile(curFile, LotusLib::READ_COMMON_HEADER);
+			LotusLib::FileEntry curFileEntry = pkg.getFile(&curFile, LotusLib::READ_COMMON_HEADER);
 
 			VertexColorReader* vertexColorReader = g_enumMapVertexColor[curFileEntry.commonHeader.type];
 			if (vertexColorReader == nullptr)

@@ -10,29 +10,34 @@ BatchIteratorDebug::BatchIteratorDebug(const std::filesystem::path& pkgsDir, con
 void
 BatchIteratorDebug::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor)
 {
+	LotusLib::FileEntry fullFileEntry = pkg.getFile(fileEntry.metadata);
 	try
 	{
-		extractor->extractDebug(fileEntry, m_package, m_ensmalleningData);
-		m_logger.info("Successfully processed: " + fileEntry.internalPath.string());
+		extractor->extractDebug(fullFileEntry, m_package, m_ensmalleningData);
+		m_logger.info("Successfully processed: " + fullFileEntry.internalPath.string());
 	}
 	catch (LotusLib::DecompressionException& err)
 	{
-		m_logger.warn("Decompression exception: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
+		m_logger.warn("Decompression exception: " + std::string(err.what()) + " " + fullFileEntry.internalPath.string());
+	}
+	catch (LotusLib::LotusException& ex)
+	{
+		m_logger.error(ex.what());
 	}
 	catch (not_imeplemented_error& err)
 	{
-		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
-		writeAllDebugs(pkg, fileEntry);
+		m_logger.warn("Not implemented: " + std::string(err.what()) + " " + fullFileEntry.internalPath.string());
+		writeAllDebugs(pkg, fullFileEntry);
 	}
 	catch (unknown_format_error& err)
 	{
-		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + fileEntry.internalPath.string());
-		writeAllDebugs(pkg, fileEntry);
+		m_logger.error("Unknown Format: " + std::string(err.what()) + " " + fullFileEntry.internalPath.string());
+		writeAllDebugs(pkg, fullFileEntry);
 	}
 	catch (std::runtime_error& err)
 	{
-		m_logger.error(std::string(err.what()) + ": " + fileEntry.internalPath.string());
-		writeAllDebugs(pkg, fileEntry);
+		m_logger.error(std::string(err.what()) + ": " + fullFileEntry.internalPath.string());
+		writeAllDebugs(pkg, fullFileEntry);
 	}
 }
 
@@ -61,7 +66,7 @@ BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::
 	{
 		try
 		{
-			LotusLib::FileEntry curFile = pkg.getFile(**iter);
+			LotusLib::FileEntry curFile = pkg.getFile(*iter, LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER);
 
 			enumCounts[curFile.commonHeader.type]++;
 			
@@ -79,6 +84,11 @@ BatchIteratorDebug::printEnumCounts(const std::string& package, const LotusLib::
 		catch (LotusLib::DecompressionException&)
 		{
 			m_logger.warn("Decompress error: " + internalPath.string());
+			continue;
+		}
+		catch (LotusLib::LotusException& ex)
+		{
+			m_logger.error(ex.what());
 			continue;
 		}
 		catch (LimitException& ex)

@@ -23,7 +23,7 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 		{
 			try
 			{
-				LotusLib::FileEntry curEntry = curPkg.getFile(iter.getFullPath());
+				LotusLib::FileEntry curEntry = curPkg.getFile((*iter), LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
 
 				Extractor* extractor = g_enumMapExtractor[curEntry.commonHeader.type];
 
@@ -44,6 +44,10 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 			catch (LotusLib::DecompressionException& ex)
 			{
 				m_logger.error("Decompression error, skipping");
+				continue;
+			}
+			catch (LotusLib::LotusException& ex)
+			{
 				continue;
 			}
 		}

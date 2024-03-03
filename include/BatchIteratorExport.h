@@ -26,7 +26,7 @@ namespace WarframeExporter
 		void processUnknownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry) override;
 		void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor) override;
 
-		bool existingFileIdentical(LotusLib::FileEntry& fileEntry, const std::filesystem::path& outputPath);
+		bool existingFileIdentical(int64_t timestamp, const std::filesystem::path& outputPath);
 		void writeFileProperties(const std::filesystem::path filePath, LotusLib::FileEntry& fileEntry);
 	};
 }

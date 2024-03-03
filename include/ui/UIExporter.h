@@ -5,21 +5,26 @@
 
 #include <QTreeWidget>
 #include <QBrush>
+#include <QMessageBox>
 
 #include "LotusLib.h"
-#include "ui/ui_Exporter.h"
 #include "Extractor.h"
-#include "TreeItemSubtypes.h"
+#include "LotusPath.h"
+#include "ui/ui_Exporter.h"
+#include "ui/TreeItemSubtypes.h"
+#include "ui/ExporterThread.h"
 
 class UiExporter : private Ui_MainWindow, public QObject
 {
     LotusLib::PackagesReader m_packages;
+    std::filesystem::path m_cacheDirPath;
     std::filesystem::path m_exportPath;
     WarframeExporter::ExtractorType m_viewTypes;
     WarframeExporter::ExtractorType m_extractTypes;
     std::vector<std::string> m_viewPkgNames;
     std::vector<std::string> m_exportPkgNames;
     QBrush m_dirBrush;
+    ExporterThread m_exporterThread;
 
 public:
     UiExporter();
@@ -37,9 +42,22 @@ private:
     void clearMetaData();
     void setMetadata(TreeItemFile* file);
 
+    void extractDirectory(LotusLib::LotusPath internalPath);
+    void extractFile(LotusLib::LotusPath internalPath);
+
     static std::vector<std::string> getPackageNames(WarframeExporter::ExtractorType extractTypes);
+
+    void swapToExtractButton();
+    void swapToCancelButton();
 
 public slots:
     void itemClicked(QTreeWidgetItem *item, int column);
     void setData(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);
+    void extractButtonClicked();
+    void extractCancelButtonClicked();
+    void extractIndexingStarted();
+    void extractStart(int totalItems);
+    void extractItemComplete(int curItemCount);
+    void extractError(std::string msg);
+    void extractComplete();
 };

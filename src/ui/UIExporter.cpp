@@ -12,6 +12,13 @@ UiExporter::setup(QMainWindow *MainWindow)
 {
     Ui_MainWindow::setupUi(MainWindow);
     connect(this->treeWidget, &QTreeWidget::itemClicked, this, &UiExporter::itemClicked);
+    connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
+    // Exporter
+    connect(&m_exporterThread, &ExporterThread::extractIndexingStarted, this, &UiExporter::extractIndexingStarted);
+    connect(&m_exporterThread, &ExporterThread::extractStart, this, &UiExporter::extractStart);
+    connect(&m_exporterThread, &ExporterThread::extractItemComplete, this, &UiExporter::extractItemComplete);
+    connect(&m_exporterThread, &ExporterThread::extractError, this, &UiExporter::extractError);
+    connect(&m_exporterThread, &ExporterThread::extractComplete, this, &UiExporter::extractComplete);
 }
 
 void
@@ -184,6 +191,18 @@ UiExporter::setMetadata(TreeItemFile* file)
     this->PackageData->setText(file->getQPkg());
 }
 
+void
+UiExporter::extractDirectory(LotusLib::LotusPath internalPath)
+{
+    m_exporterThread.setInternalPath(internalPath);
+    m_exporterThread.start();
+}
+
+void
+UiExporter::extractFile(LotusLib::LotusPath internalPath)
+{
+}
+
 std::vector<std::string>
 UiExporter::getPackageNames(WarframeExporter::ExtractorType extractTypes)
 {
@@ -209,6 +228,23 @@ UiExporter::getPackageNames(WarframeExporter::ExtractorType extractTypes)
 }
 
 void
+UiExporter::swapToExtractButton()
+{
+    disconnect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractCancelButtonClicked);
+    this->ExtractButton->setText("Extract");
+    connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
+}
+
+void
+UiExporter::swapToCancelButton()
+{
+    disconnect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
+    this->ExtractButton->setText("Cancel");
+    connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractCancelButtonClicked);
+}
+
+
+void
 UiExporter::itemClicked(QTreeWidgetItem *item, int column)
 {
     int itemType = item->type();
@@ -229,11 +265,104 @@ void
 UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes)
 {
     m_packages.setData(cachePath);
+    m_cacheDirPath = cachePath;
     m_exportPath = exportPath;
     m_viewTypes = viewTypes;
     m_extractTypes = extractTypes;
     m_viewPkgNames = getPackageNames(viewTypes);
     m_exportPkgNames = getPackageNames(extractTypes);
+    m_exporterThread.setData(cachePath, exportPath, extractTypes, m_exportPkgNames);
 
     setupTree();
+}
+
+void
+UiExporter::extractButtonClicked()
+{
+    QList<QTreeWidgetItem*> selectedTreeItems = this->treeWidget->selectedItems();
+
+    if (selectedTreeItems.size() == 0)
+    {
+        QMessageBox errBox;
+        errBox.critical(nullptr, "Error", "No folder/file selected");
+        errBox.setFixedSize(500, 200);
+        errBox.show();
+        return;
+    }
+
+    QTreeWidgetItem* selectedItem = selectedTreeItems[0];
+    int itemType = selectedItem->type();
+
+    this->ExtractProgressBar->setValue(0);
+    this->ExtractProgressBar->setMaximum(0);
+    
+    if (itemType == TreeItemDirectory::QTreeWidgetItemType)
+    {
+        TreeItemDirectory* itemCasted = static_cast<TreeItemDirectory*>(selectedItem);
+        LotusLib::LotusPath internalPath = itemCasted->getFullInternalPath();
+        this->extractDirectory(internalPath);
+    }
+
+    else if (itemType == TreeItemFile::QTreeWidgetItemType)
+    {
+        QMessageBox errBox;
+        errBox.critical(nullptr, "Error", "File extraction not currently supported");
+        errBox.setFixedSize(500, 200);
+        errBox.show();
+        return;
+    }
+
+    swapToCancelButton();
+}
+
+void
+UiExporter::extractCancelButtonClicked()
+{
+    //m_exporterThread.exit();
+    m_exporterThread.extractCancelled();
+    m_exporterThread.wait();
+    this->ExtractProgressBar->setFormat("Cancelled %v/%m");
+    swapToExtractButton();
+}
+
+void
+UiExporter::extractIndexingStarted()
+{
+    this->ExtractProgressBar->setFormat("Indexing");
+}
+
+void
+UiExporter::extractStart(int totalItems)
+{
+    this->ExtractProgressBar->setMinimum(0);
+    this->ExtractProgressBar->setMaximum(totalItems);
+    this->ExtractProgressBar->setFormat("Extracting %v/%m");
+}
+
+void
+UiExporter::extractItemComplete(int curItemCount)
+{
+    this->ExtractProgressBar->setValue(curItemCount);
+}
+
+void
+UiExporter::extractError(std::string msg)
+{
+    this->ExtractProgressBar->setFormat("Error");
+
+    QMessageBox errBox;
+    errBox.critical(nullptr, "Error During Extraction", msg.c_str());
+    errBox.setFixedSize(500, 200);
+    errBox.show();
+
+    swapToExtractButton();
+
+    return;
+}
+
+void
+UiExporter::extractComplete()
+{
+    this->ExtractProgressBar->setFormat("Done %v/%m");\
+    swapToExtractButton();
 }

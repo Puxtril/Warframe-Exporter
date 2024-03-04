@@ -12,7 +12,7 @@
 #include "LotusPath.h"
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
-#include "ui/ExporterThread.h"
+#include "ui/ExporterDirectoryThread.h"
 
 class UiExporter : private Ui_MainWindow, public QObject
 {
@@ -24,7 +24,7 @@ class UiExporter : private Ui_MainWindow, public QObject
     std::vector<std::string> m_viewPkgNames;
     std::vector<std::string> m_exportPkgNames;
     QBrush m_dirBrush;
-    ExporterThread m_exporterThread;
+    ExporterDirectoryThread m_exporterDirectoryThread;
 
 public:
     UiExporter();

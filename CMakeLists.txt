@@ -73,7 +73,7 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	#   And since they need to be picked up by Moc, they need to be treated as a source file
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/UIPicker.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/BatchIteratorExportQt.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/ExporterThread.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/ExporterDirectoryThread.h
 )
 
 ##################################################

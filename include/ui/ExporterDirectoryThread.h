@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 
-class ExporterThread : public QThread
+class ExporterDirectoryThread : public QThread
 {
     Q_OBJECT
 
@@ -21,7 +21,7 @@ class ExporterThread : public QThread
     std::shared_ptr<BatchIteratorExportQt> m_exporter;
 
 public:
-    ExporterThread();
+    ExporterDirectoryThread();
 
     void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, std::vector<std::string> pkgNames);
     void setInternalPath(LotusLib::LotusPath internalPath);

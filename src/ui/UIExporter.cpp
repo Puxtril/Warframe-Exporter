@@ -13,12 +13,12 @@ UiExporter::setup(QMainWindow *MainWindow)
     Ui_MainWindow::setupUi(MainWindow);
     connect(this->treeWidget, &QTreeWidget::itemClicked, this, &UiExporter::itemClicked);
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
-    // Exporter
-    connect(&m_exporterThread, &ExporterThread::extractIndexingStarted, this, &UiExporter::extractIndexingStarted);
-    connect(&m_exporterThread, &ExporterThread::extractStart, this, &UiExporter::extractStart);
-    connect(&m_exporterThread, &ExporterThread::extractItemComplete, this, &UiExporter::extractItemComplete);
-    connect(&m_exporterThread, &ExporterThread::extractError, this, &UiExporter::extractError);
-    connect(&m_exporterThread, &ExporterThread::extractComplete, this, &UiExporter::extractComplete);
+    // Directory exporter
+    connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractIndexingStarted, this, &UiExporter::extractIndexingStarted);
+    connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractStart, this, &UiExporter::extractStart);
+    connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractItemComplete, this, &UiExporter::extractItemComplete);
+    connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractError, this, &UiExporter::extractError);
+    connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractComplete, this, &UiExporter::extractComplete);
 }
 
 void
@@ -194,8 +194,8 @@ UiExporter::setMetadata(TreeItemFile* file)
 void
 UiExporter::extractDirectory(LotusLib::LotusPath internalPath)
 {
-    m_exporterThread.setInternalPath(internalPath);
-    m_exporterThread.start();
+    m_exporterDirectoryThread.setInternalPath(internalPath);
+    m_exporterDirectoryThread.start();
 }
 
 void
@@ -271,7 +271,7 @@ UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path expor
     m_extractTypes = extractTypes;
     m_viewPkgNames = getPackageNames(viewTypes);
     m_exportPkgNames = getPackageNames(extractTypes);
-    m_exporterThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
+    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
 
     setupTree();
 }
@@ -318,8 +318,8 @@ UiExporter::extractButtonClicked()
 void
 UiExporter::extractCancelButtonClicked()
 {
-    m_exporterThread.extractCancelled();
-    m_exporterThread.wait();
+    m_exporterDirectoryThread.extractCancelled();
+    m_exporterDirectoryThread.wait();
     this->ExtractProgressBar->setFormat("Cancelled %v/%m");
     swapToExtractButton();
 }

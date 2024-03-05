@@ -13,6 +13,7 @@
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
 #include "ui/ExporterDirectoryThread.h"
+#include "ui/ExporterFileThread.h"
 
 class UiExporter : private Ui_MainWindow, public QObject
 {
@@ -25,6 +26,7 @@ class UiExporter : private Ui_MainWindow, public QObject
     std::vector<std::string> m_exportPkgNames;
     QBrush m_dirBrush;
     ExporterDirectoryThread m_exporterDirectoryThread;
+    ExporterFileThread m_exporterFileThread;
 
 public:
     UiExporter();
@@ -43,7 +45,7 @@ private:
     void setMetadata(TreeItemFile* file);
 
     void extractDirectory(LotusLib::LotusPath internalPath);
-    void extractFile(LotusLib::LotusPath internalPath);
+    void extractFile(LotusLib::LotusPath internalPath, const std::string& pkgName);
 
     static std::vector<std::string> getPackageNames(WarframeExporter::ExtractorType extractTypes);
 

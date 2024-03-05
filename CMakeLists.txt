@@ -74,6 +74,7 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/UIPicker.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/BatchIteratorExportQt.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/ExporterDirectoryThread.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/ExporterFileThread.h
 )
 
 ##################################################

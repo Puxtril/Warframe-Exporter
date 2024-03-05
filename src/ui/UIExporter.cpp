@@ -19,6 +19,11 @@ UiExporter::setup(QMainWindow *MainWindow)
     connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractItemComplete, this, &UiExporter::extractItemComplete);
     connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractError, this, &UiExporter::extractError);
     connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractComplete, this, &UiExporter::extractComplete);
+    // File exporter
+    connect(&m_exporterFileThread, &ExporterFileThread::extractStart, this, &UiExporter::extractStart);
+    connect(&m_exporterFileThread, &ExporterFileThread::extractError, this, &UiExporter::extractError);
+    connect(&m_exporterFileThread, &ExporterFileThread::extractItemComplete, this, &UiExporter::extractItemComplete);
+    connect(&m_exporterFileThread, &ExporterFileThread::extractComplete, this, &UiExporter::extractComplete);
 }
 
 void
@@ -199,8 +204,10 @@ UiExporter::extractDirectory(LotusLib::LotusPath internalPath)
 }
 
 void
-UiExporter::extractFile(LotusLib::LotusPath internalPath)
+UiExporter::extractFile(LotusLib::LotusPath internalPath, const std::string& pkgName)
 {
+    m_exporterFileThread.setFileData(internalPath, pkgName);
+    m_exporterFileThread.start();
 }
 
 std::vector<std::string>
@@ -233,6 +240,7 @@ UiExporter::swapToExtractButton()
     disconnect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractCancelButtonClicked);
     this->ExtractButton->setText("Extract");
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
+    this->ExtractButton->setEnabled(true);
 }
 
 void
@@ -272,6 +280,7 @@ UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path expor
     m_viewPkgNames = getPackageNames(viewTypes);
     m_exportPkgNames = getPackageNames(extractTypes);
     m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
+    m_exporterFileThread.setData(&m_packages, exportPath);
 
     setupTree();
 }
@@ -301,18 +310,16 @@ UiExporter::extractButtonClicked()
         TreeItemDirectory* itemCasted = static_cast<TreeItemDirectory*>(selectedItem);
         LotusLib::LotusPath internalPath = itemCasted->getFullInternalPath();
         this->extractDirectory(internalPath);
+        swapToCancelButton();
     }
 
     else if (itemType == TreeItemFile::QTreeWidgetItemType)
     {
-        QMessageBox errBox;
-        errBox.critical(nullptr, "Error", "File extraction not currently supported");
-        errBox.setFixedSize(500, 200);
-        errBox.show();
-        return;
+        TreeItemFile* itemCasted = static_cast<TreeItemFile*>(selectedItem);
+        LotusLib::LotusPath internalPath = itemCasted->getQFullpath().toStdString();
+        this->extractFile(internalPath, itemCasted->getPkg());
+        this->ExtractButton->setEnabled(false);
     }
-
-    swapToCancelButton();
 }
 
 void

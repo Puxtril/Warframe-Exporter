@@ -11,6 +11,7 @@ UiPicker::setupUi(QDialog *WindowPicker)
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
     loadSettings();
+    loadVersion();
 }
 
 void
@@ -44,6 +45,13 @@ UiPicker::loadSettings()
     this->CheckboxExportLevels->setCheckState(settings.getExportLevels() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxExportMaterials->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxExportAudio->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
+}
+
+void
+UiPicker::loadVersion()
+{
+    QString version = std::string(g_version).c_str();
+    this->VersionLabel->setText(version);
 }
 
 void

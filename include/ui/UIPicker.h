@@ -4,6 +4,7 @@
 #include "ui/UIExporter.h"
 #include "Extractor.h"
 #include "ui/Settings.h"
+#include "Meta.h"
 
 #include <qdialog.h>
 #include <qmainwindow.h>
@@ -24,6 +25,7 @@ public:
 
 private:
     void loadSettings();
+    void loadVersion();
 
 signals:
     void pickerDone(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);

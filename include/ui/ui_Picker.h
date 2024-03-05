@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'PickerDTseyF.ui'
+** Form generated from reading UI file 'PickerIgIYkB.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef PICKERDTSEYF_H
-#define PICKERDTSEYF_H
+#ifndef PICKERIGIYKB_H
+#define PICKERIGIYKB_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -17,6 +17,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
@@ -56,13 +57,15 @@ public:
     QSpacerItem *BottomSpacer;
     QFrame *LoadButtonFrame;
     QHBoxLayout *horizontalLayout_3;
+    QLabel *VersionLabel;
     QPushButton *LoadButton;
+    QSpacerItem *horizontalSpacer_2;
 
     void setupUi(QDialog *WindowPicker)
     {
         if (WindowPicker->objectName().isEmpty())
             WindowPicker->setObjectName("WindowPicker");
-        WindowPicker->resize(459, 404);
+        WindowPicker->resize(465, 394);
         verticalLayout = new QVBoxLayout(WindowPicker);
         verticalLayout->setObjectName("verticalLayout");
         CacheWindowsFrame = new QGroupBox(WindowPicker);
@@ -221,11 +224,31 @@ public:
         LoadButtonFrame->setLineWidth(0);
         horizontalLayout_3 = new QHBoxLayout(LoadButtonFrame);
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
+        VersionLabel = new QLabel(LoadButtonFrame);
+        VersionLabel->setObjectName("VersionLabel");
+        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Ignored);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(VersionLabel->sizePolicy().hasHeightForWidth());
+        VersionLabel->setSizePolicy(sizePolicy3);
+        QFont font;
+        font.setPointSize(8);
+        VersionLabel->setFont(font);
+        VersionLabel->setTextFormat(Qt::PlainText);
+
+        horizontalLayout_3->addWidget(VersionLabel);
+
         LoadButton = new QPushButton(LoadButtonFrame);
         LoadButton->setObjectName("LoadButton");
+        LoadButton->setMinimumSize(QSize(100, 0));
         LoadButton->setMaximumSize(QSize(100, 16777215));
 
         horizontalLayout_3->addWidget(LoadButton);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_2);
 
 
         verticalLayout->addWidget(LoadButtonFrame);
@@ -270,6 +293,7 @@ public:
 #if QT_CONFIG(whatsthis)
         LoadButtonFrame->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Load the main window and begin browsing the internal files.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
+        VersionLabel->setText(QString());
         LoadButton->setText(QCoreApplication::translate("WindowPicker", "Load", nullptr));
     } // retranslateUi
 
@@ -281,4 +305,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // PICKERDTSEYF_H
+#endif // PICKERIGIYKB_H

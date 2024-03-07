@@ -3,9 +3,9 @@
 #include <filesystem>
 #include <set>
 
-#include <QTreeWidget>
-#include <QBrush>
-#include <QMessageBox>
+#include <QtWidgets/QTreeWidget>
+#include <QtGui/QBrush>
+#include <QtWidgets/QMessageBox>
 
 #include "LotusLib.h"
 #include "Extractor.h"

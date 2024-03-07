@@ -1,7 +1,4 @@
 #include "ui/ui.h"
-#include "ui/UIPicker.h"
-
-#include <qdialog.h>
 
 int main(int argc, char** argv)
 {

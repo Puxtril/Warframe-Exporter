@@ -6,11 +6,11 @@
 #include "ui/Settings.h"
 #include "Meta.h"
 
-#include <qdialog.h>
-#include <qmainwindow.h>
-#include <QMessageBox>
-#include <qtmetamacros.h>
-#include <qfiledialog.h>
+#include <QtWidgets/qdialog.h>
+#include <QtWidgets/qmainwindow.h>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/qtmetamacros.h>
+#include <QtWidgets/qfiledialog.h>
 
 class UiPicker : public QObject, private Ui_WindowPicker
 {

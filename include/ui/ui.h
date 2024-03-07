@@ -1,9 +1,9 @@
 #pragma once
 
 #include "ui/UIExporter.h"
-#include "ui/ui_Picker.h"
+#include "ui/UIPicker.h"
 
-#include <qmainwindow.h>
-#include <qapplication.h>
+#include <QtWidgets/qmainwindow.h>
+#include <QtWidgets/qapplication.h>
 
 int main(int argc, char** argv);

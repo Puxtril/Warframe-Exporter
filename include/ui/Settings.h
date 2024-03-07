@@ -3,9 +3,9 @@
 #include "Extractor.h"
 
 #include <filesystem>
-#include <qobject.h>
+#include <QtCore/qobject.h>
 #include <string>
-#include <QSettings>
+#include <QtCore/QSettings>
 
 class UiSettings : public QObject
 {

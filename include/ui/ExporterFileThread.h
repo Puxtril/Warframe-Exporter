@@ -5,7 +5,7 @@
 #include "LotusPath.h"
 #include "ExportSingleFile.h"
 
-#include <QThread>
+#include <QtCore/QThread>
 #include <string>
 #include <memory>
 

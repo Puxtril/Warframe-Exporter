@@ -5,7 +5,7 @@
 #include "LotusPath.h"
 #include "ui/BatchIteratorExportQt.h"
 
-#include <QThread>
+#include <QtCore/QThread>
 #include <string>
 #include <memory>
 

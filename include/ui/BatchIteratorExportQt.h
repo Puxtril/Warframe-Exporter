@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QProgressBar>
+#include <QtWidgets/QProgressBar>
 
 #include "BatchIteratorExport.h"
 #include "Ensmallening.hpp"

@@ -2,7 +2,7 @@
 
 #include "LotusLib.h"
 
-#include <QTreeWidget>
+#include <QtWidgets/QTreeWidget>
 
 class TreeItemDirectory : public QTreeWidgetItem
 {

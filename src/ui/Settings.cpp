@@ -87,10 +87,10 @@ UiSettings::getExportAudio() const
 void
 UiSettings::setSettings(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes)
 {
-    QString qCachePath = QString(cachePath.c_str());
+    QString qCachePath = QString(cachePath.string().c_str());
     m_settings.setValue(m_cacheWindowsKey, qCachePath);
 
-    QString qExportPath = QString(exportPath.c_str());
+    QString qExportPath = QString(exportPath.string().c_str());
     m_settings.setValue(m_exportPathKey, qExportPath);
 
     m_settings.setValue(m_checkboxViewTextures, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Texture) > 0);

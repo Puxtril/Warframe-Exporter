@@ -73,13 +73,13 @@ BatchIteratorDebug::printEnumCounts(LotusLib::PackageReader& pkg, const LotusLib
 			
 			// For the first 10 files, add directly into examples
 			if (enumExamples[curFile.commonHeader.type].size() < 10)
-				enumExamples[curFile.commonHeader.type].push_back(curFile.internalPath);
+				enumExamples[curFile.commonHeader.type].push_back(curFile.internalPath.string());
 			
 			// Every 10 new files, replace an existing example
 			else if (enumCounts[curFile.commonHeader.type] % 10 == 0)
 			{
 				int newIndex = enumCounts[curFile.commonHeader.type] % 100 / 10;
-				enumExamples[curFile.commonHeader.type][newIndex] = curFile.internalPath;
+				enumExamples[curFile.commonHeader.type][newIndex] = curFile.internalPath.string();
 			}
 		}
 		catch (LotusLib::DecompressionException&)

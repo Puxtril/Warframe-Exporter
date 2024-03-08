@@ -22,3 +22,6 @@
 [submodule "Binary-reader"]
 	path = lib/Binary-Reader
 	url = https://github.com/Puxtril/Binary-Reader.git
+[submodule "lib/qt5"]
+	path = lib/qt5
+	url = https://code.qt.io/qt/qt5.git

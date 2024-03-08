@@ -43,6 +43,7 @@ Download the latest from the Releases section. This is a CLI program, so open up
   * [nlohmann-json](https://github.com/nlohmann/json): Required by fx-gltf.
 * [glm](https://github.com/g-truc/glm): A helper library for models. Provides matrix and vector math operations.
 * [TCLAP](https://sourceforge.net/projects/tclap/): Command-line interface library
+* [Qt6](https://doc.qt.io/): GUI framework. 
 
 # ImHex Patterns
 
@@ -168,6 +169,7 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 # Building
 
 CMake is very nice and I love it. See how easy this is to compile?
+**EXCEPT THE UI**
 
 ## Requirements
 
@@ -182,9 +184,25 @@ CMake is very nice and I love it. See how easy this is to compile?
 
 ## Build Commands
 
-1. `git clone https://github.com/Puxtril/Warframe-Exporter.git`
-1. `cd Warframe-Exporter`
-1. `git submodule update --init --recursive`
-1. `mkdir build && cd build`
-1. `cmake ..`
-1. Linux: `make` Windows: `cmake --build . --config Release`
+1. `git clone https://github.com/Puxtril/Warframe-Exporter.git && cd Warframe-Exporter`
+1. Edit the first few lines of CMakeLists.txt to build what you want.
+1. Initilize the submodules
+	1. `cd lib`
+	1. `git submodule update --init Binary-Reader ddspp fx-gltf glm json LotusLib spdlog tclap-code qt5`
+	1. `cd qt5`
+	1. `git submodule update --init qtbase qttools qtdeclarative`
+	1. `cd qttools`
+	1. `git submodule update --init`
+	1. `cd ../../..`
+1. Build Qt
+	1. `mkdir build-qt && cd build-qt`
+	1. If you're running on Windows, run the rest of these commands from the MSVC shell (x64 Native Tools Command Prompt)
+	1. `../lib/qt5/configure -release -optimize-size -prefix "../lib/qt-install" -confirm-license`
+	1. `cmake --build . --parallel 4`
+	1. `cmake --install .`
+1. Build Warframe-Exporter
+	1. `mkdir build && cd build`
+	1. `cmake ..`
+	1. Linux: `make` Windows: `cmake --build . --config Release`
+1. Copy dependencies (Windows)
+	1. `../lib/qt-install/bin/windeployqt Warframe-Exporter.exe`

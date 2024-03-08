@@ -25,18 +25,16 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 ##################################################
-# Dumb Qt stuff
-
-if(COMPILE_WF_UI_EXE)
-	set(CMAKE_AUTOMOC ON)
-endif()
-
-##################################################
 # OS-based flags
+
+# Idk Qt wants these
+if (COMPILE_WF_UI_EXE AND MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus /permissive-")
+	add_definitions(-DUNICODE -D_UNICODE)
+endif()
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} /O2 /sdl /Oi /W3 /std:c++17")
-	add_definitions(-DUNICODE -D_UNICODE)
 elseif(UNIX)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -Wall")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -ggdb")
@@ -91,6 +89,7 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Oodle-2.9/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/include"
 )
 
 ##################################################
@@ -112,12 +111,32 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		find_library(OODLE_CORE NAMES oo2corelinux64_debug PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux)
 	endif()
 
+	# I'm finding Qt manually instead of just using find_package() (Which is not recommended)
+	# I continued running into errors trying to use that.
+	# I'm assuming this is due to compiling from source and not using Qt's installer.
 	if(COMPILE_WF_UI_EXE)
-		find_package(OpenGL REQUIRED)
-		find_package(Qt6 COMPONENTS Widgets Core Gui OpenGLWidgets REQUIRED)
+		# Auto-runs the Qt MOC tool
+		# Needed for those extra files inside WARFRAME_EXPORTER_UI_SOURCES
+		set(CMAKE_AUTOMOC ON)
+	
+		# This is simply to find MOC command
+		set(Qt6Core_VERSION_MAJOR 6)
+		set(Qt6Core_VERSION_MINOR 6)
+		find_package(Qt6 PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install" COMPONENTS Core REQUIRED)
+		
+		# Typically these would be auto-discovered by find_package()
+		find_library(Qt6Widgets NAMES Qt6Widgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+		find_library(Qt6Core NAMES Qt6Core PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+		find_library(Qt6Gui NAMES Qt6Gui PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+		find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_UI_SOURCES})
-		target_link_libraries(Warframe-Exporter Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets LotusLib ${OODLE_CORE})
+		target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGLWidgets} ${OODLE_CORE})
+		
+		# Application will launch CMD window if this isn't set
+		if (MSVC)
+			target_link_options(Warframe-Exporter PUBLIC /SUBSYSTEM:windows /ENTRY:mainCRTStartup)
+		endif()
 	endif()
 
 	if(COMPILE_WF_CLI_EXE)

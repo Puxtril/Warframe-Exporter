@@ -1,7 +1,4 @@
 #include "model/ModelConverter.h"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/vector_uint4_sized.hpp"
-#include <iterator>
 
 using namespace WarframeExporter::Model;
 
@@ -50,12 +47,13 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
         
         intNodes.push_back(newNode);
     }
-    // Prevent invinite loop, by default the top-most node has parent index of 0
+
+    // Prevent infinite loop, by default the top-most node has parent index of 0
     if (intNodes.size() > 1 && intNodes[0].parentIndex == 0)
         intNodes[0].parentIndex = -1;
     
-    std::vector<bool> bonesSetInverseBinds(intNodes.size(), false);
     // Set Inverse Binds for Weighted Bones
+    std::vector<bool> bonesSetInverseBinds(intNodes.size(), false);
     for (size_t x = 0; x < outHeader.weightedBones.size(); x++)
     {
         glm::mat4& matrix = extBody.reverseBinds[x];
@@ -197,16 +195,16 @@ ModelConverter::flipXAxis(ModelBodyExternal& extBody)
     // For rigged models
     for (auto& x : extBody.reverseBinds)
     {
-        x = glm::transpose(glm::scale(glm::transpose(x), { -1, 1, 1 }));
+        x = glm::transpose(glm::scale(glm::transpose(x), { 1, 1, -1 }));
     }
     for (auto& x : extBody.boneRotations)
     {
-        x.x *= -1;
-        x.y *= -1;
+        x.x *= -1.0f;
+        x.w *= -1.0f;
     }
     for (auto& x : extBody.bonePositions)
     {
-        x.x *= -1;
+        x.z *= -1.0f;
     }
     
     // For static models

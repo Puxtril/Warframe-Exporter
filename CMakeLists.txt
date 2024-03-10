@@ -111,27 +111,45 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		find_library(OODLE_CORE NAMES oo2corelinux64_debug PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Linux)
 	endif()
 
-	# I'm finding Qt manually instead of just using find_package() (Which is not recommended)
-	# I continued running into errors trying to use that.
-	# I'm assuming this is due to compiling from source and not using Qt's installer.
 	if(COMPILE_WF_UI_EXE)
 		# Auto-runs the Qt MOC tool
 		# Needed for those extra files inside WARFRAME_EXPORTER_UI_SOURCES
 		set(CMAKE_AUTOMOC ON)
-	
-		# This is simply to find MOC command
-		set(Qt6Core_VERSION_MAJOR 6)
-		set(Qt6Core_VERSION_MINOR 6)
-		find_package(Qt6 PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install" COMPONENTS Core REQUIRED)
-		
-		# Typically these would be auto-discovered by find_package()
-		find_library(Qt6Widgets NAMES Qt6Widgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
-		find_library(Qt6Core NAMES Qt6Core PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
-		find_library(Qt6Gui NAMES Qt6Gui PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
-		find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_UI_SOURCES})
-		target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGLWidgets} ${OODLE_CORE})
+
+		find_package(Qt6 QUIET COMPONENTS Widgets Core Gui OpenGLWidgets)
+
+		# Qt6 is installed on the system (Probably using a *nix package manager)
+		if (Qt6_FOUND)
+
+			# ezpz
+			target_link_libraries(Warframe-Exporter Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets LotusLib ${OODLE_CORE})
+			message(STATUS "Linked to Qt6 libraries installed on the system")
+
+		# Not found. Probably Windows. Requires building from source.
+		else()
+
+			# This is simply to find MOC command
+			set(Qt6Core_VERSION_MAJOR 6)
+			set(Qt6Core_VERSION_MINOR 6)
+			find_package(Qt6 NO_DEFAULT_PATH PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install" COMPONENTS Core)
+
+			if (Qt6_FOUND)
+			else()
+				message(FATAL_ERROR "Qt6 was not found inside \"${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install\" Please build from source using the instructions in README.md")
+			endif()
+			
+			# Typically these would be auto-discovered by find_package()
+			find_library(Qt6Widgets NAMES Qt6Widgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+			find_library(Qt6Core NAMES Qt6Core PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+			find_library(Qt6Gui NAMES Qt6Gui PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+			find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+
+			target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGLWidgets} ${OODLE_CORE})
+			message(STATUS "Linked to Qt6 libraries built locally")
+
+		endif()
 		
 		# Application will launch CMD window if this isn't set
 		if (MSVC)

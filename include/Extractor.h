@@ -20,7 +20,8 @@ namespace WarframeExporter
 		Material = 4,
 		VERTEX_COLOR = 8,
 		Level = 32,
-		Audio = 64
+		Audio = 64,
+		Shader = 128
 	};
 	
 	class Extractor : public EnumMapValue

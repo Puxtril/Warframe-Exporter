@@ -9,6 +9,7 @@ CLIDebug::CLIDebug()
 	m_debugMatCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-materials", "Attempts to read materials", false);
 	m_debugLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-levels", "Attempts to read levels", false);
 	m_debugAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-audio", "Attempts to read audios", false);
+	m_debugShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-shader", "Attempts to read shaders", false);
 }
 
 CLIDebug*
@@ -35,7 +36,8 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_debugModelCmd.get())
 		.add(m_debugMatCmd.get())
 		.add(m_debugLevelCmd.get())
-		.add(m_debugAudioCmd.get());
+		.add(m_debugAudioCmd.get())
+		.add(m_debugShaderCmd.get());
 }
 
 void
@@ -46,7 +48,7 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
 {
-	if (m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
+	if (m_debugShaderCmd->getValue() || m_debugAudioCmd->getValue() || m_debugMatCmd->getValue() || m_debugModelCmd->getValue() || m_debugTextCmd->getValue() || m_debugLevelCmd->getValue())
 	{
 		debug(cacheDirPath, pkgName, internalPath, outPath, ensmallening);
 	}
@@ -133,6 +135,8 @@ CLIDebug::debug(const std::filesystem::path& cacheDirPath, const std::string& pk
 		types |= (int)WarframeExporter::ExtractorType::Level;
 	if (m_debugAudioCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Audio;
+	if (m_debugShaderCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Shader;
 
 	std::vector<std::string> pkgNames;
 	if (pkgName.empty())
@@ -173,6 +177,12 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesys
 		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
 		pkgNames.push_back("Misc");
+	}
+	
+	if ((int)types & (int)WarframeExporter::ExtractorType::Shader)
+	{
+		pkgNames.push_back("ShaderDx11");
+		pkgNames.push_back("ShaderPermutationDx11");
 	}
 
 	return pkgNames;

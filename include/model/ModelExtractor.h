@@ -64,6 +64,9 @@ namespace WarframeExporter::Model
 
 		static ModelExtractor* getInstance();
 
+		void indexVertexColors(LotusLib::PackageReader& pkgs);
+		void cancelVertexColorIndexing();
+
 		void extractExternal(LotusLib::FileEntry& fileEntry, const Ensmallening& ensmalleningData, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
 		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg);
 

@@ -10,6 +10,18 @@ ModelExtractor::getInstance()
 }
 
 void
+ModelExtractor::indexVertexColors(LotusLib::PackageReader& pkgs)
+{
+	m_vertexColorIndexer.indexVertexColors(pkgs);
+}
+
+void
+ModelExtractor::cancelVertexColorIndexing()
+{
+	m_vertexColorIndexer.cancelIndexing();
+}
+
+void
 ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, const Ensmallening& ensmalleningData, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
 {
 	if (fileEntry.bData.getLength() == 0)

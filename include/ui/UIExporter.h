@@ -10,10 +10,14 @@
 #include "LotusLib.h"
 #include "Extractor.h"
 #include "LotusPath.h"
+
+#include "model/vertexcolor/VertexColorIndexer.h"
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
-#include "ui/ExporterDirectoryThread.h"
-#include "ui/ExporterFileThread.h"
+
+#include "ui/tasks/ExporterDirectoryThread.h"
+#include "ui/tasks/ExporterFileThread.h"
+#include "ui/tasks/IndexVertexColors.h"
 
 class UiExporter : private Ui_MainWindow, public QObject
 {
@@ -27,9 +31,11 @@ class UiExporter : private Ui_MainWindow, public QObject
     QBrush m_dirBrush;
     ExporterDirectoryThread m_exporterDirectoryThread;
     ExporterFileThread m_exporterFileThread;
+    IndexVertexColorsThread m_vertexColorIndexerThread;
 
 public:
     UiExporter();
+    ~UiExporter() override;
 
     void setup(QMainWindow *MainWindow);
 

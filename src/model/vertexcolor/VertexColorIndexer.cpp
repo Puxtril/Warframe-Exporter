@@ -1,10 +1,9 @@
 #include "model/vertexcolor/VertexColorIndexer.h"
-#include "LotusLib.h"
 
 using namespace WarframeExporter::Model::VertexColor;
 
 VertexColorIndexer::VertexColorIndexer()
-	: m_logger(Logger::getInstance())
+	: m_cancelIndexing(false), m_logger(Logger::getInstance())
 {}
 
 void
@@ -28,6 +27,19 @@ VertexColorIndexer::getModelColors(const LotusLib::LotusPath& modelPath, std::ve
 	}
 }
 
+void
+VertexColorIndexer::indexVertexColors(LotusLib::PackageReader& pkg)
+{
+	if (!isIndexed(pkg))
+		indexColors(pkg);
+}
+
+void
+VertexColorIndexer::cancelIndexing()
+{
+	m_cancelIndexing = true;
+}
+
 int
 VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
 {
@@ -35,6 +47,12 @@ VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
 
 	for (auto& curFile : pkg)
 	{
+		if (m_cancelIndexing)
+		{
+			m_cancelIndexing = false;
+			break;
+		}
+
 		// Sometimes the source path doesn't exist
 		// Which means the vertex color is useless...
 		// /Lotus/Objects/Tenno/Ships/PlayerShip/Structural/OperatorChairRoom/AirlockTransitionWallAB.vc

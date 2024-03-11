@@ -1,4 +1,4 @@
-#include "ui/ExporterDirectoryThread.h"
+#include "ui/tasks/ExporterDirectoryThread.h"
 
 ExporterDirectoryThread::ExporterDirectoryThread()
     : QThread()

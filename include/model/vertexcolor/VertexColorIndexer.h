@@ -30,6 +30,7 @@ namespace WarframeExporter::Model::VertexColor
 
 		using vertexColorData = std::vector<glm::u8vec4>;
 
+		bool m_cancelIndexing;
 		packageColors m_vertexColorMap;
 		Logger& m_logger;
 		
@@ -37,6 +38,8 @@ namespace WarframeExporter::Model::VertexColor
 		VertexColorIndexer();
 
 		void getModelColors(const LotusLib::LotusPath& modelPath, std::vector<vertexColorData>& outColors, LotusLib::PackageReader& pkg);
+		void indexVertexColors(LotusLib::PackageReader& pkg);
+		void cancelIndexing();
 
 	private:
 		int indexColors(LotusLib::PackageReader& pkg);

@@ -28,20 +28,20 @@ TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 	return TextureHeaderExternal{ enum1, enum2, enum3, enum4, width, height };
 }
 
-TextureBodyInternal
+std::vector<char>
 TextureReader::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderInternal& headerInternal, const Ensmallening& postEnsmallening)
 {
 	if (postEnsmallening.isPostPart1())
 	{
-		std::unique_ptr<char[]> data = std::make_unique<char[]>(bodyReader->getLength());
-		std::memcpy(data.get(), bodyReader->getPtr().data(), bodyReader->getLength());
-		return TextureBodyInternal{ std::move(data), bodyReader->getLength() };
+		std::vector<char> data(bodyReader->getLength());
+		std::memcpy(data.data(), bodyReader->getPtr().data(), bodyReader->getLength());
+		return data;
 	}
 	else
 	{
 		std::vector<uint8_t> rawData = bodyReader->getPtr();
-		std::unique_ptr<char[]> unSwizzled = std::make_unique<char[]>(bodyReader->getLength());
-		headerInternal.formatClass->unSwizzle((char*)rawData.data(), (int)bodyReader->getLength(), unSwizzled.get());
-		return TextureBodyInternal{std::move(unSwizzled), bodyReader->getLength()};
+		std::vector<char> unSwizzled(bodyReader->getLength());
+		headerInternal.formatClass->unSwizzle((char*)rawData.data(), (int)bodyReader->getLength(), unSwizzled.data());
+		return unSwizzled;
 	}
 }

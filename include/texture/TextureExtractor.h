@@ -77,7 +77,9 @@ namespace WarframeExporter::Texture
 		};
 
 		static TextureExtractor* getInstance();
-		static void writeData (const std::filesystem::path& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const LotusLib::CommonHeader& comHeader);
+
+		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData);
+		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;

@@ -7,15 +7,6 @@
 
 namespace WarframeExporter::Texture
 {
-	struct TextureHeaderInternal
-	{
-		TextureCompression formatEnum;
-		TextureInfo* formatClass;
-		int32_t mip0Len;
-		int16_t width;
-		int16_t height;
-	};
-
 	struct TextureHeaderExternal
 	{
 		uint8_t unkEnum1;
@@ -26,9 +17,26 @@ namespace WarframeExporter::Texture
 		int16_t heightBase;
 	};
 
+	struct TextureHeaderInternal
+	{
+		TextureCompression formatEnum;
+		TextureInfo* formatClass;
+		int32_t mip0Len;
+		int16_t width;
+		int16_t height;
+	};
+
+	struct TextureInternal
+	{
+		TextureHeaderInternal header;
+		std::vector<char> body;
+	};
+
+	/*
 	struct TextureBodyInternal
 	{
 		std::unique_ptr<char[]> data;
 		size_t dataLen;
 	};
+	*/
 }

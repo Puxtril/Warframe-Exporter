@@ -9,62 +9,36 @@ MaterialExtractor::getInstance()
 	return instance;
 }
 
-void
-MaterialExtractor::getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths)
+MaterialExternal
+MaterialExtractor::getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
-	uint32_t pathCount = headerReader->readUInt32();
-	for (uint32_t x = 0; x < pathCount; x++)
-	{
-		uint32_t nameLen = headerReader->readUInt32();
-		std::string name = headerReader->readAsciiString(nameLen);
-		outPaths.push_back(name);
-	}
+	MaterialReader* reader = g_enumMapMaterial[commonHeader.type];
+	MaterialExternal external = reader->readData(headerReader, commonHeader);
+	return external;
 }
 
-std::vector<std::string>
-MaterialExtractor::getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader)
+MaterialInternal
+MaterialExtractor::formatMaterial(const MaterialExternal& materialExternal)
 {
-	std::vector<std::string> outPaths;
-	for (int x = 0; x < 3; x++)
-	{
-		uint32_t nameLen = headerReader->readUInt32();
-		std::string name = headerReader->readAsciiString(nameLen);
-		outPaths.push_back(name);
-	}
-	return outPaths;
+	MaterialInternal internal = MaterialConverter::convertMaterial(materialExternal);
+	return internal;
+}
+
+void
+MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath)
+{
+	std::ofstream out;
+	out.open(outputPath, std::ios::out | std::ofstream::trunc);
+	out.write(materialInternal.formatted.c_str(), materialInternal.formatted.size());
+	out.close();
 }
 
 void
 MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
-	std::ofstream out;
-	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-	
-	out.write(fileEntry.commonHeader.attributes.c_str(), fileEntry.commonHeader.attributes.length());
-
-	if (fileEntry.commonHeader.type == (int)MaterialType::MATERIAL_214 ||
-		fileEntry.commonHeader.type == (int)MaterialType::MATERIAL_216)
-	{
-		std::vector<std::string> threeTextures = getHlm3Textures(&fileEntry.headerData);
-		out.write("\nHLM Textures:\n", 15);
-		for (const auto& name : threeTextures)
-		{
-			out.write(name.c_str(), name.length());
-			out.write("\n", 1);
-		}
-	}
-	
-	std::vector<std::string> extraNames;
-	getExtraNames(&fileEntry.headerData, extraNames);
-
-	out.write("\n", 1);
-	for (const auto& name : extraNames)
-	{
-		out.write(name.c_str(), name.length());
-		out.write("\n", 1);
-	}
-
-	out.close();
+	MaterialExternal external = getExternalMaterial(&fileEntry.headerData, fileEntry.commonHeader);
+	MaterialInternal internal = formatMaterial(external);
+	writeOut(internal, outputPath);
 }
 
 void

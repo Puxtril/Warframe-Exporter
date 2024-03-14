@@ -2,20 +2,13 @@
 
 #include "Extractor.h"
 #include "BinaryReaderBuffered.h"
+#include "material/MaterialTypes.h"
+#include "material/MaterialStructs.h"
+#include "material/MaterialEnumMap.h"
+#include "material/MaterialConverter.h"
 
 namespace WarframeExporter::Material
 {
-	enum class MaterialType
-	{
-		MATERIAL_203 = 203,
-		MATERIAL_204 = 204,
-		MATERIAL_205 = 205,
-		MATERIAL_206 = 206,
-		MATERIAL_208 = 208,
-		MATERIAL_214 = 214,
-		MATERIAL_216 = 216
-	};
-
 	class MaterialExtractor : public Extractor
 	{
 		MaterialExtractor() : Extractor() {}
@@ -58,8 +51,10 @@ namespace WarframeExporter::Material
 
 		static MaterialExtractor* getInstance();
 
-		std::vector<std::string> getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader);
-		void getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths);
+		MaterialExternal getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
+		MaterialInternal formatMaterial(const MaterialExternal& materialExternal);
+		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath);
+
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
 	};

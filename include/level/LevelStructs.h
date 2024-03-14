@@ -33,6 +33,12 @@ namespace WarframeExporter::Level
 	{
 		std::vector<std::string> attributes;
 	};
+
+	struct LevelExternal
+	{
+		LevelHeaderExternal header;
+		LevelBodyExternal body;
+	};
 	
 	struct LevelObjectInternal
 	{

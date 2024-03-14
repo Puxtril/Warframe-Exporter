@@ -9,24 +9,35 @@ LevelExtractor::getInstance()
 	return instance;
 }
 
-void
-LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+LevelExternal
+LevelExtractor::getLevelExternal(LotusLib::FileEntry& fileEntry)
 {
 	LevelReader* levelReader = g_enumMapLevel[fileEntry.commonHeader.type];
 	
-	LevelHeaderExternal headerExt;
-	LevelBodyExternal bodyExt;
-	levelReader->readHeader(fileEntry.headerData, headerExt);
-	levelReader->readBody(fileEntry.bData, headerExt, bodyExt);
+	LevelExternal external;
+	levelReader->readHeader(fileEntry.headerData, external.header);
+	levelReader->readBody(fileEntry.bData, external.header, external.body);
 
+	return external;
+}
+
+LevelInternal
+LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal)
+{
 	LevelInternal bodyInt;
-	LevelConverter::convertToInternal(headerExt, bodyExt, fileEntry.internalPath, bodyInt);
-	m_logger.info("Level mesh count: " + std::to_string(bodyInt.objs.size()));
+	LevelConverter::convertToInternal(levelExternal.header, levelExternal.body, fileEntry.internalPath, bodyInt);
+	return bodyInt;
+}
 
-	LevelExporterGltf gltfOut;
+void
+LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+{
+	LevelExternal levelExt = getLevelExternal(fileEntry);
+	LevelInternal levelInt = convertToInternal(fileEntry, levelExt);
 
-	createGltfCombined(pkgs, ensmalleningData, bodyInt, gltfOut);
+	m_logger.info("Level mesh count: " + std::to_string(levelInt.objs.size()));
 
+	LevelExporterGltf gltfOut = createGltfCombined(pkgs, ensmalleningData, levelInt);
 	gltfOut.save(outputPath);
 }
 
@@ -37,9 +48,11 @@ LevelExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 	levelReader->readHeaderDebug(fileEntry.headerData);
 }
 
-void
-LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf)
+LevelExporterGltf
+LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt)
 {
+	LevelExporterGltf outGltf;
+
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc");
 
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
@@ -91,4 +104,6 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 			continue;
 		}
 	}
+
+	return outGltf;
 }

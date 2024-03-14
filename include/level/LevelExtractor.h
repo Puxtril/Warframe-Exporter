@@ -50,10 +50,13 @@ namespace WarframeExporter::Level
 
 		static LevelExtractor* getInstance();
 
+		LevelExternal getLevelExternal(LotusLib::FileEntry& fileEntry);
+		LevelInternal convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal);
+		LevelExporterGltf createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt);
+
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
 	
 	private:
-		void createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf);
 	};
 }

@@ -1,16 +1,12 @@
 #pragma once
 
 #include "Extractor.h"
+#include "shader/ShaderStructs.h"
+#include "shader/ShaderTypes.h"
+#include "shader/ShaderEnumMap.h"
 
 namespace WarframeExporter::Shader
 {
-    enum class ShaderType
-    {
-        SHADER_18 = 18,
-        SHADER_21 = 21,
-        SHADER_26 = 26
-    };
-
     class ShaderExtractor : public Extractor
     {
         ShaderExtractor() : Extractor() {}
@@ -30,6 +26,11 @@ namespace WarframeExporter::Shader
             const static std::string ext = "hlsl";
 			return ext;
         }
+		
+		inline bool isMultiExport() const override
+		{
+			return true;
+		}
 
 		inline ExtractorType getExtractorType() const override
         {
@@ -49,7 +50,14 @@ namespace WarframeExporter::Shader
 
         static ShaderExtractor* getInstance();
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
+        ShaderHeaderExternal getHeader(LotusLib::FileEntry& fileEntry);
+
+        ShaderEntry readEntry(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header, int index);
+        std::vector<ShaderEntry> readAllEntries(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header);
+
+        void writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex = 0);
+
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputDir) override;
 		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
     };
 }

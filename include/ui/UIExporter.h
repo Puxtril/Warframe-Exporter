@@ -14,6 +14,7 @@
 #include "model/vertexcolor/VertexColorIndexer.h"
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
+#include "ui/preview/PreviewManager.h"
 
 #include "ui/tasks/ExporterDirectoryThread.h"
 #include "ui/tasks/ExporterFileThread.h"
@@ -32,6 +33,7 @@ class UiExporter : private Ui_MainWindow, public QObject
     ExporterDirectoryThread m_exporterDirectoryThread;
     ExporterFileThread m_exporterFileThread;
     IndexVertexColorsThread m_vertexColorIndexerThread;
+    PreviewManager m_previewManager;
 
 public:
     UiExporter();
@@ -48,7 +50,9 @@ private:
     void setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeWidgetItem* parentWidget);
 
     void clearMetaData();
+    void clearPreview();
     void setMetadata(TreeItemFile* file);
+    void setPreview(TreeItemFile* file);
 
     void extractDirectory(LotusLib::LotusPath internalPath);
     void extractFile(LotusLib::LotusPath internalPath, const std::string& pkgName);

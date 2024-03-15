@@ -29,28 +29,13 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="Preview">
          <attribute name="title">
           <string>Preview</string>
          </attribute>
-         <widget class="QOpenGLWidget" name="openGLWidget">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>70</y>
-            <width>300</width>
-            <height>200</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_3"/>
         </widget>
         <widget class="QWidget" name="Details">
          <attribute name="title">

@@ -1,16 +1,15 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExporterKtMZna.ui'
+** Form generated from reading UI file 'ExporteraQNVAf.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTERKTMZNA_H
-#define EXPORTERKTMZNA_H
+#ifndef EXPORTERAQNVAF_H
+#define EXPORTERAQNVAF_H
 
 #include <QtCore/QVariant>
-#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
@@ -37,7 +36,7 @@ public:
     QTreeWidget *treeWidget;
     QTabWidget *tabWidget;
     QWidget *Preview;
-    QOpenGLWidget *openGLWidget;
+    QVBoxLayout *verticalLayout_3;
     QWidget *Details;
     QVBoxLayout *verticalLayout;
     QSpacerItem *verticalSpacer_2;
@@ -88,14 +87,8 @@ public:
         tabWidget->setObjectName("tabWidget");
         Preview = new QWidget();
         Preview->setObjectName("Preview");
-        openGLWidget = new QOpenGLWidget(Preview);
-        openGLWidget->setObjectName("openGLWidget");
-        openGLWidget->setGeometry(QRect(0, 70, 300, 200));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(openGLWidget->sizePolicy().hasHeightForWidth());
-        openGLWidget->setSizePolicy(sizePolicy);
+        verticalLayout_3 = new QVBoxLayout(Preview);
+        verticalLayout_3->setObjectName("verticalLayout_3");
         tabWidget->addTab(Preview, QString());
         Details = new QWidget();
         Details->setObjectName("Details");
@@ -109,11 +102,11 @@ public:
         NameContainer->setObjectName("NameContainer");
         NameLabel = new QLabel(Details);
         NameLabel->setObjectName("NameLabel");
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(NameLabel->sizePolicy().hasHeightForWidth());
-        NameLabel->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(NameLabel->sizePolicy().hasHeightForWidth());
+        NameLabel->setSizePolicy(sizePolicy);
         NameLabel->setMinimumSize(QSize(80, 30));
         NameLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -121,11 +114,11 @@ public:
 
         NameData = new QLabel(Details);
         NameData->setObjectName("NameData");
-        QSizePolicy sizePolicy2(QSizePolicy::Ignored, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(NameData->sizePolicy().hasHeightForWidth());
-        NameData->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(NameData->sizePolicy().hasHeightForWidth());
+        NameData->setSizePolicy(sizePolicy1);
         NameData->setAlignment(Qt::AlignCenter);
 
         NameContainer->addWidget(NameData);
@@ -137,8 +130,8 @@ public:
         FullPathContainer->setObjectName("FullPathContainer");
         FullPathLabel = new QLabel(Details);
         FullPathLabel->setObjectName("FullPathLabel");
-        sizePolicy1.setHeightForWidth(FullPathLabel->sizePolicy().hasHeightForWidth());
-        FullPathLabel->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(FullPathLabel->sizePolicy().hasHeightForWidth());
+        FullPathLabel->setSizePolicy(sizePolicy);
         FullPathLabel->setMinimumSize(QSize(80, 30));
         FullPathLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -146,8 +139,8 @@ public:
 
         FullPathData = new QLabel(Details);
         FullPathData->setObjectName("FullPathData");
-        sizePolicy2.setHeightForWidth(FullPathData->sizePolicy().hasHeightForWidth());
-        FullPathData->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(FullPathData->sizePolicy().hasHeightForWidth());
+        FullPathData->setSizePolicy(sizePolicy1);
         FullPathData->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         FullPathContainer->addWidget(FullPathData);
@@ -159,8 +152,8 @@ public:
         SizeContainer->setObjectName("SizeContainer");
         SizeLabel = new QLabel(Details);
         SizeLabel->setObjectName("SizeLabel");
-        sizePolicy1.setHeightForWidth(SizeLabel->sizePolicy().hasHeightForWidth());
-        SizeLabel->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(SizeLabel->sizePolicy().hasHeightForWidth());
+        SizeLabel->setSizePolicy(sizePolicy);
         SizeLabel->setMinimumSize(QSize(80, 30));
         SizeLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -168,8 +161,8 @@ public:
 
         SizeData = new QLabel(Details);
         SizeData->setObjectName("SizeData");
-        sizePolicy2.setHeightForWidth(SizeData->sizePolicy().hasHeightForWidth());
-        SizeData->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(SizeData->sizePolicy().hasHeightForWidth());
+        SizeData->setSizePolicy(sizePolicy1);
         SizeData->setAlignment(Qt::AlignCenter);
 
         SizeContainer->addWidget(SizeData);
@@ -181,8 +174,8 @@ public:
         CompressedLengthContainer->setObjectName("CompressedLengthContainer");
         CompressedLengthLabel = new QLabel(Details);
         CompressedLengthLabel->setObjectName("CompressedLengthLabel");
-        sizePolicy1.setHeightForWidth(CompressedLengthLabel->sizePolicy().hasHeightForWidth());
-        CompressedLengthLabel->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(CompressedLengthLabel->sizePolicy().hasHeightForWidth());
+        CompressedLengthLabel->setSizePolicy(sizePolicy);
         CompressedLengthLabel->setMinimumSize(QSize(80, 30));
         CompressedLengthLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -190,8 +183,8 @@ public:
 
         CompressedLengthData = new QLabel(Details);
         CompressedLengthData->setObjectName("CompressedLengthData");
-        sizePolicy2.setHeightForWidth(CompressedLengthData->sizePolicy().hasHeightForWidth());
-        CompressedLengthData->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(CompressedLengthData->sizePolicy().hasHeightForWidth());
+        CompressedLengthData->setSizePolicy(sizePolicy1);
         CompressedLengthData->setAlignment(Qt::AlignCenter);
 
         CompressedLengthContainer->addWidget(CompressedLengthData);
@@ -203,8 +196,8 @@ public:
         TimestampContainer->setObjectName("TimestampContainer");
         TimestampLabel = new QLabel(Details);
         TimestampLabel->setObjectName("TimestampLabel");
-        sizePolicy1.setHeightForWidth(TimestampLabel->sizePolicy().hasHeightForWidth());
-        TimestampLabel->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(TimestampLabel->sizePolicy().hasHeightForWidth());
+        TimestampLabel->setSizePolicy(sizePolicy);
         TimestampLabel->setMinimumSize(QSize(80, 30));
         TimestampLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -212,8 +205,8 @@ public:
 
         TimestampData = new QLabel(Details);
         TimestampData->setObjectName("TimestampData");
-        sizePolicy2.setHeightForWidth(TimestampData->sizePolicy().hasHeightForWidth());
-        TimestampData->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(TimestampData->sizePolicy().hasHeightForWidth());
+        TimestampData->setSizePolicy(sizePolicy1);
         TimestampData->setAlignment(Qt::AlignCenter);
 
         TimestampContainer->addWidget(TimestampData);
@@ -225,8 +218,8 @@ public:
         PackageContainer->setObjectName("PackageContainer");
         PackageLabel = new QLabel(Details);
         PackageLabel->setObjectName("PackageLabel");
-        sizePolicy1.setHeightForWidth(PackageLabel->sizePolicy().hasHeightForWidth());
-        PackageLabel->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(PackageLabel->sizePolicy().hasHeightForWidth());
+        PackageLabel->setSizePolicy(sizePolicy);
         PackageLabel->setMinimumSize(QSize(80, 30));
         PackageLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -234,8 +227,8 @@ public:
 
         PackageData = new QLabel(Details);
         PackageData->setObjectName("PackageData");
-        sizePolicy2.setHeightForWidth(PackageData->sizePolicy().hasHeightForWidth());
-        PackageData->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(PackageData->sizePolicy().hasHeightForWidth());
+        PackageData->setSizePolicy(sizePolicy1);
         PackageData->setAlignment(Qt::AlignCenter);
 
         PackageContainer->addWidget(PackageData);
@@ -265,8 +258,8 @@ public:
         horizontalLayout_2->setContentsMargins(-1, -1, 0, -1);
         ExtractButton = new QPushButton(frame);
         ExtractButton->setObjectName("ExtractButton");
-        sizePolicy1.setHeightForWidth(ExtractButton->sizePolicy().hasHeightForWidth());
-        ExtractButton->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(ExtractButton->sizePolicy().hasHeightForWidth());
+        ExtractButton->setSizePolicy(sizePolicy);
         ExtractButton->setCheckable(false);
         ExtractButton->setChecked(false);
         ExtractButton->setFlat(false);
@@ -296,7 +289,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
         ExtractButton->setDefault(false);
 
 
@@ -326,6 +319,7 @@ public:
 #if QT_CONFIG(shortcut)
         ExtractButton->setShortcut(QString());
 #endif // QT_CONFIG(shortcut)
+        ExtractProgressBar->setFormat(QCoreApplication::translate("MainWindow", "%p%", nullptr));
     } // retranslateUi
 
 };
@@ -336,4 +330,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTERKTMZNA_H
+#endif // EXPORTERAQNVAF_H

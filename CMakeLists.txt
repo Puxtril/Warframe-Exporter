@@ -69,6 +69,7 @@ file(GLOB WARFRAME_EXPORTER_CLI_SOURCES CONFIGURE_DEPENDS
 
 file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/preview/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/tasks/*.cpp
 	# Since these objects define signals, they need the Q_OBJECT macro
 	#   And since they have this macro, they need to be picked up by Moc (Auto mode)

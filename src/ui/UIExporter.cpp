@@ -35,6 +35,8 @@ UiExporter::setup(QMainWindow *MainWindow)
     connect(&m_exporterFileThread, &ExporterFileThread::extractError, this, &UiExporter::extractError);
     connect(&m_exporterFileThread, &ExporterFileThread::extractItemComplete, this, &UiExporter::extractItemComplete);
     connect(&m_exporterFileThread, &ExporterFileThread::extractComplete, this, &UiExporter::extractComplete);
+
+    m_previewManager.setupUis(this->Preview, this->verticalLayout_3);
 }
 
 void
@@ -197,6 +199,12 @@ UiExporter::clearMetaData()
 }
 
 void
+UiExporter::clearPreview()
+{
+    m_previewManager.clearPreview();
+}
+
+void
 UiExporter::setMetadata(TreeItemFile* file)
 {
     this->NameData->setText(file->getQName());
@@ -205,6 +213,13 @@ UiExporter::setMetadata(TreeItemFile* file)
     this->CompressedLengthData->setText(file->getQCompressedSize());
     this->TimestampData->setText(file->getQTimestamp());
     this->PackageData->setText(file->getQPkg());
+}
+
+void
+UiExporter::setPreview(TreeItemFile* file)
+{
+    LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).getFile(file->getQFullpath().toStdString());
+    m_previewManager.swapToFilePreview(fileEntry);
 }
 
 void
@@ -277,12 +292,14 @@ UiExporter::itemClicked(QTreeWidgetItem *item, int column)
     if (itemType == TreeItemDirectory::QTreeWidgetItemType)
     {
         this->clearMetaData();
+        this->clearPreview();
     }
 
     else if (itemType == TreeItemFile::QTreeWidgetItemType)
     {
         TreeItemFile* itemFile = static_cast<TreeItemFile*>(item);
         setMetadata(itemFile);
+        setPreview(itemFile);
     }
 }
 

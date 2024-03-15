@@ -43,6 +43,11 @@ namespace WarframeExporter::Texture
 			static std::string outFileExt = "dds";
 			return outFileExt;
 		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
 
 		inline const std::string& getFriendlyName() const override
 		{

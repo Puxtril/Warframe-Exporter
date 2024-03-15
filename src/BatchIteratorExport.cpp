@@ -10,17 +10,30 @@ BatchIteratorExport::BatchIteratorExport(const std::filesystem::path& pkgsDir, c
 void
 BatchIteratorExport::processKnownFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, Extractor* extractor)
 {
-	std::filesystem::path savePath = m_outExportPath / fileEntry.internalPath.getPreferredPath().relative_path();
-	savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
+	std::filesystem::path savePath;
 
-	if (existingFileIdentical(fileEntry, savePath))
+	if (extractor->isMultiExport())
 	{
-		m_logger.info("Identical file time, skipping: " + fileEntry.internalPath.string());
-		return;
-	}
+		savePath = m_outExportPath / fileEntry.internalPath.getPreferredPath().relative_path();
+		savePath.replace_extension("");
 
-	if (!std::filesystem::exists(savePath.parent_path()))
-		std::filesystem::create_directories(savePath.parent_path());
+		if (!std::filesystem::exists(savePath))
+			std::filesystem::create_directories(savePath);
+	}
+	else
+	{
+		savePath = m_outExportPath / fileEntry.internalPath.getPreferredPath().relative_path();
+		savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
+
+		if (existingFileIdentical(fileEntry, savePath))
+		{
+			m_logger.info("Identical file time, skipping: " + fileEntry.internalPath.string());
+			return;
+		}
+
+		if (!std::filesystem::exists(savePath.parent_path()))
+			std::filesystem::create_directories(savePath.parent_path());
+	}
 
 	try
 	{

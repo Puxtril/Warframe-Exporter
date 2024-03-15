@@ -29,6 +29,11 @@ namespace WarframeExporter::Material
 			const static std::string outFileExt = "txt";
 			return outFileExt;
 		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
 
 		inline const std::string& getFriendlyName() const override
 		{

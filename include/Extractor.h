@@ -34,6 +34,9 @@ namespace WarframeExporter
 	public:
 		virtual const std::string& getFriendlyName() const = 0;
 		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const = 0;
+		// If true, `outputPath` in `extract` will be a folder.
+		// Otherwise, will be a file with the correct extension
+		virtual bool isMultiExport() const = 0;
 		virtual ExtractorType getExtractorType() const = 0;
 		virtual void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) = 0;
 		virtual void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) = 0;

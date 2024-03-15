@@ -301,7 +301,11 @@ UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path expor
     m_vertexColorIndexerThread.setData(&m_packages);
 
     if (((int)m_extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0)
+    {
+        // Avoid race condition
+        m_packages.getPackage("Misc").getDirMeta("/");
         m_vertexColorIndexerThread.start();
+    }
 
     setupTree();
 }

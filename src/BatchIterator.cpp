@@ -18,6 +18,9 @@ BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vect
 	for (const std::string& curPackageName : packages)
 	{
 		LotusLib::PackageReader curPkg = m_package.getPackage(curPackageName);
+		
+		if (!pkgHasDir(curPkg, basePath))
+			continue;
 
 		for (auto iter = curPkg.getIter(basePath); iter != curPkg.getIter(); iter++)
 		{
@@ -64,5 +67,19 @@ BatchIterator::validatePackages(const std::vector<std::string>& packages)
 			m_logger.error("Package does not exist: " + curPkgStr);
 			throw std::runtime_error("Package does not exist: " + curPkgStr);
 		}
+	}
+}
+
+bool
+BatchIterator::pkgHasDir(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& path)
+{
+	try
+	{
+		pkg.getDirMeta(path);
+		return true;
+	}
+	catch (std::exception&)
+	{
+		return false;
 	}
 }

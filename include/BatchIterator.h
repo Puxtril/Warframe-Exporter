@@ -34,5 +34,6 @@ namespace WarframeExporter
 		virtual void processSkipFile(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const Extractor* extractor) = 0;
 
 		void validatePackages(const std::vector<std::string>& packages);
+		bool pkgHasDir(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& path);
 	};
 }

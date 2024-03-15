@@ -7,6 +7,7 @@
 #include "material/MaterialExtractor.h"
 #include "level/LevelExtractor.h"
 #include "audio/AudioExtractorProxy.h"
+#include "shader/ShaderExtractor.h"
 
 namespace WarframeExporter
 {
@@ -15,5 +16,6 @@ namespace WarframeExporter
 		.registerClass(Texture::TextureExtractor::getInstance())
 		.registerClass(Material::MaterialExtractor::getInstance())
 		.registerClass(Level::LevelExtractor::getInstance())
-		.registerClass(Audio::AudioExtractorProxy::getInstance());
+		.registerClass(Audio::AudioExtractorProxy::getInstance())
+		.registerClass(Shader::ShaderExtractor::getInstance());
 }

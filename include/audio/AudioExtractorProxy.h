@@ -27,6 +27,11 @@ namespace WarframeExporter::Audio
 			return type;
 		}
 
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
+
 		inline std::vector<int> getEnumMapKeys() const override
 		{
 			const static std::vector<int> extTypes = {

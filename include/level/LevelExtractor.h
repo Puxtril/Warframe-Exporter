@@ -27,6 +27,11 @@ namespace WarframeExporter::Level
 			static std::string outFileExt = "glb";
 			return outFileExt;
 		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
 
 		inline const std::string& getFriendlyName() const override
 		{

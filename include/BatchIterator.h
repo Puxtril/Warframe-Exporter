@@ -53,5 +53,6 @@ namespace WarframeExporter
 		) = 0;
 
 		void validatePackages(LotusLib::PackagesReader& pkgsDir, const std::vector<std::string>& packages);
+		bool pkgHasDir(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& path);
 	};
 }

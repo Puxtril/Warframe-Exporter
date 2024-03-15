@@ -10,8 +10,20 @@ BatchIteratorExport::BatchIteratorExport()
 void
 BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
-	std::filesystem::path savePath = outputPath / "Export" / fileEntry.internalPath.getPreferredPath().relative_path();
-	savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
+	std::filesystem::path savePath;
+
+	if (extractor->isMultiExport())
+	{
+		savePath = outputPath / fileEntry.internalPath.getPreferredPath().relative_path();
+		savePath.replace_extension("");
+
+		if (!std::filesystem::exists(savePath))
+			std::filesystem::create_directories(savePath);
+	}
+	else
+	{
+		savePath = outputPath / fileEntry.internalPath.getPreferredPath().relative_path();
+		savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
 
 	if (existingFileIdentical(fileEntry.metadata.getTimeStamp(), savePath))
 	{
@@ -19,8 +31,9 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 		return;
 	}
 
-	if (!std::filesystem::exists(savePath.parent_path()))
-		std::filesystem::create_directories(savePath.parent_path());
+		if (!std::filesystem::exists(savePath.parent_path()))
+			std::filesystem::create_directories(savePath.parent_path());
+	}
 
 	try
 	{

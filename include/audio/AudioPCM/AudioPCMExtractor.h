@@ -24,6 +24,11 @@ namespace WarframeExporter::Audio {
 			static ExtractorType type = ExtractorType::Audio;
 			return type;
 		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
 
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
 		{

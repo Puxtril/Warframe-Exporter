@@ -9,7 +9,7 @@ CLIDebug::CLIDebug()
 	m_debugMatCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-materials", "Attempts to read materials", false);
 	m_debugLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-levels", "Attempts to read levels", false);
 	m_debugAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-audio", "Attempts to read audios", false);
-	m_debugShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-shader", "Attempts to read shaders", false);
+	m_debugShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "debug-shaders", "Attempts to read shaders", false);
 }
 
 CLIDebug*

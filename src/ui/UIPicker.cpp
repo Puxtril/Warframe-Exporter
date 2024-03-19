@@ -39,12 +39,14 @@ UiPicker::loadSettings()
     this->CheckboxViewLevels->setCheckState(settings.getViewLevels() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxViewMaterials->setCheckState(settings.getViewMaterials() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxViewAudio->setCheckState(settings.getViewAudio() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxViewShaders->setCheckState(settings.getViewShaders() ? Qt::Checked : Qt::Unchecked);
 
     this->CheckboxExportTextures->setCheckState(settings.getExportTextures() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxExportModels->setCheckState(settings.getExportModels() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxExportLevels->setCheckState(settings.getExportLevels() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxExportMaterials->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
     this->CheckboxExportAudio->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
+    this->CheckboxExportShaders->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
 }
 
 void
@@ -91,6 +93,8 @@ UiPicker::parsePickerOptions()
         viewTypes |= (int)WarframeExporter::ExtractorType::Model;
     if (this->CheckboxViewTextures->isChecked())
         viewTypes |= (int)WarframeExporter::ExtractorType::Texture;
+    if (this->CheckboxViewShaders->isChecked())
+        viewTypes |= (int)WarframeExporter::ExtractorType::Shader;
 
     if (viewTypes == 0)
     {
@@ -113,6 +117,8 @@ UiPicker::parsePickerOptions()
         exportTypes |= (int)WarframeExporter::ExtractorType::Model;
     if (this->CheckboxExportTextures->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Texture;
+    if (this->CheckboxExportShaders->isChecked())
+        exportTypes |= (int)WarframeExporter::ExtractorType::Shader;
 
     if (exportTypes == 0)
     {

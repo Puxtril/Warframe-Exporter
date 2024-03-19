@@ -168,6 +168,13 @@
           </property>
          </widget>
         </item>
+        <item row="3" column="1">
+         <widget class="QCheckBox" name="CheckboxViewShaders">
+          <property name="text">
+           <string>Shaders</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -261,6 +268,13 @@
          <widget class="QCheckBox" name="CheckboxExportAudio">
           <property name="text">
            <string>Audio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QCheckBox" name="CheckboxExportShaders">
+          <property name="text">
+           <string>Shaders</string>
           </property>
          </widget>
         </item>

@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'PickerIgIYkB.ui'
+** Form generated from reading UI file 'PickerXNRkFX.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef PICKERIGIYKB_H
-#define PICKERIGIYKB_H
+#ifndef PICKERXNRKFX_H
+#define PICKERXNRKFX_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -46,6 +46,7 @@ public:
     QCheckBox *CheckboxViewTextures;
     QCheckBox *CheckboxViewMaterials;
     QCheckBox *CheckboxViewAudio;
+    QCheckBox *CheckboxViewShaders;
     QSpacerItem *horizontalSpacer;
     QGroupBox *PackagesExportFrame;
     QGridLayout *gridLayout_3;
@@ -54,6 +55,7 @@ public:
     QCheckBox *CheckboxExportTextures;
     QCheckBox *CheckboxExportMaterials;
     QCheckBox *CheckboxExportAudio;
+    QCheckBox *CheckboxExportShaders;
     QSpacerItem *BottomSpacer;
     QFrame *LoadButtonFrame;
     QHBoxLayout *horizontalLayout_3;
@@ -159,6 +161,11 @@ public:
 
         gridLayout->addWidget(CheckboxViewAudio, 3, 0, 1, 1);
 
+        CheckboxViewShaders = new QCheckBox(PackagesViewFrame);
+        CheckboxViewShaders->setObjectName("CheckboxViewShaders");
+
+        gridLayout->addWidget(CheckboxViewShaders, 3, 1, 1, 1);
+
 
         horizontalLayout_2->addWidget(PackagesViewFrame);
 
@@ -205,6 +212,11 @@ public:
         CheckboxExportAudio->setObjectName("CheckboxExportAudio");
 
         gridLayout_3->addWidget(CheckboxExportAudio, 3, 0, 1, 1);
+
+        CheckboxExportShaders = new QCheckBox(PackagesExportFrame);
+        CheckboxExportShaders->setObjectName("CheckboxExportShaders");
+
+        gridLayout_3->addWidget(CheckboxExportShaders, 3, 1, 1, 1);
 
 
         horizontalLayout_2->addWidget(PackagesExportFrame);
@@ -281,6 +293,7 @@ public:
         CheckboxViewTextures->setText(QCoreApplication::translate("WindowPicker", "Textures", nullptr));
         CheckboxViewMaterials->setText(QCoreApplication::translate("WindowPicker", "Materials", nullptr));
         CheckboxViewAudio->setText(QCoreApplication::translate("WindowPicker", "Audio", nullptr));
+        CheckboxViewShaders->setText(QCoreApplication::translate("WindowPicker", "Shaders", nullptr));
 #if QT_CONFIG(whatsthis)
         PackagesExportFrame->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>When a folder is selected for export, this determines which file types are exported to your computer. The general order from smallest -&gt; largest:</p><p>Materials -&gt; Models -&gt; Audio -&gt; Textures -&gt; Levels (very big)</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
@@ -290,6 +303,7 @@ public:
         CheckboxExportTextures->setText(QCoreApplication::translate("WindowPicker", "Textures", nullptr));
         CheckboxExportMaterials->setText(QCoreApplication::translate("WindowPicker", "Materials", nullptr));
         CheckboxExportAudio->setText(QCoreApplication::translate("WindowPicker", "Audio", nullptr));
+        CheckboxExportShaders->setText(QCoreApplication::translate("WindowPicker", "Shaders", nullptr));
 #if QT_CONFIG(whatsthis)
         LoadButtonFrame->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Load the main window and begin browsing the internal files.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
@@ -305,4 +319,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // PICKERIGIYKB_H
+#endif // PICKERXNRKFX_H

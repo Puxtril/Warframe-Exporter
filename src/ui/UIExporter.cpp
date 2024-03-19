@@ -263,6 +263,12 @@ UiExporter::getPackageNames(WarframeExporter::ExtractorType extractTypes)
         pkgNames.push_back("Texture");
     }
 
+    if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0)
+    {
+        pkgNames.push_back("ShaderDx11");
+        pkgNames.push_back("ShaderPermutationDx11");
+    }
+
     return pkgNames;
 }
 

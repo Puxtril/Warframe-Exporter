@@ -19,12 +19,14 @@ class UiSettings : public QObject
     static const inline QString m_checkboxViewLevels = "load/view/levels";
     static const inline QString m_checkboxViewMaterials = "load/view/materials";
     static const inline QString m_checkboxViewAudio = "load/view/audio";
+    static const inline QString m_checkboxViewShaders = "load/view/shaders";
 
     static const inline QString m_checkboxExportTextures = "load/export/textures";
     static const inline QString m_checkboxExportModels = "load/export/models";
     static const inline QString m_checkboxExportLevels = "load/export/levels";
     static const inline QString m_checkboxExportMaterials = "load/export/materials";
     static const inline QString m_checkboxExportAudio = "load/export/audio";
+    static const inline QString m_checkboxExportShaders = "load/export/shaders";
 
     UiSettings();
     UiSettings(const UiSettings&) = delete;
@@ -41,12 +43,14 @@ public:
     bool getViewLevels() const;
     bool getViewMaterials() const;
     bool getViewAudio() const;
+    bool getViewShaders() const;
 
     bool getExportTextures() const;
     bool getExportModels() const;
     bool getExportLevels() const;
     bool getExportMaterials() const;
     bool getExportAudio() const;
+    bool getExportShaders() const;
 
 public slots:
     void setSettings(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);

@@ -122,6 +122,23 @@ If you indend to add a new format such as Animation, Maps, Audio, etc.
         1. Add that member variable to the CLI inside `addMainCmds`
         1. Add the member variable check to the `if` statement inside `addMiscCommands` AND `processCmd`
         1. Add a package name to `getPkgsNames`
+1. Add the UI features
+    1. Add UI Buttons
+        1. Download and open Qt6 Designer
+        1. Open Picker.ui
+        1. Add Checkboxes to an appropriate location
+        1. Update the checkbox names in the "Object Inspector" window on Designer
+    1. Add checkbox value to `pickerDone` signal
+        1. Open `src/ui/UIPicker.cpp`
+        1. Inside the function `parsePickerOptions`, add `if` statements for both checkboxes
+    1. Add load/save settings
+        1. Inside `include/ui/Settings.h`, add `static const QString` values for view/export
+        1. Inside `include/ui/Settings.h`, Add getter-methods for view/export
+        1. Implement above methods inside `src/ui/Settings.cpp`
+        1. Add save commands inside `src/ui/Settings.cpp` method `setSettings`
+        1. Add calls to these functions inside `src/ui/UIPicker.cpp` method `loadSettings`
+    1. Add new package loads
+        1. If needed, add new package loading to `src/ui/UIExporter.cpp` method `getPackageNames`
 
 ## Adding a new 3D Model format
 

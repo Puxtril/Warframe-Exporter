@@ -71,6 +71,7 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/preview/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/tasks/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/QtOpenGLViewer/QtOpenGLViewer.cpp
 	# Since these objects define signals, they need the Q_OBJECT macro
 	#   And since they have this macro, they need to be picked up by Moc (Auto mode)
 	#   And since they need to be picked up by Moc, they need to be treated as a source file
@@ -95,6 +96,7 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Oodle-2.9/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/QtOpenGLViewer"
 )
 
 ##################################################

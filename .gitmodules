@@ -25,3 +25,6 @@
 [submodule "lib/qt5"]
 	path = lib/qt5
 	url = https://code.qt.io/qt/qt5.git
+[submodule "lib/QtOpenGLViewer"]
+	path = lib/QtOpenGLViewer
+	url = https://github.com/Puxtril/QtOpenGLViewer.git

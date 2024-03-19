@@ -4,7 +4,8 @@ PreviewManager::PreviewManager()
     : m_ensmallening(true, true, true)
 {
     m_previewWidgets = {
-        {WarframeExporter::ExtractorType::Material, PreviewMaterial::getInstance()}
+        {WarframeExporter::ExtractorType::Material, PreviewMaterial::getInstance()},
+        {WarframeExporter::ExtractorType::Texture, PreviewTexture::getInstance()}
     };
 }
 
@@ -32,8 +33,10 @@ PreviewManager::swapToFilePreview(LotusLib::FileEntry& fileEntry)
     
     clearPreview();
 
-    preview->setupWidget(fileEntry, *m_pkgs, m_ensmallening);
+    // OpenGL widgets do initlization before the first draw call.
+    // So lets initilize OpenGL (by rendering once) before setting textures/models.
     preview->show();
+    preview->setupWidget(fileEntry, *m_pkgs, m_ensmallening);
 }
 
 void

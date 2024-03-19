@@ -11,6 +11,7 @@
 #include "ui/preview/PreviewLoading.h"
 #include "ui/preview/PreviewUnsupported.h"
 #include "ui/preview/PreviewMaterial.h"
+#include "ui/preview/PreviewTexture.h"
 
 class PreviewManager
 {

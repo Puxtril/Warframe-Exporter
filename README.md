@@ -44,7 +44,8 @@ Download the latest from the Releases section. This is a CLI program, so open up
   * [nlohmann-json](https://github.com/nlohmann/json): Required by fx-gltf.
 * [glm](https://github.com/g-truc/glm): A helper library for models. Provides matrix and vector math operations.
 * [TCLAP](https://sourceforge.net/projects/tclap/): Command-line interface library
-* [Qt6](https://doc.qt.io/): GUI framework. 
+* [Qt6](https://doc.qt.io/): GUI framework.
+* [QtOpenGLViewer](https://github.com/Puxtril/QtOpenGLViewer): View 2D/3D scenes with mouse rotation/pan/zoom
 
 # ImHex Patterns
 

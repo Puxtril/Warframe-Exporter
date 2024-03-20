@@ -112,7 +112,7 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 
 		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
 		{
-			LotusLib::FileEntry fileEntry = pkg.getFile(**iter);
+			LotusLib::FileEntry fileEntry = pkg.getFile(*iter);
 			debugger.writeAllDebugs(pkg, fileEntry, outPath);
 		}
 	}

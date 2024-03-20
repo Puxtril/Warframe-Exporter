@@ -125,6 +125,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_UI_SOURCES})
 
+		find_package(OpenGL REQUIRED)
 		find_package(Qt6 QUIET COMPONENTS Widgets Core Gui OpenGLWidgets)
 
 		# Qt6 is installed on the system (Probably using a *nix package manager)
@@ -151,9 +152,10 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 			find_library(Qt6Widgets NAMES Qt6Widgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6Core NAMES Qt6Core PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6Gui NAMES Qt6Gui PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+			find_library(Qt6OpenGL NAMES Qt6OpenGL PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 
-			target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGLWidgets} ${OODLE_CORE})
+			target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} OpenGL::GL ${OODLE_CORE})
 			message(STATUS "Linked to Qt6 libraries built locally")
 
 		endif()

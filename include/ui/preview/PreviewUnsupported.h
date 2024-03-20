@@ -2,7 +2,7 @@
 
 #include "ui/preview/Preview.h"
 
-#include <QLabel>
+#include <QtWidgets/QLabel>
 
 class PreviewUnsupported : public Preview
 {

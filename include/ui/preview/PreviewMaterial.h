@@ -3,7 +3,7 @@
 #include "ui/preview/Preview.h"
 #include "material/MaterialExtractor.h"
 
-#include <QPlainTextEdit>
+#include <QtWidgets/QPlainTextEdit>
 
 class PreviewMaterial : public Preview
 {

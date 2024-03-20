@@ -1,17 +1,16 @@
 #pragma once
 
 #include "texture/TextureExtractor.h"
-
-#include "QtOpenGLViewer.h"
 #include "texture/TextureInfo.h"
-#include <GL/gl.h>
-#include <QOpenGLVertexArrayObject>
+#include "QtOpenGLViewer.h"
+
 #include <map>
-#include <qopenglbuffer.h>
-#include <qopenglcontext.h>
-#include <qopenglshaderprogram.h>
-#include <qopengltexture.h>
-#include <iostream>
+
+#include <GL/gl.h>
+#include <QtOpenGL/QOpenGLVertexArrayObject>
+#include <QtOpenGL/QOpenGLBuffer>
+#include <QtOpenGL/QOpenGLShaderProgram>
+#include <QtOpenGL/QOpenGLTexture>
 
 class TextureRenderWidget : public QtOpenGLViewer
 {

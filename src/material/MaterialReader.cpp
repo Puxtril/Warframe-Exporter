@@ -53,3 +53,30 @@ MaterialReader::getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader
 
 	return outPaths;
 }
+
+std::vector<std::string>
+MaterialReader::getShaderSet1(BinaryReader::BinaryReaderBuffered* headerReader, int count)
+{
+    std::vector<std::string> shaders;
+    for (int i = 0; i < count; i++)
+    {
+        uint32_t len = headerReader->readUInt32();
+        std::string shader = headerReader->readAsciiString(len);
+        shaders.push_back(shader);
+        headerReader->seek(1, std::ios::cur);
+    }
+    return shaders;
+}
+
+std::vector<std::string>
+MaterialReader::getShaderSet2(BinaryReader::BinaryReaderBuffered* headerReader, int count)
+{
+    std::vector<std::string> shaders;
+    for (int i = 0; i < count; i++)
+    {
+        uint32_t len = headerReader->readUInt32();
+        std::string shader = headerReader->readAsciiString(len);
+        shaders.push_back(shader);
+    }
+    return shaders;
+}

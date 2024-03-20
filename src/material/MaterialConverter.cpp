@@ -41,6 +41,28 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial)
         }
     }
 
+    formatted << std::endl;
+    formatted << "--------------------" << std::endl;
+    formatted << "|   Shader Set 1   |" << std::endl;
+    formatted << "--------------------" << std::endl;
+    formatted << std::endl;
+
+    for (int i = 0; i < externalMaterial.shaderSet1.size(); i++)
+    {
+        formatted << i << ": " << externalMaterial.shaderSet1[i] << std::endl;
+    }
+
+    formatted << std::endl;
+    formatted << "--------------------" << std::endl;
+    formatted << "|   Shader Set 2   |" << std::endl;
+    formatted << "--------------------" << std::endl;
+    formatted << std::endl;
+
+    for (int i = 0; i < externalMaterial.shaderSet2.size(); i++)
+    {
+        formatted << i << ": " << externalMaterial.shaderSet2[i] << std::endl;
+    }
+
     MaterialInternal internalMaterial;
     internalMaterial.formatted = formatted.str();
     return internalMaterial;

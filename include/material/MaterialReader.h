@@ -16,5 +16,7 @@ namespace WarframeExporter::Material
         std::vector<std::string> splitAttributes(const std::string& attributes);
         std::vector<std::string> getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader);
         std::vector<std::string> getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader);
+        std::vector<std::string> getShaderSet1(BinaryReader::BinaryReaderBuffered* headerReader, int count);
+        std::vector<std::string> getShaderSet2(BinaryReader::BinaryReaderBuffered* headerReader, int count);
     };
 };

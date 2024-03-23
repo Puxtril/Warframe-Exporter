@@ -218,6 +218,9 @@ UiExporter::setMetadata(TreeItemFile* file)
 void
 UiExporter::setPreview(TreeItemFile* file)
 {
+    if (((int)m_extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 && !m_vertexColorIndexerThread.isFinished())
+        m_vertexColorIndexerThread.wait();
+    
     LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).getFile(file->getQFullpath().toStdString());
     m_previewManager.swapToFilePreview(fileEntry);
 }

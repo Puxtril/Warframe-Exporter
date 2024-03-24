@@ -4,12 +4,16 @@
 #include "shader/ShaderStructs.h"
 #include "shader/ShaderTypes.h"
 #include "shader/ShaderEnumMap.h"
+#include "shader/ShaderConverter.h"
+#include "shader/ShaderConverterD3D.h"
 
 namespace WarframeExporter::Shader
 {
     class ShaderExtractor : public Extractor
     {
-        ShaderExtractor() : Extractor() {}
+		bool m_hasWarnedCompileNonWindows;
+		
+        ShaderExtractor() : m_hasWarnedCompileNonWindows(false), Extractor() {}
 
     public:
         ShaderExtractor(const ShaderExtractor&) = delete;
@@ -54,10 +58,16 @@ namespace WarframeExporter::Shader
 
         ShaderEntry readEntry(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header, int index);
         std::vector<ShaderEntry> readAllEntries(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header);
+		
+		void decompileShader(ShaderEntry& shaderEntry);
+		void decompileShaders(std::vector<ShaderEntry>& shaderEntries);
 
         void writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex = 0);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputDir) override;
 		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
+		
+	private:
+		void _decompileShader(ShaderEntry& shaderEntry, int index = -1);
     };
 }

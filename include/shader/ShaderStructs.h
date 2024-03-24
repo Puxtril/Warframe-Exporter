@@ -23,6 +23,7 @@ namespace WarframeExporter::Shader
     struct ShaderEntry
     {
         std::vector<char> bytecode;
+		std::string decompiled;
         uint32_t stage;
     };
 };

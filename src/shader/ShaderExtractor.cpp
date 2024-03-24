@@ -29,14 +29,39 @@ ShaderExtractor::readAllEntries(ShaderReader* shaderReader, BinaryReader::Binary
 }
 
 void
+ShaderExtractor::decompileShader(ShaderEntry& shaderEntry)
+{
+	_decompileShader(shaderEntry);
+}
+
+void
+ShaderExtractor::decompileShaders(std::vector<ShaderEntry>& shaderEntries)
+{
+	for (int i = 0; i < shaderEntries.size(); i++)
+	{
+		_decompileShader(shaderEntries[i], i);
+	}
+}
+
+void
 ShaderExtractor::writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex)
 {
     std::filesystem::path outputFile = outputDir / std::to_string(shaderIndex);
-    outputFile.replace_extension("bin");
+	
 
     std::ofstream out;
-	out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
-	out.write(shader.bytecode.data(), shader.bytecode.size());
+	if (shader.decompiled == "")
+	{
+		outputFile.replace_extension("bin");
+		out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write(shader.bytecode.data(), shader.bytecode.size());
+	}
+	else
+	{
+		outputFile.replace_extension("hlsl");
+		out.open(outputFile, std::ios::out | std::ofstream::trunc);
+		out.write(shader.decompiled.c_str(), shader.decompiled.length());
+	}
 	out.close();
 }
 
@@ -61,6 +86,7 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
 
     for (size_t iShader = 0; iShader < bodyEntries.size(); iShader++)
     {
+		decompileShader(bodyEntries[iShader]);
         writeShader(bodyEntries[iShader], outputDir, iShader);
     }
 }
@@ -81,4 +107,29 @@ ShaderExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::Packages
     ShaderReader* shaderReader = g_enumMapShader[fullFileEntry.commonHeader.type];
 
     shaderReader->readShaderDebug(&fullFileEntry.headerData, &fullFileEntry.bData);
+}
+
+void
+ShaderExtractor::_decompileShader(ShaderEntry& shaderEntry, int index)
+{
+#ifdef WIN32
+	ShaderConverterD3D* decompiler = ShaderConverterD3D::getInstance();
+#else
+	if (!m_hasWarnedCompileNonWindows)
+	{
+		m_logger->warn("Unable to decompile shaders on non-Windows platform");
+		m_hasWarnedCompileNonWindows = true;
+	}
+	ShaderExtractor* decompiler = ShaderConverter::getInstance();
+#endif
+	
+	bool success = decompiler->decompileShader(shaderEntry);
+	
+	if (!success)
+	{
+		if (index == -1)
+			m_logger.error("Shader decompilation failed");
+		else
+			m_logger.error("Shader decompilation failed (Index " + std::to_string(index) + ")");
+	}
 }

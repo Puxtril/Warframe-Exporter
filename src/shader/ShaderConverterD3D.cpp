@@ -31,9 +31,6 @@ ShaderConverterD3D::decompileShader(ShaderEntry& shaderEntry)
 	
 	shaderEntry.decompiled = std::string(static_cast<char*>(disassembly->GetBufferPointer()));
 	return true;
-	
-#else
-	static_assert(false, "ShaderConverterD3D.decompilerShader() called on non-Windows platform");
 #endif
-
+	return false;
 }

@@ -117,10 +117,10 @@ ShaderExtractor::_decompileShader(ShaderEntry& shaderEntry, int index)
 #else
 	if (!m_hasWarnedCompileNonWindows)
 	{
-		m_logger->warn("Unable to decompile shaders on non-Windows platform");
+		m_logger.warn("Unable to decompile shaders on non-Windows platform");
 		m_hasWarnedCompileNonWindows = true;
 	}
-	ShaderExtractor* decompiler = ShaderConverter::getInstance();
+	ShaderConverter* decompiler = ShaderConverter::getInstance();
 #endif
 	
 	bool success = decompiler->decompileShader(shaderEntry);

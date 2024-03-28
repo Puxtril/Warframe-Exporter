@@ -195,16 +195,16 @@ ModelConverter::flipXAxis(ModelBodyExternal& extBody)
     // For rigged models
     for (auto& x : extBody.reverseBinds)
     {
-        x = glm::transpose(glm::scale(glm::transpose(x), { 1, 1, -1 }));
+        x = glm::transpose(glm::scale(glm::transpose(x), { -1, 1, 1 }));
     }
     for (auto& x : extBody.boneRotations)
     {
-        x.x *= -1.0f;
-        x.w *= -1.0f;
+        x.x *= -1;
+        x.y *= -1;
     }
     for (auto& x : extBody.bonePositions)
     {
-        x.z *= -1.0f;
+        x.x *= -1;
     }
     
     // For static models
@@ -213,6 +213,7 @@ ModelConverter::flipXAxis(ModelBodyExternal& extBody)
         for (glm::vec3& curPos : extBody.positions)
         {
             curPos.z *= -1.0f;
+            curPos.x *= -1.0f;
         }
     }
 }

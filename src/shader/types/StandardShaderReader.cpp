@@ -131,8 +131,9 @@ StandardShaderReader::readShaderBodyDebug(const ShaderHeaderExternal& shaderHead
 
         bodyReader->seek(2, std::ios::cur);
         
-        std::string shaderTypeMsg = "Shader stage enumeration " + std::to_string(iShader);
-        bodyReader->readUInt16(0, 1, shaderTypeMsg);
+        //std::string shaderTypeMsg = "Shader stage enumeration " + std::to_string(iShader);
+        //bodyReader->readUInt16(0, 1, shaderTypeMsg);
+        bodyReader->readUInt16();
 
         bodyReader->seek(14, std::ios::cur);
     }

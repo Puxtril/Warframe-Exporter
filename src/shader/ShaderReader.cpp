@@ -6,5 +6,6 @@ void
 ShaderReader::readShaderDebug(BinaryReader::BinaryReaderBuffered* headerReader, BinaryReader::BinaryReaderBuffered* bodyReader)
 {
     ShaderHeaderExternal shaderHeader = readShaderHeaderDebug(headerReader);
-    readShaderBodyDebug(shaderHeader, bodyReader);
+    if (shaderHeader.shaderCount > 0)
+        readShaderBodyDebug(shaderHeader, bodyReader);
 }

@@ -206,16 +206,6 @@ ModelConverter::flipXAxis(ModelBodyExternal& extBody)
     {
         x.x *= -1;
     }
-    
-    // For static models
-    if (extBody.bonePositions.empty())
-    {
-        for (glm::vec3& curPos : extBody.positions)
-        {
-            curPos.z *= -1.0f;
-            curPos.x *= -1.0f;
-        }
-    }
 }
 
 std::vector<std::string>

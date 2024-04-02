@@ -7,6 +7,15 @@ UiExporter::UiExporter()
     m_dirBrush = QBrush(dirColor);
 }
 
+UiExporter::~UiExporter()
+{
+    if (m_exporterDirectoryThread.isRunning())
+    {
+        m_exporterDirectoryThread.extractCancelled();
+        m_exporterDirectoryThread.wait();
+    }
+}
+
 void
 UiExporter::setup(QMainWindow *MainWindow)
 {

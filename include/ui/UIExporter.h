@@ -34,6 +34,7 @@ class UiExporter : private Ui_MainWindow, public QObject
 
 public:
     UiExporter();
+    virtual ~UiExporter();
 
     void setup(QMainWindow *MainWindow);
 

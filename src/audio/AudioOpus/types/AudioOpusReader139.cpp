@@ -19,7 +19,7 @@ AudioOpusReader139::readBody(const AudioHeader& extHeader, BinaryReader::BinaryR
 		data.resize(fReader->getLength());
 		fReader->readUInt8Array((uint8_t*)data.data(), fReader->getLength());
 	}
-	if (bReader != nullptr && (fReader == nullptr || fReader->getLength() != extHeader.size))
+	if (bReader != nullptr && (fReader == nullptr || static_cast<int>(fReader->getLength()) != extHeader.size))
 	{
 		size_t curSize = data.size();
 		data.resize(curSize + bReader->getLength());

@@ -42,7 +42,7 @@ StandardShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader,
     int firstShaderOffset = bodyReader->getLength() - shaderHeader.shaderCodeTotalSize;
     bodyReader->seek(firstShaderOffset, std::ios::beg);
 
-    for (size_t iShader = 0; iShader < index; iShader++)
+    for (int iShader = 0; iShader < index; iShader++)
     {
         bodyReader->seek(shaderHeader.shaderLengths[iShader], std::ios::cur);
     }

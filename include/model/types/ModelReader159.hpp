@@ -53,7 +53,7 @@ namespace WarframeExporter::Model
 			headerReader->seek(4 * 6, std::ios::cur);
 
 			static const std::string faceCountMaxMsg = "UInt64 face count";
-			uint64_t faceCount = headerReader->readUInt64(0, UINT32_MAX, faceCountMaxMsg);
+			headerReader->readUInt64(0, UINT32_MAX, faceCountMaxMsg);
 
 			const static std::string meshInfoMsg = "Mesh Info Count";
 			uint32_t meshInfoCount = headerReader->readUInt32(1, 5, meshInfoMsg);
@@ -65,8 +65,6 @@ namespace WarframeExporter::Model
 				uint32_t meshInfoNameLen = headerReader->readUInt32();
 				headerReader->seek(meshInfoNameLen, std::ios_base::cur);
 
-				auto meshInfoOffset = headerReader->tell();
-
 				// Apparently these can have less than 1 LOD
 				// Took out some debug logic because these are all over the place
 				static const std::string LODOffsetMsg = "MeshInfo LOD Offset";
@@ -76,11 +74,8 @@ namespace WarframeExporter::Model
 				headerReader->readUInt32(0, UINT32_MAX, LODOffsetMsg);
 				headerReader->readUInt32(0, UINT32_MAX, LODOffsetMsg);
 
-				uint32_t curFaceLODCount = headerReader->readUInt32();
-				curFaceLODCount = headerReader->readUInt32();
-				curFaceLODCount = headerReader->readUInt32();
-				curFaceLODCount = headerReader->readUInt32();
-				curFaceLODCount = headerReader->readUInt32();
+				// Current face LOD Count (5 UInt32)
+				headerReader->seek(20, std::ios::cur);
 
 				headerReader->seek(0x20, std::ios::cur);
 

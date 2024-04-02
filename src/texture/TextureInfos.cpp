@@ -37,7 +37,7 @@ TextureInfoBC1::unSwizzle(char* inData, int inDataLen, char* outData) const
     int inPos = 0;
     int outPos = 0;
 
-    for (size_t i = 0; i < inDataLen / (2 * WFBLOCKSZ); i++)
+    for (int i = 0; i < inDataLen / (2 * WFBLOCKSZ); i++)
     {
         memcpy(pixels0, inData + inPos, WFBLOCKSZ);
         inPos += WFBLOCKSZ;

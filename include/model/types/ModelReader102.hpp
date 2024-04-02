@@ -65,7 +65,7 @@ namespace WarframeExporter::Model
 
 		inline void skipPhysicsPath(BinaryReader::BinaryReaderBuffered* headerReader) const
 		{
-			uint32_t structType = headerReader->readUInt32();
+			headerReader->readUInt32();
 			uint32_t subType = headerReader->readUInt32();
 
 			// Perhaps these 2 numbers are flags?

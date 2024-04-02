@@ -275,7 +275,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 		curPos += ModelBodyInternal::UVLen;
 		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		for (int x = 0; x < body.colors.size(); x++)
+		for (size_t x = 0; x < body.colors.size(); x++)
 		{
 			memcpy(curPos, &body.colors[x][iVert], ModelBodyInternal::colorLen);
 			curPos += ModelBodyInternal::colorLen;
@@ -330,7 +330,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	std::vector<int32_t> vertexColAccIndices;
-	for (int x = 0; x < body.colors.size(); x++)
+	for (size_t x = 0; x < body.colors.size(); x++)
 	{
 		Accessor colAcc;
 		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
@@ -367,7 +367,7 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	attrs["POSITION"] = posAccIndex;
 	attrs["TEXCOORD_0"] = uv1AccIndex;
 	attrs["TEXCOORD_1"] = uv2AccIndex;
-	for (int x = 0; x < vertexColAccIndices.size(); x++)
+	for (size_t x = 0; x < vertexColAccIndices.size(); x++)
 		attrs["COLOR_" + std::to_string(x)] = vertexColAccIndices[x];
 	attrs["JOINTS_0"] = boneIndexAccIndex;
 	attrs["WEIGHTS_0"] = boneWeightAccIndex;
@@ -399,7 +399,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 		curPos += ModelBodyInternal::UVLen;
 		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
 		curPos += ModelBodyInternal::UVLen;
-		for (int x = 0; x < body.colors.size(); x++)
+		for (size_t x = 0; x < body.colors.size(); x++)
 		{
 			memcpy(curPos, &body.colors[x][iVert], ModelBodyInternal::colorLen);
 			curPos += ModelBodyInternal::colorLen;
@@ -450,7 +450,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	std::vector<int32_t> vertexColAccIndices;
-	for (int x = 0; x < body.colors.size(); x++)
+	for (size_t x = 0; x < body.colors.size(); x++)
 	{
 		Accessor colAcc;
 		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
@@ -468,7 +468,7 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	attrs["POSITION"] = posAccIndex;
 	attrs["TEXCOORD_0"] = uv1AccIndex;
 	attrs["TEXCOORD_1"] = uv2AccIndex;
-	for (int x = 0; x < vertexColAccIndices.size(); x++)
+	for (size_t x = 0; x < vertexColAccIndices.size(); x++)
 		attrs["COLOR_" + std::to_string(x)] = vertexColAccIndices[x];
 
 	return attrs;

@@ -148,7 +148,6 @@ CLIDebug::debug(const std::filesystem::path& cacheDirPath, const std::string& pk
 
 	WarframeExporter::BatchIteratorDebug debugger;
 	LotusLib::PackagesReader pkgs(cacheDirPath);
-	LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
 
 	debugger.batchIterate(pkgs, ensmallening, outPath, intPath, {pkgName}, (WarframeExporter::ExtractorType)types);
 }

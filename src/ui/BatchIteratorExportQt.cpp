@@ -1,7 +1,7 @@
 #include "ui/BatchIteratorExportQt.h"
 
 BatchIteratorExportQt::BatchIteratorExportQt()
-    : m_fileCountExtracted(0), m_killExtraction(false), WarframeExporter::BatchIteratorExport()
+    : WarframeExporter::BatchIteratorExport(), m_fileCountExtracted(0), m_killExtraction(false)
 {
 }
 
@@ -31,7 +31,7 @@ BatchIteratorExportQt::resetFileCount()
 }
 
 BatchIteratorCountQt::BatchIteratorCountQt()
-    : m_fileCount(0), WarframeExporter::BatchIterator()
+    : WarframeExporter::BatchIterator(), m_fileCount(0)
 {
 }
 

@@ -27,7 +27,7 @@ LevelReader201::readHeaderDebug(BinaryReader::BinaryReaderBuffered& reader) cons
 		reader.seek(pathLen, std::ios_base::cur);
 	}
 
-	uint32_t unkNum = reader.readUInt32();
+	reader.readUInt32();
 	uint32_t levelObjCount = reader.readUInt32();
 	const static std::string levelObjPathLenMsg = "Level object path length";
 	for (uint32_t x = 0; x < levelObjCount; x++)
@@ -46,7 +46,7 @@ void
 LevelReader201::readBodyDebug(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader) const
 {
 	std::vector<uint32_t> indices(extHeader.levelObjs.size());
-	for (int x = 0; x < extHeader.levelObjs.size(); x++)
+	for (size_t x = 0; x < extHeader.levelObjs.size(); x++)
 		indices[x] = reader.readUInt32();
 }
 
@@ -77,7 +77,7 @@ LevelReader201::readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHead
 		outHeader.assetPaths[x] = reader.readAsciiString(pathLen);
 	}
 
-	uint32_t unkNum = reader.readUInt32();
+	reader.readUInt32();
 	uint32_t levelObjCount = reader.readUInt32();
 	outHeader.levelObjs.resize(levelObjCount);
 	for (uint32_t x = 0; x < levelObjCount; x++)

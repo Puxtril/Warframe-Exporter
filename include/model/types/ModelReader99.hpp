@@ -116,9 +116,7 @@ namespace WarframeExporter::Model
 
 				uint32_t meshInfoNameLen = headerReader->readUInt32();
 				headerReader->seek(meshInfoNameLen, std::ios_base::cur);
-
-				auto meshInfoOffset = headerReader->tell();
-
+				
 				// Apparently these can have less than 1 LOD
 				// Took out some debug logic because these are all over the place
 				static const std::string LODOffsetMsg = "MeshInfo LOD Offset";

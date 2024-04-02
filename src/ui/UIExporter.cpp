@@ -63,7 +63,7 @@ UiExporter::setupTree()
         }
         */
 
-        for (int i = 0; i < curEntry.getDirCount(); i++)
+        for (int i = 0; i < static_cast<int>(curEntry.getDirCount()); i++)
         {
             LotusLib::DirMeta curNode = curEntry.getChildDir(i);
             dirNamesInAllPkgs.insert(curNode.getName());
@@ -71,7 +71,7 @@ UiExporter::setupTree()
     }
 
     // Build parameters for recursive call
-    for (const std::string_view& curDirName : dirNamesInAllPkgs)
+    for (const std::string& curDirName : dirNamesInAllPkgs)
     {
         TreeItemDirectory* newDirWidget = nullptr;
         std::vector<LotusLib::DirMeta> dirEntries;
@@ -79,7 +79,7 @@ UiExporter::setupTree()
         for (size_t iPkg = 0; iPkg < m_viewPkgNames.size(); iPkg++)
         {
             const std::string& curPkgName = m_viewPkgNames[iPkg];
-            LotusLib::DirMeta curEntry = m_packages.getPackage(curPkgName).getDirMeta("/").getChildDir(std::string(curDirName));
+            LotusLib::DirMeta curEntry = m_packages.getPackage(curPkgName).getDirMeta("/").getChildDir(curDirName);
 
             // Ensure relation in pkgNames and curEntries
             if (curEntry.isEmpty())
@@ -126,7 +126,7 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
             continue;
 
         // Append file entries
-        for (int i = 0; i < curEntry.getFileCount(); i++)
+        for (int i = 0; i < static_cast<int>(curEntry.getFileCount()); i++)
         {
             LotusLib::FileMeta curNode = curEntry.getChildFile(i);
 
@@ -135,7 +135,7 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
         }
 
         // Collect directory names
-        for (int i = 0; i < curEntry.getDirCount(); i++)
+        for (int i = 0; i < static_cast<int>(curEntry.getDirCount()); i++)
         {
             LotusLib::DirMeta curNode = curEntry.getChildDir(i);
             dirNamesInAllPkgs.insert(curNode.getName());

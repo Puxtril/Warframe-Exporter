@@ -37,7 +37,7 @@ ShaderExtractor::decompileShader(ShaderEntry& shaderEntry)
 void
 ShaderExtractor::decompileShaders(std::vector<ShaderEntry>& shaderEntries)
 {
-	for (int i = 0; i < shaderEntries.size(); i++)
+	for (size_t i = 0; i < shaderEntries.size(); i++)
 	{
 		_decompileShader(shaderEntries[i], i);
 	}

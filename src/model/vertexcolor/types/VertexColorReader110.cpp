@@ -27,7 +27,7 @@ VertexColorReader110::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, s
 	size_t colorCount = bodyReader->getLength() / 4;
 
 	outData.resize(colorCount);
-	for (int x = 0; x < colorCount; x++)
+	for (size_t x = 0; x < colorCount; x++)
 	{
 		bodyReader->readUInt8Array(&outData[x][0], 4);
 	}

@@ -13,7 +13,7 @@ namespace WarframeExporter::Shader
     {
 		bool m_hasWarnedCompileNonWindows;
 		
-        ShaderExtractor() : m_hasWarnedCompileNonWindows(false), Extractor() {}
+        ShaderExtractor() : Extractor(), m_hasWarnedCompileNonWindows(false) {}
 
     public:
         ShaderExtractor(const ShaderExtractor&) = delete;

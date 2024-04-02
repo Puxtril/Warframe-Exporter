@@ -4,17 +4,13 @@
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 #include "EnumMapValue.h"
+#include "level/LevelTypes.h"
 
 #include <string>
 #include <cstdint>
 
 namespace WarframeExporter::Level
 {
-	enum class LevelType
-	{
-		LEVEL_201 = 201
-	};
-	
 	class LevelReader : public EnumMapValue
 	{
 	protected:

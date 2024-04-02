@@ -7,7 +7,8 @@ Formats currently supported:
 - 3D Models (mostly) -> glTF
 - Audio -> Ogg & Wav (Credit to [Sehnryr](https://github.com/sehnryr/wfcache-api))
 - Levels -> glTF
-- Shaders -> Compiled HLSL (Decompile TODO)
+- Material parameters -> Txt
+- Shaders -> Decompiled HLSL
 
 Formats with started progress:
 - Animation -> glTF
@@ -17,22 +18,19 @@ Formats with started progress:
 1. [How to use](#how-to-use)
 1. [External Libraries](#external-libraries)
 1. [ImHex Patterns](#imhex-patterns)
+1. [Contributions](#contributions)
+1. [Building](#building)
 1. [Library Overview](#overview-of-this-library)
     1. [High level](#high-level-overview)
     1. [Medium level](#medium-level-overview)
     1. [Low level](#low-level-overview)
-1. [Contributions](#contributions)
-    1. [Extractor](#adding-a-new-extractor)
-    1. [3D Models](#adding-a-new-3d-model-format)
-    1. [Textures](#adding-a-new-texture-format) ([Texture Compression](##adding-a-new-texture-compression-format))
-    1. [Materials](#adding-a-new-material-format)
-    1. [Audio](#adding-a-new-audio-format)
-    1. [Level](#adding-a-new-level-format)
-1. [Building](#building)
 
 # How to use
 
-Download the latest from the Releases section. This is a CLI program, so open up CMD or Powershell in the same folder as the executable and type `.\Warframe-Exporter.exe --help` to get started.
+Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/releases/latest).
+- `Warframe-Exporter` is the easy-to-use program with a Graphical User Interface.
+- `Warframe-Exporter-CLI` is a Command-Line interface. This is useful for writing scripts to export files.
+- `Warframe-Exporter-CLI-Advanced` is a Command-Line interface with extra features. You probably don't need this unless you're familiar with the inner workings of Warframe.
 
 # External Libraries
 
@@ -57,44 +55,6 @@ Inside the `utils` folder, you'll find a collection of `.hexpat` files. These ar
     1. (Optional) Using the advanced tool, find specific formats using the `--print-enums` flag
     1. Write raw files from the advanced tool using the `--write-raw` flag
 1. Within ImHex, go to *File -> Import -> Pattern File* and select the appropriate pattern
-
-# Overview of this library
-
-I will split this up into 3 sections, each subsequent section being more verbose. For more information on the cache file structure, read the [LotusLib documentation](https://github.com/Puxtril/LotusLib#documentation).
-
-## High-level overview
-
-This project converts the data from the Warframe cache files into usable formats. A command-line interface is provided (break out your CMD skills), though programmers may compile this into a library for use in other projects. It also supports debugging because let's be real, there will be new versions of exsting formats added, and that needs to be detectable.
-
-## Medium-level overview
-
-This is best explained by going over the data flow. To iterate over a group of files within the cache, you can choose between exporting and debugging the files. When a file is reached that is supported by an extractor, it begins the extraction process. Each extractor follows a similar flow.
-
-Extraction process:
-1. Parse the file contents into usable data (integer, floats, strings, etc).
-1. Convert that data into a compatable format for later processing. This is an intermediate stage between reading and exporting into another format. We want both stages to be independant of each other.
-1. Export the data into a standard format that can be read by other programs like Blender. Highly encouraged to use an external library for this.
-
-During the exporting process, log all errors to a file.
-
-Debug process: Parse the file contents and set certian checkpoints. If a checkpoint is reached and the data is not expected, assume the file is not fully supported. Log this information to a file. During this process, log additional information as files are iterated over.
-
-## Low-level overview
-
-This is best explained by orgaizing the project into separate sections.
-
-* Iterator: The base class `BatchIterator` is sublassed by `BatchIteratorDebug` and `BatchIteratorExport`. Both are self-explanitory. The main difference is `BatchIteratorDebug` will not write extracted files to disk.
-* Enum Map: File types are identified by an enumeration. The goal of this section is to map an enumeration to an object that processes the data. Because some formats like textures may have multiple enumerations that can be processed the exact same way. `EnumMap` is the mapping between an enumeration and the object processor; must be a sublass of `EnumMapValue`. `EnumMapValue` is the abstract class for objects to process enumertaions; these subclasses should also be abstract. This class has only 1 required method: return the array of associated enumerations. `Extractor` is an abtract sublcass of `EnumMapValue` that provides an interface for all extractors. `EnumMapExtractor` is the instanciated `EnumMap` using class `Extractor`. Because each Iterator needs access to this, it made sense to keep this separate. There may be other enum maps in this project, but the Extactor map was used as an example.
-* File Properties: Files stored in the cache have a filetime (DOS time) associated with them. To make extraction easier between subsequent runs, only write files with different modification times. Unforunately reading/writing files from disk is OS-specific, thus this class.
-* Ensmallening: Provides a simple interface for extractors to modfiy behavior based on the ensmallening change.
-
-I will also gloss over the previously mentioned "Extraction process". Each extractor should have their own folder in `include` and `src`. Within those folders I've named files in a specific pattern.
-
-* The main extractor file that inherits from `Extractor` should be named `<Name>Extractor`, ex. `TextureExtractor`.
-* The first stage is reading from the cache: `TextureReader`.
-* Next is converting the data into a compatable format: `TextureConverter`.
-* The structs to store the previously mentioned data is defined in `TextureStructs`.
-* Finally, the data is exported into a standard format: `TextureExporterDDS`.
 
 # Contributions
 
@@ -140,17 +100,16 @@ If you indend to add a new format such as Animation, Maps, Audio, etc.
     1. Add new package loads
         1. If needed, add new package loading to `src/ui/UIExporter.cpp` method `getPackageNames`
 
-## Adding a new 3D Model format
+## Adding a new 3D Model/Texture/Material/etc type
 
-1. Add the new enum value to `WarframeExporter::Model::ModelType` (inside `model/ModelReader.h`)
-1. Add the enum value to `WarframeExporter::Model::ModelExtractor::getEnumMapKeys()` (inside `model/ModelExtractor.h`)
-1. Add a new reader class in the directory `model/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
-1. Register the class to `WarframeExporter::Model::g_enumMapModel` (inside `model/ModelEnumMap.h`)
+*Warframe will often add slightly altered file formats. You can tell by the new enumeration value inside the CommonHeader. New formats need manual inspection and addition to the extractor. You can see all the existing file foramts inside each respective asset type's folder named `types`.*
 
-## Adding a new Texture Format
+**\<type\> refers to the asset type. Ex: model, texture, etc.**
 
-1. Add the new enum value to `WarframeExporter::Texture::TextureType` (inside `texture/TextureExtractor.h`)
-1. Add the enum value to `WarframeExporter::Texture::TextureExtractor::getEnumMapKeys()` (inside `texture/TextureExtractor.h`)
+1. Add the new enum value inside `<type>Types.h`
+1. Add the enum value to `getEnumMapKeys()` (inside `<type>Extractor.h`)
+1. Add a new reader class in the directory `types`. You should copy an existing class - the new format will likely be very similar to a previous one.
+1. Register the class to `g_enumMap<type>` (inside `<type>EnumMap.h`)
 
 ## Adding a new Texture Compression Format
 This is very unlikely to occur. They recently started using BC6 and BC7, so there's no more compression formats they could use. Unless they add another uncompressed format.
@@ -158,32 +117,6 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 1. Add the new enum value to `WarframeExporter::Texture::TextureCompression` (inside `texture/TextureInfo.h`)
 1. Add a new class inside `texture/TextureInfos.h`.
 1. Register the new class to `WarframeExporter::Texture::g_enumMapTexture` (inside `texture/TextureEnumMap.h`)
-
-## Adding a new Material format
-
-1. Add the new enum value to `WarframeExporter::Material::MaterialType` (inside `material/MaterialExtractor.h`)
-1. Add the enum value to `WarframeExporter::Material::MaterialExtractor::getEnumMapKeys()` (inside `material/MaterialExtractor.h`)
-
-## Adding a new Level format
-
-1. Add the new enum value to `WarframeExporter::Level::LevelType` (inside `level/LevelReader.h`)
-1. Add the enum value to `WarframeExporter::Level::LevelExtractor::getEnumMapKeys()` (inside `level/LevelExtractor.h`)
-1. Add a new reader class in the directory `level/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
-1. Register the class to `WarframeExporter::Level::g_enumMapLevel` (inside `level/LevelEnumMap.h`)
-
-## Adding a new Audio format
-
-1. Add the new enum value to `WarframeExporter::Audio::AudioType` (inside `audio/AudioStructs.h`)
-1. Add the enum value to `WarframeExporter::Audio::AudioExtractorProxy::getEnumMapKeys()` (inside `audio/AudioExtractorProxy.h`)
-1. Add a new reader class inside `audio/types`, `audio/AudioPCM/types`, and `audio/AudioOpus/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
-1. Register the class to `WarframeExporter::Audio::g_enumMapAudioExtractor` (inside `model/EnumMapAudioExtractor.h`)
-
-## Adding a new Level format
-
-1. Add the new enum value to `WarframeExporter::Level::LevelType` (inside `level/LevelReader.h`)
-1. Add the enum value to `WarframeExporter::Level::LevelExtractor::getEnumMapKeys()` (inside `level/LevelExtractor.h`)
-1. Add a new reader class inside `level/types`. You should copy an existing class - the new format will likely be very similar to a previous one.
-1. Register the class to `WarframeExporter::Level::g_enumMapLevel` (inside `level/LevelEnumMap.h`)
 
 # Building
 
@@ -196,10 +129,14 @@ CMake is very nice and I love it. See how easy this is to compile?
     - Windows: CMake, git, Visual Studio 2022
     - Other OSs: CMake, git, any C++ compiler
 - A copy of the Oodle SDK (Provided by Unreal Engine)
-    - Download Unreal Engine from the official website (You will need an account and the Epic launcher)
-    - Once downloaded find the SDK folder `Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.5/lib`
+    - Download the files.
+        - Download from the engine
+            - Download Unreal Engine from the official website (You will need an account and the Epic launcher)
+            - Once downloaded find the SDK folder `Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.5/lib`
+        - OR download [from here.](https://github.com/WorkingRobot/OodleUE/tree/main/Engine/Source/Runtime/OodleDataCompression/Sdks)
     - Create a folder in the root of this repository named `bin`
-    - Copy folders from Unreal into `bin`. Currently the following folders/platforms are supported: `Win64`, `Linux`, and `Mac`
+    - Copy folders `Linux` and `Win64` into `bin`.
+    
 
 ## Build Commands
 
@@ -207,21 +144,62 @@ CMake is very nice and I love it. See how easy this is to compile?
 1. Edit the first few lines of CMakeLists.txt to build what you want.
 1. Initilize the submodules
 	1. `cd lib`
-	1. `git submodule update --init Binary-Reader ddspp fx-gltf glm json LotusLib spdlog tclap-code qt5`
-	1. `cd qt5`
-	1. `git submodule update --init qtbase qttools qtdeclarative`
-	1. `cd qttools`
-	1. `git submodule update --init`
-	1. `cd ../../..`
-1. Build Qt
-	1. `mkdir build-qt && cd build-qt`
-	1. If you're running on Windows, run the rest of these commands from the MSVC shell (x64 Native Tools Command Prompt)
-	1. `../lib/qt5/configure -release -optimize-size -prefix "../lib/qt-install" -confirm-license`
-	1. `cmake --build . --parallel 4`
-	1. `cmake --install .`
+	1. `git submodule update --init Binary-Reader ddspp fx-gltf glm json LotusLib spdlog tclap-code`
+1. If you're on Windows and haven't installed the Qt6 SDK
+    1. Initilize the repositories
+        1. `git submodule update --init qt5`
+        1. `cd qt5`
+        1. `git submodule update --init qtbase qttools qtdeclarative`
+        1. `cd qttools`
+        1. `git submodule update --init`
+        1. `cd ../../..`
+    1. Build Qt
+        1. `mkdir build-qt && cd build-qt`
+        1. Run the rest of these commands from the MSVC shell (x64 Native Tools Command Prompt)
+        1. `../lib/qt5/configure -release -optimize-size -prefix "../lib/qt-install" -confirm-license`
+        1. `cmake --build . --parallel 4`
+        1. `cmake --install .`
 1. Build Warframe-Exporter
 	1. `mkdir build && cd build`
 	1. `cmake ..`
 	1. Linux: `make` Windows: `cmake --build . --config Release`
 1. Copy dependencies (Windows)
 	1. `../lib/qt-install/bin/windeployqt Warframe-Exporter.exe`
+
+# Overview of this library
+
+I will split this up into 3 sections, each subsequent section being more verbose. For more information on the cache file structure, read the [LotusLib documentation](https://github.com/Puxtril/LotusLib#documentation).
+
+## High-level overview
+
+This project converts the data from the Warframe cache files into usable formats. A command-line interface is provided (break out your CMD skills), though programmers may compile this as a library for use in other projects. It also supports debugging because let's be real, there will be new versions of exsting formats added, and that needs to be debuggable.
+
+## Medium-level overview
+
+This is best explained by going over the data flow. To iterate over a group of files within the cache, you can choose between exporting and debugging the files. When a file is reached that is supported by an extractor, it begins the extraction process. Each extractor follows a similar flow.
+
+Extraction process:
+1. Parse the file contents into usable data (integer, floats, strings, etc).
+1. Convert that data into a compatable format for later processing. This is an intermediate stage between reading and exporting into another format. We want both stages to be independant of each other.
+1. Export the data into a standard format that can be read by other programs like Blender. Highly encouraged to use an external library for this.
+
+During the exporting process, log all errors to a file.
+
+Debug process: Parse the file contents and set certian checkpoints. If a checkpoint is reached and the data is not expected, assume the file is not fully supported. Log this information to a file. During this process, log additional information as files are iterated over.
+
+## Low-level overview
+
+This is best explained by orgaizing the project into separate sections.
+
+* Iterator: The base class `BatchIterator` is sublassed by `BatchIteratorDebug` and `BatchIteratorExport`. Both are self-explanitory. The main difference is `BatchIteratorDebug` will not write extracted files to disk.
+* Enum Map: File types are identified by an enumeration. The goal of this section is to map an enumeration to an object that processes the data. Because some formats like textures may have multiple enumerations that can be processed the exact same way. `EnumMap` is the mapping between an enumeration and the object processor; must be a sublass of `EnumMapValue`. `EnumMapValue` is the abstract class for objects to process enumertaions; these subclasses should also be abstract. This class has only 1 required method: return the array of associated enumerations. `Extractor` is an abtract sublcass of `EnumMapValue` that provides an interface for all extractors. `EnumMapExtractor` is the instanciated `EnumMap` using class `Extractor`. Because each Iterator needs access to this, it made sense to keep this separate. There may be other enum maps in this project, but the Extactor map was used as an example.
+* File Properties: Files stored in the cache have a filetime (DOS time) associated with them. To make extraction easier between subsequent runs, only write files with different modification times. Unforunately reading/writing files from disk is OS-specific, thus this class.
+* Ensmallening: Provides a simple interface for extractors to modfiy behavior based on the ensmallening change.
+
+I will also gloss over the previously mentioned "Extraction process". Each extractor should have their own folder in `include` and `src`. Within those folders I've named files in a specific pattern.
+
+* The main extractor file that inherits from `Extractor` should be named `<Name>Extractor`, ex. `TextureExtractor`.
+* The first stage is reading from the cache: `TextureReader`.
+* Next is converting the data into a compatable format: `TextureConverter`.
+* The structs to store the previously mentioned data is defined in `TextureStructs`.
+* Finally, the data is exported into a standard format: `TextureExporterDDS`.

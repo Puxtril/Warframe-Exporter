@@ -7,17 +7,6 @@ UiExporter::UiExporter()
     m_dirBrush = QBrush(dirColor);
 }
 
-UiExporter::~UiExporter()
-{
-    if (m_vertexColorIndexerThread.isRunning())
-    {
-        // Should only take a moment to exit gracefully
-        // Terminating instead of waiting will cause a segfault
-        m_vertexColorIndexerThread.stop();
-        m_vertexColorIndexerThread.wait();
-    }
-}
-
 void
 UiExporter::setup(QMainWindow *MainWindow)
 {
@@ -217,10 +206,7 @@ UiExporter::setMetadata(TreeItemFile* file)
 
 void
 UiExporter::setPreview(TreeItemFile* file)
-{
-    if (((int)m_extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 && !m_vertexColorIndexerThread.isFinished())
-        m_vertexColorIndexerThread.wait();
-    
+{ 
     LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).getFile(file->getQFullpath().toStdString());
     m_previewManager.swapToFilePreview(fileEntry);
 }
@@ -228,9 +214,6 @@ UiExporter::setPreview(TreeItemFile* file)
 void
 UiExporter::extractDirectory(LotusLib::LotusPath internalPath)
 {
-    if (((int)m_extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 && !m_vertexColorIndexerThread.isFinished())
-        m_vertexColorIndexerThread.wait();
-
     m_exporterDirectoryThread.setInternalPath(internalPath);
     m_exporterDirectoryThread.start();
 }
@@ -238,9 +221,6 @@ UiExporter::extractDirectory(LotusLib::LotusPath internalPath)
 void
 UiExporter::extractFile(LotusLib::LotusPath internalPath, const std::string& pkgName)
 {
-    if (((int)m_extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 && !m_vertexColorIndexerThread.isFinished())
-        m_vertexColorIndexerThread.wait();
-
     m_exporterFileThread.setFileData(internalPath, pkgName);
     m_exporterFileThread.start();
 }
@@ -324,14 +304,8 @@ UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path expor
     m_exportPkgNames = getPackageNames(extractTypes);
     m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
     m_exporterFileThread.setData(&m_packages, exportPath);
-    m_vertexColorIndexerThread.setData(&m_packages);
 
-    if (((int)m_extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0)
-    {
-        // Avoid race condition
-        m_packages.getPackage("Misc").getDirMeta("/");
-        m_vertexColorIndexerThread.start();
-    }
+    WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = false;
 
     setupTree();
 }

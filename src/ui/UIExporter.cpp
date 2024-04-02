@@ -359,7 +359,9 @@ UiExporter::extractCancelButtonClicked()
 void
 UiExporter::extractIndexingStarted()
 {
-    this->ExtractProgressBar->setFormat("Indexing");
+    this->ExtractProgressBar->setMinimum(0);
+    this->ExtractProgressBar->setMaximum(1);
+    this->ExtractProgressBar->setFormat("Indexing...");
 }
 
 void

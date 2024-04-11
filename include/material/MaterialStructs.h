@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 namespace WarframeExporter::Material
 {
@@ -23,6 +24,10 @@ namespace WarframeExporter::Material
 
     struct MaterialInternal
     {
-        std::string formatted;
+        std::map<std::string, std::string> shaderAttributes;
+        std::map<std::string, std::string> miscAttributes;
+        std::vector<std::string> hlm3Textures;
+        std::vector<std::string> shaderSet1;
+        std::vector<std::string> shaderSet2;
     };
 };

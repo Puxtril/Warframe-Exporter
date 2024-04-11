@@ -10,5 +10,19 @@ namespace WarframeExporter::Material
     {
     public:
         static MaterialInternal convertMaterial(const MaterialExternal& externalMaterial);
+        static std::string combineMaterial(const MaterialInternal& internalMaterial);
+
+    private:
+        static void splitAndCombineAttributes(
+            const std::vector<std::string>& rawAttributes,
+            std::map<std::string, std::string>& shaderAttributes,
+            std::map<std::string, std::string>& miscAttributes
+        );
+
+        static void splitAndCombineAttributes(
+            const std::string& rawAttributes,
+            std::map<std::string, std::string>& shaderAttributes,
+            std::map<std::string, std::string>& miscAttributes
+        );
     };
 };

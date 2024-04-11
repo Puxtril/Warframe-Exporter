@@ -47,9 +47,11 @@ MaterialExtractor::addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, Lotus
 void
 MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath)
 {
+	std::string output = MaterialConverter::combineMaterial(materialInternal);
+
 	std::ofstream out;
 	out.open(outputPath, std::ios::out | std::ofstream::trunc);
-	out.write(materialInternal.formatted.c_str(), materialInternal.formatted.size());
+	out.write(output.c_str(), output.size());
 	out.close();
 }
 

@@ -11,6 +11,7 @@ CLIExtract::CLIExtract()
 	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract all shaders", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
+	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format. Values: Binary, Decompiled", false, "Binary", "Binary | Decompiled");
 }
 
 CLIExtract*
@@ -43,7 +44,9 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 void
 CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 {
-	cmdLine.add(m_includeVertexColors.get());
+	cmdLine
+	.add(m_includeVertexColors.get())
+	.add(m_shaderExportType.get());
 }
  
 void
@@ -53,6 +56,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		return;
 
 	WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = m_includeVertexColors->getValue();
+	setShaderFormat(m_shaderExportType->getValue());
 
 	int types = 0;
 	if (m_extTextCmd->getValue() || m_extAllCmd->getValue())
@@ -91,6 +95,25 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	WarframeExporter::Logger::getInstance().debug("Loading packages: " + pkgs.str());
 
 	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
+}
+
+void
+CLIExtract::setShaderFormat(const std::string& cmdValue)
+{
+	WarframeExporter::Shader::ShaderExportType requestedType = WarframeExporter::Shader::SHADER_EXPORT_BINARY;
+	if (cmdValue == "Decompiled" || cmdValue == "decompiled" || cmdValue == "decompile" || cmdValue == "Decompile")
+		requestedType = WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE;
+
+#ifdef Win32
+	WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = requestedType;
+#else
+	if (requestedType == WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE)
+	{
+		WarframeExporter::Logger::getInstance().error("Cannot decompile shader on non-Windows OS");
+		exit(1);
+	}
+	WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = WarframeExporter::Shader::SHADER_EXPORT_BINARY;
+#endif
 }
 
 void

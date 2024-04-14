@@ -2,6 +2,16 @@
 
 using namespace WarframeExporter::Shader;
 
+ShaderExtractor::ShaderExtractor()
+    : Extractor(), m_hasWarnedCompileNonWindows(false)
+{
+#ifdef WIN32
+    m_shaderExportType = SHADER_EXPORT_D3DDECOMPILE;
+#else
+    m_shaderExportType = SHADER_EXPORT_BINARY;
+#endif
+}
+
 ShaderExtractor*
 ShaderExtractor::getInstance()
 {
@@ -48,7 +58,6 @@ ShaderExtractor::writeShader(const ShaderEntry& shader, const std::filesystem::p
 {
     std::filesystem::path outputFile = outputDir / std::to_string(shaderIndex);
 	
-
     std::ofstream out;
 	if (shader.decompiled == "")
 	{
@@ -86,7 +95,8 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
 
     for (size_t iShader = 0; iShader < bodyEntries.size(); iShader++)
     {
-		decompileShader(bodyEntries[iShader]);
+        if (m_shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
+		    decompileShader(bodyEntries[iShader]);
         writeShader(bodyEntries[iShader], outputDir, iShader);
     }
 }

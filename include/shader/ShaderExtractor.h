@@ -6,6 +6,7 @@
 #include "shader/ShaderEnumMap.h"
 #include "shader/ShaderConverter.h"
 #include "shader/ShaderConverterD3D.h"
+#include "shader/ShaderExportType.h"
 
 namespace WarframeExporter::Shader
 {
@@ -13,11 +14,13 @@ namespace WarframeExporter::Shader
     {
 		bool m_hasWarnedCompileNonWindows;
 		
-        ShaderExtractor() : Extractor(), m_hasWarnedCompileNonWindows(false) {}
+        ShaderExtractor();
 
     public:
         ShaderExtractor(const ShaderExtractor&) = delete;
 		ShaderExtractor operator=(const ShaderExtractor&) = delete;
+
+		static inline ShaderExportType m_shaderExportType;
 
         inline const std::string& getFriendlyName() const override
         {

@@ -31,12 +31,4 @@ namespace WarframeExporter::Texture
 		TextureHeaderInternal header;
 		std::vector<char> body;
 	};
-
-	/*
-	struct TextureBodyInternal
-	{
-		std::unique_ptr<char[]> data;
-		size_t dataLen;
-	};
-	*/
 }

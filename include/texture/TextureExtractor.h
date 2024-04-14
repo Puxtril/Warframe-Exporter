@@ -2,15 +2,16 @@
 
 #include "Extractor.h"
 #include "../Ensmallening.hpp"
-#include "TextureStructs.hpp"
+#include "texture/TextureStructs.hpp"
 #include "BinaryReaderBuffered.h"
-#include "BinaryReaderBuffered.h"
-#include "TextureReader.h"
-#include "TextureConverter.h"
-#include "TextureEnumMap.h"
-#include "TextureExporterDDS.h"
+#include "texture/TextureReader.h"
+#include "texture/TextureConverter.h"
+#include "texture/TextureEnumMap.h"
+#include "texture/TextureExporterDDS.h"
+#include "texture/TextureExportTypes.h"
+#include "texture/TextureTypes.h"
+#include "texture/TextureExporterConvert.h"
 
-#include <iostream>
 
 namespace WarframeExporter::Texture
 {	
@@ -22,11 +23,30 @@ namespace WarframeExporter::Texture
 		TextureExtractor(const TextureExtractor&) = delete;
 		TextureExtractor operator=(const TextureExtractor&) = delete;
 
+		static inline TextureExportType m_exportType = TextureExportType::TEXTURE_EXPORT_DDS;
+
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
 		{
-			static std::string outFileExt = "dds";
-			return outFileExt;
-		}
+			size_t curOffset = hReader->tell();
+			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, {true, true, true});
+			hReader->seek(curOffset, std::ios::beg);
+			
+			static const std::string hdr = "hdr";
+			if (extHeader.format == (uint8_t)TextureCompression::BC6)
+				return hdr;
+
+			static const std::string dds = "dds";
+			if (m_exportType == TextureExportType::TEXTURE_EXPORT_DDS)
+				return dds;
+
+			static const std::string png = "png";
+			if (m_exportType == TextureExportType::TEXTURE_EXPORT_PNG)
+				return png;
+
+			static const std::string tga = "tga";
+			if (m_exportType == TextureExportType::TEXTURE_EXPORT_TGA)
+				return tga;
+		}	
 		
 		inline bool isMultiExport() const override
 		{

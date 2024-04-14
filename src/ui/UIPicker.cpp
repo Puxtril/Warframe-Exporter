@@ -10,6 +10,8 @@ UiPicker::setupUi(QDialog *WindowPicker)
 {
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
+    addShaderFormatOptions();
+    addTextureFormatOptions();
     loadSettings();
     loadVersion();
 }
@@ -27,26 +29,61 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
 }
 
 void
+UiPicker::addShaderFormatOptions()
+{
+    this->ShaderFormatCombo->addItem("Binary", WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY);
+#ifdef WIN32
+    this->ShaderFormatCombo->addItem("Decompiled", WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE);
+#endif
+}
+
+void
+UiPicker::addTextureFormatOptions()
+{
+    this->TextureFormatCombo->addItem("DDS", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS);
+    this->TextureFormatCombo->addItem("PNG",WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG);
+    this->TextureFormatCombo->addItem("TGA", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA);
+}
+
+void
 UiPicker::loadSettings()
 {
     UiSettings& settings = UiSettings::getInstance();
 
     this->CacheWindowsInput->setText(settings.getCacheWindowsPath());
     this->ExportPathInput->setText(settings.getExportPath());
-    
-    this->CheckboxViewTextures->setCheckState(settings.getViewTextures() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxViewModels->setCheckState(settings.getViewModels() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxViewLevels->setCheckState(settings.getViewLevels() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxViewMaterials->setCheckState(settings.getViewMaterials() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxViewAudio->setCheckState(settings.getViewAudio() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxViewShaders->setCheckState(settings.getViewShaders() ? Qt::Checked : Qt::Unchecked);
 
-    this->CheckboxExportTextures->setCheckState(settings.getExportTextures() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxExportModels->setCheckState(settings.getExportModels() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxExportLevels->setCheckState(settings.getExportLevels() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxExportMaterials->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxExportAudio->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
-    this->CheckboxExportShaders->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
+    this->TextureCheckbox->setCheckState(settings.getExportTextures() ? Qt::Checked : Qt::Unchecked);
+    this->ModelCheckbox->setCheckState(settings.getExportModels() ? Qt::Checked : Qt::Unchecked);
+    this->LevelCheckbox->setCheckState(settings.getExportLevels() ? Qt::Checked : Qt::Unchecked);
+    this->MaterialCheckbox->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
+    this->AudioCheckbox->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
+    this->ShaderCheckbox->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
+
+    WarframeExporter::Texture::TextureExportType textureFormat = settings.getTextureFormat();
+    switch(textureFormat)
+    {
+        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS:
+            this->TextureFormatCombo->setCurrentIndex(0);
+            break;
+        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG:
+            this->TextureFormatCombo->setCurrentIndex(1);
+            break;
+        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA:
+            this->TextureFormatCombo->setCurrentIndex(2);
+            break;
+    }
+
+    WarframeExporter::Shader::ShaderExportType shaderFormat = settings.getShaderFormat();
+    switch(shaderFormat)
+    {
+        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY:
+            this->ShaderFormatCombo->setCurrentIndex(0);
+            break;
+        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_D3DDECOMPILE:
+            this->ShaderFormatCombo->setCurrentIndex(1);
+            break;
+    }
 }
 
 void
@@ -81,43 +118,19 @@ UiPicker::parsePickerOptions()
         return;
     }
 
-    int viewTypes = 0;
-
-    if (this->CheckboxViewAudio->isChecked())
-        viewTypes |= (int)WarframeExporter::ExtractorType::Audio;
-    if (this->CheckboxViewLevels->isChecked())
-        viewTypes |= (int)WarframeExporter::ExtractorType::Level;
-    if (this->CheckboxViewMaterials->isChecked())
-        viewTypes |= (int)WarframeExporter::ExtractorType::Material;
-    if (this->CheckboxViewModels->isChecked())
-        viewTypes |= (int)WarframeExporter::ExtractorType::Model;
-    if (this->CheckboxViewTextures->isChecked())
-        viewTypes |= (int)WarframeExporter::ExtractorType::Texture;
-    if (this->CheckboxViewShaders->isChecked())
-        viewTypes |= (int)WarframeExporter::ExtractorType::Shader;
-
-    if (viewTypes == 0)
-    {
-        QMessageBox errBox;
-        errBox.critical(nullptr, "Error", "No view items selected");
-        errBox.setFixedSize(500, 200);
-        errBox.show();
-        return;
-    }
-
     int exportTypes = 0;
 
-    if (this->CheckboxExportAudio->isChecked())
+    if (this->AudioCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Audio;
-    if (this->CheckboxExportLevels->isChecked())
+    if (this->LevelCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Level;
-    if (this->CheckboxExportMaterials->isChecked())
+    if (this->MaterialCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Material;
-    if (this->CheckboxExportModels->isChecked())
+    if (this->ModelCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Model;
-    if (this->CheckboxExportTextures->isChecked())
+    if (this->TextureCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Texture;
-    if (this->CheckboxExportShaders->isChecked())
+    if (this->ShaderCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Shader;
 
     if (exportTypes == 0)
@@ -129,7 +142,13 @@ UiPicker::parsePickerOptions()
         return;
     }
 
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)viewTypes, (WarframeExporter::ExtractorType)exportTypes);
+    int selectedTextureFormat = this->TextureFormatCombo->itemData(this->TextureFormatCombo->currentIndex()).toInt();
+    WarframeExporter::Texture::TextureExportType textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(selectedTextureFormat);
+
+    int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
+    WarframeExporter::Shader::ShaderExportType shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
+
+    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType);
 }
 
 void

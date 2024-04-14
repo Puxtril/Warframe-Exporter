@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Extractor.h"
+#include "shader/ShaderExportType.h"
+#include "texture/TextureExportTypes.h"
 
 #include <filesystem>
 #include <QtCore/qobject.h>
 #include <string>
 #include <QtCore/QSettings>
+#include <cstdint>
 
 class UiSettings : public QObject
 {
@@ -13,13 +16,6 @@ class UiSettings : public QObject
 
     static const inline QString m_cacheWindowsKey = "load/cachePath";
     static const inline QString m_exportPathKey = "load/exportPath";
-    
-    static const inline QString m_checkboxViewTextures = "load/view/textures";
-    static const inline QString m_checkboxViewModels = "load/view/models";
-    static const inline QString m_checkboxViewLevels = "load/view/levels";
-    static const inline QString m_checkboxViewMaterials = "load/view/materials";
-    static const inline QString m_checkboxViewAudio = "load/view/audio";
-    static const inline QString m_checkboxViewShaders = "load/view/shaders";
 
     static const inline QString m_checkboxExportTextures = "load/export/textures";
     static const inline QString m_checkboxExportModels = "load/export/models";
@@ -27,6 +23,9 @@ class UiSettings : public QObject
     static const inline QString m_checkboxExportMaterials = "load/export/materials";
     static const inline QString m_checkboxExportAudio = "load/export/audio";
     static const inline QString m_checkboxExportShaders = "load/export/shaders";
+
+    static const inline QString m_comboTextureFormat = "load/export/textureformat";
+    static const inline QString m_comboShaderFormat = "load/export/shaderformat";
 
     UiSettings();
     UiSettings(const UiSettings&) = delete;
@@ -38,13 +37,6 @@ public:
     QString getCacheWindowsPath() const;
     QString getExportPath() const;
 
-    bool getViewTextures() const;
-    bool getViewModels() const;
-    bool getViewLevels() const;
-    bool getViewMaterials() const;
-    bool getViewAudio() const;
-    bool getViewShaders() const;
-
     bool getExportTextures() const;
     bool getExportModels() const;
     bool getExportLevels() const;
@@ -52,6 +44,15 @@ public:
     bool getExportAudio() const;
     bool getExportShaders() const;
 
+    WarframeExporter::Shader::ShaderExportType getShaderFormat() const;
+    WarframeExporter::Texture::TextureExportType getTextureFormat() const;
+
 public slots:
-    void setSettings(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);
+    void setSettings(
+        std::filesystem::path cachePath,
+        std::filesystem::path exportPath,
+        WarframeExporter::ExtractorType extractTypes,
+        WarframeExporter::Shader::ShaderExportType shaderExportType,
+        WarframeExporter::Texture::TextureExportType textureExportType    
+    );
 };

@@ -44,9 +44,9 @@ UiExporter::setupTree()
 
     // Initial pass to get all directory names
     std::set<std::string> dirNamesInAllPkgs;
-    for (size_t iPkg = 0; iPkg < m_viewPkgNames.size(); iPkg++)
+    for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
-        std::string& curPkgName = m_viewPkgNames[iPkg];
+        std::string& curPkgName = m_exportPkgNames[iPkg];
         LotusLib::DirMeta curEntry = m_packages.getPackage(curPkgName).getDirMeta("/");
 
         // Purposefully commented out because these clutter the root directory
@@ -76,9 +76,9 @@ UiExporter::setupTree()
         TreeItemDirectory* newDirWidget = nullptr;
         std::vector<LotusLib::DirMeta> dirEntries;
 
-        for (size_t iPkg = 0; iPkg < m_viewPkgNames.size(); iPkg++)
+        for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
-            const std::string& curPkgName = m_viewPkgNames[iPkg];
+            const std::string& curPkgName = m_exportPkgNames[iPkg];
             LotusLib::DirMeta curEntry = m_packages.getPackage(curPkgName).getDirMeta("/").getChildDir(curDirName);
 
             // Ensure relation in pkgNames and curEntries
@@ -118,7 +118,7 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
     // 2. Initial pass to collect all unique directory names
     // Nasty but slightly more optimized this way
     std::set<std::string_view> dirNamesInAllPkgs;
-    for (size_t iPkg = 0; iPkg < m_viewPkgNames.size(); iPkg++)
+    for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
         LotusLib::DirMeta& curEntry = curEntries[iPkg];
 
@@ -130,7 +130,7 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
         {
             LotusLib::FileMeta curNode = curEntry.getChildFile(i);
 
-            TreeItemFile* fileWidget = new TreeItemFile(parentWidget, curNode, m_viewPkgNames[iPkg]);
+            TreeItemFile* fileWidget = new TreeItemFile(parentWidget, curNode, m_exportPkgNames[iPkg]);
             fileWidget->setData(0, 0, curNode.getName().c_str());
         }
 
@@ -149,7 +149,7 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
         std::vector<LotusLib::DirMeta> dirEntries;
         size_t validDirCount = 0;
 
-        for (size_t iPkg = 0; iPkg < m_viewPkgNames.size(); iPkg++)
+        for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
             // Ensure relation in m_viewPkgNames and curEntries
             if (curEntries[iPkg].isEmpty())
@@ -302,19 +302,25 @@ UiExporter::itemClicked(QTreeWidgetItem *item, int column)
 }
 
 void
-UiExporter::setData(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes)
+UiExporter::setData(
+        std::filesystem::path cachePath,
+        std::filesystem::path exportPath,
+        WarframeExporter::ExtractorType extractTypes,
+        WarframeExporter::Shader::ShaderExportType shaderExportType,
+        WarframeExporter::Texture::TextureExportType textureExportType    
+)
 {
     m_packages.setData(cachePath);
     m_cacheDirPath = cachePath;
     m_exportPath = exportPath;
-    m_viewTypes = viewTypes;
     m_extractTypes = extractTypes;
-    m_viewPkgNames = getPackageNames(viewTypes);
     m_exportPkgNames = getPackageNames(extractTypes);
     m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
     m_exporterFileThread.setData(&m_packages, exportPath);
 
     WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = false;
+    WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = shaderExportType;
+    WarframeExporter::Texture::TextureExtractor::m_exportType = textureExportType;
 
     setupTree();
 }

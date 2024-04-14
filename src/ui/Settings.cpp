@@ -25,42 +25,6 @@ UiSettings::getExportPath() const
 }
 
 bool
-UiSettings::getViewTextures() const
-{
-    return m_settings.value(m_checkboxViewTextures).toBool();
-}
-
-bool
-UiSettings::getViewModels() const
-{
-    return m_settings.value(m_checkboxViewModels).toBool();
-}
-
-bool
-UiSettings::getViewLevels() const
-{
-    return m_settings.value(m_checkboxViewLevels).toBool();
-}
-
-bool
-UiSettings::getViewMaterials() const
-{
-    return m_settings.value(m_checkboxViewMaterials).toBool();
-}
-
-bool
-UiSettings::getViewAudio() const
-{
-    return m_settings.value(m_checkboxViewAudio).toBool();
-}
-
-bool
-UiSettings::getViewShaders() const
-{
-    return m_settings.value(m_checkboxViewShaders).toBool();
-}
-
-bool
 UiSettings::getExportTextures() const
 {
     return m_settings.value(m_checkboxExportTextures).toBool();
@@ -96,8 +60,28 @@ UiSettings::getExportShaders() const
     return m_settings.value(m_checkboxExportShaders).toBool();
 }
 
+WarframeExporter::Shader::ShaderExportType
+UiSettings::getShaderFormat() const
+{
+    int value = m_settings.value(m_comboShaderFormat).toInt();
+    return static_cast<WarframeExporter::Shader::ShaderExportType>(value);
+}
+
+WarframeExporter::Texture::TextureExportType
+UiSettings::getTextureFormat() const
+{
+    int value = m_settings.value(m_comboTextureFormat).toInt();
+    return static_cast<WarframeExporter::Texture::TextureExportType>(value);
+}
+
 void
-UiSettings::setSettings(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes)
+UiSettings::setSettings(
+        std::filesystem::path cachePath,
+        std::filesystem::path exportPath,
+        WarframeExporter::ExtractorType extractTypes,
+        WarframeExporter::Shader::ShaderExportType shaderExportType,
+        WarframeExporter::Texture::TextureExportType textureExportType    
+    )
 {
     QString qCachePath = QString(cachePath.string().c_str());
     m_settings.setValue(m_cacheWindowsKey, qCachePath);
@@ -105,17 +89,13 @@ UiSettings::setSettings(std::filesystem::path cachePath, std::filesystem::path e
     QString qExportPath = QString(exportPath.string().c_str());
     m_settings.setValue(m_exportPathKey, qExportPath);
 
-    m_settings.setValue(m_checkboxViewTextures, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Texture) > 0);
-    m_settings.setValue(m_checkboxViewModels, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Model) > 0);
-    m_settings.setValue(m_checkboxViewLevels, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Level) > 0);
-    m_settings.setValue(m_checkboxViewMaterials, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Material) > 0);
-    m_settings.setValue(m_checkboxViewAudio, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Audio) > 0);
-    m_settings.setValue(m_checkboxViewShaders, ((int)viewTypes & (int)WarframeExporter::ExtractorType::Shader) > 0);
-
     m_settings.setValue(m_checkboxExportTextures, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Texture) > 0);
     m_settings.setValue(m_checkboxExportModels, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0);
     m_settings.setValue(m_checkboxExportLevels, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Level) > 0);
     m_settings.setValue(m_checkboxExportMaterials, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Material) > 0);
     m_settings.setValue(m_checkboxExportAudio, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0);
     m_settings.setValue(m_checkboxExportShaders, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0);
+
+    m_settings.setValue(m_comboShaderFormat, (int)shaderExportType);
+    m_settings.setValue(m_comboTextureFormat, (int)textureExportType);
 }

@@ -1,20 +1,20 @@
 /********************************************************************************
-** Form generated from reading UI file 'PickerXNRkFX.ui'
+** Form generated from reading UI file 'PickerQQMRIq.ui'
 **
-** Created by: Qt User Interface Compiler version 6.6.1
+** Created by: Qt User Interface Compiler version 6.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef PICKERXNRKFX_H
-#define PICKERXNRKFX_H
+#ifndef PICKERQQMRIQ_H
+#define PICKERQQMRIQ_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QFrame>
-#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -28,7 +28,7 @@ QT_BEGIN_NAMESPACE
 class Ui_WindowPicker
 {
 public:
-    QVBoxLayout *verticalLayout;
+    QVBoxLayout *verticalLayout_2;
     QGroupBox *CacheWindowsFrame;
     QHBoxLayout *horizontalLayout;
     QLineEdit *CacheWindowsInput;
@@ -38,24 +38,39 @@ public:
     QLineEdit *ExportPathInput;
     QPushButton *ExportPathBrowse;
     QSpacerItem *TopSpacer;
-    QHBoxLayout *horizontalLayout_2;
-    QGroupBox *PackagesViewFrame;
-    QGridLayout *gridLayout;
-    QCheckBox *CheckboxViewLevels;
-    QCheckBox *CheckboxViewModels;
-    QCheckBox *CheckboxViewTextures;
-    QCheckBox *CheckboxViewMaterials;
-    QCheckBox *CheckboxViewAudio;
-    QCheckBox *CheckboxViewShaders;
-    QSpacerItem *horizontalSpacer;
-    QGroupBox *PackagesExportFrame;
-    QGridLayout *gridLayout_3;
-    QCheckBox *CheckboxExportLevels;
-    QCheckBox *CheckboxExportModels;
-    QCheckBox *CheckboxExportTextures;
-    QCheckBox *CheckboxExportMaterials;
-    QCheckBox *CheckboxExportAudio;
-    QCheckBox *CheckboxExportShaders;
+    QHBoxLayout *horizontalLayout_5;
+    QSpacerItem *horizontalSpacer_4;
+    QVBoxLayout *verticalLayout;
+    QHBoxLayout *TitleSection;
+    QLabel *TitleType;
+    QLabel *TitleExtract;
+    QLabel *TitleOutputFormat;
+    QFrame *TitleLine;
+    QHBoxLayout *AudioSection;
+    QLabel *AudioLabel;
+    QCheckBox *AudioCheckbox;
+    QLabel *AudioFormatLabel;
+    QHBoxLayout *LevelSection;
+    QLabel *LevelLabel;
+    QCheckBox *LevelCheckbox;
+    QLabel *LevelFormatLabel;
+    QHBoxLayout *MaterialSection;
+    QLabel *MaterialLabel;
+    QCheckBox *MaterialCheckbox;
+    QLabel *MaterialFormatLabel;
+    QHBoxLayout *ModelSection;
+    QLabel *ModelLabel;
+    QCheckBox *ModelCheckbox;
+    QLabel *ModelFormatLabel;
+    QHBoxLayout *ShaderSecion;
+    QLabel *ShaderLabel;
+    QCheckBox *ShaderCheckbox;
+    QComboBox *ShaderFormatCombo;
+    QHBoxLayout *TextureSection;
+    QLabel *TextureLabel;
+    QCheckBox *TextureCheckbox;
+    QComboBox *TextureFormatCombo;
+    QSpacerItem *horizontalSpacer_3;
     QSpacerItem *BottomSpacer;
     QFrame *LoadButtonFrame;
     QHBoxLayout *horizontalLayout_3;
@@ -67,9 +82,9 @@ public:
     {
         if (WindowPicker->objectName().isEmpty())
             WindowPicker->setObjectName("WindowPicker");
-        WindowPicker->resize(465, 394);
-        verticalLayout = new QVBoxLayout(WindowPicker);
-        verticalLayout->setObjectName("verticalLayout");
+        WindowPicker->resize(541, 484);
+        verticalLayout_2 = new QVBoxLayout(WindowPicker);
+        verticalLayout_2->setObjectName("verticalLayout_2");
         CacheWindowsFrame = new QGroupBox(WindowPicker);
         CacheWindowsFrame->setObjectName("CacheWindowsFrame");
         CacheWindowsFrame->setMaximumSize(QSize(16777215, 70));
@@ -86,7 +101,7 @@ public:
         horizontalLayout->addWidget(CacheWindowsBrowse);
 
 
-        verticalLayout->addWidget(CacheWindowsFrame);
+        verticalLayout_2->addWidget(CacheWindowsFrame);
 
         ExportPathFrame = new QGroupBox(WindowPicker);
         ExportPathFrame->setObjectName("ExportPathFrame");
@@ -104,129 +119,257 @@ public:
         horizontalLayout_4->addWidget(ExportPathBrowse);
 
 
-        verticalLayout->addWidget(ExportPathFrame);
+        verticalLayout_2->addWidget(ExportPathFrame);
 
-        TopSpacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+        TopSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::MinimumExpanding);
 
-        verticalLayout->addItem(TopSpacer);
+        verticalLayout_2->addItem(TopSpacer);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
-        PackagesViewFrame = new QGroupBox(WindowPicker);
-        PackagesViewFrame->setObjectName("PackagesViewFrame");
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
+        horizontalSpacer_4 = new QSpacerItem(70, 20, QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer_4);
+
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setObjectName("verticalLayout");
+        TitleSection = new QHBoxLayout();
+        TitleSection->setObjectName("TitleSection");
+        TitleSection->setContentsMargins(-1, 10, -1, 10);
+        TitleType = new QLabel(WindowPicker);
+        TitleType->setObjectName("TitleType");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(40);
-        sizePolicy.setHeightForWidth(PackagesViewFrame->sizePolicy().hasHeightForWidth());
-        PackagesViewFrame->setSizePolicy(sizePolicy);
-        PackagesViewFrame->setMinimumSize(QSize(0, 100));
-        PackagesViewFrame->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-        PackagesViewFrame->setCheckable(false);
-        gridLayout = new QGridLayout(PackagesViewFrame);
-        gridLayout->setObjectName("gridLayout");
-        CheckboxViewLevels = new QCheckBox(PackagesViewFrame);
-        CheckboxViewLevels->setObjectName("CheckboxViewLevels");
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(TitleType->sizePolicy().hasHeightForWidth());
+        TitleType->setSizePolicy(sizePolicy);
+        TitleType->setMinimumSize(QSize(70, 0));
+        QFont font;
+        font.setUnderline(false);
+        TitleType->setFont(font);
+        TitleType->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout->addWidget(CheckboxViewLevels, 2, 0, 1, 1);
+        TitleSection->addWidget(TitleType);
 
-        CheckboxViewModels = new QCheckBox(PackagesViewFrame);
-        CheckboxViewModels->setObjectName("CheckboxViewModels");
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Ignored);
+        TitleExtract = new QLabel(WindowPicker);
+        TitleExtract->setObjectName("TitleExtract");
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(CheckboxViewModels->sizePolicy().hasHeightForWidth());
-        CheckboxViewModels->setSizePolicy(sizePolicy1);
+        sizePolicy1.setHeightForWidth(TitleExtract->sizePolicy().hasHeightForWidth());
+        TitleExtract->setSizePolicy(sizePolicy1);
+        TitleExtract->setFont(font);
+        TitleExtract->setAlignment(Qt::AlignCenter);
 
-        gridLayout->addWidget(CheckboxViewModels, 0, 1, 1, 1);
+        TitleSection->addWidget(TitleExtract);
 
-        CheckboxViewTextures = new QCheckBox(PackagesViewFrame);
-        CheckboxViewTextures->setObjectName("CheckboxViewTextures");
-        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        TitleOutputFormat = new QLabel(WindowPicker);
+        TitleOutputFormat->setObjectName("TitleOutputFormat");
+        sizePolicy1.setHeightForWidth(TitleOutputFormat->sizePolicy().hasHeightForWidth());
+        TitleOutputFormat->setSizePolicy(sizePolicy1);
+        TitleOutputFormat->setFont(font);
+        TitleOutputFormat->setAlignment(Qt::AlignCenter);
+
+        TitleSection->addWidget(TitleOutputFormat);
+
+
+        verticalLayout->addLayout(TitleSection);
+
+        TitleLine = new QFrame(WindowPicker);
+        TitleLine->setObjectName("TitleLine");
+        TitleLine->setFrameShape(QFrame::HLine);
+        TitleLine->setFrameShadow(QFrame::Sunken);
+
+        verticalLayout->addWidget(TitleLine);
+
+        AudioSection = new QHBoxLayout();
+        AudioSection->setObjectName("AudioSection");
+        AudioLabel = new QLabel(WindowPicker);
+        AudioLabel->setObjectName("AudioLabel");
+        sizePolicy.setHeightForWidth(AudioLabel->sizePolicy().hasHeightForWidth());
+        AudioLabel->setSizePolicy(sizePolicy);
+        AudioLabel->setMinimumSize(QSize(70, 0));
+        QFont font1;
+        font1.setPointSize(10);
+        AudioLabel->setFont(font1);
+
+        AudioSection->addWidget(AudioLabel);
+
+        AudioCheckbox = new QCheckBox(WindowPicker);
+        AudioCheckbox->setObjectName("AudioCheckbox");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(CheckboxViewTextures->sizePolicy().hasHeightForWidth());
-        CheckboxViewTextures->setSizePolicy(sizePolicy2);
+        sizePolicy2.setHeightForWidth(AudioCheckbox->sizePolicy().hasHeightForWidth());
+        AudioCheckbox->setSizePolicy(sizePolicy2);
+        AudioCheckbox->setLayoutDirection(Qt::LeftToRight);
+        AudioCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        AudioCheckbox->setTristate(false);
 
-        gridLayout->addWidget(CheckboxViewTextures, 0, 0, 1, 1);
+        AudioSection->addWidget(AudioCheckbox);
 
-        CheckboxViewMaterials = new QCheckBox(PackagesViewFrame);
-        CheckboxViewMaterials->setObjectName("CheckboxViewMaterials");
-        sizePolicy2.setHeightForWidth(CheckboxViewMaterials->sizePolicy().hasHeightForWidth());
-        CheckboxViewMaterials->setSizePolicy(sizePolicy2);
+        AudioFormatLabel = new QLabel(WindowPicker);
+        AudioFormatLabel->setObjectName("AudioFormatLabel");
+        sizePolicy1.setHeightForWidth(AudioFormatLabel->sizePolicy().hasHeightForWidth());
+        AudioFormatLabel->setSizePolicy(sizePolicy1);
+        AudioFormatLabel->setAlignment(Qt::AlignCenter);
 
-        gridLayout->addWidget(CheckboxViewMaterials, 2, 1, 1, 1);
-
-        CheckboxViewAudio = new QCheckBox(PackagesViewFrame);
-        CheckboxViewAudio->setObjectName("CheckboxViewAudio");
-
-        gridLayout->addWidget(CheckboxViewAudio, 3, 0, 1, 1);
-
-        CheckboxViewShaders = new QCheckBox(PackagesViewFrame);
-        CheckboxViewShaders->setObjectName("CheckboxViewShaders");
-
-        gridLayout->addWidget(CheckboxViewShaders, 3, 1, 1, 1);
+        AudioSection->addWidget(AudioFormatLabel);
 
 
-        horizontalLayout_2->addWidget(PackagesViewFrame);
+        verticalLayout->addLayout(AudioSection);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        LevelSection = new QHBoxLayout();
+        LevelSection->setObjectName("LevelSection");
+        LevelLabel = new QLabel(WindowPicker);
+        LevelLabel->setObjectName("LevelLabel");
+        sizePolicy.setHeightForWidth(LevelLabel->sizePolicy().hasHeightForWidth());
+        LevelLabel->setSizePolicy(sizePolicy);
+        LevelLabel->setMinimumSize(QSize(70, 0));
+        LevelLabel->setFont(font1);
 
-        horizontalLayout_2->addItem(horizontalSpacer);
+        LevelSection->addWidget(LevelLabel);
 
-        PackagesExportFrame = new QGroupBox(WindowPicker);
-        PackagesExportFrame->setObjectName("PackagesExportFrame");
-        sizePolicy.setHeightForWidth(PackagesExportFrame->sizePolicy().hasHeightForWidth());
-        PackagesExportFrame->setSizePolicy(sizePolicy);
-        PackagesExportFrame->setMinimumSize(QSize(0, 100));
-        PackagesExportFrame->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-        PackagesExportFrame->setCheckable(false);
-        gridLayout_3 = new QGridLayout(PackagesExportFrame);
-        gridLayout_3->setObjectName("gridLayout_3");
-        CheckboxExportLevels = new QCheckBox(PackagesExportFrame);
-        CheckboxExportLevels->setObjectName("CheckboxExportLevels");
+        LevelCheckbox = new QCheckBox(WindowPicker);
+        LevelCheckbox->setObjectName("LevelCheckbox");
+        sizePolicy2.setHeightForWidth(LevelCheckbox->sizePolicy().hasHeightForWidth());
+        LevelCheckbox->setSizePolicy(sizePolicy2);
+        LevelCheckbox->setLayoutDirection(Qt::LeftToRight);
+        LevelCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        LevelCheckbox->setTristate(false);
 
-        gridLayout_3->addWidget(CheckboxExportLevels, 2, 0, 1, 1);
+        LevelSection->addWidget(LevelCheckbox);
 
-        CheckboxExportModels = new QCheckBox(PackagesExportFrame);
-        CheckboxExportModels->setObjectName("CheckboxExportModels");
-        sizePolicy1.setHeightForWidth(CheckboxExportModels->sizePolicy().hasHeightForWidth());
-        CheckboxExportModels->setSizePolicy(sizePolicy1);
+        LevelFormatLabel = new QLabel(WindowPicker);
+        LevelFormatLabel->setObjectName("LevelFormatLabel");
+        LevelFormatLabel->setAlignment(Qt::AlignCenter);
 
-        gridLayout_3->addWidget(CheckboxExportModels, 0, 1, 1, 1);
-
-        CheckboxExportTextures = new QCheckBox(PackagesExportFrame);
-        CheckboxExportTextures->setObjectName("CheckboxExportTextures");
-        sizePolicy2.setHeightForWidth(CheckboxExportTextures->sizePolicy().hasHeightForWidth());
-        CheckboxExportTextures->setSizePolicy(sizePolicy2);
-
-        gridLayout_3->addWidget(CheckboxExportTextures, 0, 0, 1, 1);
-
-        CheckboxExportMaterials = new QCheckBox(PackagesExportFrame);
-        CheckboxExportMaterials->setObjectName("CheckboxExportMaterials");
-        sizePolicy2.setHeightForWidth(CheckboxExportMaterials->sizePolicy().hasHeightForWidth());
-        CheckboxExportMaterials->setSizePolicy(sizePolicy2);
-
-        gridLayout_3->addWidget(CheckboxExportMaterials, 2, 1, 1, 1);
-
-        CheckboxExportAudio = new QCheckBox(PackagesExportFrame);
-        CheckboxExportAudio->setObjectName("CheckboxExportAudio");
-
-        gridLayout_3->addWidget(CheckboxExportAudio, 3, 0, 1, 1);
-
-        CheckboxExportShaders = new QCheckBox(PackagesExportFrame);
-        CheckboxExportShaders->setObjectName("CheckboxExportShaders");
-
-        gridLayout_3->addWidget(CheckboxExportShaders, 3, 1, 1, 1);
+        LevelSection->addWidget(LevelFormatLabel);
 
 
-        horizontalLayout_2->addWidget(PackagesExportFrame);
+        verticalLayout->addLayout(LevelSection);
+
+        MaterialSection = new QHBoxLayout();
+        MaterialSection->setObjectName("MaterialSection");
+        MaterialLabel = new QLabel(WindowPicker);
+        MaterialLabel->setObjectName("MaterialLabel");
+        sizePolicy.setHeightForWidth(MaterialLabel->sizePolicy().hasHeightForWidth());
+        MaterialLabel->setSizePolicy(sizePolicy);
+        MaterialLabel->setFont(font1);
+
+        MaterialSection->addWidget(MaterialLabel);
+
+        MaterialCheckbox = new QCheckBox(WindowPicker);
+        MaterialCheckbox->setObjectName("MaterialCheckbox");
+        sizePolicy2.setHeightForWidth(MaterialCheckbox->sizePolicy().hasHeightForWidth());
+        MaterialCheckbox->setSizePolicy(sizePolicy2);
+        MaterialCheckbox->setLayoutDirection(Qt::LeftToRight);
+        MaterialCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        MaterialCheckbox->setTristate(false);
+
+        MaterialSection->addWidget(MaterialCheckbox);
+
+        MaterialFormatLabel = new QLabel(WindowPicker);
+        MaterialFormatLabel->setObjectName("MaterialFormatLabel");
+        MaterialFormatLabel->setAlignment(Qt::AlignCenter);
+
+        MaterialSection->addWidget(MaterialFormatLabel);
 
 
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout->addLayout(MaterialSection);
 
-        BottomSpacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        ModelSection = new QHBoxLayout();
+        ModelSection->setObjectName("ModelSection");
+        ModelLabel = new QLabel(WindowPicker);
+        ModelLabel->setObjectName("ModelLabel");
+        ModelLabel->setFont(font1);
 
-        verticalLayout->addItem(BottomSpacer);
+        ModelSection->addWidget(ModelLabel);
+
+        ModelCheckbox = new QCheckBox(WindowPicker);
+        ModelCheckbox->setObjectName("ModelCheckbox");
+        sizePolicy2.setHeightForWidth(ModelCheckbox->sizePolicy().hasHeightForWidth());
+        ModelCheckbox->setSizePolicy(sizePolicy2);
+        ModelCheckbox->setLayoutDirection(Qt::LeftToRight);
+        ModelCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        ModelCheckbox->setTristate(false);
+
+        ModelSection->addWidget(ModelCheckbox);
+
+        ModelFormatLabel = new QLabel(WindowPicker);
+        ModelFormatLabel->setObjectName("ModelFormatLabel");
+        ModelFormatLabel->setAlignment(Qt::AlignCenter);
+
+        ModelSection->addWidget(ModelFormatLabel);
+
+
+        verticalLayout->addLayout(ModelSection);
+
+        ShaderSecion = new QHBoxLayout();
+        ShaderSecion->setObjectName("ShaderSecion");
+        ShaderLabel = new QLabel(WindowPicker);
+        ShaderLabel->setObjectName("ShaderLabel");
+        ShaderLabel->setFont(font1);
+
+        ShaderSecion->addWidget(ShaderLabel);
+
+        ShaderCheckbox = new QCheckBox(WindowPicker);
+        ShaderCheckbox->setObjectName("ShaderCheckbox");
+        sizePolicy2.setHeightForWidth(ShaderCheckbox->sizePolicy().hasHeightForWidth());
+        ShaderCheckbox->setSizePolicy(sizePolicy2);
+        ShaderCheckbox->setLayoutDirection(Qt::LeftToRight);
+        ShaderCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        ShaderCheckbox->setTristate(false);
+
+        ShaderSecion->addWidget(ShaderCheckbox);
+
+        ShaderFormatCombo = new QComboBox(WindowPicker);
+        ShaderFormatCombo->setObjectName("ShaderFormatCombo");
+
+        ShaderSecion->addWidget(ShaderFormatCombo);
+
+
+        verticalLayout->addLayout(ShaderSecion);
+
+        TextureSection = new QHBoxLayout();
+        TextureSection->setObjectName("TextureSection");
+        TextureLabel = new QLabel(WindowPicker);
+        TextureLabel->setObjectName("TextureLabel");
+        TextureLabel->setFont(font1);
+
+        TextureSection->addWidget(TextureLabel);
+
+        TextureCheckbox = new QCheckBox(WindowPicker);
+        TextureCheckbox->setObjectName("TextureCheckbox");
+        sizePolicy2.setHeightForWidth(TextureCheckbox->sizePolicy().hasHeightForWidth());
+        TextureCheckbox->setSizePolicy(sizePolicy2);
+        TextureCheckbox->setLayoutDirection(Qt::LeftToRight);
+        TextureCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        TextureCheckbox->setTristate(false);
+
+        TextureSection->addWidget(TextureCheckbox);
+
+        TextureFormatCombo = new QComboBox(WindowPicker);
+        TextureFormatCombo->setObjectName("TextureFormatCombo");
+
+        TextureSection->addWidget(TextureFormatCombo);
+
+
+        verticalLayout->addLayout(TextureSection);
+
+
+        horizontalLayout_5->addLayout(verticalLayout);
+
+        horizontalSpacer_3 = new QSpacerItem(70, 13, QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer_3);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_5);
+
+        BottomSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout_2->addItem(BottomSpacer);
 
         LoadButtonFrame = new QFrame(WindowPicker);
         LoadButtonFrame->setObjectName("LoadButtonFrame");
@@ -239,14 +382,14 @@ public:
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
         VersionLabel = new QLabel(LoadButtonFrame);
         VersionLabel->setObjectName("VersionLabel");
-        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Ignored);
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Ignored);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(VersionLabel->sizePolicy().hasHeightForWidth());
         VersionLabel->setSizePolicy(sizePolicy3);
-        QFont font;
-        font.setPointSize(8);
-        VersionLabel->setFont(font);
+        QFont font2;
+        font2.setPointSize(8);
+        VersionLabel->setFont(font2);
         VersionLabel->setTextFormat(Qt::PlainText);
 
         horizontalLayout_3->addWidget(VersionLabel);
@@ -258,12 +401,12 @@ public:
 
         horizontalLayout_3->addWidget(LoadButton);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::MinimumExpanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_3->addItem(horizontalSpacer_2);
 
 
-        verticalLayout->addWidget(LoadButtonFrame);
+        verticalLayout_2->addWidget(LoadButtonFrame);
 
 
         retranslateUi(WindowPicker);
@@ -284,30 +427,68 @@ public:
 #endif // QT_CONFIG(whatsthis)
         ExportPathFrame->setTitle(QCoreApplication::translate("WindowPicker", "Export Path", nullptr));
         ExportPathBrowse->setText(QCoreApplication::translate("WindowPicker", "Browse", nullptr));
+        TitleType->setText(QCoreApplication::translate("WindowPicker", "Type", nullptr));
+        TitleExtract->setText(QCoreApplication::translate("WindowPicker", "Extract", nullptr));
+        TitleOutputFormat->setText(QCoreApplication::translate("WindowPicker", "Output Format", nullptr));
 #if QT_CONFIG(whatsthis)
-        PackagesViewFrame->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Once &quot;Load&quot; is pressed, you will be able to browse the internal files. This determines which packages are loaded and presented. There may be some overlap, so picking Models, Materials, or Audio will all load the &quot;Misc&quot; package. In esence, those 3 checkboxes do the same thing... but don't worry about that, just pick what you want to see!</p></body></html>", nullptr));
+        AudioLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Audio/Music files</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
-        PackagesViewFrame->setTitle(QCoreApplication::translate("WindowPicker", "View", nullptr));
-        CheckboxViewLevels->setText(QCoreApplication::translate("WindowPicker", "Levels", nullptr));
-        CheckboxViewModels->setText(QCoreApplication::translate("WindowPicker", "Models", nullptr));
-        CheckboxViewTextures->setText(QCoreApplication::translate("WindowPicker", "Textures", nullptr));
-        CheckboxViewMaterials->setText(QCoreApplication::translate("WindowPicker", "Materials", nullptr));
-        CheckboxViewAudio->setText(QCoreApplication::translate("WindowPicker", "Audio", nullptr));
-        CheckboxViewShaders->setText(QCoreApplication::translate("WindowPicker", "Shaders", nullptr));
+        AudioLabel->setText(QCoreApplication::translate("WindowPicker", "Audio", nullptr));
+        AudioCheckbox->setText(QString());
 #if QT_CONFIG(whatsthis)
-        PackagesExportFrame->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>When a folder is selected for export, this determines which file types are exported to your computer. The general order from smallest -&gt; largest:</p><p>Materials -&gt; Models -&gt; Audio -&gt; Textures -&gt; Levels (very big)</p></body></html>", nullptr));
+        AudioFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Audio files are stored as both of these formats in-game, this determines the export format.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
-        PackagesExportFrame->setTitle(QCoreApplication::translate("WindowPicker", "Export", nullptr));
-        CheckboxExportLevels->setText(QCoreApplication::translate("WindowPicker", "Levels", nullptr));
-        CheckboxExportModels->setText(QCoreApplication::translate("WindowPicker", "Models", nullptr));
-        CheckboxExportTextures->setText(QCoreApplication::translate("WindowPicker", "Textures", nullptr));
-        CheckboxExportMaterials->setText(QCoreApplication::translate("WindowPicker", "Materials", nullptr));
-        CheckboxExportAudio->setText(QCoreApplication::translate("WindowPicker", "Audio", nullptr));
-        CheckboxExportShaders->setText(QCoreApplication::translate("WindowPicker", "Shaders", nullptr));
+        AudioFormatLabel->setText(QCoreApplication::translate("WindowPicker", "Wav/Opus", nullptr));
 #if QT_CONFIG(whatsthis)
-        LoadButtonFrame->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Load the main window and begin browsing the internal files.</p></body></html>", nullptr));
+        LevelLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Rooms and open areas. <span style=\" font-weight:700;\">Exported files are large.</span></p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        LevelLabel->setText(QCoreApplication::translate("WindowPicker", "Level", nullptr));
+        LevelCheckbox->setText(QString());
+#if QT_CONFIG(whatsthis)
+        LevelFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>A 3D model format supported by most programs.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        LevelFormatLabel->setText(QCoreApplication::translate("WindowPicker", "glTF", nullptr));
+#if QT_CONFIG(whatsthis)
+        MaterialLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Material parameters like textures used and default colors.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        MaterialLabel->setText(QCoreApplication::translate("WindowPicker", "Material", nullptr));
+        MaterialCheckbox->setText(QString());
+#if QT_CONFIG(whatsthis)
+        MaterialFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Regular text data</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        MaterialFormatLabel->setText(QCoreApplication::translate("WindowPicker", "Txt", nullptr));
+#if QT_CONFIG(whatsthis)
+        ModelLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Static and rigged models.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        ModelLabel->setText(QCoreApplication::translate("WindowPicker", "Model", nullptr));
+        ModelCheckbox->setText(QString());
+#if QT_CONFIG(whatsthis)
+        ModelFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>A 3D model format supported by most programs.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        ModelFormatLabel->setText(QCoreApplication::translate("WindowPicker", "glTF", nullptr));
+#if QT_CONFIG(whatsthis)
+        ShaderLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>High Level Shading Language shaders. These should only be extracted if you understand how to interpret decompiled HLSL code.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        ShaderLabel->setText(QCoreApplication::translate("WindowPicker", "Shader", nullptr));
+        ShaderCheckbox->setText(QString());
+#if QT_CONFIG(whatsthis)
+        ShaderFormatCombo->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p><span style=\" font-weight:700;\">Decompiled:</span> Uses the function D3DDecompile to produce a text-based output.</p><p><span style=\" font-weight:700;\">Bytecode:</span> Just the raw binary data. You can decompile this yourself.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(whatsthis)
+        TextureLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Textures used by models</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        TextureLabel->setText(QCoreApplication::translate("WindowPicker", "Texture", nullptr));
+        TextureCheckbox->setText(QString());
+#if QT_CONFIG(whatsthis)
+        TextureFormatCombo->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p><span style=\" font-weight:700;\">DDS:</span> The raw texture. Some compressed formats (like BC7) may not be supported by all programs. This is the fastest option.</p><p><span style=\" font-weight:700;\">PNG:</span> Uses a PNG library to encode the texture. This will take more time but exported textures will be universally compatable.</p><p><span style=\" font-weight:700;\">TGA:</span> Faster than PNG but much larger file sizes.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(whatsthis)
+        LoadButtonFrame->setWhatsThis(QString());
 #endif // QT_CONFIG(whatsthis)
         VersionLabel->setText(QString());
+#if QT_CONFIG(whatsthis)
+        LoadButton->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Load the main window and begin browsing the internal files.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
         LoadButton->setText(QCoreApplication::translate("WindowPicker", "Load", nullptr));
     } // retranslateUi
 
@@ -319,4 +500,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // PICKERXNRKFX_H
+#endif // PICKERQQMRIQ_H

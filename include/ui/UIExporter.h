@@ -23,9 +23,7 @@ class UiExporter : private Ui_MainWindow, public QObject
     LotusLib::PackagesReader m_packages;
     std::filesystem::path m_cacheDirPath;
     std::filesystem::path m_exportPath;
-    WarframeExporter::ExtractorType m_viewTypes;
     WarframeExporter::ExtractorType m_extractTypes;
-    std::vector<std::string> m_viewPkgNames;
     std::vector<std::string> m_exportPkgNames;
     QBrush m_dirBrush;
     ExporterDirectoryThread m_exporterDirectoryThread;
@@ -61,7 +59,13 @@ private:
 
 public slots:
     void itemClicked(QTreeWidgetItem *item, int column);
-    void setData(std::filesystem::path cachePath, std::filesystem::path exportPath, WarframeExporter::ExtractorType viewTypes, WarframeExporter::ExtractorType extractTypes);
+    void setData(
+        std::filesystem::path cachePath,
+        std::filesystem::path exportPath,
+        WarframeExporter::ExtractorType extractTypes,
+        WarframeExporter::Shader::ShaderExportType shaderExportType,
+        WarframeExporter::Texture::TextureExportType textureExportType    
+    );
     void extractButtonClicked();
     void extractCancelButtonClicked();
     void extractIndexingStarted();

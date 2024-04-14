@@ -11,6 +11,7 @@ CLIExtract::CLIExtract()
 	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract all shaders", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
+	m_textureFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "texture-format", "Texture output format. Possible values: DDS, PNG, TGA", false, "DDS", "Texture output format");
 }
 
 CLIExtract*
@@ -43,7 +44,9 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 void
 CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 {
-	cmdLine.add(m_includeVertexColors.get());
+	cmdLine
+	.add(m_includeVertexColors.get())
+	.add(m_textureFormat.get());
 }
  
 void
@@ -53,6 +56,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		return;
 
 	WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = m_includeVertexColors->getValue();
+	setTextureOutputFormat(m_textureFormat->getValue());
 
 	int types = 0;
 	if (m_extTextCmd->getValue() || m_extAllCmd->getValue())
@@ -91,6 +95,19 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	WarframeExporter::Logger::getInstance().debug("Loading packages: " + pkgs.str());
 
 	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
+}
+
+void
+CLIExtract::setTextureOutputFormat(const std::string& commandValue)
+{
+	if (commandValue == "DDS" || commandValue == "dds")
+		WarframeExporter::Texture::TextureExtractor::getInstance()->m_exportType = WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS;
+	else if (commandValue == "PNG" || commandValue == "png")
+		WarframeExporter::Texture::TextureExtractor::getInstance()->m_exportType = WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG;
+	else if (commandValue == "TGA" || commandValue == "tga")
+		WarframeExporter::Texture::TextureExtractor::getInstance()->m_exportType = WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA;
+	else
+		spdlog::get("Warframe-Exporter")->error("Texture format is not valid");
 }
 
 void

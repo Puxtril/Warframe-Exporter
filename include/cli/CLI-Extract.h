@@ -6,6 +6,7 @@
 #include "Ensmallening.hpp"
 #include "BatchIteratorExport.h"
 #include "model/ModelExtractor.h"
+#include "texture/TextureExtractor.h"
 
 #include <memory>
 #include <filesystem>
@@ -22,6 +23,7 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_extShaderCmd;
 
 	std::shared_ptr<TCLAP::SwitchArg> m_includeVertexColors;
+	std::shared_ptr<TCLAP::ValueArg<std::string>> m_textureFormat;
 
 	CLIExtract();
 
@@ -36,6 +38,7 @@ public:
 	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening) override;
 
 private:
+	void setTextureOutputFormat(const std::string& commandValue);
 	void checkOutputDir(const std::string& outPath);
 	void extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening);
 	std::vector<std::string> getPkgsNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath);

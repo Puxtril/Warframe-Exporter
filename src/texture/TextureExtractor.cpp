@@ -32,15 +32,30 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 void
 TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile)
 {
-	std::ofstream out;
-	out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
-	
-	DDSHeaderFull headerFull = DDSLib::encodeHeader(texture.header.formatClass->getFormat(), texture.header.width, texture.header.height);
-	DDSLib::serialize(out, headerFull);
-
 	uint32_t mip0Start = (uint32_t)texture.body.size() - texture.header.mip0Len;
-	out.write(texture.body.data() + mip0Start, texture.header.mip0Len);
-	out.close();
+	char* dataStart = texture.body.data() + mip0Start;
+	size_t dataLen = texture.header.mip0Len;
+
+	if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_DDS)
+	{
+		std::ofstream out;
+		out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		
+		DDSHeaderFull headerFull = DDSLib::encodeHeader(texture.header.formatClass->getFormat(), texture.header.width, texture.header.height);
+		DDSLib::serialize(out, headerFull);
+
+		out.write(dataStart, dataLen);
+		out.close();
+	}
+
+	else if (texture.header.formatEnum == TextureCompression::BC6)
+		TextureExporterConvert::convertAndWriteToHdr(dataStart, dataLen, outputFile, texture.header.width, texture.header.height);
+
+	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_PNG)
+		TextureExporterConvert::convertAndWriteToPng(dataStart, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
+	 
+	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_TGA)
+		TextureExporterConvert::convertAndWriteToTga(dataStart, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 }
 
 void

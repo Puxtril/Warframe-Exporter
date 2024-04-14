@@ -28,3 +28,9 @@
 [submodule "lib/QtOpenGLViewer"]
 	path = lib/QtOpenGLViewer
 	url = https://github.com/Puxtril/QtOpenGLViewer.git
+[submodule "lib/bcdec"]
+	path = lib/bcdec
+	url = https://github.com/Puxtril/bcdec.git
+[submodule "lib/libspng"]
+	path = lib/libspng
+	url = https://github.com/randy408/libspng.git

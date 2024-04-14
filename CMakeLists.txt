@@ -97,6 +97,8 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Oodle-2.9/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/QtOpenGLViewer"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/bcdec"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/libspng/spng"
 )
 
 ##################################################
@@ -106,7 +108,13 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 
 	# Compile subprojects
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
-	
+
+	# Compile Libspng
+	set(SPNG_SHARED OFF CACHE BOOL "Build spng shared library")
+	set(SPNG_STATIC ON CACHE BOOL "Build spng shared library")
+	set(BUILD_EXAMPLES OFF CACHE BOOL "Build spng examples")
+	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/libspng")
+
 	# Link Oodle static library
 	if(WIN32)
 		find_library(OODLE_CORE NAMES oo2core_win64 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/bin/Win64)	
@@ -138,7 +146,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		if (Qt6_FOUND)
 
 			# ezpz
-			target_link_libraries(Warframe-Exporter Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets LotusLib ${OODLE_CORE})
+			target_link_libraries(Warframe-Exporter Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets LotusLib ${OODLE_CORE} spng_static)
 			message(STATUS "Linked to Qt6 libraries installed on the system")
 
 		# Not found. Probably Windows. Requires building from source.
@@ -161,7 +169,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 			find_library(Qt6OpenGL NAMES Qt6OpenGL PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 
-			target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} OpenGL::GL ${OODLE_CORE} ${D3D_COMPILER})
+			target_link_libraries(Warframe-Exporter LotusLib ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} OpenGL::GL ${OODLE_CORE} ${D3D_COMPILER} spng_static)
 			message(STATUS "Linked to Qt6 libraries built locally")
 
 		endif()
@@ -174,13 +182,13 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 
 	if(COMPILE_WF_CLI_EXE)
 		add_executable(Warframe-Exporter-CLI ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_CLI_SOURCES})
-		target_link_libraries(Warframe-Exporter-CLI LotusLib ${OODLE_CORE} ${D3D_COMPILER})
+		target_link_libraries(Warframe-Exporter-CLI LotusLib ${OODLE_CORE} ${D3D_COMPILER} spng_static)
 		target_compile_definitions(Warframe-Exporter-CLI PUBLIC WF_EXTRACT)
 	endif()
 		
 	if(COMPILE_WF_CLI_EXE_ADVANCED)
 		add_executable(Warframe-Exporter-CLI-Advanced ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_CLI_SOURCES})
-		target_link_libraries(Warframe-Exporter-CLI-Advanced LotusLib ${OODLE_CORE} ${D3D_COMPILER})
+		target_link_libraries(Warframe-Exporter-CLI-Advanced LotusLib ${OODLE_CORE} ${D3D_COMPILER} spng_static)
 		target_compile_definitions(Warframe-Exporter-CLI-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
 	endif()
 

@@ -46,6 +46,7 @@ PreviewMaterial::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
     WarframeExporter::Material::MaterialExternal matExternal = materialExtractor->getExternalMaterial(&fileEntry.headerData, fileEntry.commonHeader);
     WarframeExporter::Material::MaterialInternal matInternal = materialExtractor->formatMaterial(matExternal);
     
-    QString materialData(matInternal.formatted.c_str());
+    std::string formatted = WarframeExporter::Material::MaterialConverter::combineMaterial(matInternal);
+    QString materialData(formatted.c_str());
     m_widgetText->setPlainText(materialData);
 }

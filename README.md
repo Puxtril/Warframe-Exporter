@@ -44,6 +44,8 @@ Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/relea
 * [TCLAP](https://sourceforge.net/projects/tclap/): Command-line interface library
 * [Qt6](https://doc.qt.io/): GUI framework.
 * [QtOpenGLViewer](https://github.com/Puxtril/QtOpenGLViewer): View 2D/3D scenes with mouse rotation/pan/zoom
+* [bcdec](https://github.com/iOrange/bcdec): Decode [block-compressed](https://en.wikipedia.org/wiki/S3_Texture_Compression) DDS images.
+* [libspng](https://github.com/randy408/libspng): Effieciently encode images as PNG.
 
 # ImHex Patterns
 

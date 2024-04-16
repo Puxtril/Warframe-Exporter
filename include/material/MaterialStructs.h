@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LotusPath.h"
+
 #include <vector>
 #include <string>
 #include <map>
@@ -9,7 +11,7 @@ namespace WarframeExporter::Material
     struct MaterialAttributes
     {
         std::string attributes;
-        std::string filePath;
+        LotusLib::LotusPath filePath;
     };
 
     struct MaterialExternal

@@ -1,5 +1,9 @@
 #pragma once
 
+// stb_image_write.h: 'sprintf'
+// Also `fopen` in TextureExporterConvert.cpp
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "ExporterLogger.h"
 #include "bcdec.h"
 #include "spng.h"

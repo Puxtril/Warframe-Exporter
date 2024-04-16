@@ -99,6 +99,7 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/QtOpenGLViewer"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/bcdec"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/libspng/spng"
+	"${CMAKE_CURRENT_BINARY_DIR}/lib/zlib"
 )
 
 ##################################################
@@ -109,6 +110,13 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 	# LotusLib requires zstd
 	# It adds a library target `zstd_static` which needs to be linked to executables
 	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
+
+	# Libspng requires zlib
+	set(ZLIB_USE_STATIC_LIBS ON)
+	set(ZLIB_ROOT ${zlib_BINARY_DIR})
+	set(ZLIB_LIBRARY ${zlib_BINARY_DIR})
+	set(ZLIB_INCLUDE_DIRS ${zlib_INCLUDE_DIR})
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/zlib)
 
 	# Compile Libspng
 	set(SPNG_SHARED OFF CACHE BOOL "Build spng shared library")

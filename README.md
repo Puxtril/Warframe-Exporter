@@ -159,9 +159,19 @@ CMake is very nice and I love it. See how easy this is to compile?
         1. `../lib/qt5/configure -release -optimize-size -prefix "../lib/qt-install" -confirm-license`
         1. `cmake --build . --parallel 4`
         1. `cmake --install .`
+1. Install zlib
+    1. Linux: Install using your package manager.
+    1. Windows: *sigh* follow these steps.
+        1. `cd` into an empty directory. We will build zlib here.
+        1. `git clone https://github.com/madler/zlib.git`
+        1. `mkdir zlib-build`
+        1. `cd zlib-build`
+        1. `cmake ..\zlib -DCMAKE_INSTALL_PREFIX=..\zlib-install`
+        1. `cmake --build . --config Release`
+        1. `cmake --install .`
 1. Build Warframe-Exporter
 	1. `mkdir build && cd build`
-	1. `cmake ..`
+	1. Linux: `cmake ..` Windows: `cmake .. -DZLIB_ROOT=<path-to>/zlib-build`
 	1. Linux: `make` Windows: `cmake --build . --config Release`
 1. Copy dependencies (Windows)
 	1. `../lib/qt-install/bin/windeployqt Warframe-Exporter.exe`

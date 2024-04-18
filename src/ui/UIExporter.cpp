@@ -312,11 +312,11 @@ UiExporter::setData(
 {
     m_packages.setData(cachePath);
     m_cacheDirPath = cachePath;
-    m_exportPath = exportPath;
+    m_exportPath = exportPath / "Extracted";
     m_extractTypes = extractTypes;
     m_exportPkgNames = getPackageNames(extractTypes);
-    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
-    m_exporterFileThread.setData(&m_packages, exportPath);
+    m_exporterDirectoryThread.setData(&m_packages, exportPath / "Extracted", extractTypes, m_exportPkgNames);
+    m_exporterFileThread.setData(&m_packages, exportPath / "Extracted");
     m_previewManager.setData(&m_packages, {true, true, true});
 
     WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = false;

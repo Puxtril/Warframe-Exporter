@@ -149,7 +149,7 @@ CLIDebug::debug(const std::filesystem::path& cacheDirPath, const std::string& pk
 	WarframeExporter::BatchIteratorDebug debugger;
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 
-	debugger.batchIterate(pkgs, ensmallening, outPath, intPath, {pkgName}, (WarframeExporter::ExtractorType)types);
+	debugger.batchIterate(pkgs, ensmallening, outPath / "Debug", intPath, {pkgName}, (WarframeExporter::ExtractorType)types);
 }
 
 std::vector<std::string>

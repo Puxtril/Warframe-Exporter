@@ -148,7 +148,7 @@ CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::
 	WarframeExporter::BatchIteratorExport extractor;
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 
-	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types);
+	extractor.batchIterate(pkgs, ensmallening, outPath / "Extract", intPath, pkgNames, types);
 }
 
 std::vector<std::string>

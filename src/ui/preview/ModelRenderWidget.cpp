@@ -46,13 +46,7 @@ ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelIn
     glBindBuffer(GL_ARRAY_BUFFER, m_glVertexBufferObject);
 
     size_t vertexPosSize = sizeof(float) * 3 * modelInternal.positions.size();
-    size_t vertexColorSize = sizeof(uint8_t) * 4 * modelInternal.colors[0].size();
-    std::vector<char> combined(vertexPosSize + vertexColorSize);
-    memcpy(combined.data(), modelInternal.positions.data(), vertexPosSize);
-    memcpy(combined.data() + vertexPosSize, modelInternal.colors[0].data(), vertexColorSize);
-    
-    glBufferData(GL_ARRAY_BUFFER, vertexPosSize + vertexColorSize, combined.data(), GL_STATIC_DRAW);
-
+    glBufferData(GL_ARRAY_BUFFER, vertexPosSize, modelInternal.positions.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * modelInternal.indices.size(), modelInternal.indices.data(), GL_STATIC_DRAW);
@@ -60,10 +54,6 @@ ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelIn
     // vertex positions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
-
-    // vertex Colors
-    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 0, (void*)vertexPosSize);
-    glEnableVertexAttribArray(1);
     
     paintGL();
 }
@@ -74,11 +64,9 @@ ModelRenderWidget::loadShaders()
     const char* shaderCode = R"""(#version 420 core
         out vec4 FragColor;
 
-        in vec4 vertexColor;
-
         void main()
         {
-            FragColor = vertexColor;
+            FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         })""";
 
     unsigned int shader;
@@ -95,21 +83,16 @@ ModelRenderWidget::loadShaders()
     
     const char* vertexShaderCode = R"""(#version 420 core
         layout (location = 0) in vec3 aPos;
-        layout (location = 1) in vec4 aColor;
 
         layout(binding = 0) uniform MatrixBlock
         {
             mat4 projection;
             mat4 modelview;
         };
-
-        out vec4 vertexColor;
         
         void main()
         {
             gl_Position = projection * modelview * vec4(aPos, 1.0);
-            vertexColor = vec4(aColor.x * 5, aColor.y, aColor.z, 1.0);
-            //vertexColor = vec4(aPos, 1.0);
         })""";
 
     unsigned int vertexShader;

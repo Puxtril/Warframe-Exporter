@@ -11,6 +11,8 @@
 #include "Extractor.h"
 #include "LotusPath.h"
 
+#include "ui/UIMainWindow.h"
+#include "ui/Settings.h"
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
 #include "ui/preview/PreviewManager.h"
@@ -34,9 +36,12 @@ public:
     UiExporter();
     virtual ~UiExporter();
 
-    void setup(QMainWindow *MainWindow);
+    void setup(UiMainWindow* MainWindow);
 
 private:
+    void saveGeometry();
+    void loadGeometry();
+
     // curEntries are a list of matching directories currently being processed.
     // Since we are merging m_viewPkgNames.size packages, we need to merge matching directory names.
     // Some directories may be null. That's fine. But we need to ensure curEntries[i] 
@@ -58,6 +63,7 @@ private:
     void swapToCancelButton();
 
 public slots:
+    void aboutToClose();
     void itemClicked(QTreeWidgetItem *item, int column);
     void setData(
         std::filesystem::path cachePath,

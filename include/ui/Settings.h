@@ -27,6 +27,12 @@ class UiSettings : public QObject
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
 
+    static const inline QString m_mainWindowGeometry = "geometry/mainwindow";
+    static const inline QString m_exporterSplitGeometry = "geometry/splitter";
+
+    static const inline QString m_mainWindowState = "state/mainwindow";
+    static const inline QString m_exporterSplitState = "state/splitter";
+
     UiSettings();
     UiSettings(const UiSettings&) = delete;
     const UiSettings& operator=(const UiSettings&) = delete;
@@ -43,6 +49,14 @@ public:
     bool getExportMaterials() const;
     bool getExportAudio() const;
     bool getExportShaders() const;
+
+    void saveMainWindowData(QByteArray geometry, QByteArray state);
+    QByteArray getMainWindowGeometry();
+    QByteArray getMainWindowState();
+
+    void saveSplitterData(QByteArray geometry, QByteArray state);
+    QByteArray getSplitterGeometry();
+    QByteArray getSplitterState();
 
     WarframeExporter::Shader::ShaderExportType getShaderFormat() const;
     WarframeExporter::Texture::TextureExportType getTextureFormat() const;

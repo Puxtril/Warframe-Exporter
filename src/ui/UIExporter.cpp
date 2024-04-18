@@ -17,11 +17,15 @@ UiExporter::~UiExporter()
 }
 
 void
-UiExporter::setup(QMainWindow *MainWindow)
+UiExporter::setup(UiMainWindow *MainWindow)
 {
     Ui_MainWindow::setupUi(MainWindow);
     connect(this->treeWidget, &QTreeWidget::itemClicked, this, &UiExporter::itemClicked);
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
+
+    loadGeometry();
+    connect(MainWindow, &UiMainWindow::mainWindowClose, this, &UiExporter::aboutToClose);
+    
     // Directory exporter
     connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractIndexingStarted, this, &UiExporter::extractIndexingStarted);
     connect(&m_exporterDirectoryThread, &ExporterDirectoryThread::extractStart, this, &UiExporter::extractStart);
@@ -35,6 +39,23 @@ UiExporter::setup(QMainWindow *MainWindow)
     connect(&m_exporterFileThread, &ExporterFileThread::extractComplete, this, &UiExporter::extractComplete);
 
     m_previewManager.setupUis(this->Preview, this->verticalLayout_3);
+}
+
+void
+UiExporter::saveGeometry()
+{
+    UiSettings& settings = UiSettings::getInstance();
+    
+    settings.saveSplitterData(this->splitter->saveGeometry(), this->splitter->saveState());
+}
+
+void
+UiExporter::loadGeometry()
+{
+    UiSettings& settings = UiSettings::getInstance();
+
+    this->splitter->restoreState(settings.getSplitterState());
+    this->splitter->restoreGeometry(settings.getSplitterGeometry());
 }
 
 void
@@ -281,6 +302,11 @@ UiExporter::swapToCancelButton()
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractCancelButtonClicked);
 }
 
+void
+UiExporter::aboutToClose()
+{
+    saveGeometry();
+}
 
 void
 UiExporter::itemClicked(QTreeWidgetItem *item, int column)

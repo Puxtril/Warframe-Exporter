@@ -4,7 +4,7 @@ int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
     
-    QMainWindow mainWindow;
+    UiMainWindow mainWindow;
     UiExporter window;
     window.setup(&mainWindow);
     

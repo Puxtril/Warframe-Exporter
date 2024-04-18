@@ -75,6 +75,44 @@ UiSettings::getTextureFormat() const
 }
 
 void
+UiSettings::saveMainWindowData(QByteArray geometry, QByteArray state)
+{
+    m_settings.setValue(m_mainWindowGeometry, geometry);
+    m_settings.setValue(m_mainWindowState, state);
+}
+
+QByteArray
+UiSettings::getMainWindowGeometry()
+{
+    return m_settings.value(m_mainWindowGeometry).toByteArray();
+}
+
+QByteArray
+UiSettings::getMainWindowState()
+{
+    return m_settings.value(m_mainWindowState).toByteArray();
+}
+
+void
+UiSettings::saveSplitterData(QByteArray geometry, QByteArray state)
+{
+    m_settings.setValue(m_exporterSplitGeometry, geometry);
+    m_settings.setValue(m_exporterSplitState, state);
+}
+
+QByteArray
+UiSettings::getSplitterGeometry()
+{
+    return m_settings.value(m_exporterSplitGeometry).toByteArray();
+}
+
+QByteArray
+UiSettings::getSplitterState()
+{
+    return m_settings.value(m_exporterSplitState).toByteArray();
+}
+
+void
 UiSettings::setSettings(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,

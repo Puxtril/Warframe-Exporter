@@ -6,5 +6,7 @@
 
 #include <QtWidgets/qmainwindow.h>
 #include <QtWidgets/qapplication.h>
+#include <QtWidgets/qstylefactory.h>
+#include <QtGui/QPalette>
 
 int main(int argc, char** argv);

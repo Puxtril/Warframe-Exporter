@@ -11,10 +11,10 @@ class UiMainWindow : public QMainWindow
     void closeEvent(QCloseEvent *event) override;
     
     void saveGeometry();
-    void loadGeometry();
 
 public:
     UiMainWindow();
+    void loadGeometry();
 
 signals:
     void mainWindowClose();

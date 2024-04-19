@@ -75,22 +75,15 @@ UiSettings::getTextureFormat() const
 }
 
 void
-UiSettings::saveMainWindowData(QByteArray geometry, QByteArray state)
+UiSettings::saveMainWindowData(QSize size)
 {
-    m_settings.setValue(m_mainWindowGeometry, geometry);
-    m_settings.setValue(m_mainWindowState, state);
+    m_settings.setValue(m_mainWindowSize, size);
 }
 
-QByteArray
-UiSettings::getMainWindowGeometry()
+QSize
+UiSettings::getMainWindowSize()
 {
-    return m_settings.value(m_mainWindowGeometry).toByteArray();
-}
-
-QByteArray
-UiSettings::getMainWindowState()
-{
-    return m_settings.value(m_mainWindowState).toByteArray();
+    return m_settings.value(m_mainWindowSize).toSize();
 }
 
 void

@@ -7,6 +7,7 @@ int main(int argc, char** argv)
     UiMainWindow mainWindow;
     UiExporter window;
     window.setup(&mainWindow);
+    mainWindow.loadGeometry();
     
     QDialog dialog;
     UiPicker picker;

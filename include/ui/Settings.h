@@ -8,6 +8,7 @@
 #include <QtCore/qobject.h>
 #include <string>
 #include <QtCore/QSettings>
+#include <QtCore/QSize>
 #include <cstdint>
 
 class UiSettings : public QObject
@@ -27,11 +28,10 @@ class UiSettings : public QObject
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
 
-    static const inline QString m_mainWindowGeometry = "geometry/mainwindow";
-    static const inline QString m_exporterSplitGeometry = "geometry/splitter";
+    static const inline QString m_mainWindowSize = "mainwindow/size";
 
-    static const inline QString m_mainWindowState = "state/mainwindow";
-    static const inline QString m_exporterSplitState = "state/splitter";
+    static const inline QString m_exporterSplitGeometry = "splitter/geometry";
+    static const inline QString m_exporterSplitState = "splitter/state";
 
     UiSettings();
     UiSettings(const UiSettings&) = delete;
@@ -50,9 +50,8 @@ public:
     bool getExportAudio() const;
     bool getExportShaders() const;
 
-    void saveMainWindowData(QByteArray geometry, QByteArray state);
-    QByteArray getMainWindowGeometry();
-    QByteArray getMainWindowState();
+    void saveMainWindowData(QSize size);
+    QSize getMainWindowSize();
 
     void saveSplitterData(QByteArray geometry, QByteArray state);
     QByteArray getSplitterGeometry();

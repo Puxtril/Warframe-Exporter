@@ -21,7 +21,7 @@ UiMainWindow::saveGeometry()
 {
     UiSettings& settings = UiSettings::getInstance();
 
-    settings.saveMainWindowData(QMainWindow::saveGeometry(), QMainWindow::saveState());
+    settings.saveMainWindowData(QMainWindow::size());
 }
 
 void
@@ -29,6 +29,5 @@ UiMainWindow::loadGeometry()
 {
     UiSettings& settings = UiSettings::getInstance();
     
-    restoreGeometry(settings.getMainWindowGeometry());
-    restoreState(settings.getMainWindowState());
+    resize(settings.getMainWindowSize());
 }

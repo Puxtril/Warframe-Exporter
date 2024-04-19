@@ -129,25 +129,7 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.UV2 = extBody.UV2;
     outBody.boneWeights = extBody.boneWeights;
 
-    // Split RGBA Vertex colors into 2 separate color maps
-    // One is RGB from original
-    // Next is the Alpha channel copied onto RGB channels
-    std::vector<std::vector<glm::u8vec4>> newColors;
-    for (size_t x = 0; x < extBody.colors.size(); x++)
-    {
-        std::vector<glm::u8vec4> alphaColor(extHeader.vertexCount);
-        for (size_t y = 0; y < extHeader.vertexCount; y++)
-        {
-            alphaColor[y][0] = extBody.colors[x][y][3];
-            alphaColor[y][1] = extBody.colors[x][y][3];
-            alphaColor[y][2] = extBody.colors[x][y][3];
-            extBody.colors[x][y][3] = 0.0f;
-        }
-
-        newColors.push_back(std::move(extBody.colors[x]));
-        newColors.push_back(std::move(alphaColor));
-    }
-    outBody.colors = std::move(newColors);
+    outBody.colors = std::move(extBody.colors);
 
     // Convert local bone indices to global
     std::vector<glm::u16vec4>& newIndices = outBody.boneIndices;

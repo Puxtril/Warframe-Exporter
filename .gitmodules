@@ -30,7 +30,7 @@
 	url = https://github.com/Puxtril/QtOpenGLViewer.git
 [submodule "lib/bcdec"]
 	path = lib/bcdec
-	url = https://github.com/Puxtril/bcdec.git
+	url = https://github.com/iOrange/bcdec.git
 [submodule "lib/libspng"]
 	path = lib/libspng
 	url = https://github.com/randy408/libspng.git

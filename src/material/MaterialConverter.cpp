@@ -18,6 +18,21 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial)
     return internal;
 }
 
+void
+MaterialConverter::replaceCurlyBracketsWithSquare(MaterialInternal& internalMaterial)
+{
+    for (auto& curPair : internalMaterial.shaderAttributes)
+    {
+        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '{', '[');
+        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '}', ']');
+    }
+    for (auto& curPair : internalMaterial.miscAttributes)
+    {
+        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '{', '[');
+        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '}', ']');
+    }
+}
+
 std::string
 MaterialConverter::combineMaterial(const MaterialInternal& internalMaterial)
 {

@@ -21,6 +21,7 @@ MaterialInternal
 MaterialExtractor::formatMaterial(const MaterialExternal& materialExternal)
 {
 	MaterialInternal internal = MaterialConverter::convertMaterial(materialExternal);
+	MaterialConverter::replaceCurlyBracketsWithSquare(internal);
 	return internal;
 }
 

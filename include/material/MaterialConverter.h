@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <algorithm>
 
 #include "material/MaterialStructs.h"
 
@@ -11,6 +12,7 @@ namespace WarframeExporter::Material
     public:
         static MaterialInternal convertMaterial(const MaterialExternal& externalMaterial);
         static std::string combineMaterial(const MaterialInternal& internalMaterial);
+        static void replaceCurlyBracketsWithSquare(MaterialInternal& internalMaterial);
 
     private:
         static void splitAndCombineAttributes(

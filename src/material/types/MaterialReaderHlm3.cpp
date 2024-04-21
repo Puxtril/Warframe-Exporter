@@ -10,9 +10,8 @@ MaterialReaderHlm3::readData(BinaryReader::BinaryReaderBuffered* headerReader, c
     extMaterial.attributes = splitAttributes(commonHeader.attributes);
     extMaterial.hlm3Textures = getHlm3Textures(headerReader);
     extMaterial.keywords = getExtraNames(headerReader);
-    extMaterial.shaderSet1 = getShaderSet1(headerReader, 16);
-    headerReader->seek(3, std::ios::cur);
-    extMaterial.shaderSet2 = getShaderSet2(headerReader, 29);
+    extMaterial.shaderSet1 = getShaderSet1(headerReader, 15);
+    extMaterial.shaderSet2 = getShaderSet2(headerReader, 30);
 
     return extMaterial;
 }

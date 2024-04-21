@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <set>
 
 #include "material/MaterialStructs.h"
 
@@ -17,14 +18,23 @@ namespace WarframeExporter::Material
     private:
         static void splitAndCombineAttributes(
             const std::vector<std::string>& rawAttributes,
-            std::map<std::string, std::string>& shaderAttributes,
-            std::map<std::string, std::string>& miscAttributes
+            std::vector<std::pair<std::string, std::string>>& shaderAttributes,
+            std::vector<std::pair<std::string, std::string>>& miscAttributes,
+            std::set<std::string>& seenAttributes
         );
 
         static void splitAndCombineAttributes(
             const std::string& rawAttributes,
-            std::map<std::string, std::string>& shaderAttributes,
-            std::map<std::string, std::string>& miscAttributes
+            std::vector<std::pair<std::string, std::string>>& shaderAttributes,
+            std::vector<std::pair<std::string, std::string>>& miscAttributes,
+            std::set<std::string>& seenAttributes
+        );
+
+        static void splitAndCombineAttribute(
+            std::string_view& curAttribute,
+            std::vector<std::pair<std::string, std::string>>& shaderAttributes,
+            std::vector<std::pair<std::string, std::string>>& miscAttributes,
+            std::set<std::string>& seenAttributes
         );
     };
 };

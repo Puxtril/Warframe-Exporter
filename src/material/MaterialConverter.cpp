@@ -11,9 +11,11 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial)
     internal.shaderSet1 = std::move(externalMaterial.shaderSet1);
     internal.shaderSet2 = std::move(externalMaterial.shaderSet2);
 
-    splitAndCombineAttributes(externalMaterial.attributes, internal.shaderAttributes, internal.miscAttributes);
+    std::set<std::string> seenAttributes;
+
+    splitAndCombineAttributes(externalMaterial.attributes, internal.shaderAttributes, internal.miscAttributes, seenAttributes);
     for (const auto& x : externalMaterial.attributeChain)
-        splitAndCombineAttributes(x.attributes, internal.shaderAttributes, internal.miscAttributes);
+        splitAndCombineAttributes(x.attributes, internal.shaderAttributes, internal.miscAttributes, seenAttributes);
 
     return internal;
 }
@@ -163,63 +165,67 @@ MaterialConverter::combineMaterial(const MaterialInternal& internalMaterial)
 */
 
 void
-MaterialConverter::splitAndCombineAttributes(const std::vector<std::string>& rawAttributes, std::map<std::string, std::string>& shaderAttributes, std::map<std::string, std::string>& miscAttributes)
+MaterialConverter::splitAndCombineAttributes(
+    const std::vector<std::string>& rawAttributes,
+    std::vector<std::pair<std::string, std::string>>& shaderAttributes,
+    std::vector<std::pair<std::string, std::string>>& miscAttributes,
+    std::set<std::string>& seenAttributes
+)
 {
     for (const std::string& curStr : rawAttributes)
     {
         std::string_view cur(curStr);
-        size_t mid = cur.find('=');
-
-        std::string key;
-        std::string value;
-        if (mid != std::string_view::npos)
-        {
-            key = std::string(cur.substr(0, mid));
-            value = std::string(cur.substr(mid + 1, cur.length() - mid));
-        }
-        else
-        {
-            key = std::string(cur);
-        }
-
-        std::map<std::string, std::string>* insertIntoMap = &miscAttributes;
-        if (key.find(':') != std::string::npos)
-            insertIntoMap = &shaderAttributes;
-
-        if (insertIntoMap->count(key) == 0)
-            insertIntoMap->operator[](key) = value;
+        splitAndCombineAttribute(cur, shaderAttributes, miscAttributes, seenAttributes);
     }
 }
 
 void
-MaterialConverter::splitAndCombineAttributes(const std::string& rawAttributes, std::map<std::string, std::string>& shaderAttributes, std::map<std::string, std::string>& miscAttributes)
+MaterialConverter::splitAndCombineAttributes(
+    const std::string& rawAttributes,
+    std::vector<std::pair<std::string, std::string>>& shaderAttributes,
+    std::vector<std::pair<std::string, std::string>>& miscAttributes,
+    std::set<std::string>& seenAttributes
+)
 {
     size_t last = 0;
     size_t next = 0;
     while ((next = rawAttributes.find('\n', last)) != std::string::npos)
     {
         std::string_view cur = std::string_view(rawAttributes).substr(last, next-last);
-        size_t mid = cur.find('=');
-
-        std::string key;
-        std::string value;
-        if (mid != std::string_view::npos)
-        {
-            key = std::string(cur.substr(0, mid));
-            value = std::string(cur.substr(mid + 1, cur.length() - mid));
-        }
-        else
-        {
-            key = std::string(cur);
-        }
-
-        std::map<std::string, std::string>* insertIntoMap = &miscAttributes;
-        if (key.find(':') != std::string::npos)
-            insertIntoMap = &shaderAttributes;
-
-        if (insertIntoMap->count(key) == 0)
-            insertIntoMap->operator[](key) = value;
-
+        splitAndCombineAttribute(cur, shaderAttributes, miscAttributes, seenAttributes);
         last = next + 1;
+    }
+}
+
+void
+MaterialConverter::splitAndCombineAttribute(
+    std::string_view& curAttribute,
+    std::vector<std::pair<std::string, std::string>>& shaderAttributes,
+    std::vector<std::pair<std::string, std::string>>& miscAttributes,
+    std::set<std::string>& seenAttributes
+)
+{
+    size_t mid = curAttribute.find('=');
+
+    std::string key;
+    std::string value;
+    if (mid != std::string_view::npos)
+    {
+        key = std::string(curAttribute.substr(0, mid));
+        value = std::string(curAttribute.substr(mid + 1, curAttribute.length() - mid));
+    }
+    else
+    {
+        key = std::string(curAttribute);
+    }
+
+    std::vector<std::pair<std::string, std::string>>* insertInto = &miscAttributes;
+    if (key.find(':') != std::string::npos)
+        insertInto = &shaderAttributes;
+
+    if (seenAttributes.count(key) == 0)
+    {
+        insertInto->push_back({key, value});
+        seenAttributes.insert(key);
     }
 }

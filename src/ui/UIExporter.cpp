@@ -20,7 +20,7 @@ void
 UiExporter::setup(UiMainWindow *MainWindow)
 {
     Ui_MainWindow::setupUi(MainWindow);
-    connect(this->treeWidget, &QTreeWidget::itemClicked, this, &UiExporter::itemClicked);
+    connect(this->treeWidget, &QTreeWidget::itemSelectionChanged, this, &UiExporter::itemChanged);
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
 
     loadGeometry();
@@ -309,8 +309,10 @@ UiExporter::aboutToClose()
 }
 
 void
-UiExporter::itemClicked(QTreeWidgetItem *item, int column)
+UiExporter::itemChanged()
 {
+    QTreeWidgetItem* item = this->treeWidget->currentItem();
+
     int itemType = item->type();
     
     if (itemType == TreeItemDirectory::QTreeWidgetItemType)

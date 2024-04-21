@@ -64,7 +64,7 @@ private:
 
 public slots:
     void aboutToClose();
-    void itemClicked(QTreeWidgetItem *item, int column);
+    void itemChanged();
     void setData(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,

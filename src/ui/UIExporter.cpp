@@ -256,7 +256,7 @@ UiExporter::extractFile(LotusLib::LotusPath internalPath, const std::string& pkg
 }
 
 std::vector<std::string>
-UiExporter::getPackageNames(WarframeExporter::ExtractorType extractTypes)
+UiExporter::getPackageNames(LotusLib::PackagesReader& packages, WarframeExporter::ExtractorType extractTypes)
 {
     std::vector<std::string> pkgNames;
     if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 ||
@@ -264,6 +264,7 @@ UiExporter::getPackageNames(WarframeExporter::ExtractorType extractTypes)
         ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0)
     {
         pkgNames.push_back("Misc");
+        pkgNames.push_back("Misc_xx");
     }
 
     if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Level) > 0)
@@ -274,12 +275,21 @@ UiExporter::getPackageNames(WarframeExporter::ExtractorType extractTypes)
     if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Texture) > 0)
     {
         pkgNames.push_back("Texture");
+        pkgNames.push_back("LightMap");
     }
 
     if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0)
     {
         pkgNames.push_back("ShaderDx11");
         pkgNames.push_back("ShaderPermutationDx11");
+        
+        try
+		{
+			packages.getPackage("ShaderDx12");
+			pkgNames.push_back("ShaderDx12");
+			pkgNames.push_back("ShaderPermutationDx12");
+		}
+		catch (std::out_of_range&) { }
     }
 
     return pkgNames;
@@ -342,7 +352,7 @@ UiExporter::setData(
     m_cacheDirPath = cachePath;
     m_exportPath = exportPath / "Extracted";
     m_extractTypes = extractTypes;
-    m_exportPkgNames = getPackageNames(extractTypes);
+    m_exportPkgNames = getPackageNames(m_packages, extractTypes);
     m_exporterDirectoryThread.setData(&m_packages, exportPath / "Extracted", extractTypes, m_exportPkgNames);
     m_exporterFileThread.setData(&m_packages, exportPath / "Extracted");
     m_previewManager.setData(&m_packages, {true, true, true});

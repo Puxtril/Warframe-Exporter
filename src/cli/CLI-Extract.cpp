@@ -163,6 +163,7 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 		{
 			pkgs.getPackage("Texture");
 			pkgNames.push_back("Texture");
+			pkgNames.push_back("LightMap");
 		}
 		catch (std::out_of_range&)
 		{
@@ -180,12 +181,21 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
 		pkgNames.push_back("Misc");
+		pkgNames.push_back("Misc_xx");
 	}
 	
 	if ((int)types & (int)WarframeExporter::ExtractorType::Shader)
 	{
 		pkgNames.push_back("ShaderDx11");
 		pkgNames.push_back("ShaderPermutationDx11");
+		
+		try
+		{
+			pkgs.getPackage("ShaderDx12");
+			pkgNames.push_back("ShaderDx12");
+			pkgNames.push_back("ShaderPermutationDx12");
+		}
+		catch (std::out_of_range&) { }
 	}
 
 	return pkgNames;

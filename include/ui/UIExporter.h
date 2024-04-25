@@ -57,7 +57,7 @@ private:
     void extractDirectory(LotusLib::LotusPath internalPath);
     void extractFile(LotusLib::LotusPath internalPath, const std::string& pkgName);
 
-    static std::vector<std::string> getPackageNames(WarframeExporter::ExtractorType extractTypes);
+    static std::vector<std::string> getPackageNames(LotusLib::PackagesReader& packges, WarframeExporter::ExtractorType extractTypes);
 
     void swapToExtractButton();
     void swapToCancelButton();

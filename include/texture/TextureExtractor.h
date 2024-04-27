@@ -30,22 +30,31 @@ namespace WarframeExporter::Texture
 			size_t curOffset = hReader->tell();
 			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, {true, true, true});
 			hReader->seek(curOffset, std::ios::beg);
-			
+
 			static const std::string hdr = "hdr";
 			if (extHeader.format == (uint8_t)TextureCompression::BC6)
 				return hdr;
 
-			static const std::string dds = "dds";
-			if (m_exportType == TextureExportType::TEXTURE_EXPORT_DDS)
+			switch (m_exportType)
+			{
+			case TextureExportType::TEXTURE_EXPORT_DDS:
+			{
+				static const std::string dds = "dds";
 				return dds;
-
-			static const std::string png = "png";
-			if (m_exportType == TextureExportType::TEXTURE_EXPORT_PNG)
+			}
+			case TextureExportType::TEXTURE_EXPORT_PNG:
+			{
+				static const std::string png = "png";
 				return png;
-
-			static const std::string tga = "tga";
-			if (m_exportType == TextureExportType::TEXTURE_EXPORT_TGA)
+			}
+			case TextureExportType::TEXTURE_EXPORT_TGA:
+			{
+				static const std::string tga = "tga";
 				return tga;
+			}
+			default:
+				throw std::runtime_error("Unexpected export format");
+			}
 		}	
 		
 		inline bool isMultiExport() const override

@@ -32,8 +32,8 @@ AudioOpusExporterOGG::writeOpusPage(const AudioHeader& header, int pageIndex, st
 	opusOggHeader.granulePosition = 0;
 	opusOggHeader.streamSerialNumber = 531113123;
 	opusOggHeader.pageSequenceNumber = pageIndex;
-	opusOggHeader.segmentTable = createSegmentTable(opusHeader.getByteSize(), 255);
-	opusOggHeader.pageSegments = opusOggHeader.segmentTable.size();
+	opusOggHeader.segmentTable = createSegmentTable(static_cast<int>(opusHeader.getByteSize()), 255);
+	opusOggHeader.pageSegments = static_cast<uint8_t>(opusOggHeader.segmentTable.size());
 
 	char* data = new char[opusHeader.getByteSize()];
 	opusHeader.serialize(data);
@@ -54,8 +54,8 @@ AudioOpusExporterOGG::writeTagPage(const AudioHeader& header, int pageIndex, std
 	tagsOggHeader.granulePosition = 0;
 	tagsOggHeader.streamSerialNumber = 531113123;
 	tagsOggHeader.pageSequenceNumber = pageIndex;
-	tagsOggHeader.segmentTable = createSegmentTable(infoTag.getByteSize(), 255);
-	tagsOggHeader.pageSegments = tagsOggHeader.segmentTable.size();
+	tagsOggHeader.segmentTable = createSegmentTable(static_cast<int>(infoTag.getByteSize()), 255);
+	tagsOggHeader.pageSegments = static_cast<uint8_t>(tagsOggHeader.segmentTable.size());
 	
 	char* data = new char[infoTag.getByteSize()];
 	infoTag.serialize(data);
@@ -86,8 +86,8 @@ AudioOpusExporterOGG::writeBodyPage(const AudioHeader& header, const char* data,
 	bodyHeader.granulePosition = granPos;
 	bodyHeader.streamSerialNumber = 531113123;
 	bodyHeader.pageSequenceNumber = pageIndex;
-	bodyHeader.segmentTable = createSegmentTable(dataLen, header.blockAllign);
-	bodyHeader.pageSegments = bodyHeader.segmentTable.size();
+	bodyHeader.segmentTable = createSegmentTable(static_cast<int>(dataLen), header.blockAllign);
+	bodyHeader.pageSegments = static_cast<uint8_t>(bodyHeader.segmentTable.size());
 
 	addChecksumAndWrite(bodyHeader, data, dataLen, outFile);
 }
@@ -104,16 +104,16 @@ AudioOpusExporterOGG::addChecksumAndWrite(OggHeader& oggHeader, const char* data
 
 	// Find checksum, then re-write
 	// Not the most optimized, but future-proof
-	oggHeader.checksum  = AudioOpusExporterOggChecksum::calculateHash((unsigned char*)pageBytes.data(), pageSize);
+	oggHeader.checksum  = AudioOpusExporterOggChecksum::calculateHash((unsigned char*)pageBytes.data(), static_cast<uint32_t>(pageSize));
 	oggHeader.serialize(pageBytes.data());
 
 	outFile.write((char*)pageBytes.data(), pageBytes.size());
 }
 
-std::vector<char>
+std::vector<uint8_t>
 AudioOpusExporterOGG::createSegmentTable(int dataLen, int segmentSize)
 {
-	std::vector<char> segmentTable;
+	std::vector<uint8_t> segmentTable;
 
 	for (int x = 0; x < dataLen; x += segmentSize)
 	{

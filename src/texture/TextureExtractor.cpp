@@ -22,7 +22,7 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 		throw std::runtime_error("BC6 textures currently unsupported");
 
 	TextureInternal intTexture;
-	intTexture.header = TextureConverter::convertHeader(extHeader, entry.getLength());
+	intTexture.header = TextureConverter::convertHeader(extHeader, static_cast<int32_t>(entry.getLength()));
 
 	m_logger.debug(spdlog::fmt_lib::format("Format={} ResRaw={}x{} ResConv={}x{} Mip0Size={}", extHeader.format, extHeader.widthBase, extHeader.heightBase, intTexture.header.width, intTexture.header.height, intTexture.header.mip0Len));
 

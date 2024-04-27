@@ -28,6 +28,6 @@ namespace WarframeExporter::Audio
 	
 		static void addChecksumAndWrite(OggHeader& oggHeader, const char* data, size_t dataLen, std::ofstream& outFile);
 
-		static std::vector<char> createSegmentTable(int dataLen, int segmentSize);
+		static std::vector<uint8_t> createSegmentTable(int dataLen, int segmentSize);
 	};
 }

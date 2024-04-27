@@ -71,7 +71,7 @@ OpusTags::serialize(char* dest) const
 
 	memcpy(dest + offset, &magic, 8);
 	offset += 8;
-	uint32_t vendorStrLen = vendor.length();
+	uint32_t vendorStrLen = static_cast<uint32_t>(vendor.length());
 	memcpy(dest + offset, &vendorStrLen, 4);
 	offset += 4;
 	memcpy(dest + offset, vendor.c_str(), vendorStrLen);
@@ -81,7 +81,7 @@ OpusTags::serialize(char* dest) const
 	offset += 4;
 	for (size_t x = 0; x < comments.size(); x++)
 	{
-		uint32_t curComStrLen = comments[x].length();
+		uint32_t curComStrLen = static_cast<uint32_t>(comments[x].length());
 		memcpy(dest + offset, &curComStrLen, 4);
 		offset += 4;
 		memcpy(dest + offset, comments[x].c_str(), curComStrLen);

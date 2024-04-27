@@ -77,7 +77,7 @@ VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
 			continue;
 		}
 	}
-	return m_vertexColorMap.size();
+	return static_cast<int>(m_vertexColorMap.size());
 }
 
 void
@@ -99,15 +99,10 @@ bool
 VertexColorIndexer::isIndexed(LotusLib::PackageReader& pkg)
 {
 	const std::filesystem::path& cachePath = pkg.getDirectory();
-	try
-	{
-		m_vertexColorMap.at(cachePath);
+
+	if (m_vertexColorMap.count(cachePath) == 1)
 		return true;
-	}
-	catch (std::out_of_range&)
-	{
-		return false;
-	}
+	return false;
 }
 
 VertexColorIndexer::modelToColorList&

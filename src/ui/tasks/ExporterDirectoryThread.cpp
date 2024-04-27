@@ -31,7 +31,7 @@ ExporterDirectoryThread::run()
 
     BatchIteratorCountQt totalItemsIter;
     totalItemsIter.batchIterate(*m_pkgsReader, ensmalleningData, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes);
-    size_t totalItems = totalItemsIter.getFileCount();
+    int totalItems = static_cast<int>(totalItemsIter.getFileCount());
 
     emit ExporterDirectoryThread::extractStart(totalItems);
     
@@ -42,7 +42,7 @@ ExporterDirectoryThread::run()
     {
         m_exporter->batchIterate(*m_pkgsReader, ensmalleningData, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes);
     }
-    catch (ExtractionCancelled& ex)
+    catch (ExtractionCancelled&)
     {
         disconnect(m_exporter.get(), &BatchIteratorExportQt::extractedFileCount, this, &ExporterDirectoryThread::_extractItemComplete);
         return;

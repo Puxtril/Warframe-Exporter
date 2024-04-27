@@ -5,9 +5,9 @@ using namespace WarframeExporter::Level;
 void
 LevelExporterGltf::addModelData(const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& body, const LevelObjectInternal& levelObj)
 {
-	int nodeCountInit = m_document.nodes.size();
+	int32_t nodeCountInit = static_cast<int32_t>(m_document.nodes.size());
 	ModelExporterGltf::addModelData(header, body);
-	int nodeCountAfter = m_document.nodes.size();
+	int32_t nodeCountAfter = static_cast<int32_t>(m_document.nodes.size());
 
 	std::vector<int32_t> meshNodeIndices = getMeshNodeIndices(nodeCountInit, nodeCountAfter);
 	addLevelInformation(levelObj, meshNodeIndices);

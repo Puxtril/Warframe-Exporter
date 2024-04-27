@@ -14,7 +14,7 @@ AudioPCMReader139::readBody(const AudioHeader& extHeader, BinaryReader::BinaryRe
 {
 	std::vector<char>& data = outBody.data;
 
-	int bLen = 0;
+	size_t bLen = 0;
 	if (bReader != nullptr)
 	{
 		bLen = bReader->getLength();

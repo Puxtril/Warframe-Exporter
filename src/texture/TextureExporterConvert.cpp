@@ -121,5 +121,7 @@ TextureExporterConvert::getConvertInfo(TextureCompression compression)
             return TextureExporterConvert::BC7ConvertInfo;
         case TextureCompression::Uncompressed:
             throw std::runtime_error("No conversion info for uncompressed format");
+        default:
+            throw std::runtime_error("Compression format not implemented for conversion");
     }
 }

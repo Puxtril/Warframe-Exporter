@@ -47,7 +47,7 @@ ShaderExtractor::decompileShader(ShaderEntry& shaderEntry)
 void
 ShaderExtractor::decompileShaders(std::vector<ShaderEntry>& shaderEntries)
 {
-	for (size_t i = 0; i < shaderEntries.size(); i++)
+	for (int i = 0; i < shaderEntries.size(); i++)
 	{
 		_decompileShader(shaderEntries[i], i);
 	}
@@ -93,7 +93,7 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
 
     std::vector<ShaderEntry> bodyEntries = readAllEntries(shaderReader, &fullFileEntry.bData, externalHeader);
 
-    for (size_t iShader = 0; iShader < bodyEntries.size(); iShader++)
+    for (int iShader = 0; iShader < bodyEntries.size(); iShader++)
     {
         if (m_shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
 		    decompileShader(bodyEntries[iShader]);

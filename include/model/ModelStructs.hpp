@@ -122,12 +122,12 @@ namespace WarframeExporter::Model
 
 		int32_t vertexSizeRigged() const
 		{
-			return positionLen + (UVLen * 2) + (colorLen * colors.size()) + boneIndexLen + boneWeightLen;
+			return static_cast<int32_t>(positionLen + (UVLen * 2) + (colorLen * colors.size()) + boneIndexLen + boneWeightLen);
 		}
 
 		int32_t vertexSizeStatic() const
 		{
-			return positionLen + (UVLen * 2) + (colorLen * colors.size());
+			return static_cast<int32_t>(positionLen + (UVLen * 2) + (colorLen * colors.size()));
 		}
 	};
 }

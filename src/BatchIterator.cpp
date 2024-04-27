@@ -41,12 +41,12 @@ BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallenin
 
 				processKnownFile(pkgsDir, curPackageName, curEntry, extractor, ensmalleningData, outputPath);
 			}
-			catch (LotusLib::DecompressionException& ex)
+			catch (LotusLib::DecompressionException&)
 			{
 				m_logger.error("Decompression error, skipping");
 				continue;
 			}
-			catch (LotusLib::LotusException& ex)
+			catch (LotusLib::LotusException&)
 			{
 				continue;
 			}

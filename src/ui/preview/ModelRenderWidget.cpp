@@ -29,7 +29,7 @@ ModelRenderWidget::drawScene()
     glUseProgram(m_shaderProgram);
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
-    glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_SHORT, 0);
 
     glBindVertexArray(0);
     glUseProgram(0);

@@ -2,8 +2,8 @@
 # Set these appropriately
 
 option(COMPILE_WF_UI_EXE "Compile the standard UI executable" ON)
-option(COMPILE_WF_CLI_EXE "Compile the standard CLI executable" OFF)
-option(COMPILE_WF_CLI_EXE_ADVANCED "Compile the standard CLI executable with more advanced options" OFF)
+option(COMPILE_WF_CLI_EXE "Compile the standard CLI executable" ON)
+option(COMPILE_WF_CLI_EXE_ADVANCED "Compile the standard CLI executable with more advanced options" ON)
 option(COMPILE_WF_LIB "Compile a static library" OFF)
 
 ##################################################

@@ -1,0 +1,60 @@
+name: Compile Warframe Exporter
+run-name: Compile ${{ gitea.ref }}
+on: [push]
+
+defaults:
+  run:
+    shell: powershell
+
+jobs:
+  # This is a custom-build Windows 10 Virtual Machine
+  # It uses a custom environment file with these variables
+  # Qt6 and zlib were pre-installed to reduce compile times
+  # And I didn't feel like figuring out their build process
+  #   - CMAKE_PREFIX_PATH=C:\Qt\6.6.3\msvc2019_64  # There's a bug in CMAKE that requires this for building Qt
+  #   - Qt6_DIR=C:\Qt\6.6.3\msvc                   # Not necessary for Qt building, but needed for windeployqt.exe
+  #   - ZLIB_ROOT=C:\zlib                          # Pre-compiled Zlib. Just a CMake build & install
+  #   - OODLE_ROOT=C:\2.9.12                       # Full SDK, but this only uses the static library
+  Compile-Windows:
+    runs-on: windows
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      # Basically, skip qt5 because it's already installed
+      - name: Init Extractor submodules
+        run: |
+          cd lib
+          git submodule update --init Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog tclap-code 
+      - name: Init LotusLib submodule
+        run: |
+          cd lib/LotusLib/lib
+          git submodule update --init zstd
+      # This is what requires a private build process
+      - name: Copy Oodle binaries
+        run: |
+          cp -r "$Env:OODLE_ROOT\lib" bin
+      - name: Initilize CMake
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+      - name: Compile project
+        run: |
+          cd build
+          cmake --build . --config Release
+      - name: Link Qt Requirements
+        run: |
+          & "$Env:Qt6_DIR\bin\windeployqt.exe" build\Release\Warframe-Exporter.exe
+      - name: Zip Exporter GUI and Qt Dependencies to Artifacts folder
+        run: |
+          mkdir artifacts
+          cd build\Release
+          Compress-Archive -DestinationPath ..\..\artifacts\Warframe-Exporter.zip -Path "Warframe-Exporter.exe", "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll", "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "d3dcompiler_47.dll", "platforms"
+      - name: Copy CLI executables to Artifacts folder
+        run: |
+          cp build\Release\Warframe-Exporter-CLI.exe artifacts
+          cp build\Release\Warframe-Exporter-CLI-Advanced.exe artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Warframe-Exporter-Windows
+          path: artifacts/

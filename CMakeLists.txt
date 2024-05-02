@@ -4,7 +4,6 @@
 option(COMPILE_WF_UI_EXE "Compile the standard UI executable" ON)
 option(COMPILE_WF_CLI_EXE "Compile the standard CLI executable" ON)
 option(COMPILE_WF_CLI_EXE_ADVANCED "Compile the standard CLI executable with more advanced options" ON)
-option(COMPILE_WF_LIB "Compile a static library" OFF)
 
 ##################################################
 # Project stuff
@@ -105,6 +104,9 @@ include_directories(
 ##################################################
 # Executable compile commands
 
+# Compile shared source files among UI and CLI
+add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
+
 if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 
 	# LotusLib requires zstd
@@ -144,7 +146,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		# Needed for those extra files inside WARFRAME_EXPORTER_UI_SOURCES
 		set(CMAKE_AUTOMOC ON)
 
-		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_UI_SOURCES})
+		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_UI_SOURCES})
 
 		find_package(OpenGL REQUIRED)
 		find_package(Qt6 QUIET COMPONENTS Widgets Core Gui OpenGLWidgets)
@@ -153,7 +155,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		if (Qt6_FOUND)
 
 			# ezpz
-			target_link_libraries(Warframe-Exporter Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets OpenGL::GL ${D3D_COMPILER} LotusLib libzstd_static ${OODLE_CORE} spng_static ${ZLIB_LIBRARY})
+			target_link_libraries(Warframe-Exporter Warframe-Exporter-Lib Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets OpenGL::GL ${D3D_COMPILER} LotusLib libzstd_static ${OODLE_CORE} spng_static ${ZLIB_LIBRARY})
 			message(STATUS "Linked to Qt6 libraries installed on the system")
 
 		# Not found. Probably Windows. Requires building from source.
@@ -176,7 +178,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 			find_library(Qt6OpenGL NAMES Qt6OpenGL PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 
-			target_link_libraries(Warframe-Exporter LotusLib libzstd_static ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} OpenGL::GL ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY})
+			target_link_libraries(Warframe-Exporter Warframe-Exporter-Lib LotusLib libzstd_static ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} OpenGL::GL ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY})
 			message(STATUS "Linked to Qt6 libraries built locally")
 
 		endif()
@@ -188,22 +190,15 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 	endif()
 
 	if(COMPILE_WF_CLI_EXE)
-		add_executable(Warframe-Exporter-CLI ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_CLI_SOURCES})
-		target_link_libraries(Warframe-Exporter-CLI LotusLib libzstd_static ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY})
+		add_executable(Warframe-Exporter-CLI ${WARFRAME_EXPORTER_CLI_SOURCES})
+		target_link_libraries(Warframe-Exporter-CLI Warframe-Exporter-Lib LotusLib libzstd_static ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY})
 		target_compile_definitions(Warframe-Exporter-CLI PUBLIC WF_EXTRACT)
 	endif()
 		
 	if(COMPILE_WF_CLI_EXE_ADVANCED)
-		add_executable(Warframe-Exporter-CLI-Advanced ${WARFRAME_EXPORTER_SOURCES} ${WARFRAME_EXPORTER_CLI_SOURCES})
-		target_link_libraries(Warframe-Exporter-CLI-Advanced LotusLib libzstd_static ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY})
+		add_executable(Warframe-Exporter-CLI-Advanced ${WARFRAME_EXPORTER_CLI_SOURCES})
+		target_link_libraries(Warframe-Exporter-CLI-Advanced Warframe-Exporter-Lib LotusLib libzstd_static ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY})
 		target_compile_definitions(Warframe-Exporter-CLI-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
 	endif()
 
-endif()
-
-##################################################
-# Library target
-
-if (COMPILE_WF_LIB)
-	add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
 endif()

@@ -1,4 +1,5 @@
 #include "texture/TextureExtractor.h"
+#include <stdexcept>
 
 using namespace WarframeExporter::Texture;
 
@@ -20,6 +21,9 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 
 	if (extHeader.format == (uint8_t)TextureCompression::BC6)
 		throw std::runtime_error("BC6 textures currently unsupported");
+
+	if (g_enumMapTexture[(int)extHeader.format] == nullptr)
+		throw std::runtime_error("Unknown texture compression format: " + std::to_string(extHeader.format));
 
 	TextureInternal intTexture;
 	intTexture.header = TextureConverter::convertHeader(extHeader, static_cast<int32_t>(entry.getLength()));

@@ -47,7 +47,7 @@ private:
     // Some directories may be null. That's fine. But we need to ensure curEntries[i] 
     //   lines up with pkgNames[i], even if curEntries[i] is currently null
     void setupTree();
-    void setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeWidgetItem* parentWidget);
+    void setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*> curEntries, QTreeWidgetItem* parentWidget);
 
     void clearMetaData();
     void clearPreview();

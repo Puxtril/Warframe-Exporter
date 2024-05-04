@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CachePairReader.h"
+#include "CachePair.h"
 #include "ExporterLogger.h"
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"

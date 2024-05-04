@@ -108,7 +108,7 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 	try
 	{
 		// Test if `internalPath` is a directory
-		pkg.getDirMeta(internalPath);
+		pkg.getDirNode(internalPath);
 
 		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
 		{
@@ -166,7 +166,7 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesys
 			pkgNames.push_back("Texture");
 			pkgNames.push_back("LightMap");
 		}
-		catch (std::out_of_range&)
+		catch (LotusLib::LotusException&)
 		{
 			pkgNames.push_back("TextureDx9");
 		}
@@ -196,7 +196,7 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesys
 			pkgNames.push_back("ShaderDx12");
 			pkgNames.push_back("ShaderPermutationDx12");
 		}
-		catch (std::out_of_range&) { }
+		catch (LotusLib::LotusException&) { }
 		
 	}
 

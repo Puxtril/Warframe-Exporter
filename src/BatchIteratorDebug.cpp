@@ -115,7 +115,7 @@ BatchIteratorDebug::printEnumCounts(LotusLib::PackageReader& pkg, const LotusLib
 void
 BatchIteratorDebug::writeAllDebugs(LotusLib::PackageReader& pkg, LotusLib::FileEntry& fileEntry, const std::filesystem::path& baseOutputPath)
 {
-	std::filesystem::path debugPath = baseOutputPath / "Debug" / fileEntry.internalPath.getPreferredPath().relative_path();
+	std::filesystem::path debugPath = baseOutputPath / "Debug" / fileEntry.internalPath.relative_path();
 	if (!std::filesystem::exists(debugPath.parent_path()))
 		std::filesystem::create_directories(debugPath.parent_path());
 

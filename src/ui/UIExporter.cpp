@@ -1,4 +1,5 @@
 #include "ui/UIExporter.h"
+#include "DirNode.h"
 
 UiExporter::UiExporter()
 {
@@ -68,7 +69,7 @@ UiExporter::setupTree()
     for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
         std::string& curPkgName = m_exportPkgNames[iPkg];
-        LotusLib::DirMeta curEntry = m_packages.getPackage(curPkgName).getDirMeta("/");
+        const LotusLib::FileEntries::DirNode* curEntry = m_packages.getPackage(curPkgName).getDirNode("/");
 
         // Purposefully commented out because these clutter the root directory
         // Misc package has lots of root files that can't be extracted
@@ -84,10 +85,10 @@ UiExporter::setupTree()
         }
         */
 
-        for (int i = 0; i < static_cast<int>(curEntry.getDirCount()); i++)
+        for (int i = 0; i < static_cast<int>(curEntry->getDirCount()); i++)
         {
-            LotusLib::DirMeta curNode = curEntry.getChildDir(i);
-            dirNamesInAllPkgs.insert(curNode.getName());
+            const LotusLib::FileEntries::DirNode* curNode = curEntry->getChildDir(i);
+            dirNamesInAllPkgs.insert(curNode->getName());
         }
     }
 
@@ -95,24 +96,24 @@ UiExporter::setupTree()
     for (const std::string& curDirName : dirNamesInAllPkgs)
     {
         TreeItemDirectory* newDirWidget = nullptr;
-        std::vector<LotusLib::DirMeta> dirEntries;
+        std::vector<const LotusLib::FileEntries::DirNode*> dirEntries;
 
         for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
             const std::string& curPkgName = m_exportPkgNames[iPkg];
-            LotusLib::DirMeta curEntry = m_packages.getPackage(curPkgName).getDirMeta("/").getChildDir(curDirName);
+            const LotusLib::FileEntries::DirNode* curEntry = m_packages.getPackage(curPkgName).getDirNode("/")->getChildDir(curDirName);
 
             // Ensure relation in pkgNames and curEntries
-            if (curEntry.isEmpty())
+            if (curEntry == nullptr)
             {
-                dirEntries.push_back(LotusLib::DirMeta());
+                dirEntries.push_back(nullptr);
                 continue;
             }
 
             if (newDirWidget == nullptr)
             {
-                newDirWidget = new TreeItemDirectory(nullptr, curEntry.getFullPath());
-                newDirWidget->setData(0, 0, curEntry.getName().c_str());
+                newDirWidget = new TreeItemDirectory(nullptr, curEntry->getFullPath());
+                newDirWidget->setData(0, 0, curEntry->getName().c_str());
                 newDirWidget->setForeground(0, m_dirBrush);
                 topLevelItems.push_back(newDirWidget);
             }
@@ -133,7 +134,7 @@ UiExporter::setupTree()
 }
 
 void
-UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeWidgetItem* parentWidget)
+UiExporter::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*> curEntries, QTreeWidgetItem* parentWidget)
 {
     // 1. Collect all file names and put into parentWidget
     // 2. Initial pass to collect all unique directory names
@@ -141,25 +142,25 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
     std::set<std::string_view> dirNamesInAllPkgs;
     for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
-        LotusLib::DirMeta& curEntry = curEntries[iPkg];
+        const LotusLib::FileEntries::DirNode* curEntry = curEntries[iPkg];
 
-        if (curEntry.isEmpty())
+        if (curEntry == nullptr || (curEntry->getDirCount() == 0 && curEntry->getFileCount() == 0))
             continue;
 
         // Append file entries
-        for (int i = 0; i < static_cast<int>(curEntry.getFileCount()); i++)
+        for (int i = 0; i < static_cast<int>(curEntry->getFileCount()); i++)
         {
-            LotusLib::FileMeta curNode = curEntry.getChildFile(i);
+            const LotusLib::FileEntries::FileNode* curNode = curEntry->getChildFile(i);
 
             TreeItemFile* fileWidget = new TreeItemFile(parentWidget, curNode, m_exportPkgNames[iPkg]);
-            fileWidget->setData(0, 0, curNode.getName().c_str());
+            fileWidget->setData(0, 0, curNode->getName().c_str());
         }
 
         // Collect directory names
-        for (int i = 0; i < static_cast<int>(curEntry.getDirCount()); i++)
+        for (int i = 0; i < static_cast<int>(curEntry->getDirCount()); i++)
         {
-            LotusLib::DirMeta curNode = curEntry.getChildDir(i);
-            dirNamesInAllPkgs.insert(curNode.getName());
+            const LotusLib::FileEntries::DirNode* curNode = curEntry->getChildDir(i);
+            dirNamesInAllPkgs.insert(curNode->getName());
         }
     }
 
@@ -167,30 +168,30 @@ UiExporter::setupTreeRecursive(std::vector<LotusLib::DirMeta> curEntries, QTreeW
     for (const std::string_view& curDirName : dirNamesInAllPkgs)
     {
         TreeItemDirectory* newDirWidget = nullptr;
-        std::vector<LotusLib::DirMeta> dirEntries;
+        std::vector<const LotusLib::FileEntries::DirNode*> dirEntries;
         size_t validDirCount = 0;
 
         for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
             // Ensure relation in m_viewPkgNames and curEntries
-            if (curEntries[iPkg].isEmpty())
+            if (curEntries[iPkg] == nullptr || (curEntries[iPkg]->getDirCount() == 0 && curEntries[iPkg]->getFileCount() == 0))
             {
-                dirEntries.push_back(LotusLib::DirMeta());
+                dirEntries.push_back(nullptr);
                 continue;
             }
 
-            LotusLib::DirMeta curEntry = curEntries[iPkg].getChildDir(std::string(curDirName));
+            const LotusLib::FileEntries::DirNode* curEntry = curEntries[iPkg]->getChildDir(std::string(curDirName));
 
-            if (curEntry.isEmpty())
+            if (curEntry == nullptr || (curEntry->getDirCount() == 0 && curEntry->getFileCount() == 0))
             {
-                dirEntries.push_back(LotusLib::DirMeta());
+                dirEntries.push_back(nullptr);
                 continue;
             }
 
             if (newDirWidget == nullptr)
             {
-                newDirWidget = new TreeItemDirectory(parentWidget, curEntry.getFullPath());
-                newDirWidget->setData(0, 0, curEntry.getName().c_str());
+                newDirWidget = new TreeItemDirectory(parentWidget, curEntry->getFullPath());
+                newDirWidget->setData(0, 0, curEntry->getName().c_str());
                 newDirWidget->setForeground(0, m_dirBrush);
                 validDirCount++;
             }
@@ -289,7 +290,7 @@ UiExporter::getPackageNames(LotusLib::PackagesReader& packages, WarframeExporter
 			pkgNames.push_back("ShaderDx12");
 			pkgNames.push_back("ShaderPermutationDx12");
 		}
-		catch (std::out_of_range&) { }
+		catch (LotusLib::LotusException&) { }
     }
 
     return pkgNames;

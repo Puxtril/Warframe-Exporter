@@ -76,7 +76,7 @@ BatchIterator::pkgHasDir(LotusLib::PackageReader& pkg, const LotusLib::LotusPath
 {
 	try
 	{
-		pkg.getDirMeta(path);
+		pkg.getDirNode(path);
 		return true;
 	}
 	catch (std::exception&)

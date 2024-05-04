@@ -165,7 +165,7 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 			pkgNames.push_back("Texture");
 			pkgNames.push_back("LightMap");
 		}
-		catch (std::out_of_range&)
+		catch (LotusLib::LotusException&)
 		{
 			pkgNames.push_back("TextureDx9");
 		}
@@ -195,7 +195,7 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 			pkgNames.push_back("ShaderDx12");
 			pkgNames.push_back("ShaderPermutationDx12");
 		}
-		catch (std::out_of_range&) { }
+		catch (LotusLib::LotusException&) { }
 	}
 
 	return pkgNames;

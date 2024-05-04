@@ -82,11 +82,11 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
     LotusLib::FileEntry fullFileEntry;
     try
     {
-        fullFileEntry = pkgs.getPackage("ShaderPermutationDx11").getFile(fileEntry.metadata.getFullPath());
+        fullFileEntry = pkgs.getPackage("ShaderPermutationDx11").getFile(fileEntry.metadata->getFullPath());
     }
     catch (std::exception&)
     {
-        fullFileEntry = pkgs.getPackage("ShaderDx11").getFile(fileEntry.metadata.getFullPath());
+        fullFileEntry = pkgs.getPackage("ShaderDx11").getFile(fileEntry.metadata->getFullPath());
     }
     
     ShaderReader* shaderReader = g_enumMapShader[fullFileEntry.commonHeader.type];
@@ -107,11 +107,11 @@ ShaderExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::Packages
     LotusLib::FileEntry fullFileEntry;
     try
     {
-        fullFileEntry = pkgs.getPackage("ShaderPermutationDx11").getFile(fileEntry.metadata.getFullPath());
+        fullFileEntry = pkgs.getPackage("ShaderPermutationDx11").getFile(fileEntry.metadata->getFullPath());
     }
     catch (std::exception&)
     {
-        fullFileEntry = pkgs.getPackage("ShaderDx11").getFile(fileEntry.metadata.getFullPath());
+        fullFileEntry = pkgs.getPackage("ShaderDx11").getFile(fileEntry.metadata->getFullPath());
     }
     
     ShaderReader* shaderReader = g_enumMapShader[fullFileEntry.commonHeader.type];

@@ -19,14 +19,14 @@ public:
 
 class TreeItemFile : public QTreeWidgetItem
 {
-    LotusLib::FileMeta m_file;
+    const LotusLib::FileEntries::FileNode* m_file;
     const std::string& m_pkg;
 
 public:
     static constexpr int QTreeWidgetItemType = 1006;
 
-    TreeItemFile(LotusLib::FileMeta fileMeta, const std::string& pkgName);
-    TreeItemFile(QTreeWidgetItem* parentWidget, LotusLib::FileMeta fileMeta, const std::string& pkgName);
+    TreeItemFile(const LotusLib::FileEntries::FileNode* fileNode, const std::string& pkgName);
+    TreeItemFile(QTreeWidgetItem* parentWidget, const LotusLib::FileEntries::FileNode* fileNode, const std::string& pkgName);
 
     QString getQName() const;
     QString getQFullpath() const;

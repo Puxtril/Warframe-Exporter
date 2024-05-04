@@ -14,7 +14,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 
 	if (extractor->isMultiExport())
 	{
-		savePath = outputPath / fileEntry.internalPath.getPreferredPath().relative_path();
+		savePath = outputPath / fileEntry.internalPath.relative_path();
 		savePath.replace_extension("");
 
 		if (!std::filesystem::exists(savePath))
@@ -22,10 +22,10 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 	}
 	else
 	{
-		savePath = outputPath / fileEntry.internalPath.getPreferredPath().relative_path();
+		savePath = outputPath / fileEntry.internalPath.relative_path();
 		savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
 
-	if (existingFileIdentical(fileEntry.metadata.getTimeStamp(), savePath))
+	if (existingFileIdentical(fileEntry.metadata->getTimeStamp(), savePath))
 	{
 		m_logger.info("Identical file time, skipping: " + fileEntry.internalPath.string());
 		return;
@@ -86,6 +86,6 @@ BatchIteratorExport::existingFileIdentical(int64_t timestamp, const std::filesys
 void
 BatchIteratorExport::writeFileProperties(const std::filesystem::path filePath, LotusLib::FileEntry& fileEntry)
 {
-	uint64_t timeRaw = fileEntry.metadata.getTimeStamp();
+	uint64_t timeRaw = fileEntry.metadata->getTimeStamp();
 	FileProperties::writeDos(std::filesystem::path(filePath), timeRaw, timeRaw, timeRaw);
 }

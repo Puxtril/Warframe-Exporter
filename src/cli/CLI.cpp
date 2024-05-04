@@ -150,7 +150,7 @@ void
 createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath)
 {
 #ifdef WF_DEBUG
-	LotusLib::Logger::getInstance().setLogProperties("LotusLib", outPath / "LotusLib.log", logLevel);
+	LotusLib::Logger::setLogProperties(outPath / "LotusLib.log", logLevel, logLevel);
 #endif
 	WarframeExporter::Logger::getInstance().setLogProperties(outPath / "Warframe-Exporter.log", logLevel);
 }

@@ -20,6 +20,8 @@
 #include "ui/tasks/ExporterDirectoryThread.h"
 #include "ui/tasks/ExporterFileThread.h"
 
+#include "EnumMapExtractor.h"
+
 class UiExporter : private Ui_MainWindow, public QObject
 {
     LotusLib::PackagesReader m_packages;

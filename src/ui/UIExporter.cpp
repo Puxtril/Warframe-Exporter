@@ -1,5 +1,4 @@
 #include "ui/UIExporter.h"
-#include "DirNode.h"
 
 UiExporter::UiExporter()
 {
@@ -151,6 +150,23 @@ UiExporter::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*
         for (int i = 0; i < static_cast<int>(curEntry->getFileCount()); i++)
         {
             const LotusLib::FileEntries::FileNode* curNode = curEntry->getChildFile(i);
+
+            try
+            {
+                int format = m_packages.getPackage(m_exportPkgNames[iPkg]).getFileFormat(curNode);
+                WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[format];
+                if (extractor == nullptr)
+                    continue;
+                WarframeExporter::ExtractorType curEntryType = extractor->getExtractorType();
+                if (((int)curEntryType & (int)m_extractTypes) == 0)
+                {
+                    continue;
+                }
+            }
+            catch (std::exception&)
+			{
+				continue;
+			}
 
             TreeItemFile* fileWidget = new TreeItemFile(parentWidget, curNode, m_exportPkgNames[iPkg]);
             fileWidget->setData(0, 0, curNode->getName().c_str());

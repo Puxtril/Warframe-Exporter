@@ -1,15 +1,16 @@
 /********************************************************************************
-** Form generated from reading UI file 'PickerQQMRIq.ui'
+** Form generated from reading UI file 'PickertRZjSB.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef PICKERQQMRIQ_H
-#define PICKERQQMRIQ_H
+#ifndef PICKERTRZJSB_H
+#define PICKERTRZJSB_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -21,6 +22,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -76,7 +78,9 @@ public:
     QHBoxLayout *horizontalLayout_3;
     QLabel *VersionLabel;
     QPushButton *LoadButton;
+    QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_2;
+    QToolButton *AdditionalSettingsButton;
 
     void setupUi(QDialog *WindowPicker)
     {
@@ -324,6 +328,8 @@ public:
         ShaderSecion->addWidget(ShaderCheckbox);
 
         ShaderFormatCombo = new QComboBox(WindowPicker);
+        ShaderFormatCombo->addItem(QString());
+        ShaderFormatCombo->addItem(QString());
         ShaderFormatCombo->setObjectName("ShaderFormatCombo");
 
         ShaderSecion->addWidget(ShaderFormatCombo);
@@ -350,6 +356,9 @@ public:
         TextureSection->addWidget(TextureCheckbox);
 
         TextureFormatCombo = new QComboBox(WindowPicker);
+        TextureFormatCombo->addItem(QString());
+        TextureFormatCombo->addItem(QString());
+        TextureFormatCombo->addItem(QString());
         TextureFormatCombo->setObjectName("TextureFormatCombo");
 
         TextureSection->addWidget(TextureFormatCombo);
@@ -401,9 +410,21 @@ public:
 
         horizontalLayout_3->addWidget(LoadButton);
 
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::MinimumExpanding, QSizePolicy::Policy::Minimum);
 
-        horizontalLayout_3->addItem(horizontalSpacer_2);
+        horizontalLayout_2->addItem(horizontalSpacer_2);
+
+        AdditionalSettingsButton = new QToolButton(LoadButtonFrame);
+        AdditionalSettingsButton->setObjectName("AdditionalSettingsButton");
+        QIcon icon(QIcon::fromTheme(QString::fromUtf8("preferences-other")));
+        AdditionalSettingsButton->setIcon(icon);
+
+        horizontalLayout_2->addWidget(AdditionalSettingsButton);
+
+
+        horizontalLayout_3->addLayout(horizontalLayout_2);
 
 
         verticalLayout_2->addWidget(LoadButtonFrame);
@@ -436,7 +457,7 @@ public:
         AudioLabel->setText(QCoreApplication::translate("WindowPicker", "Audio", nullptr));
         AudioCheckbox->setText(QString());
 #if QT_CONFIG(whatsthis)
-        AudioFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Audio files are stored as both of these formats in-game, this determines the export format.</p></body></html>", nullptr));
+        AudioFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Audio files are stored as both of these formats in-game, which determins the export format.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
         AudioFormatLabel->setText(QCoreApplication::translate("WindowPicker", "Wav/Opus", nullptr));
 #if QT_CONFIG(whatsthis)
@@ -471,6 +492,9 @@ public:
 #endif // QT_CONFIG(whatsthis)
         ShaderLabel->setText(QCoreApplication::translate("WindowPicker", "Shader", nullptr));
         ShaderCheckbox->setText(QString());
+        ShaderFormatCombo->setItemText(0, QCoreApplication::translate("WindowPicker", "Decompiled", nullptr));
+        ShaderFormatCombo->setItemText(1, QCoreApplication::translate("WindowPicker", "Bytecode", nullptr));
+
 #if QT_CONFIG(whatsthis)
         ShaderFormatCombo->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p><span style=\" font-weight:700;\">Decompiled:</span> Uses the function D3DDecompile to produce a text-based output.</p><p><span style=\" font-weight:700;\">Bytecode:</span> Just the raw binary data. You can decompile this yourself.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
@@ -479,6 +503,10 @@ public:
 #endif // QT_CONFIG(whatsthis)
         TextureLabel->setText(QCoreApplication::translate("WindowPicker", "Texture", nullptr));
         TextureCheckbox->setText(QString());
+        TextureFormatCombo->setItemText(0, QCoreApplication::translate("WindowPicker", "DDS", nullptr));
+        TextureFormatCombo->setItemText(1, QCoreApplication::translate("WindowPicker", "PNG", nullptr));
+        TextureFormatCombo->setItemText(2, QCoreApplication::translate("WindowPicker", "TGA", nullptr));
+
 #if QT_CONFIG(whatsthis)
         TextureFormatCombo->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p><span style=\" font-weight:700;\">DDS:</span> The raw texture. Some compressed formats (like BC7) may not be supported by all programs. This is the fastest option.</p><p><span style=\" font-weight:700;\">PNG:</span> Uses a PNG library to encode the texture. This will take more time but exported textures will be universally compatable.</p><p><span style=\" font-weight:700;\">TGA:</span> Faster than PNG but much larger file sizes.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
@@ -490,6 +518,7 @@ public:
         LoadButton->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Load the main window and begin browsing the internal files.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
         LoadButton->setText(QCoreApplication::translate("WindowPicker", "Load", nullptr));
+        AdditionalSettingsButton->setText(QCoreApplication::translate("WindowPicker", "...", nullptr));
     } // retranslateUi
 
 };
@@ -500,4 +529,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // PICKERQQMRIQ_H
+#endif // PICKERTRZJSB_H

@@ -75,6 +75,19 @@ UiSettings::getTextureFormat() const
 }
 
 void
+UiSettings::setFilterFiles(bool filter)
+{
+    m_settings.setValue(m_filterExportTypes, filter);
+}
+
+bool
+UiSettings::getFilterFiles()
+{
+    bool value = m_settings.value(m_filterExportTypes, true).toBool();
+    return value;
+}
+
+void
 UiSettings::saveMainWindowData(QSize size)
 {
     m_settings.setValue(m_mainWindowSize, size);

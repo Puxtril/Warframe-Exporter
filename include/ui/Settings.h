@@ -33,6 +33,8 @@ class UiSettings : public QObject
     static const inline QString m_exporterSplitGeometry = "splitter/geometry";
     static const inline QString m_exporterSplitState = "splitter/state";
 
+    static const inline QString m_filterExportTypes = "additionalsettings/filterfiles";
+
     UiSettings();
     UiSettings(const UiSettings&) = delete;
     const UiSettings& operator=(const UiSettings&) = delete;
@@ -59,6 +61,9 @@ public:
 
     WarframeExporter::Shader::ShaderExportType getShaderFormat() const;
     WarframeExporter::Texture::TextureExportType getTextureFormat() const;
+
+    void setFilterFiles(bool filter);
+    bool getFilterFiles();
 
 public slots:
     void setSettings(

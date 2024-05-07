@@ -151,22 +151,26 @@ UiExporter::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*
         {
             const LotusLib::FileEntries::FileNode* curNode = curEntry->getChildFile(i);
 
-            try
-            {
-                int format = m_packages.getPackage(m_exportPkgNames[iPkg]).getFileFormat(curNode);
-                WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[format];
-                if (extractor == nullptr)
-                    continue;
-                WarframeExporter::ExtractorType curEntryType = extractor->getExtractorType();
-                if (((int)curEntryType & (int)m_extractTypes) == 0)
+            // Adds lots of extra processing time
+            if (UiSettings::getInstance().getFilterFiles())
+            {   
+                try
+                {
+                    int format = m_packages.getPackage(m_exportPkgNames[iPkg]).getFileFormat(curNode);
+                    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[format];
+                    if (extractor == nullptr)
+                        continue;
+                    WarframeExporter::ExtractorType curEntryType = extractor->getExtractorType();
+                    if (((int)curEntryType & (int)m_extractTypes) == 0)
+                    {
+                        continue;
+                    }
+                }
+                catch (std::exception&)
                 {
                     continue;
                 }
             }
-            catch (std::exception&)
-			{
-				continue;
-			}
 
             TreeItemFile* fileWidget = new TreeItemFile(parentWidget, curNode, m_exportPkgNames[iPkg]);
             fileWidget->setData(0, 0, curNode->getName().c_str());

@@ -8,6 +8,8 @@ UiPicker::UiPicker(QObject *parent)
 void
 UiPicker::setupUi(QDialog *WindowPicker)
 {
+    m_additionalSettings.setupUi(&m_additionalSettingsDialog);
+    
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
     addShaderFormatOptions();
@@ -19,6 +21,10 @@ UiPicker::setupUi(QDialog *WindowPicker)
 void
 UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* exporter)
 {
+    QObject::connect(this->AdditionalSettingsButton, &QPushButton::clicked, this, &UiPicker::additionalSettingsClicked);
+    QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::accepted, this, &UiPicker::additionalSettingsClosed);
+    QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::rejected, this, &UiPicker::additionalSettingsCancelled);
+
     QObject::connect(this->LoadButton, &QPushButton::clicked, this, &UiPicker::parsePickerOptions);
     QObject::connect(this, &UiPicker::pickerDone, WindowPicker, &QDialog::hide);
     QObject::connect(this, &UiPicker::pickerDone, mainWindow, &QMainWindow::show);
@@ -169,4 +175,28 @@ UiPicker::browseExportPath()
     {
         this->ExportPathInput->setText(directory);
     }
+}
+
+void
+UiPicker::additionalSettingsClicked()
+{
+    Qt::CheckState isChecked = UiSettings::getInstance().getFilterFiles() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+    m_additionalSettings.FilterFilesCheckbox->setCheckState(isChecked);
+
+    m_additionalSettingsDialog.setModal(Qt::ApplicationModal);
+    m_additionalSettingsDialog.show();
+}
+
+void
+UiPicker::additionalSettingsClosed()
+{
+    m_additionalSettingsDialog.hide();
+
+    UiSettings::getInstance().setFilterFiles(m_additionalSettings.FilterFilesCheckbox->isChecked());
+}
+
+void
+UiPicker::additionalSettingsCancelled()
+{
+    m_additionalSettingsDialog.hide();
 }

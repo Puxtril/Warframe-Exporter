@@ -2,6 +2,7 @@
 
 #include "ui/ui_Picker.h"
 #include "ui/UIExporter.h"
+#include "ui/ui_AdditionalSettings.h"
 #include "Extractor.h"
 #include "ui/Settings.h"
 #include "Meta.h"
@@ -17,6 +18,9 @@
 class UiPicker : public QObject, private Ui_WindowPicker
 {
     Q_OBJECT
+
+    QDialog m_additionalSettingsDialog;
+    Ui_AdditionalSettings m_additionalSettings;
 
 public:
     UiPicker(QObject *parent = nullptr);
@@ -44,4 +48,7 @@ public slots:
     void parsePickerOptions();
     void browseCacheWindows();
     void browseExportPath();
+    void additionalSettingsClicked();
+    void additionalSettingsClosed();
+    void additionalSettingsCancelled();
 };

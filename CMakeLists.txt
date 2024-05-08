@@ -47,6 +47,7 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/material/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/material/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/model/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/model/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/model/vertexcolor/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/model/vertexcolor/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/texture/*.cpp

@@ -1,18 +1,18 @@
 #pragma once
 
 #include "EnumMap.h"
-#include "model/types/ModelReader86.hpp"
-#include "model/types/ModelReader96.hpp"
-#include "model/types/ModelReader99.hpp"
-#include "model/types/ModelReader101.hpp"
-#include "model/types/ModelReader102.hpp"
-#include "model/types/ModelReader103.hpp"
-#include "model/types/ModelReader159.hpp"
-#include "model/types/ModelReader160.hpp"
-#include "model/types/ModelReader269.hpp"
-#include "model/types/ModelReader272.hpp"
-#include "model/types/ModelReader289.hpp"
-#include "model/types/ModelReader290.hpp"
+#include "model/types/ModelReader86.h"
+#include "model/types/ModelReader96.h"
+#include "model/types/ModelReader99.h"
+#include "model/types/ModelReader101.h"
+#include "model/types/ModelReader102.h"
+#include "model/types/ModelReader103.h"
+#include "model/types/ModelReader159.h"
+#include "model/types/ModelReader160.h"
+#include "model/types/ModelReader269.h"
+#include "model/types/ModelReader272.h"
+#include "model/types/ModelReader289.h"
+#include "model/types/ModelReader290.h"
 
 namespace WarframeExporter::Model
 {

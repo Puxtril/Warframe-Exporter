@@ -4,17 +4,18 @@
 
 #include <QtWidgets/QLabel>
 
-class PreviewLoading : public Preview
+class PreviewMessage : public Preview
 {
-    PreviewLoading() = default;
-    PreviewLoading(const PreviewLoading&) = delete;
-    const PreviewLoading& operator=(const PreviewLoading&) = delete;
+    PreviewMessage() = default;
+    PreviewMessage(const PreviewMessage&) = delete;
+    const PreviewMessage& operator=(const PreviewMessage&) = delete;
 
     QLabel* m_widgetText;
 
 public:
-    static PreviewLoading* getInstance(); 
+    static PreviewMessage* getInstance(); 
 
+    void setMessage(const std::string& msg);
     void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout) override;
     void unloadData() override;
     void hide() override;

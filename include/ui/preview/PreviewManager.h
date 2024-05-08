@@ -8,8 +8,7 @@
 #include "Extractor.h"
 
 #include "ui/preview/Preview.h"
-#include "ui/preview/PreviewLoading.h"
-#include "ui/preview/PreviewUnsupported.h"
+#include "ui/preview/PreviewMessage.h"
 #include "ui/preview/PreviewMaterial.h"
 #include "ui/preview/PreviewTexture.h"
 #include "ui/preview/PreviewModel.h"

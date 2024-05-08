@@ -17,7 +17,7 @@ PreviewManager::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout)
     {
         std::get<1>(child)->setupUi(parentWidget, parentLayout);
     }
-    PreviewUnsupported::getInstance()->setupUi(parentWidget, parentLayout);
+    PreviewMessage::getInstance()->setupUi(parentWidget, parentLayout);
 }
 
 void
@@ -34,10 +34,20 @@ PreviewManager::swapToFilePreview(LotusLib::FileEntry& fileEntry)
     
     clearPreview();
 
-    // OpenGL widgets do initlization before the first draw call.
-    // So lets initilize OpenGL (by rendering once) before setting textures/models.
-    preview->show();
-    preview->setupWidget(fileEntry, *m_pkgs, m_ensmallening);
+    try
+    {
+        // OpenGL widgets do initlization before the first draw call.
+        // So lets initilize OpenGL (by rendering once) before setting textures/models.
+        preview->show();
+        preview->setupWidget(fileEntry, *m_pkgs, m_ensmallening);
+    }
+    catch (std::exception&)
+    {
+        preview->hide();
+        preview->unloadData();
+        PreviewMessage::getInstance()->setMessage("Error loading preview");
+        PreviewMessage::getInstance()->show();
+    }
 }
 
 void
@@ -48,7 +58,7 @@ PreviewManager::clearPreview()
         std::get<1>(child)->hide();
         std::get<1>(child)->unloadData();
     }
-    PreviewUnsupported::getInstance()->hide();
+    PreviewMessage::getInstance()->hide();
 }
 
 Preview*
@@ -58,11 +68,15 @@ PreviewManager::getPreview(LotusLib::FileEntry& fileEntry)
 
     if (extractor == nullptr)
     {
-        return PreviewUnsupported::getInstance();
+        PreviewMessage::getInstance()->setMessage("Preview Not Supported");
+        return PreviewMessage::getInstance();
     }
 
     if (m_previewWidgets.count(extractor->getExtractorType()))
+    {
         return m_previewWidgets[extractor->getExtractorType()];
+    }
 
-    return PreviewUnsupported::getInstance();
+    PreviewMessage::getInstance()->setMessage("Preview Not Supported");
+    return PreviewMessage::getInstance();
 }

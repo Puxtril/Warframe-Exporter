@@ -17,25 +17,30 @@
 #include "ui/TreeItemSubtypes.h"
 #include "ui/preview/PreviewManager.h"
 
+#include "ui/UILoading.h"
+
 #include "ui/tasks/ExporterDirectoryThread.h"
 #include "ui/tasks/ExporterFileThread.h"
+#include "ui/tasks/LoadTreeThread.h"
 
-#include "EnumMapExtractor.h"
-
-class UiExporter : private Ui_MainWindow, public QObject
+class UiExporter : public QObject, private Ui_MainWindow
 {
+    Q_OBJECT
+
     LotusLib::PackagesReader m_packages;
     std::filesystem::path m_cacheDirPath;
     std::filesystem::path m_exportPath;
     WarframeExporter::ExtractorType m_extractTypes;
     std::vector<std::string> m_exportPkgNames;
-    QBrush m_dirBrush;
     ExporterDirectoryThread m_exporterDirectoryThread;
     ExporterFileThread m_exporterFileThread;
     PreviewManager m_previewManager;
 
+    LoadTreeThread m_loadTreeThread;
+    QDialog m_loadingDialog;
+    UILoading m_loading;
+
 public:
-    UiExporter();
     virtual ~UiExporter();
 
     void setup(UiMainWindow* MainWindow);
@@ -43,13 +48,6 @@ public:
 private:
     void saveGeometry();
     void loadGeometry();
-
-    // curEntries are a list of matching directories currently being processed.
-    // Since we are merging m_viewPkgNames.size packages, we need to merge matching directory names.
-    // Some directories may be null. That's fine. But we need to ensure curEntries[i] 
-    //   lines up with pkgNames[i], even if curEntries[i] is currently null
-    void setupTree();
-    void setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*> curEntries, QTreeWidgetItem* parentWidget);
 
     void clearMetaData();
     void clearPreview();
@@ -74,6 +72,7 @@ public slots:
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType    
     );
+    void loadTreeFinished();
     void extractButtonClicked();
     void extractCancelButtonClicked();
     void extractIndexingStarted();

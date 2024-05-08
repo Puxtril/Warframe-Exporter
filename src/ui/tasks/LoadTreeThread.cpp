@@ -96,9 +96,14 @@ LoadTreeThread::setupTree()
     }
 
     // Add top-level items from dummyRootWidget
-    for (QTreeWidgetItem* curItem : topLevelItems)
+    for (size_t i = 0; i < topLevelItems.size(); i++)
     {
-        m_treeWidget->addTopLevelItem(curItem);
+        QTreeWidgetItem* curItem = topLevelItems[i];
+        
+        if (curItem->childCount() != 0)
+            m_treeWidget->addTopLevelItem(curItem);
+        else
+            delete curItem;
     }
 
     m_treeWidget->sortItems(0, Qt::SortOrder::AscendingOrder);
@@ -199,6 +204,9 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
             return;
         
         setupTreeRecursive(dirEntries, newDirWidget);
+
+        if (newDirWidget->childCount() == 0)
+            parentWidget->removeChild(newDirWidget);
     }
 }
 

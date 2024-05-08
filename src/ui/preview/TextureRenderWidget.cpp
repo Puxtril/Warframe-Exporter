@@ -48,10 +48,10 @@ TextureRenderWidget::resizeGL(int width, int height)
 
     float data[] =
     {
-        std::get<0>(dims), -std::get<1>(dims), 0, 1,
-        std::get<0>(dims),  std::get<1>(dims), 0, 0,
-        -std::get<0>(dims),  std::get<1>(dims), 1, 0,
-        -std::get<0>(dims), -std::get<1>(dims), 1, 1
+        std::get<0>(dims), -std::get<1>(dims), 1, 1,
+        std::get<0>(dims),  std::get<1>(dims), 1, 0,
+        -std::get<0>(dims),  std::get<1>(dims), 0, 0,
+        -std::get<0>(dims), -std::get<1>(dims), 0, 1
     };
 
     glBindBuffer(GL_ARRAY_BUFFER, m_glVertexBufferObject);

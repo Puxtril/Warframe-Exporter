@@ -10,35 +10,7 @@ ModelReader96::readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader,
     headerReader->readUInt32(); // Not an array
     headerReader->readUInt32(); // Not an array
 
-    // Missing pre-check, len is non-zero, path doesn't exist: /Lotus/Characters/Orokin/OrokinStatue/OrokinStatueDestroyedHead.fbx
-    // Missing pre-check, len is non-zero, path exists:        /Lotus/Characters/Grineer/GrineerTwinQueens/GrineerQueenSceptreBrokenVesselB.fbx
-    // Has pre-check,     len is zero,     path doesn't exist: /Lotus/Characters/NewWar/Tefillah/TefillahDamaged.fbx
-    // Has pre-check,     len is non-zero, path exists:        /Lotus/Objects/SolarisUnited/ExteriorKit/SUExtPipe90Corner.fbx
-    static const std::string physicsPath1 = "First physics path Check";
-    uint32_t physicsPathCheck = headerReader->readUInt16(0, (int)UINT8_MAX + 1, physicsPath1);
-    if (physicsPathCheck > 0)
-    {
-        uint32_t physPathLen;
-        if (physicsPathCheck == 255)
-        {
-            physPathLen = headerReader->readUInt32();
-        }
-        else
-        {
-            physPathLen = physicsPathCheck;
-            headerReader->seek(0x2, std::ios_base::cur);
-        }
-    
-        // Because the path may not actually exist...
-        if (physPathLen > 0)
-        {
-            uint16_t nullCheck = headerReader->readUInt16();
-            if (nullCheck != 0)
-                headerReader->seek(physPathLen - 2, std::ios_base::cur);
-        }
-    }
-    else
-        headerReader->seek(0x2, std::ios_base::cur);
+    skipPhysicsPath1(headerReader);
 
     headerReader->readUInt32(); // Not an array
     headerReader->readUInt32(); // Probably flags
@@ -142,31 +114,7 @@ ModelReader96::readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader,
 
     headerReader->seek(0x8, std::ios_base::cur);
 
-    static const std::string physicsPath2 = "Second physics path";
-    int32_t physicsPath2Check = headerReader->readUInt16(0, (int)UINT8_MAX + 1, physicsPath2);
-    if (physicsPath2Check > 0)
-    {
-        uint32_t physPath2Len;
-        if (physicsPath2Check == 255)
-        {
-            physPath2Len = headerReader->readUInt32();
-        }
-        else
-        {
-            physPath2Len = physicsPath2Check;
-            headerReader->seek(0x2, std::ios_base::cur);
-        }
-
-        // Because the path may not actually exist...
-        if (physPath2Len > 0)
-        {
-            uint16_t nullCheck = headerReader->readUInt16();
-            if (nullCheck != 0)
-                headerReader->seek(physPath2Len - 2, std::ios_base::cur);
-        }
-    }
-    else
-        headerReader->seek(0x2, std::ios_base::cur);
+    skipPhysicsPath1(headerReader);
 
     uint32_t physXMeshCount = headerReader->readUInt32();
     for (uint32_t x = 0; x < physXMeshCount; x++)
@@ -208,33 +156,11 @@ ModelReader96::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 {
     headerReader->seek(0x38, std::ios_base::cur);
 
-    uint32_t physicsPathCheck = headerReader->readUInt16();
-    if (physicsPathCheck > 0)
-    {
-        uint32_t physPathLen;
-        if (physicsPathCheck == 255)
-        {
-            physPathLen = headerReader->readUInt32();
-        }
-        else
-        {
-            physPathLen = physicsPathCheck;
-            headerReader->seek(0x2, std::ios_base::cur);
-        }
-
-        // Because the path may not actually exist...
-        if (physPathLen > 0)
-        {
-            uint16_t nullCheck = headerReader->readUInt16();
-            if (nullCheck != 0)
-                headerReader->seek(physPathLen - 2, std::ios_base::cur);
-        }
-    }
-    else
-        headerReader->seek(0x2, std::ios_base::cur);
+    skipPhysicsPath1(headerReader);
 
     headerReader->seek(0x2C, std::ios_base::cur);
 
+    // ???
     uint16_t vecCheck = headerReader->readUInt16();
     if (vecCheck != 256 && vecCheck != 257 && vecCheck != 258 && vecCheck != 0)
         headerReader->seek(-2, std::ios_base::cur);
@@ -257,89 +183,18 @@ ModelReader96::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
     headerReader->seek(somePathLen, std::ios_base::cur);
     headerReader->seek(0x41, std::ios_base::cur);
 
-    // Mesh Infos
-    uint32_t meshInfoCount = headerReader->readUInt32();
-    outHeader.meshInfos.resize(meshInfoCount);
-    for (uint32_t x = 0; x < meshInfoCount; x++)
-    {
-        MeshInfoExternal& curMeshInfo = outHeader.meshInfos[x];
-
-        headerReader->readSingleArray(&curMeshInfo.vector1.x, 4);
-        headerReader->readSingleArray(&curMeshInfo.vector2.x, 4);
-
-        uint32_t meshInfoNameLen = headerReader->readUInt32();
-        curMeshInfo.name = headerReader->readAsciiString(meshInfoNameLen);
-
-        headerReader->readUInt32Array(curMeshInfo.faceLODOffsets.data(), 5);
-        headerReader->readUInt32Array(curMeshInfo.faceLODCounts.data(), 5);
-
-        headerReader->seek(0x20, std::ios_base::cur);
-        uint32_t unkNameLen = headerReader->readUInt32();
-        headerReader->seek(unkNameLen, std::ios_base::cur);
-        headerReader->seek(0x10, std::ios_base::cur);
-    }
+    readMeshInfos(headerReader, outHeader.meshInfos);
 
     uint32_t shortCount = headerReader->readUInt32();
     headerReader->seek(shortCount * 2U, std::ios_base::cur);
 
     headerReader->seek(0x8, std::ios_base::cur);
 
-    int32_t physicsPath2Check = headerReader->readUInt16();
-    if (physicsPath2Check > 0)
-    {
-        uint32_t physPath2Len;
-        if (physicsPath2Check == 255)
-        {
-            physPath2Len = headerReader->readUInt32();
-        }
-        else
-        {
-            physPath2Len = physicsPath2Check;
-            headerReader->seek(0x2, std::ios_base::cur);
-        }
+    skipPhysicsPath1(headerReader);
 
-        // Because the path may not actually exist...
-        if (physPath2Len > 0)
-        {
-            uint16_t nullCheck = headerReader->readUInt16();
-            if (nullCheck != 0)
-                headerReader->seek(physPath2Len - 2, std::ios_base::cur);
-        }
-    }
-    else
-        headerReader->seek(0x2, std::ios_base::cur);
+    readPhysxMeshes(headerReader, outHeader.physXMeshes);
 
-    // PhysX Meshes
-    uint32_t physXMeshCount = headerReader->readUInt32();
-    outHeader.physXMeshes.resize(physXMeshCount);
-    for (uint32_t x = 0; x < physXMeshCount; x++)
-    {
-        PhysXMesh& curPhys = outHeader.physXMeshes[x];
-
-        curPhys.typeEnum = headerReader->readUInt32();
-        if (curPhys.typeEnum == 1)
-            headerReader->seek(0x4C, std::ios_base::cur);
-        else
-            headerReader->seek(0x50, std::ios_base::cur);
-
-        headerReader->seek(0x20, std::ios_base::cur);
-
-        if (curPhys.typeEnum != 0 && curPhys.typeEnum != 2 && curPhys.typeEnum != 3)
-            headerReader->seek(0x4, std::ios_base::cur);
-
-        headerReader->seek(0x4, std::ios_base::cur);
-
-        curPhys.dataLength = headerReader->readUInt32();
-        headerReader->seek(0x8, std::ios_base::cur);
-    }
-
-    uint32_t errorCount = headerReader->readUInt32();
-    outHeader.errorMsgs.resize(errorCount);
-    for (uint32_t x = 0; x < errorCount; x++)
-    {
-        uint32_t errorCountStrLen = headerReader->readUInt32();
-        outHeader.errorMsgs[x] = headerReader->readAsciiString(errorCountStrLen);
-    }
+    readErrors(headerReader, outHeader.errorMsgs);
 
     if (headerReader->tell() != headerReader->getLength())
         throw unknown_format_error("Did not reach end of file");

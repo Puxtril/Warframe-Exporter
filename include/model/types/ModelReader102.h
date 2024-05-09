@@ -51,7 +51,5 @@ namespace WarframeExporter::Model
 		// This sucks, man
 		// True for DCM, False for HLOD
 		bool isDCM(const LotusLib::CommonHeader& header);
-
-		void skipPhysicsPath(BinaryReader::BinaryReaderBuffered* headerReader) const;
-};
+	};
 };

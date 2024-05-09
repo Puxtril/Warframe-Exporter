@@ -8,7 +8,7 @@ ModelReader102::readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader
     headerReader->seek(0x1C, std::ios_base::cur);
     headerReader->readUInt32Array(5); // Possible LOD Data
     
-    this->skipPhysicsPath(headerReader);
+    skipPhysicsPath3(headerReader);
 
     headerReader->seek(0x18, std::ios_base::cur);
 
@@ -108,7 +108,7 @@ ModelReader102::readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader
         headerReader->seek(0x4, std::ios::cur);
     }
 
-    this->skipPhysicsPath(headerReader);
+    skipPhysicsPath3(headerReader);
 
     uint32_t physXMeshCount = headerReader->readUInt32();
     for (uint32_t x = 0; x < physXMeshCount; x++)
@@ -142,7 +142,7 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
-    this->skipPhysicsPath(headerReader);
+    this->skipPhysicsPath3(headerReader);
 
     headerReader->seek(0x4E, std::ios_base::cur);
 
@@ -158,23 +158,7 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     headerReader->seek(0x51, std::ios_base::cur);
 
-    uint32_t meshInfoCount = headerReader->readUInt32();
-    outHeader.meshInfos.resize(meshInfoCount);
-    for (uint32_t x = 0; x < meshInfoCount; x++)
-    {
-        MeshInfoExternal& meshInfo = outHeader.meshInfos[x];
-
-        headerReader->readSingleArray(&meshInfo.vector1.x, 4);
-        headerReader->readSingleArray(&meshInfo.vector2.x, 4);
-
-        uint32_t meshInfoNameLen = headerReader->readUInt32();
-        meshInfo.name = headerReader->readAsciiString(meshInfoNameLen);
-
-        headerReader->readUInt32Array(meshInfo.faceLODOffsets.data(), 5);
-        headerReader->readUInt32Array(meshInfo.faceLODCounts.data(), 5);
-
-        headerReader->seek(0x34, std::ios_base::cur);
-    }
+    readMeshInfos(headerReader, outHeader.meshInfos);
 
     uint32_t someSkip = headerReader->readUInt32();
     if (someSkip == 2)
@@ -193,31 +177,9 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
         headerReader->seek(0x4, std::ios::cur);
     }
 
-    this->skipPhysicsPath(headerReader);
+    skipPhysicsPath3(headerReader);
 
-    uint32_t physXMeshCount = headerReader->readUInt32();
-    outHeader.physXMeshes.resize(physXMeshCount);
-    for (uint32_t x = 0; x < physXMeshCount; x++)
-    {
-        PhysXMesh& curPhysXMesh = outHeader.physXMeshes[x];
-
-        curPhysXMesh.typeEnum = headerReader->readUInt32();
-        if (curPhysXMesh.typeEnum == 1)
-            headerReader->seek(0x4C, std::ios_base::cur);
-        else
-            headerReader->seek(0x50, std::ios_base::cur);
-
-        headerReader->readSingleArray(&curPhysXMesh.vector1.x, 4);
-        headerReader->readSingleArray(&curPhysXMesh.vector2.x, 4);
-
-        if (curPhysXMesh.typeEnum != 0 && curPhysXMesh.typeEnum != 2 && curPhysXMesh.typeEnum != 3)
-            headerReader->seek(0x4, std::ios_base::cur);
-
-        headerReader->seek(0x4, std::ios_base::cur);
-
-        curPhysXMesh.dataLength = headerReader->readUInt32();
-        headerReader->seek(0x8, std::ios_base::cur);
-    }
+    readPhysxMeshes(headerReader, outHeader.physXMeshes);
 }
 
 void
@@ -311,21 +273,4 @@ ModelReader102::isDCM(const LotusLib::CommonHeader& header)
         return true;
     
     return false;
-}
-
-void
-ModelReader102::skipPhysicsPath(BinaryReader::BinaryReaderBuffered* headerReader) const
-{
-    headerReader->readUInt32();
-    uint32_t subType = headerReader->readUInt32();
-
-    // Perhaps these 2 numbers are flags?
-    // Doesn't matter... debugging this took long enough. It works.
-    if (subType & 8)
-    {
-        headerReader->seek(2, std::ios::cur);
-    }
-
-    uint32_t pathLen = headerReader->readUInt32();
-    headerReader->seek(pathLen, std::ios::cur);
 }

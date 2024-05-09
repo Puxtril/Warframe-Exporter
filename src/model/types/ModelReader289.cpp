@@ -259,25 +259,11 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 {
     headerReader->seek(0x38, std::ios_base::cur);
 
-    uint32_t physicsPathLen = headerReader->readUInt32();
-    if (physicsPathLen != 0)
-    {
-        uint16_t physPathCheck = headerReader->readUInt16();
-        if (physPathCheck != 0)
-            headerReader->seek(physicsPathLen - 2, std::ios_base::cur);
-    }
+    skipPhysicsPath2(headerReader);
 
     headerReader->seek(0x4C, std::ios_base::cur);
 
-    // Weighted Bones
-    std::vector<std::string> weightedBoneNames;
-    uint32_t weightedBoneCount = headerReader->readUInt32();
-    for (uint32_t x = 0; x < weightedBoneCount; x++)
-    {
-        uint32_t curBoneNameLen = headerReader->readUInt32();
-        weightedBoneNames.push_back(headerReader->readAsciiString(curBoneNameLen));
-    }
-    outHeader.weightedBoneNames = weightedBoneNames;
+    readWeightedBones(headerReader, outHeader.weightedBoneNames);
 
     // Main vertex counts
     outHeader.faceCount = headerReader->readUInt32();
@@ -290,116 +276,26 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     headerReader->seek(unkArrLen * 8U, std::ios_base::cur);
     headerReader->seek(0x31, std::ios_base::cur);
 
-    // Bone tree
-    uint32_t boneTreeLen = headerReader->readUInt32();
-    outHeader.boneTree.resize(boneTreeLen);
-    for (uint32_t x = 0; x < boneTreeLen; x++)
-    {
-        BoneTreeNodeExternal& boneNode = outHeader.boneTree[x];
-        uint32_t boneTreeNameLen = headerReader->readUInt32();
-        boneNode.name = headerReader->readAsciiString(boneTreeNameLen);
-        // No heirarchy
-        headerReader->readUInt16();
-        headerReader->seek(2, std::ios_base::cur);
-    }
+    // Parent bone set to 0?
+    readBoneTree(headerReader, outHeader.boneTree);
 
-    uint32_t unkStructCount = headerReader->readUInt32();
-    for (uint32_t x = 0; x < unkStructCount; x++)
-    {
-        headerReader->seek(0x10, std::ios_base::cur);
-        uint32_t nameLen = headerReader->readUInt32();
-        headerReader->seek(nameLen, std::ios_base::cur);
-        headerReader->seek(0x4C, std::ios_base::cur);
-    }
+    uint32_t unkStructCount = skipUnknownStructs(headerReader);
 
     headerReader->seek(0x1A, std::ios_base::cur);
     outHeader.bodySkipLen1 = headerReader->readUInt32();
     headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
     headerReader->seek(0x8, std::ios_base::cur);
 
-    // MeshInfos
-    std::vector<MeshInfoExternal> meshInfos;
-    uint32_t meshInfoCount = headerReader->readUInt32();
-    for (uint32_t x = 0; x < meshInfoCount; x++)
-    {
-        MeshInfoExternal meshInfo;
-
-        headerReader->readSingleArray(&meshInfo.vector1.x, 4);
-        headerReader->readSingleArray(&meshInfo.vector2.x, 4);
-
-        uint32_t meshInfoNameLen = headerReader->readUInt32();
-        meshInfo.name = headerReader->readAsciiString(meshInfoNameLen);
-
-        headerReader->readUInt32Array(meshInfo.faceLODOffsets.data(), 5);
-        headerReader->readUInt32Array(meshInfo.faceLODCounts.data(), 5);
-
-        headerReader->seek(0x34, std::ios_base::cur);
-
-        meshInfos.push_back(meshInfo);
-    }
-    outHeader.meshInfos = meshInfos;
+    readMeshInfos(headerReader, outHeader.meshInfos);
 
     uint32_t unkWordCount = headerReader->readUInt32();
     headerReader->seek(2U * unkWordCount, std::ios_base::cur);
 
-    uint32_t morphArrCount = headerReader->readUInt32();
-    for (uint32_t x = 0; x < morphArrCount; x++)
-    {
-        uint32_t morphNameLen = headerReader->readUInt32();
-        headerReader->seek(morphNameLen, std::ios_base::cur);
-        headerReader->seek(4, std::ios_base::cur);
-    }
+    skipMorphs(headerReader);
 
-    // Bone maps
-    std::vector<std::vector<uint32_t>> boneMaps;
-    uint32_t boneMapCount = headerReader->readUInt32();
-    for (uint32_t x = 0; x < boneMapCount; x++)
-    {
-        std::vector<uint32_t> curBoneMap;
-        uint32_t curBoneMapBoneCount = headerReader->readUInt32();
-        for (uint32_t y = 0; y < curBoneMapBoneCount; y++)
-        {
-            curBoneMap.push_back(headerReader->readUInt32());
-        }
-        boneMaps.push_back(curBoneMap);
-    }
-    outHeader.boneMaps = boneMaps;
+    readBoneMaps(headerReader, outHeader.boneMaps);
 
-    // Specifications:
-    //   - Last in the following array
-    //   - Third in the repeating array
-    //   - Second value in the array. (technically 2, 3, and 4th index are the same)
-    uint32_t skipLen2 = 0;
-    uint32_t morphStructArrayCount = headerReader->readUInt32();
-    for (uint32_t x = 0; x < morphStructArrayCount; x++)
-    {
-        for (int y = 0; y < 4; y++)
-        {
-            if (y == 2)
-            {
-                uint32_t recurringUnkSubArr = headerReader->readUInt32();
-                headerReader->seek(4, std::ios_base::cur);
-                skipLen2 = headerReader->readUInt32();
-                headerReader->seek(4U * (recurringUnkSubArr - 2), std::ios_base::cur);
-            }
-            else
-            {
-                uint32_t recurringUnkSubArr = headerReader->readUInt32();
-                headerReader->seek(4U * recurringUnkSubArr, std::ios_base::cur);
-            }
-        }
-
-        uint32_t morphNameArrCount = headerReader->readUInt32();
-        for (uint32_t x = 0; x < morphNameArrCount; x++)
-        {
-            uint32_t morphNameLen = headerReader->readUInt32();
-            headerReader->seek(morphNameLen, std::ios_base::cur);
-        }
-
-        uint32_t unkArrCount = headerReader->readUInt32();
-        headerReader->seek(unkArrCount * 4U, std::ios_base::cur);
-    }
-    outHeader.bodySkipLen2 = skipLen2;
+    outHeader.bodySkipLen2 = skipMorphStructsAndFindSkip(headerReader);
 
     headerReader->seek(0x2F, std::ios_base::cur);
 
@@ -416,48 +312,11 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     headerReader->seek(0x25, std::ios::cur);
 
-    static const std::string physicsPath2 = "Second physics path";
-    uint32_t physicsPath2Len = headerReader->readUInt32(0, (int)UINT8_MAX + 1, physicsPath2);
-    if (physicsPath2Len != 0)
-    {
-        uint16_t physPathCheck = headerReader->readUInt16();
-        if (physPathCheck != 0)
-            headerReader->seek(physicsPath2Len - 2, std::ios_base::cur);
-    }
+    skipPhysicsPath2(headerReader);
 
-    // PhysX Meshes
-    uint32_t physXMeshCount = headerReader->readUInt32();
-    outHeader.physXMeshes.resize(physXMeshCount);
-    for (uint32_t x = 0; x < physXMeshCount; x++)
-    {
-        PhysXMesh& curPhysXMesh = outHeader.physXMeshes[x];
+    readPhysxMeshes(headerReader, outHeader.physXMeshes);
 
-        curPhysXMesh.typeEnum = headerReader->readUInt32();
-        if (curPhysXMesh.typeEnum == 1)
-            headerReader->seek(0x4C, std::ios_base::cur);
-        else
-            headerReader->seek(0x50, std::ios_base::cur);
-
-        headerReader->readSingleArray(&curPhysXMesh.vector1.x, 4);
-        headerReader->readSingleArray(&curPhysXMesh.vector2.x, 4);
-
-        if (curPhysXMesh.typeEnum != 0 && curPhysXMesh.typeEnum != 2 && curPhysXMesh.typeEnum != 3)
-            headerReader->seek(0x4, std::ios_base::cur);
-
-        headerReader->seek(0x4, std::ios_base::cur);
-
-        curPhysXMesh.dataLength = headerReader->readUInt32();
-        headerReader->seek(0x8, std::ios_base::cur);
-    }
-
-    // Error Messages
-    uint32_t errorCount = headerReader->readUInt32();
-    outHeader.errorMsgs.resize(errorCount);
-    for (uint32_t x = 0; x < errorCount; x++)
-    {
-        uint32_t errorCountStrLen = headerReader->readUInt32();
-        outHeader.errorMsgs[x] = headerReader->readAsciiString(errorCountStrLen);
-    }
+    readErrors(headerReader, outHeader.errorMsgs);
 
     if (headerReader->tell() != headerReader->getLength())
         throw unknown_format_error("Did not reach end of file");

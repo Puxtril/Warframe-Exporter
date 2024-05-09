@@ -118,28 +118,8 @@ ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     outHeader.faceCount = (uint32_t)headerReader->readUInt64();
 
-    uint32_t meshInfoCount = headerReader->readUInt32();
-    outHeader.meshInfos.resize(meshInfoCount);
-    for (uint32_t x = 0; x < meshInfoCount; x++)
-    {
-        MeshInfoExternal& curMeshInfo = outHeader.meshInfos[x];
-
-        headerReader->readSingleArray(&curMeshInfo.vector1.x, 4);
-        headerReader->readSingleArray(&curMeshInfo.vector2.x, 4);
-
-        uint32_t meshNameLen = headerReader->readUInt32();
-        curMeshInfo.name = headerReader->readAsciiString(meshNameLen);
-
-        headerReader->readUInt32Array(&curMeshInfo.faceLODOffsets[0], 5);
-        headerReader->readUInt32Array(&curMeshInfo.faceLODCounts[0], 5);
-
-        headerReader->seek(0x20, std::ios::cur);
-
-        uint32_t nameLen = headerReader->readUInt32();
-        headerReader->seek(nameLen, std::ios::cur);
-
-        headerReader->seek(0x10, std::ios::cur);
-    }
+    readMeshInfos(headerReader, outHeader.meshInfos);
+    
     // Terrains should only have 1 meshinfo
     // It causes issues when there are more than 1
     // Surely this won't bite me on the ass one day
@@ -163,30 +143,7 @@ ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     headerReader->seek(12, std::ios::cur);
 
-    uint32_t physXMeshCount = headerReader->readUInt32();
-    outHeader.physXMeshes.resize(physXMeshCount);
-    for (uint32_t x = 0; x < physXMeshCount; x++)
-    {
-        PhysXMesh& curPhys = outHeader.physXMeshes[x];
-
-        curPhys.typeEnum = headerReader->readUInt32();
-        if (curPhys.typeEnum == 1)
-            headerReader->seek(0x4C, std::ios_base::cur);
-        else if (curPhys.typeEnum == 7)
-            headerReader->seek(0x60, std::ios_base::cur);
-        else
-            headerReader->seek(0x50, std::ios_base::cur);
-
-        headerReader->seek(0x20, std::ios_base::cur);
-
-        if (curPhys.typeEnum != 0 && curPhys.typeEnum != 2 && curPhys.typeEnum != 3)
-            headerReader->seek(0x4, std::ios_base::cur);
-
-        headerReader->seek(0x4, std::ios_base::cur);
-
-        curPhys.dataLength = headerReader->readUInt32();
-        headerReader->seek(0x8, std::ios_base::cur);
-    }
+    readPhysxMeshes(headerReader, outHeader.physXMeshes);
 }
 
 void

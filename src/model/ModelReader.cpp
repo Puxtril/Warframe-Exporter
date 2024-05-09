@@ -34,7 +34,7 @@ ModelReader::readBoneTree(BinaryReader::BinaryReaderBuffered* reader, std::vecto
 void
 ModelReader::readBoneMaps(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::vector<uint32_t>>& outBoneMaps)
 {
-    uint32_t boneMapCount = reader->readUInt32();
+    uint32_t boneMapCount = reader->readUInt32(0, 500, "Too many Bone Maps");
     outBoneMaps.resize(boneMapCount);
 
     for (uint32_t x = 0; x < boneMapCount; x++)
@@ -78,7 +78,7 @@ ModelReader::readMeshInfos(BinaryReader::BinaryReaderBuffered* reader, std::vect
 void
 ModelReader::readMaterialPaths(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outMaterialpaths)
 {
-    uint32_t materialPathArrayLen = reader->readUInt32();
+    uint32_t materialPathArrayLen = reader->readUInt32(0, 100, "Too many materials");
 
     for (uint32_t x = 0; x < materialPathArrayLen; x++)
     {
@@ -90,7 +90,7 @@ ModelReader::readMaterialPaths(BinaryReader::BinaryReaderBuffered* reader, std::
 void
 ModelReader::readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::vector<PhysXMesh>& outPhysxMeshes)
 {
-    uint32_t physXMeshCount = reader->readUInt32();
+    uint32_t physXMeshCount = reader->readUInt32(0, 300, "Too many PhysX Meshes");
     outPhysxMeshes.resize(physXMeshCount);
 
     for (uint32_t x = 0; x < physXMeshCount; x++)

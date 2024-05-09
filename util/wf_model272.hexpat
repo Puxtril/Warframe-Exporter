@@ -43,7 +43,7 @@ struct meshPhysX {
     vec4Float vec1;
     vec4Float vec2;
     if (meshType != 3 && meshType != 2 && meshType != 0) {
-        FSkip(4);
+        padding[4];
     }
     s32 numCheck;
     u32 meshLen;
@@ -156,4 +156,4 @@ struct Model272 {
 // File definition
 
 CommonHeader Header @ $;
-Model269 model @ $;
+Model272 model @ $;

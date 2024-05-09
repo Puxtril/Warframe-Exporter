@@ -58,31 +58,9 @@ UiExporter::loadGeometry()
 }
 
 void
-UiExporter::clearMetaData()
-{
-    this->NameData->clear();
-    this->FullPathData->clear();
-    this->SizeData->clear();
-    this->CompressedLengthData->clear();
-    this->TimestampData->clear();
-    this->PackageData->clear();
-}
-
-void
 UiExporter::clearPreview()
 {
     m_previewManager.clearPreview();
-}
-
-void
-UiExporter::setMetadata(TreeItemFile* file)
-{
-    this->NameData->setText(file->getQName());
-    this->FullPathData->setText(file->getQFullpath());
-    this->SizeData->setText(file->getQSize());
-    this->CompressedLengthData->setText(file->getQCompressedSize());
-    this->TimestampData->setText(file->getQTimestamp());
-    this->PackageData->setText(file->getQPkg());
 }
 
 void
@@ -178,14 +156,12 @@ UiExporter::itemChanged()
     
     if (itemType == TreeItemDirectory::QTreeWidgetItemType)
     {
-        this->clearMetaData();
         this->clearPreview();
     }
 
     else if (itemType == TreeItemFile::QTreeWidgetItemType)
     {
         TreeItemFile* itemFile = static_cast<TreeItemFile*>(item);
-        setMetadata(itemFile);
         setPreview(itemFile);
     }
 }

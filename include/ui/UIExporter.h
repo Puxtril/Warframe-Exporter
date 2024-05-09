@@ -49,9 +49,7 @@ private:
     void saveGeometry();
     void loadGeometry();
 
-    void clearMetaData();
     void clearPreview();
-    void setMetadata(TreeItemFile* file);
     void setPreview(TreeItemFile* file);
 
     void extractDirectory(LotusLib::LotusPath internalPath);

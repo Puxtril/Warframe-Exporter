@@ -155,6 +155,7 @@ UiPicker::parsePickerOptions()
     WarframeExporter::Shader::ShaderExportType shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
+    LotusLib::Logger::setLogProperties(spdlog::level::info);
     emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType);
 }
 

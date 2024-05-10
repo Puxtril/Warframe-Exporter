@@ -69,7 +69,6 @@ namespace WarframeExporter::Shader
         void writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex = 0);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputDir) override;
-		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
 		
 	private:
 		void _decompileShader(ShaderEntry& shaderEntry, int index = -1);

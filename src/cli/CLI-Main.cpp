@@ -1,5 +1,4 @@
 #include "cli/CLI-Main.h"
-#include "LotusLib.h"
 
 CLIMain::CLIMain()
 {

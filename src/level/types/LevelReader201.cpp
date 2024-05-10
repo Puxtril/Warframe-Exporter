@@ -3,54 +3,6 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelReader201::readHeaderDebug(BinaryReader::BinaryReaderBuffered& reader) const
-{
-	const static std::string pathLenMsg = "Internal path length Level header";
-	uint32_t pathCount1 = reader.readUInt32();
-	while (pathCount1--)
-	{
-		uint32_t pathLen = reader.readUInt32(0, 500, pathLenMsg);
-		reader.seek(pathLen, std::ios_base::cur);
-	}
-	const static std::string actionPathLenMsg = "Internal path length Level header";
-	uint32_t pathCount2 = reader.readUInt32();
-	while (pathCount2--)
-	{
-		uint32_t pathLen = reader.readUInt32(0, 500, actionPathLenMsg);
-		reader.seek(pathLen, std::ios_base::cur);
-	}
-	const static std::string assetPathLenMsg = "Internal path length Level header";
-	uint32_t pathCount3 = reader.readUInt32();
-	while (pathCount3--)
-	{
-		uint32_t pathLen = reader.readUInt32(0, 500, assetPathLenMsg);
-		reader.seek(pathLen, std::ios_base::cur);
-	}
-
-	reader.readUInt32();
-	uint32_t levelObjCount = reader.readUInt32();
-	const static std::string levelObjPathLenMsg = "Level object path length";
-	for (uint32_t x = 0; x < levelObjCount; x++)
-	{
-		uint32_t pathLen = reader.readUInt32(0, 500, levelObjPathLenMsg);
-		reader.readAsciiString(pathLen);
-		reader.seek(7 * 4, std::ios_base::cur);
-		pathLen = reader.readUInt32();
-		reader.seek(pathLen, std::ios_base::cur);
-		reader.readUInt32();
-		reader.readUInt32();
-	}
-}
-
-void
-LevelReader201::readBodyDebug(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader) const
-{
-	std::vector<uint32_t> indices(extHeader.levelObjs.size());
-	for (size_t x = 0; x < extHeader.levelObjs.size(); x++)
-		indices[x] = reader.readUInt32();
-}
-
-void
 LevelReader201::readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHeaderExternal& outHeader) const
 {	
 	uint32_t pathCount1 = reader.readUInt32();

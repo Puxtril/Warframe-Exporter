@@ -3,6 +3,7 @@
 #include "Extractor.h"
 #include "audio/AudioStructs.h"
 #include "audio/AudioPCM/EnumMapAudioPCMReader.h"
+#include "audio/AudioPCM/AudioPCMExporterWAV.h"
 
 namespace WarframeExporter::Audio {
 	class AudioPCMExtractor : public Extractor
@@ -48,6 +49,5 @@ namespace WarframeExporter::Audio {
 		static AudioPCMExtractor* getInstance();
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData) override;
 	};
 }

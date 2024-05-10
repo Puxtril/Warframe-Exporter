@@ -25,8 +25,6 @@ namespace WarframeExporter::Shader
         ShaderHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader) override;
     
     protected:
-        ShaderHeaderExternal readShaderHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader) override;
-
         void skipStringArray(BinaryReader::BinaryReaderBuffered* headerReader, const std::string& msg);
         void skipAttributePackaged(BinaryReader::BinaryReaderBuffered* headerReader, const std::string& msg);
     };

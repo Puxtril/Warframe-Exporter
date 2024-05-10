@@ -71,15 +71,3 @@ TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRead
 	TextureInternal intTexture = getTexture(fileEntry, pkgs, ensmalleningData);
 	writeData(intTexture, fileEntry.commonHeader, outputPath);
 }
-
-void
-TextureExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-	/*
-	BinaryReaderBuffered* fReader = pkgDir.getFileReader(package, PackageReader::PackageTrioType::F, internalpath);
-	BinaryReaderBuffered* bReader = pkgDir.getFileReader(package, PackageReader::PackageTrioType::B, internalpath);
-
-	TextureHeaderInternal headerInt = readHeader(hReader, fReader, bReader, ensmalleningData, header, m_logger);
-	TextureBodyInternal body = readBody(fReader, bReader, ensmalleningData, header, headerInt, m_logger);
-	*/
-}

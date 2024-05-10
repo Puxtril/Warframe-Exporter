@@ -30,8 +30,6 @@ namespace WarframeExporter::Level
 			return extTypes;
 		}
 	
-		void readHeaderDebug(BinaryReader::BinaryReaderBuffered& reader) const override;
-		void readBodyDebug(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader) const override;
 		void readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHeaderExternal& outHeader) const override;
 		void readBody(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const override;
 

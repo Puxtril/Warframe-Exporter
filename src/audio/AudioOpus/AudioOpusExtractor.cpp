@@ -1,8 +1,4 @@
 #include "audio/AudioOpus/AudioOpusExtractor.h"
-#include "FileNode.h"
-#include "Package.h"
-#include "audio/AudioOpus/AudioOpusExporterOGG.h"
-#include "audio/AudioOpus/EnumMapAudioOpusReader.h"
 
 using namespace WarframeExporter::Audio;
 
@@ -25,11 +21,4 @@ AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRe
 	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
 
 	AudioOpusExporterOGG::writeData(audioHeader, audioBody, outputPath);
-}
-
-void
-AudioOpusExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-	AudioReader* reader = g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
-	reader->readHeaderDebug(&fileEntry.headerData, ensmalleningData, fileEntry.commonHeader);
 }

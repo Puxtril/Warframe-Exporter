@@ -102,24 +102,6 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
 }
 
 void
-ShaderExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-    LotusLib::FileEntry fullFileEntry;
-    try
-    {
-        fullFileEntry = pkgs.getPackage("ShaderPermutationDx11").getFile(fileEntry.metadata->getFullPath());
-    }
-    catch (std::exception&)
-    {
-        fullFileEntry = pkgs.getPackage("ShaderDx11").getFile(fileEntry.metadata->getFullPath());
-    }
-    
-    ShaderReader* shaderReader = g_enumMapShader[fullFileEntry.commonHeader.type];
-
-    shaderReader->readShaderDebug(&fullFileEntry.headerData, &fullFileEntry.bData);
-}
-
-void
 ShaderExtractor::_decompileShader(ShaderEntry& shaderEntry, int index)
 {
 #ifdef WIN32

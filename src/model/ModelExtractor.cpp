@@ -68,18 +68,3 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	outModel.addModelData(headerInt, bodyInt);
 	outModel.save(outputPath);
 }
-
-void
-ModelExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-	ModelHeaderExternal headerExt;
-
-	size_t pos = fileEntry.headerData.tell();
-	ModelReader* modelReader = g_enumMapModel[fileEntry.commonHeader.type];
-
-	modelReader->readHeaderDebug(&fileEntry.headerData, ensmalleningData, fileEntry.commonHeader);
-	fileEntry.headerData.seek(pos, std::ios_base::beg);
-	modelReader->readHeader(&fileEntry.headerData, ensmalleningData, fileEntry.commonHeader, headerExt);
-	if (headerExt.vertexCount > 0)
-		modelReader->readBodyDebug(headerExt, &fileEntry.bData);
-}

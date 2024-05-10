@@ -1,5 +1,4 @@
 #include "audio/AudioPCM/AudioPCMExtractor.h"
-#include "audio/AudioPCM/AudioPCMExporterWAV.h"
 
 using namespace WarframeExporter::Audio;
 
@@ -22,11 +21,4 @@ AudioPCMExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRea
 	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
 
 	AudioPCMExporterWAV::writeData(audioHeader, audioBody, outputPath);
-}
-
-void
-AudioPCMExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-	AudioReader* reader = g_enumMapAudioPCMReader[fileEntry.commonHeader.type];
-	reader->readHeaderDebug(&fileEntry.headerData, ensmalleningData, fileEntry.commonHeader);
 }

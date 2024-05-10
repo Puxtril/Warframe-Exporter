@@ -25,14 +25,6 @@ AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 	extractor->extract(fileEntry, pkgs, ensmalleningData, outputPath);
 }
 
-void
-AudioExtractorProxy::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.headerData);
-	Extractor* extractor = g_enumMapAudioExtractor[(int)compressionEnum];
-	extractor->extractDebug(fileEntry, pkgs, ensmalleningData);
-}
-
 AudioCompression
 AudioExtractorProxy::peekCompressionFormat(BinaryReader::BinaryReaderBuffered* headerReader) const
 {

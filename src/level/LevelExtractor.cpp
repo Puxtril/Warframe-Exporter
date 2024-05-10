@@ -41,13 +41,6 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	gltfOut.save(outputPath);
 }
 
-void
-LevelExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-	LevelReader* levelReader = g_enumMapLevel[fileEntry.commonHeader.type];
-	levelReader->readHeaderDebug(fileEntry.headerData);
-}
-
 LevelExporterGltf
 LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt)
 {

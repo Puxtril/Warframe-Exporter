@@ -64,9 +64,3 @@ MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRea
 	MaterialInternal internal = formatMaterial(external);
 	writeOut(internal, outputPath);
 }
-
-void
-MaterialExtractor::extractDebug(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
-{
-
-}

@@ -12,13 +12,10 @@ ShaderReader22::getInstance()
 ShaderHeaderExternal
 ShaderReader22::readHeader(BinaryReader::BinaryReaderBuffered* headerReader)
 {
-    return ShaderHeaderExternal();
-}
-
-ShaderHeaderExternal
-ShaderReader22::readShaderHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader)
-{
+    // Intentional
+    // I don't know what to do with this data
     ShaderHeaderExternal header;
+    return header;
 
     headerReader->seek(9, std::ios::cur);
 

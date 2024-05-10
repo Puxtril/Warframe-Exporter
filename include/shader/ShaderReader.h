@@ -14,9 +14,5 @@ namespace WarframeExporter::Shader
         virtual std::vector<ShaderEntry> readAllShaders(BinaryReader::BinaryReaderBuffered* bodyReader, const ShaderHeaderExternal& shaderHeader) = 0;
 
         void readShaderDebug(BinaryReader::BinaryReaderBuffered* headerReader, BinaryReader::BinaryReaderBuffered* bodyReader);
-
-    protected:
-        virtual ShaderHeaderExternal readShaderHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader) = 0;
-        virtual void readShaderBodyDebug(const ShaderHeaderExternal& shaderHeader, BinaryReader::BinaryReaderBuffered* bodyReader) = 0;
     };
 };

@@ -28,7 +28,7 @@ jobs:
       - name: Init LotusLib submodule
         run: |
           cd lib/LotusLib/lib
-          git submodule update --init zstd
+          git submodule update --init
       # This is what requires a private build process
       - name: Copy Oodle binaries
         run: |

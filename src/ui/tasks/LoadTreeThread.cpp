@@ -201,7 +201,7 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
 
         // Base case!
         if (validDirCount == 0)
-            return;
+            continue;
         
         setupTreeRecursive(dirEntries, newDirWidget);
 

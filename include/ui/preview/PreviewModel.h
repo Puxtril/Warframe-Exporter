@@ -15,7 +15,7 @@ class PreviewModel : public Preview
 public:
     static PreviewModel* getInstance(); 
 
-    void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout) override;
+    void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout) override;
     void unloadData() override;
     void hide() override;
     void show() override;

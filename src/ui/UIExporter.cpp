@@ -37,7 +37,7 @@ UiExporter::setup(UiMainWindow *MainWindow)
     connect(&m_exporterFileThread, &ExporterFileThread::extractItemComplete, this, &UiExporter::extractItemComplete);
     connect(&m_exporterFileThread, &ExporterFileThread::extractComplete, this, &UiExporter::extractComplete);
 
-    m_previewManager.setupUis(this->Preview, this->verticalLayout_3);
+    m_previewManager.setupUis(this->Preview, this->verticalLayout_3, this->PreviewButtonsArea, this->horizontalLayout_5);
 }
 
 void

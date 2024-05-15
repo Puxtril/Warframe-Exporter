@@ -4,6 +4,9 @@
 #include "texture/TextureExtractor.h"
 #include "ui/preview/TextureRenderWidget.h"
 
+#include <QtWidgets/QCheckBox>
+#include <QtCore/QObject>
+
 class PreviewTexture : public Preview
 {
     PreviewTexture() = default;
@@ -11,11 +14,12 @@ class PreviewTexture : public Preview
     const PreviewTexture& operator=(const PreviewTexture&) = delete;
 
     TextureRenderWidget* m_textureWidget;
+    QCheckBox* m_showAlphaCheckbox;
 
 public:
     static PreviewTexture* getInstance(); 
 
-    void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout) override;
+    void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout) override;
     void unloadData() override;
     void hide() override;
     void show() override;

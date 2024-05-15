@@ -8,7 +8,7 @@ PreviewUnsupported::getInstance()
 }
 
 void
-PreviewUnsupported::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewUnsupported::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout)
 {
     m_widgetText = new QLabel(parentWidget);
     parentLayout->addWidget(m_widgetText);

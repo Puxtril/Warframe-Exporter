@@ -11,13 +11,13 @@ PreviewManager::PreviewManager()
 }
 
 void
-PreviewManager::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewManager::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonArea, QHBoxLayout* previewButtonLayout)
 {
     for (auto& child : m_previewWidgets)
     {
-        std::get<1>(child)->setupUi(parentWidget, parentLayout);
+        std::get<1>(child)->setupUi(parentWidget, parentLayout, previewButtonArea, previewButtonLayout);
     }
-    PreviewMessage::getInstance()->setupUi(parentWidget, parentLayout);
+    PreviewMessage::getInstance()->setupUi(parentWidget, parentLayout, previewButtonArea, previewButtonLayout);
 }
 
 void

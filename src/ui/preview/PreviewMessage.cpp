@@ -1,5 +1,4 @@
 #include "ui/preview/PreviewMessage.h"
-#include "ui/preview/Preview.h"
 
 PreviewMessage*
 PreviewMessage::getInstance()
@@ -15,7 +14,7 @@ PreviewMessage::setMessage(const std::string& msg)
 }
 
 void
-PreviewMessage::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewMessage::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout)
 {
     m_widgetText = new QLabel(parentWidget);
     parentLayout->addWidget(m_widgetText);

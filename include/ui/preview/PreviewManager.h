@@ -22,7 +22,7 @@ class PreviewManager
 public:
     PreviewManager();
 
-    void setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout);
+    void setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonArea, QHBoxLayout* previewButtonLayout);
     void setData(LotusLib::PackagesReader* pkgs, const WarframeExporter::Ensmallening& ensmalleningData);
 
     void swapToFilePreview(LotusLib::FileEntry& fileEntry);

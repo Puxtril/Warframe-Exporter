@@ -9,7 +9,7 @@
 class Preview
 {
 public:
-    virtual void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout) = 0;
+    virtual void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout) = 0;
     virtual void unloadData() = 0;
     virtual void hide() = 0;
     virtual void show() = 0;

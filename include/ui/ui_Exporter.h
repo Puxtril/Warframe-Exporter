@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExportersSkmfJ.ui'
+** Form generated from reading UI file 'ExporterAOWjlh.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTERSSKMFJ_H
-#define EXPORTERSSKMFJ_H
+#ifndef EXPORTERAOWJLH_H
+#define EXPORTERAOWJLH_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -17,7 +17,6 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -48,7 +47,8 @@ public:
     QTabWidget *tabWidget;
     QWidget *Preview;
     QVBoxLayout *verticalLayout_3;
-    QSpacerItem *verticalSpacer_3;
+    QWidget *PreviewButtonsArea;
+    QHBoxLayout *horizontalLayout_5;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -135,9 +135,18 @@ public:
 
         verticalLayout_4->addWidget(tabWidget);
 
-        verticalSpacer_3 = new QSpacerItem(20, 47, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+        PreviewButtonsArea = new QWidget(horizontalLayoutWidget);
+        PreviewButtonsArea->setObjectName("PreviewButtonsArea");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(PreviewButtonsArea->sizePolicy().hasHeightForWidth());
+        PreviewButtonsArea->setSizePolicy(sizePolicy2);
+        PreviewButtonsArea->setMinimumSize(QSize(0, 47));
+        horizontalLayout_5 = new QHBoxLayout(PreviewButtonsArea);
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
 
-        verticalLayout_4->addItem(verticalSpacer_3);
+        verticalLayout_4->addWidget(PreviewButtonsArea);
 
 
         horizontalLayout_4->addLayout(verticalLayout_4);
@@ -181,4 +190,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTERSSKMFJ_H
+#endif // EXPORTERAOWJLH_H

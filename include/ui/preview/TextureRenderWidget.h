@@ -21,6 +21,7 @@ class TextureRenderWidget : public QtOpenGLViewer
     unsigned int m_shaderProgram;
     int m_texWidth;
     int m_texHeight;
+    bool m_showAlpha;
 
     std::map<WarframeExporter::Texture::TextureCompression, std::tuple<unsigned int, unsigned int>> m_textureMap;
 
@@ -39,4 +40,7 @@ private:
     void loadShaders();
 
     static std::tuple<float, float> getMeshCoordsForTexture(int screenWidth, int screenHeight, int texWidth, int texHeight);
+
+public slots:
+    void showAlpha(int state);
 };

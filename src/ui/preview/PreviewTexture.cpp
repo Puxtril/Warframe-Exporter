@@ -8,12 +8,18 @@ PreviewTexture::getInstance()
 }
 
 void
-PreviewTexture::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewTexture::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout)
 {
     m_textureWidget = new TextureRenderWidget(parentWidget);
     parentLayout->addWidget(m_textureWidget);
-
     m_textureWidget->hide();
+
+    m_showAlphaCheckbox = new QCheckBox(previewButtonsArea);
+    layout->addWidget(m_showAlphaCheckbox);
+    m_showAlphaCheckbox->setText("Apply Alpha");
+    m_showAlphaCheckbox->hide();
+
+    QObject::connect(m_showAlphaCheckbox, &QCheckBox::stateChanged, m_textureWidget, &TextureRenderWidget::showAlpha);
 }
 
 void
@@ -25,12 +31,14 @@ void
 PreviewTexture::hide()
 {
     m_textureWidget->hide();
+    m_showAlphaCheckbox->hide();
 }
 
 void
 PreviewTexture::show()
 {
     m_textureWidget->show();
+    m_showAlphaCheckbox->show();
 }
 
 void

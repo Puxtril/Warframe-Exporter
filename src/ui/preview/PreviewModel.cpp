@@ -8,7 +8,7 @@ PreviewModel::getInstance()
 }
 
 void
-PreviewModel::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewModel::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout)
 {
     m_modelWidget = new ModelRenderWidget(parentWidget);
     parentLayout->addWidget(m_modelWidget);

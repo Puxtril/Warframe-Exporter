@@ -1,14 +1,14 @@
 #include "ui/preview/TextureRenderWidget.h"
 
 TextureRenderWidget::TextureRenderWidget(QWidget *parent)
-    : QtOpenGLViewer(parent)
+    : QtOpenGLViewer(parent), m_showAlpha(false)
 {
     setIs3D(false);
 
     m_textureMap = {
         {WarframeExporter::Texture::TextureCompression::Uncompressed, {GL_RGBA8, GL_RGBA}},
-        {WarframeExporter::Texture::TextureCompression::Default, {GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RGB}},
-        {WarframeExporter::Texture::TextureCompression::BC1, {GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RGB}},
+        {WarframeExporter::Texture::TextureCompression::Default, {GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RGBA}},
+        {WarframeExporter::Texture::TextureCompression::BC1, {GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RGBA}},
         {WarframeExporter::Texture::TextureCompression::BC2, {GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, GL_RGBA}},
         {WarframeExporter::Texture::TextureCompression::BC3, {GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_RGBA}},
         {WarframeExporter::Texture::TextureCompression::BC4, {GL_COMPRESSED_RED_RGTC1_EXT, GL_RED}},
@@ -34,8 +34,15 @@ TextureRenderWidget::drawScene()
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    if (m_showAlpha)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+    glDisable(GL_BLEND);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);
@@ -193,4 +200,15 @@ TextureRenderWidget::getMeshCoordsForTexture(int screenWidth, int screenHeight, 
     if (texHeight > texWidth)
         return {((float)screenHeight / (float)screenWidth) * ((float)texWidth / (float)texHeight), 1.0};
     return {1.0, ((float)screenWidth / (float)screenHeight) * ((float)texHeight / (float)texWidth)};
+}
+
+void
+TextureRenderWidget::showAlpha(int state)
+{
+    if (state == Qt::CheckState::Checked)
+        m_showAlpha = true;
+    else if (state == Qt::CheckState::Unchecked)
+        m_showAlpha = false;
+
+    update();
 }

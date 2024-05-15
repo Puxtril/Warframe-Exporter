@@ -16,7 +16,7 @@ public:
     static PreviewMessage* getInstance(); 
 
     void setMessage(const std::string& msg);
-    void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout) override;
+    void setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout) override;
     void unloadData() override;
     void hide() override;
     void show() override;

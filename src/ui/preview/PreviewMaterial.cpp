@@ -8,7 +8,7 @@ PreviewMaterial::getInstance()
 }
 
 void
-PreviewMaterial::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewMaterial::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout)
 {
     m_widgetText = new QPlainTextEdit(parentWidget);
     parentLayout->addWidget(m_widgetText);

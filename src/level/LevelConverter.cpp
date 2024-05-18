@@ -25,10 +25,9 @@ LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExter
 void
 LevelConverter::replaceOverrideMaterials(const std::vector<std::string_view>& materialNames, Model::ModelHeaderInternal& modelHeader)
 {
-	if (materialNames.size() != modelHeader.meshInfos.size())
-		return;
+	size_t replaceCount = std::min(materialNames.size(), modelHeader.meshInfos.size());
 
-	for (size_t x = 0; x < materialNames.size(); x++)
+	for (size_t x = 0; x < replaceCount; x++)
 		if (materialNames[x].size() > 2)
 			modelHeader.meshInfos[x].matName = materialNames[x];
 }

@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'PickertRZjSB.ui'
+** Form generated from reading UI file 'PickerflCVGi.ui'
 **
-** Created by: Qt User Interface Compiler version 6.6.2
+** Created by: Qt User Interface Compiler version 6.7.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef PICKERTRZJSB_H
-#define PICKERTRZJSB_H
+#ifndef PICKERFLCVGI_H
+#define PICKERFLCVGI_H
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
@@ -151,7 +151,7 @@ public:
         QFont font;
         font.setUnderline(false);
         TitleType->setFont(font);
-        TitleType->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        TitleType->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
 
         TitleSection->addWidget(TitleType);
 
@@ -163,7 +163,7 @@ public:
         sizePolicy1.setHeightForWidth(TitleExtract->sizePolicy().hasHeightForWidth());
         TitleExtract->setSizePolicy(sizePolicy1);
         TitleExtract->setFont(font);
-        TitleExtract->setAlignment(Qt::AlignCenter);
+        TitleExtract->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         TitleSection->addWidget(TitleExtract);
 
@@ -172,7 +172,7 @@ public:
         sizePolicy1.setHeightForWidth(TitleOutputFormat->sizePolicy().hasHeightForWidth());
         TitleOutputFormat->setSizePolicy(sizePolicy1);
         TitleOutputFormat->setFont(font);
-        TitleOutputFormat->setAlignment(Qt::AlignCenter);
+        TitleOutputFormat->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         TitleSection->addWidget(TitleOutputFormat);
 
@@ -181,8 +181,8 @@ public:
 
         TitleLine = new QFrame(WindowPicker);
         TitleLine->setObjectName("TitleLine");
-        TitleLine->setFrameShape(QFrame::HLine);
-        TitleLine->setFrameShadow(QFrame::Sunken);
+        TitleLine->setFrameShape(QFrame::Shape::HLine);
+        TitleLine->setFrameShadow(QFrame::Shadow::Sunken);
 
         verticalLayout->addWidget(TitleLine);
 
@@ -206,7 +206,7 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(AudioCheckbox->sizePolicy().hasHeightForWidth());
         AudioCheckbox->setSizePolicy(sizePolicy2);
-        AudioCheckbox->setLayoutDirection(Qt::LeftToRight);
+        AudioCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         AudioCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
         AudioCheckbox->setTristate(false);
 
@@ -216,7 +216,7 @@ public:
         AudioFormatLabel->setObjectName("AudioFormatLabel");
         sizePolicy1.setHeightForWidth(AudioFormatLabel->sizePolicy().hasHeightForWidth());
         AudioFormatLabel->setSizePolicy(sizePolicy1);
-        AudioFormatLabel->setAlignment(Qt::AlignCenter);
+        AudioFormatLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         AudioSection->addWidget(AudioFormatLabel);
 
@@ -238,7 +238,7 @@ public:
         LevelCheckbox->setObjectName("LevelCheckbox");
         sizePolicy2.setHeightForWidth(LevelCheckbox->sizePolicy().hasHeightForWidth());
         LevelCheckbox->setSizePolicy(sizePolicy2);
-        LevelCheckbox->setLayoutDirection(Qt::LeftToRight);
+        LevelCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         LevelCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
         LevelCheckbox->setTristate(false);
 
@@ -246,7 +246,7 @@ public:
 
         LevelFormatLabel = new QLabel(WindowPicker);
         LevelFormatLabel->setObjectName("LevelFormatLabel");
-        LevelFormatLabel->setAlignment(Qt::AlignCenter);
+        LevelFormatLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         LevelSection->addWidget(LevelFormatLabel);
 
@@ -267,7 +267,7 @@ public:
         MaterialCheckbox->setObjectName("MaterialCheckbox");
         sizePolicy2.setHeightForWidth(MaterialCheckbox->sizePolicy().hasHeightForWidth());
         MaterialCheckbox->setSizePolicy(sizePolicy2);
-        MaterialCheckbox->setLayoutDirection(Qt::LeftToRight);
+        MaterialCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         MaterialCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
         MaterialCheckbox->setTristate(false);
 
@@ -275,7 +275,7 @@ public:
 
         MaterialFormatLabel = new QLabel(WindowPicker);
         MaterialFormatLabel->setObjectName("MaterialFormatLabel");
-        MaterialFormatLabel->setAlignment(Qt::AlignCenter);
+        MaterialFormatLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         MaterialSection->addWidget(MaterialFormatLabel);
 
@@ -294,7 +294,7 @@ public:
         ModelCheckbox->setObjectName("ModelCheckbox");
         sizePolicy2.setHeightForWidth(ModelCheckbox->sizePolicy().hasHeightForWidth());
         ModelCheckbox->setSizePolicy(sizePolicy2);
-        ModelCheckbox->setLayoutDirection(Qt::LeftToRight);
+        ModelCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         ModelCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
         ModelCheckbox->setTristate(false);
 
@@ -302,7 +302,7 @@ public:
 
         ModelFormatLabel = new QLabel(WindowPicker);
         ModelFormatLabel->setObjectName("ModelFormatLabel");
-        ModelFormatLabel->setAlignment(Qt::AlignCenter);
+        ModelFormatLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         ModelSection->addWidget(ModelFormatLabel);
 
@@ -321,15 +321,13 @@ public:
         ShaderCheckbox->setObjectName("ShaderCheckbox");
         sizePolicy2.setHeightForWidth(ShaderCheckbox->sizePolicy().hasHeightForWidth());
         ShaderCheckbox->setSizePolicy(sizePolicy2);
-        ShaderCheckbox->setLayoutDirection(Qt::LeftToRight);
+        ShaderCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         ShaderCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
         ShaderCheckbox->setTristate(false);
 
         ShaderSecion->addWidget(ShaderCheckbox);
 
         ShaderFormatCombo = new QComboBox(WindowPicker);
-        ShaderFormatCombo->addItem(QString());
-        ShaderFormatCombo->addItem(QString());
         ShaderFormatCombo->setObjectName("ShaderFormatCombo");
 
         ShaderSecion->addWidget(ShaderFormatCombo);
@@ -349,16 +347,13 @@ public:
         TextureCheckbox->setObjectName("TextureCheckbox");
         sizePolicy2.setHeightForWidth(TextureCheckbox->sizePolicy().hasHeightForWidth());
         TextureCheckbox->setSizePolicy(sizePolicy2);
-        TextureCheckbox->setLayoutDirection(Qt::LeftToRight);
+        TextureCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         TextureCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
         TextureCheckbox->setTristate(false);
 
         TextureSection->addWidget(TextureCheckbox);
 
         TextureFormatCombo = new QComboBox(WindowPicker);
-        TextureFormatCombo->addItem(QString());
-        TextureFormatCombo->addItem(QString());
-        TextureFormatCombo->addItem(QString());
         TextureFormatCombo->setObjectName("TextureFormatCombo");
 
         TextureSection->addWidget(TextureFormatCombo);
@@ -383,8 +378,8 @@ public:
         LoadButtonFrame = new QFrame(WindowPicker);
         LoadButtonFrame->setObjectName("LoadButtonFrame");
         LoadButtonFrame->setMaximumSize(QSize(16777215, 60));
-        LoadButtonFrame->setFrameShape(QFrame::NoFrame);
-        LoadButtonFrame->setFrameShadow(QFrame::Raised);
+        LoadButtonFrame->setFrameShape(QFrame::Shape::NoFrame);
+        LoadButtonFrame->setFrameShadow(QFrame::Shadow::Raised);
         LoadButtonFrame->setLineWidth(0);
         horizontalLayout_3 = new QHBoxLayout(LoadButtonFrame);
         horizontalLayout_3->setObjectName("horizontalLayout_3");
@@ -399,7 +394,7 @@ public:
         QFont font2;
         font2.setPointSize(8);
         VersionLabel->setFont(font2);
-        VersionLabel->setTextFormat(Qt::PlainText);
+        VersionLabel->setTextFormat(Qt::TextFormat::PlainText);
 
         horizontalLayout_3->addWidget(VersionLabel);
 
@@ -492,9 +487,6 @@ public:
 #endif // QT_CONFIG(whatsthis)
         ShaderLabel->setText(QCoreApplication::translate("WindowPicker", "Shader", nullptr));
         ShaderCheckbox->setText(QString());
-        ShaderFormatCombo->setItemText(0, QCoreApplication::translate("WindowPicker", "Decompiled", nullptr));
-        ShaderFormatCombo->setItemText(1, QCoreApplication::translate("WindowPicker", "Bytecode", nullptr));
-
 #if QT_CONFIG(whatsthis)
         ShaderFormatCombo->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p><span style=\" font-weight:700;\">Decompiled:</span> Uses the function D3DDecompile to produce a text-based output.</p><p><span style=\" font-weight:700;\">Bytecode:</span> Just the raw binary data. You can decompile this yourself.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
@@ -503,10 +495,6 @@ public:
 #endif // QT_CONFIG(whatsthis)
         TextureLabel->setText(QCoreApplication::translate("WindowPicker", "Texture", nullptr));
         TextureCheckbox->setText(QString());
-        TextureFormatCombo->setItemText(0, QCoreApplication::translate("WindowPicker", "DDS", nullptr));
-        TextureFormatCombo->setItemText(1, QCoreApplication::translate("WindowPicker", "PNG", nullptr));
-        TextureFormatCombo->setItemText(2, QCoreApplication::translate("WindowPicker", "TGA", nullptr));
-
 #if QT_CONFIG(whatsthis)
         TextureFormatCombo->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p><span style=\" font-weight:700;\">DDS:</span> The raw texture. Some compressed formats (like BC7) may not be supported by all programs. This is the fastest option.</p><p><span style=\" font-weight:700;\">PNG:</span> Uses a PNG library to encode the texture. This will take more time but exported textures will be universally compatable.</p><p><span style=\" font-weight:700;\">TGA:</span> Faster than PNG but much larger file sizes.</p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
@@ -529,4 +517,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // PICKERTRZJSB_H
+#endif // PICKERFLCVGI_H

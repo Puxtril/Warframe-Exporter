@@ -1,17 +1,10 @@
 # Warframe Extractor
 
-A cross-platform program/library for exporting files from Warframe. Provides a command-line interface for users, can be compiled into a library for programmers. "Easily" extensible to support new formats and upgrades to existing formats.
+A cross-platform program/library for exporting files from Warframe. Provides a Command-line and Graphical interface. "Easily" extensible to support new formats and upgrades to existing formats.
 
-Formats currently supported:
-- Textures -> DDS
-- 3D Models (mostly) -> glTF
-- Audio -> Ogg & Wav (Credit to [Sehnryr](https://github.com/sehnryr/wfcache-api))
-- Levels -> glTF
-- Material parameters -> Txt
-- Shaders -> Decompiled HLSL
+<hr>
 
-Formats with started progress:
-- Animation -> glTF
+![Preview](/assets/Preview.png)
 
 # Table of Contents
 

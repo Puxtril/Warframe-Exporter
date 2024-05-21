@@ -72,6 +72,8 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/preview/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ui/tasks/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/QtOpenGLViewer/QtOpenGLViewer.cpp
+	# Resources file
+	${CMAKE_CURRENT_SOURCE_DIR}/assets/resources.qrc
 	# Since these objects define signals, they need the Q_OBJECT macro
 	#   And since they have this macro, they need to be picked up by Moc (Auto mode)
 	#   And since they need to be picked up by Moc, they need to be treated as a source file
@@ -84,6 +86,15 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/ExporterDirectoryThread.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/ExporterFileThread.h
 )
+
+##################################################
+# App Icon
+
+if(MSVC)
+	# No idea why this doesn't work for WARFRAME_EXPORTER_SOURCES
+	set(WARFRAME_EXPORTER_UI_SOURCES ${WARFRAME_EXPORTER_UI_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/assets/resources.rc)
+	set(WARFRAME_EXPORTER_CLI_SOURCES ${WARFRAME_EXPORTER_CLI_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/assets/resources.rc)
+endif()
 
 ##################################################
 # Include dirs
@@ -162,6 +173,9 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		# Auto-runs the Qt MOC tool
 		# Needed for those extra files inside WARFRAME_EXPORTER_UI_SOURCES
 		set(CMAKE_AUTOMOC ON)
+		
+		# Qt resources file (assets/resources.qrc)
+		set(CMAKE_AUTORCC ON)
 
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_UI_SOURCES})
 

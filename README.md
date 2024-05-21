@@ -6,18 +6,6 @@ A cross-platform program/library for exporting files from Warframe. Provides a C
 
 ![Preview](/assets/Preview.png)
 
-# Table of Contents
-
-1. [How to use](#how-to-use)
-1. [External Libraries](#external-libraries)
-1. [ImHex Patterns](#imhex-patterns)
-1. [Contributions](#contributions)
-1. [Building](#building)
-1. [Library Overview](#overview-of-this-library)
-    1. [High level](#high-level-overview)
-    1. [Medium level](#medium-level-overview)
-    1. [Low level](#low-level-overview)
-
 # How to use
 
 Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/releases/latest).
@@ -27,15 +15,15 @@ Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/relea
 
 # External Libraries
 
-* [spdlog](https://github.com/gabime/spdlog): Logging
-* [Binary-Reader](https://github.com/Puxtril/Binary-Reader) Read binary data into primitive data types.
 * [LotusLib](https://github.com/Puxtril/LotusLib): Provides an interface for the Warframe files. [See requirements for Oodle](https://github.com/Puxtril/LotusLib#how-to-install).
+* [Binary-Reader](https://github.com/Puxtril/Binary-Reader) Read binary data into primitive data types.
+* [Qt6](https://doc.qt.io/): GUI framework.
+* [TCLAP](https://sourceforge.net/projects/tclap/): Command-line interface library
+* [spdlog](https://github.com/gabime/spdlog): Logging
 * [ddspp](https://github.com/puxtril/ddspp): For exporting textures as DDS
 * [fx-gltf](https://github.com/jessey-git/fx-gltf): For exprting models as [glTF](https://en.wikipedia.org/wiki/GlTF).
   * [nlohmann-json](https://github.com/nlohmann/json): Required by fx-gltf.
 * [glm](https://github.com/g-truc/glm): A helper library for models. Provides matrix and vector math operations.
-* [TCLAP](https://sourceforge.net/projects/tclap/): Command-line interface library
-* [Qt6](https://doc.qt.io/): GUI framework.
 * [QtOpenGLViewer](https://github.com/Puxtril/QtOpenGLViewer): View 2D/3D scenes with mouse rotation/pan/zoom
 * [bcdec](https://github.com/iOrange/bcdec): Decode [block-compressed](https://en.wikipedia.org/wiki/S3_Texture_Compression) DDS images.
 * [libspng](https://github.com/randy408/libspng): Effieciently encode images as PNG.
@@ -45,9 +33,9 @@ Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/relea
 Inside the `utils` folder, you'll find a collection of `.hexpat` files. These are patterns for [ImHex](https://github.com/WerWolv/ImHex). If you're interested in the file formats analyzed in this repo, I highly recommend using these.
 
 1. Download and install ImHex
-1. Copy all `.hexpat` files into `C:\Users\<Username>\AppData\Local\imhex\patterns`
+1. Copy all `.hexpat` files into `C:\Users\<Username>\AppData\Local\imhex\patterns` or `~/.local/share/imhex/patterns`
 1. Load a raw file into Imhex for analysis
-    1. (Optional) Using the advanced tool, find specific formats using the `--print-enums` flag
+    1. Using the advanced tool, find specific formats using the `--print-enums` flag
     1. Write raw files from the advanced tool using the `--write-raw` flag
 1. Within ImHex, go to *File -> Import -> Pattern File* and select the appropriate pattern
 
@@ -115,8 +103,7 @@ This is very unlikely to occur. They recently started using BC6 and BC7, so ther
 
 # Building
 
-CMake is very nice and I love it. See how easy this is to compile?
-**EXCEPT THE UI**
+CMake is very nice and I love it. ~~See how easy this is to compile?~~ I hate GUIs and Windows.
 
 ## Requirements
 
@@ -125,12 +112,12 @@ CMake is very nice and I love it. See how easy this is to compile?
     - Other OSs: CMake, git, any C++ compiler
 - A copy of the Oodle SDK (Provided by Unreal Engine)
     - Download the files.
-        - Download from the engine
+        - Easy: Download [from here.](https://github.com/WorkingRobot/OodleUE/tree/main/Engine/Source/Runtime/OodleDataCompression/Sdks)
+        - Hard: Download from the engine
             - Download Unreal Engine from the official website (You will need an account and the Epic launcher)
             - Once downloaded find the SDK folder `Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.5/lib`
-        - OR download [from here.](https://github.com/WorkingRobot/OodleUE/tree/main/Engine/Source/Runtime/OodleDataCompression/Sdks)
     - Create a folder in the root of this repository named `bin`
-    - Copy folders `Linux` and `Win64` into `bin`.
+    - Copy folders `Linux` and `Win64` into `bin`. We want the *static* libraries here.
     
 
 ## Build Commands
@@ -173,38 +160,24 @@ CMake is very nice and I love it. See how easy this is to compile?
 
 # Overview of this library
 
-I will split this up into 3 sections, each subsequent section being more verbose. For more information on the cache file structure, read the [LotusLib documentation](https://github.com/Puxtril/LotusLib#documentation).
+For more information on the cache file structure, read the [LotusLib documentation](https://github.com/Puxtril/LotusLib#documentation).
 
 ## High-level overview
 
-This project converts the data from the Warframe cache files into usable formats. A command-line interface is provided (break out your CMD skills), though programmers may compile this as a library for use in other projects. It also supports debugging because let's be real, there will be new versions of exsting formats added, and that needs to be debuggable.
-
-## Medium-level overview
-
-This is best explained by going over the data flow. To iterate over a group of files within the cache, you can choose between exporting and debugging the files. When a file is reached that is supported by an extractor, it begins the extraction process. Each extractor follows a similar flow.
-
-Extraction process:
-1. Parse the file contents into usable data (integer, floats, strings, etc).
-1. Convert that data into a compatable format for later processing. This is an intermediate stage between reading and exporting into another format. We want both stages to be independant of each other.
-1. Export the data into a standard format that can be read by other programs like Blender. Highly encouraged to use an external library for this.
-
-During the exporting process, log all errors to a file.
-
-Debug process: Parse the file contents and set certian checkpoints. If a checkpoint is reached and the data is not expected, assume the file is not fully supported. Log this information to a file. During this process, log additional information as files are iterated over.
+Inside the Cache files Warframe stores on your computer (.toc and .cache), lie all the game's assets. The assets are not stored in standard formats like PNG images or FBX 3D models, they're stored in custom formats. This program reads these custom assets from the cache and converts them into sandard formats. Since it's only reading files from the cache, there is 0 risk of being banned from Warframe. Unless you run this while Warframe is running, then Warframe may detect something is reading the cache files.
 
 ## Low-level overview
 
-This is best explained by orgaizing the project into separate sections.
+Every virtual file inside the cache contains a Common Header structure. Inside this structure is an integer enumeration indicating the file type. This file type dictates the structure of data following the Common Header. This Extractor maintains a list of all the supported file type eumerations depending on which category it falls into (Ex. Model enumerations are inside the *model* folder, textures inside the *texture* folder, etc).
 
-* Iterator: The base class `BatchIterator` is sublassed by `BatchIteratorDebug` and `BatchIteratorExport`. Both are self-explanitory. The main difference is `BatchIteratorDebug` will not write extracted files to disk.
-* Enum Map: File types are identified by an enumeration. The goal of this section is to map an enumeration to an object that processes the data. Because some formats like textures may have multiple enumerations that can be processed the exact same way. `EnumMap` is the mapping between an enumeration and the object processor; must be a sublass of `EnumMapValue`. `EnumMapValue` is the abstract class for objects to process enumertaions; these subclasses should also be abstract. This class has only 1 required method: return the array of associated enumerations. `Extractor` is an abtract sublcass of `EnumMapValue` that provides an interface for all extractors. `EnumMapExtractor` is the instanciated `EnumMap` using class `Extractor`. Because each Iterator needs access to this, it made sense to keep this separate. There may be other enum maps in this project, but the Extactor map was used as an example.
-* File Properties: Files stored in the cache have a filetime (DOS time) associated with them. To make extraction easier between subsequent runs, only write files with different modification times. Unforunately reading/writing files from disk is OS-specific, thus this class.
-* Ensmallening: Provides a simple interface for extractors to modfiy behavior based on the ensmallening change.
+I've implemented my own flow to extract assets. The goal was to ensure new formats can easily be added (which has been proved true). Each folder (ex. Model, Texture, Material, etc) implements this basic structure:
 
-I will also gloss over the previously mentioned "Extraction process". Each extractor should have their own folder in `include` and `src`. Within those folders I've named files in a specific pattern.
+1) **Read** the virtual file into an *external* data structure. The *external* structure should resemble the source file structure as closely as possible.
+1) **Convert** the *external* structure into an *internal* structure. This stage removes any game-logic, engine transformations, or anything else that may interfere with basic assumptions about the structure. The *internal* structure should be compatable for any possible use case.
+1) **Export** the *internal* structure into a standard format. These often require the use of external libraries to accomodate standard file formats (ex. glTF, PNG). 
 
-* The main extractor file that inherits from `Extractor` should be named `<Name>Extractor`, ex. `TextureExtractor`.
-* The first stage is reading from the cache: `TextureReader`.
-* Next is converting the data into a compatable format: `TextureConverter`.
-* The structs to store the previously mentioned data is defined in `TextureStructs`.
-* Finally, the data is exported into a standard format: `TextureExporterDDS`.
+You may also notice an *enum map* structure floating about. The goal here is to *link integer enumerations with C++ classes to process them.* To better explain, here are the steps to use this system:
+
+1) Create a new abstract class that inherits from `EnumMapValue`. `EnumMapValue` has only 1 abstract method that returns an array of processable enumeration values. Example: `Extractor.h`
+1) Create a new concrete class that implements this interface. Example: `model/ModelExtractor`
+1) Create a *const static EnumMap* using the abstract class from step 1 and initilize all the concrete classes. Example: `EnumMapExtractor.h`

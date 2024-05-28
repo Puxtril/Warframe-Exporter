@@ -34,3 +34,6 @@
 [submodule "lib/libspng"]
 	path = lib/libspng
 	url = https://github.com/randy408/libspng.git
+[submodule "lib/PhysxParser"]
+	path = lib/PhysxParser
+	url = https://github.com/Puxtril/PhysxParser.git

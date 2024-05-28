@@ -65,6 +65,7 @@ UiPicker::loadSettings()
     this->MaterialCheckbox->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
     this->AudioCheckbox->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
     this->ShaderCheckbox->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
+    this->LandscapeCheckbox->setCheckState(settings.getExportLandscapes() ? Qt::Checked : Qt::Unchecked);
 
     WarframeExporter::Texture::TextureExportType textureFormat = settings.getTextureFormat();
     switch(textureFormat)
@@ -138,6 +139,8 @@ UiPicker::parsePickerOptions()
         exportTypes |= (int)WarframeExporter::ExtractorType::Texture;
     if (this->ShaderCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Shader;
+    if (this->LandscapeCheckbox->isChecked())
+        exportTypes |= (int)WarframeExporter::ExtractorType::Landscape;
 
     if (exportTypes == 0)
     {

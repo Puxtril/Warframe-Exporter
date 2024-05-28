@@ -3,9 +3,6 @@
 #include "landscape/LandscapeStructs.h"
 #include "glm/gtx/quaternion.hpp"
 
-#include <set>
-#include <iostream>
-
 namespace WarframeExporter::Landscape
 {
     class LandscapeConverter

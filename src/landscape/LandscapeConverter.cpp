@@ -5,11 +5,11 @@ using namespace WarframeExporter::Landscape;
 void
 LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader, const std::vector<LandscapeBodyChunkExternal>& externalChunks, LandscapeInternal& internal)
 {
-    for (int iRow = 0; iRow < externalHeader.rowCount; iRow++)
+    for (unsigned int iRow = 0; iRow < externalHeader.rowCount; iRow++)
     {
-        for (int iColumn = 0; iColumn < externalHeader.columnCount; iColumn++)
+        for (unsigned int iColumn = 0; iColumn < externalHeader.columnCount; iColumn++)
         {
-            int chunkIndex = iRow + iColumn;
+            unsigned int chunkIndex = iRow + iColumn;
             const glm::vec3& scale = externalHeader.chunks[chunkIndex].scale;
             internal.positions.push_back({iRow * scale.x, 0.0, iColumn * scale.z});
         }

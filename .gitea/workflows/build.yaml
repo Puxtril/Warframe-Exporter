@@ -24,7 +24,7 @@ jobs:
       - name: Init Extractor submodules
         run: |
           cd lib
-          git submodule update --init Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog tclap-code 
+          git submodule update --init Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog tclap-code PhysxParser
       - name: Init LotusLib submodule
         run: |
           cd lib/LotusLib/lib

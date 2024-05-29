@@ -16,6 +16,7 @@ namespace WarframeExporter::Landscape
         Mesh addLandscapeChunk(const Physx::HeightFieldMeshSplit& mesh);
         Attributes addLandscapeVertices(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
         int32_t addPositions(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
+        int32_t generateAndAddUVs(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
 
         // Returns index of Accessors
         int32_t addLandscapeIndices(const std::vector<uint32_t>& indices, Buffer& buffer);

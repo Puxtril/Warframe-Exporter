@@ -66,6 +66,7 @@ LandscapeExporterGltf::addLandscapeVertices(const Physx::HeightFieldMeshSplit& m
 {
     Attributes attrs;
 	attrs["POSITION"] = addPositions(mesh, buffer);
+    attrs["TEXCOORD_0"] = generateAndAddUVs(mesh, buffer);
     return attrs;
 }
 
@@ -98,6 +99,54 @@ LandscapeExporterGltf::addPositions(const Physx::HeightFieldMeshSplit& mesh, Buf
 	m_document.accessors.push_back(posAcc);
 
     return posAccIndex;
+}
+
+int32_t
+LandscapeExporterGltf::generateAndAddUVs(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer)
+{
+    const uint32_t uvDataSize = static_cast<uint32_t>(mesh.verts.size()) * (sizeof(float) * 2);
+    uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
+    uint32_t newSize = curSize + uvDataSize;
+    buffer.data.resize(newSize);
+    buffer.byteLength = newSize;
+
+    uint32_t maxU = 0;
+    uint32_t maxV = 0;
+    for (size_t i = 0; i < mesh.verts.size(); i++)
+    {
+        if (mesh.verts[i][0] > maxU)
+            maxU = mesh.verts[i][0];
+        if (mesh.verts[i][2] > maxV)
+            maxV = mesh.verts[i][2];
+    }
+
+    for (size_t i = 0; i < mesh.verts.size(); i++)
+    {
+        const float v = mesh.verts[i][2] / (float)maxV;
+        const float u = 1.0F - mesh.verts[i][0] / (float)maxU;
+        memcpy(buffer.data.data() + curSize + (i * 2 * 4), &v, 4);
+        memcpy(buffer.data.data() + curSize + (i * 2 * 4) + 4, &u, 4);
+    }
+    
+    BufferView bufView;
+	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
+	bufView.buffer = 0;
+	bufView.byteOffset = curSize;
+	bufView.byteLength = uvDataSize;
+	bufView.byteStride = sizeof(float) * 2;
+	bufView.target = BufferView::TargetType::ArrayBuffer;
+	m_document.bufferViews.push_back(bufView);
+
+    Accessor uvAcc;
+	int32_t uvAccIndex = (int32_t)m_document.accessors.size();
+	uvAcc.bufferView = bufViewIndex;
+	uvAcc.byteOffset = 0;
+	uvAcc.count = static_cast<uint32_t>(mesh.verts.size());
+	uvAcc.type = Accessor::Type::Vec2;
+	uvAcc.componentType = Accessor::ComponentType::Float;
+	m_document.accessors.push_back(uvAcc);
+
+    return uvAccIndex;
 }
 
 int32_t

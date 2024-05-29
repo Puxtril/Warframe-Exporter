@@ -21,8 +21,8 @@ LandscapeExporterGltf::addLandscapeChunks(const LandscapeInternal& landscape)
         m_document.scenes.resize(1);
         Scene& scene = m_document.scenes[0];
 
-        Node curNode;
-        curNode.translation = {landscape.positions[i][0], 0.0, landscape.positions[i][2]};
+        Node curNode;        
+        std::memcpy(&curNode.matrix[0], &landscape.transforms[i][0], 16 * sizeof(float));
         curNode.mesh = curMeshIndex;
         int curNodeIndex = static_cast<int>(m_document.nodes.size());
         m_document.nodes.push_back(curNode);

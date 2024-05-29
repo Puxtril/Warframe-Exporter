@@ -42,6 +42,7 @@ LandscapeExtractor::formatLandscape(const LandscapeHeaderExternal& landscapeHead
         internal.chunks.push_back(mesh);
     }
 
+    LandscapeConverter::addTransforms(internal);
     return internal;
 }
 

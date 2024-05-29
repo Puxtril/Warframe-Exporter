@@ -33,3 +33,16 @@ LandscapeConverter::scaleChunks(Physx::HeightFieldMeshSplit& mesh, const Landsca
         curVert[2] *= extHeaderChunk.scale.z;
     }
 }
+
+void
+LandscapeConverter::addTransforms(LandscapeInternal& landscape)
+{
+    for (size_t i = 0; i < landscape.chunks.size(); i++)
+    {
+        const Physx::HeightFieldMeshSplit& curMesh = landscape.chunks[i];
+
+        glm::mat4 translate = glm::translate(glm::mat4(1.0F), glm::vec3(landscape.positions[i][0], 0.0, landscape.positions[i][2]));
+        glm::mat4 rotate = glm::rotate(glm::mat4(1.0F), glm::radians(90.0F), glm::vec3(0.0F, 1.0F, 0.0F));
+        landscape.transforms.push_back(rotate * translate);
+    }
+}

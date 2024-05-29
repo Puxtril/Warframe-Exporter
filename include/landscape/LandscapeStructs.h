@@ -2,6 +2,7 @@
 
 #include "glm/ext/vector_float3.hpp"
 #include "glm/vec3.hpp"
+#include "glm/matrix.hpp"
 #include "heightfield/Structs.h"
 
 #include <vector>
@@ -34,5 +35,6 @@ namespace WarframeExporter::Landscape
         std::vector<glm::vec3> positions;
         std::vector<Physx::HeightFieldMeshSplit> chunks;
         std::vector<std::vector<std::string>> materialPathArrays;
+        std::vector<glm::mat4> transforms;
     };
 }

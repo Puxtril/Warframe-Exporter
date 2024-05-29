@@ -3,6 +3,8 @@
 #include "model/ModelExporterGltf.h"
 #include "landscape/LandscapeStructs.h"
 
+#include <cstring>
+
 namespace WarframeExporter::Landscape
 {
     class LandscapeExporterGltf : public Model::ModelExporterGltf

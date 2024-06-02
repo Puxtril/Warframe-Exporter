@@ -5,12 +5,10 @@
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 #include "level/LevelConverter.h"
-
 #include "level/LevelExporterGltf.h"
 #include "model/ModelExtractor.h"
+#include "landscape/LandscapeExtractor.h"
 #include "CommonHeader.h"
-
-#include <iostream>
 
 namespace WarframeExporter::Level
 {
@@ -57,10 +55,12 @@ namespace WarframeExporter::Level
 
 		LevelExternal getLevelExternal(LotusLib::FileEntry& fileEntry);
 		LevelInternal convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal);
-		LevelExporterGltf createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt);
+		Document createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 	
 	private:
+		void findLandscape(LevelExternal& levelExternal);
+		void addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, LotusLib::PackagesReader& pkgs);
 	};
 }

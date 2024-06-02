@@ -5,25 +5,20 @@
 
 #include <cstring>
 
-namespace WarframeExporter::Landscape
+namespace WarframeExporter::Landscape::LandscapeExporterGltf
 {
-    class LandscapeExporterGltf : public Model::ModelExporterGltf
-    {
-    public:
-        void addLandscapeChunks(const LandscapeInternal& landscape);
+    void addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape);
 
-    protected:
-        Mesh addLandscapeChunk(const Physx::HeightFieldMeshSplit& mesh);
-        Attributes addLandscapeVertices(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
-        int32_t addPositions(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
-        int32_t generateAndAddUVs(const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
+    Mesh _addLandscapeChunk(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh);
+    Attributes _addLandscapeVertices(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
+    int32_t _addPositions(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
+    int32_t _generateAndAddUVs(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer);
 
-        // Returns index of Accessors
-        int32_t addLandscapeIndices(const std::vector<uint32_t>& indices, Buffer& buffer);
+    // Returns index of Accessors
+    int32_t _addLandscapeIndices(Document& gltfDoc, const std::vector<uint32_t>& indices, Buffer& buffer);
 
-        // Materials are currently unknown, so we're just naming them "Material <index>"
-        void resizeMaterials(size_t newSize);
+    // Materials are currently unknown, so we're just naming them "Material <index>"
+    void _resizeMaterials(Document& gltfDoc, size_t newSize);
 
-        void addExtraAttributes(const std::vector<std::vector<std::string>>& materialPathArrays, Mesh& mesh, size_t chunkIndex);
-    };
+    void _addExtraAttributes(Document& gltfDoc, const std::vector<std::vector<std::string>>& materialPathArrays, Mesh& mesh, size_t chunkIndex);
 }

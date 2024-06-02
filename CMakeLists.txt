@@ -126,9 +126,6 @@ set(BUILD_UNITTESTS OFF CACHE INTERNAL "")
 set(BUILD_DOC OFF CACHE INTERNAL "")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code")
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/json")
-
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build glm static libs")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
 

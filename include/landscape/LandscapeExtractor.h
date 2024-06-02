@@ -54,9 +54,9 @@ namespace WarframeExporter::Landscape
 		LandscapeHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
 		std::vector<LandscapeBodyChunkExternal> readLandscapeChunks(BinaryReader::BinaryReaderBuffered* bodyReader, const LandscapeHeaderExternal extHeader, const LotusLib::CommonHeader& commonHeader);
 		LandscapeInternal formatLandscape(const LandscapeHeaderExternal& landscapeHeader, const std::vector<LandscapeBodyChunkExternal>& landscapeBody);
-		LandscapeExporterGltf convertToGltf(const LandscapeInternal& internal);
+		Document convertToGltf(const LandscapeInternal& internal);
 
-		void write(LandscapeExporterGltf& gltf, const std::filesystem::path& outputPath);
+		void write(Document& gltf, const std::filesystem::path& outputPath);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
 	};

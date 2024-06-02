@@ -46,18 +46,18 @@ LandscapeExtractor::formatLandscape(const LandscapeHeaderExternal& landscapeHead
     return internal;
 }
 
-LandscapeExporterGltf
+Document
 LandscapeExtractor::convertToGltf(const LandscapeInternal& internal)
 {
-    LandscapeExporterGltf gltf;
-    gltf.addLandscapeChunks(internal);
+    Document gltf;
+    LandscapeExporterGltf::addLandscapeChunks(gltf, internal);
     return gltf;
 }
 
 void
-LandscapeExtractor::write(LandscapeExporterGltf& gltf, const std::filesystem::path& outputPath)
+LandscapeExtractor::write(Document& gltf, const std::filesystem::path& outputPath)
 {
-    gltf.save(outputPath);
+    Model::ModelExporterGltf::save(gltf, outputPath);
 }
 
 void
@@ -66,6 +66,6 @@ LandscapeExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRe
     LandscapeHeaderExternal extHeader = readHeader(&fileEntry.headerData, fileEntry.commonHeader);
     std::vector<LandscapeBodyChunkExternal> chunks = readLandscapeChunks(&fileEntry.bData, extHeader, fileEntry.commonHeader);
     LandscapeInternal intLandscape = formatLandscape(extHeader, chunks);
-    LandscapeExporterGltf gltf = convertToGltf(intLandscape);
+    Document gltf = convertToGltf(intLandscape);
     write(gltf, outputPath);
 }

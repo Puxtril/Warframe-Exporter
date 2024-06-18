@@ -49,6 +49,7 @@ namespace WarframeExporter::Level
 		{
 			std::vector<int> extTypes = {
 				(int)LevelType::LEVEL_201,
+				(int)LevelType::LEVEL_202
 			};
 			return extTypes;
 		}

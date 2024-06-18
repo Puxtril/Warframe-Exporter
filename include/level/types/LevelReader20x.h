@@ -12,21 +12,24 @@
 
 namespace WarframeExporter::Level
 {
-	class LevelReader201 : public LevelReader
+	class LevelReader20x : public LevelReader
 	{
 	protected:
-		LevelReader201() = default;
+		LevelReader20x() = default;
 		
 	public:
-		inline static LevelReader201* getInstance()
+		inline static LevelReader20x* getInstance()
 		{
-			static LevelReader201* instance = new LevelReader201();
+			static LevelReader20x* instance = new LevelReader20x();
 			return instance;
 		}
 
 		inline std::vector<int> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = { (int)LevelType::LEVEL_201 };
+			std::vector<int> extTypes = {
+				(int)LevelType::LEVEL_201,
+				(int)LevelType::LEVEL_202
+			};
 			return extTypes;
 		}
 	

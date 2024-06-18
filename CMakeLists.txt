@@ -118,13 +118,15 @@ include_directories(
 # Executable compile commands
 
 # Add libraries among all targets
+
+# LotusLib requires zstd
+# It adds a library target `zstd_static` which needs to be linked to executables
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
+
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 set(BUILD_UNITTESTS OFF CACHE INTERNAL "")
 set(BUILD_DOC OFF CACHE INTERNAL "")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code")
-
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/json")
 
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build glm static libs")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
@@ -142,10 +144,6 @@ add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
 target_link_libraries(Warframe-Exporter-Lib spdlog glm_static nlohmann_json::nlohmann_json fx-gltf spng_static TCLAP)
 
 if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
-
-	# LotusLib requires zstd
-	# It adds a library target `zstd_static` which needs to be linked to executables
-	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
 
 	# zlib is used by libPNG
 	# Both dynamic and static libraries will be built by zlib,

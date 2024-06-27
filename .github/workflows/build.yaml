@@ -55,7 +55,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DZLIB_ROOT=$env:GITHUB_WORKSPACE\zlib\install
+          cmake .. -DZLIB_ROOT=${{ github.workspace }}\zlib\install
       - name: Compile project
         run: |
           cd build

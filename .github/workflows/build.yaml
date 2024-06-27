@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir zlib
           cd zlib
-          Invoke-WebRequest -Url https://zlib.net/zlib-1.3.1.tar.gz -OutFile zlib.tar.gz
+          Invoke-WebRequest -Uri https://zlib.net/zlib-1.3.1.tar.gz -OutFile zlib.tar.gz
           tar -xzf .\zlib.tar.gz
           mkdir build
           cmake ..\zlib-1.3.1 -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\zlib\install
@@ -49,7 +49,7 @@ jobs:
           cd lib\LotusLib
           mkdir bin\Win64
           cd bin\Win64
-          Invoke-WebRequest -Url https://github.com/WorkingRobot/OodleUE/blob/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Win64/oo2core_win64.lib -Outfile oo2core_win64.lib
+          Invoke-WebRequest -Uri https://github.com/WorkingRobot/OodleUE/blob/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Win64/oo2core_win64.lib -Outfile oo2core_win64.lib
       - name: Initilize CMake
         run: |
           mkdir build

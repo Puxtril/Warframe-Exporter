@@ -1,6 +1,6 @@
 name: Compile
 
-run-name: ${{ github.ref_name }}: ${{ github.event.head_commit.message }}
+run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on: [push]
 
 defaults:

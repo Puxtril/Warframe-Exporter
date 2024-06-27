@@ -49,7 +49,7 @@ jobs:
         run: |
           mkdir bin\Win64
           cd bin\Win64
-          Invoke-WebRequest -Uri https://github.com/WorkingRobot/OodleUE/blob/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Win64/oo2core_win64.lib -Outfile oo2core_win64.lib
+          Invoke-WebRequest -Uri https://github.com/WorkingRobot/OodleUE/raw/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Win64/oo2core_win64.lib -Outfile oo2core_win64.lib
       - name: Initilize CMake
         run: |
           mkdir build

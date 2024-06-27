@@ -1,5 +1,6 @@
-name: Compile Warframe Exporter
-run-name: Compile ${{ github.ref }}
+name: Compile
+
+run-name: ${{ github.ref_name }}: ${{ github.event.head_commit.message }}
 on: [push]
 
 defaults:

@@ -30,6 +30,7 @@ jobs:
           Invoke-WebRequest -Uri https://zlib.net/zlib-1.3.1.tar.gz -OutFile zlib.tar.gz
           tar -xzf .\zlib.tar.gz
           mkdir build
+          cd build
           cmake ..\zlib-1.3.1 -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\zlib\install
           cmake --build . --config Release
           cmake --install .

@@ -1,5 +1,6 @@
-name: Compile Warframe Exporter
-run-name: Compile ${{ gitea.ref }}
+name: Compile
+
+run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on: [push]
 
 defaults:
@@ -7,20 +8,36 @@ defaults:
     shell: powershell
 
 jobs:
-  # This is a custom-build Windows 10 Virtual Machine
-  # It uses a custom environment file with these variables
-  # Qt6 and zlib were pre-installed to reduce compile times
-  # And I didn't feel like figuring out their build process
-  #   - CMAKE_PREFIX_PATH=C:\Qt\6.6.3\msvc2019_64  # There's a bug in CMAKE that requires this for building Qt
-  #   - Qt6_DIR=C:\Qt\6.6.3\msvc                   # Not necessary for Qt building, but needed for windeployqt.exe
-  #   - ZLIB_ROOT=C:\zlib                          # Pre-compiled Zlib. Just a CMake build & install
-  #   - OODLE_ROOT=C:\2.9.12                       # Full SDK, but this only uses the static library
   Compile-Windows:
-    runs-on: windows
+    runs-on: windows-2019
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      # Basically, skip qt5 because it's already installed
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Install qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.7.1
+          host: 'windows'
+          arch: 'win64_msvc2019_64'
+          install-deps: 'true'
+          setup-python: 'true'
+          cache: 'true'
+      - name: Download and compile Zlib
+        run: |
+          mkdir zlib
+          cd zlib
+          Invoke-WebRequest -Uri https://zlib.net/zlib-1.3.1.tar.gz -OutFile zlib.tar.gz
+          tar -xzf .\zlib.tar.gz
+          mkdir build
+          cd build
+          cmake ..\zlib-1.3.1 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\zlib\install
+          cmake --build . --config Release
+          cmake --install .
+          cd ..\install\lib
+          mv zlib.lib zlib-dynamic.lib
+          mv zlibstatic.lib zlib.lib
       - name: Init Extractor submodules
         run: |
           cd lib
@@ -29,22 +46,23 @@ jobs:
         run: |
           cd lib/LotusLib/lib
           git submodule update --init
-      # This is what requires a private build process
-      - name: Copy Oodle binaries
+      - name: Download Oodle binaries
         run: |
-          cp -r "$Env:OODLE_ROOT\lib" bin
+          mkdir bin\Win64
+          cd bin\Win64
+          Invoke-WebRequest -Uri https://github.com/WorkingRobot/OodleUE/raw/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Win64/oo2core_win64.lib -Outfile oo2core_win64.lib
       - name: Initilize CMake
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DZLIB_ROOT=${{ github.workspace }}\zlib\install
       - name: Compile project
         run: |
           cd build
           cmake --build . --config Release
       - name: Link Qt Requirements
         run: |
-          & "$Env:Qt6_DIR\bin\windeployqt.exe" build\Release\Warframe-Exporter.exe
+          & "windeployqt.exe" build\Release\Warframe-Exporter.exe
       - name: Zip Exporter GUI and Qt Dependencies to Artifacts folder
         run: |
           mkdir artifacts

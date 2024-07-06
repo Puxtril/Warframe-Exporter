@@ -92,13 +92,13 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPat
 
 		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
 		{
-			LotusLib::FileEntry fileEntry = pkg.getFile(*iter);
+			LotusLib::FileEntry fileEntry = pkg.getFile(*iter, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
 			WarframeExporter::DebugUtils::writeAllDebugs(pkg, fileEntry, outPath);
 		}
 	}
 	catch (std::exception&)
 	{
-		LotusLib::FileEntry fileEntry = pkg.getFile(internalPath);
+		LotusLib::FileEntry fileEntry = pkg.getFile(internalPath, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
 		WarframeExporter::DebugUtils::writeAllDebugs(pkg, fileEntry, outPath);
 	}
 }

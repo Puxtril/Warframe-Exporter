@@ -20,7 +20,6 @@ ModelRenderWidget::drawScene()
 {
     drawAxes();
     
-    glEnable(GL_CULL_FACE);
     glEnable (GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
     
@@ -45,15 +44,43 @@ ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelIn
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, m_glVertexBufferObject);
 
-    size_t vertexPosSize = sizeof(float) * 3 * modelInternal.positions.size();
-    glBufferData(GL_ARRAY_BUFFER, vertexPosSize, modelInternal.positions.data(), GL_STATIC_DRAW);
+    size_t combinedVertSize = (sizeof(float) * 3) + 3;
+    std::vector<unsigned char> buf(combinedVertSize * modelInternal.positions.size());
+
+    // Check if model has no/empty vertex colors
+    bool fillWithWhite = false;
+    if (modelInternal.colors.size() == 0)
+        fillWithWhite = true;
+    else
+    {
+        size_t sum = 0;
+        for (const glm::u8vec4& x : modelInternal.colors[0])
+            sum += x[0] + x[1] + x[2] + x[3];
+        if (sum == 0)
+            fillWithWhite = true;
+    }
+    
+    // Copy Vertex position/color into buffer
+    constexpr uint32_t all1 = 0xFFFFFFFF;
+    for (size_t i = 0; i < modelInternal.positions.size(); i++)
+    {
+        size_t bufPtr = i * combinedVertSize;
+        memcpy(&buf[0] + bufPtr, &modelInternal.positions[i][0], sizeof(float) * 3);
+        if (fillWithWhite)
+            memcpy(&buf[0] + bufPtr + (sizeof(float) * 3), &all1, 3);
+        else
+            memcpy(&buf[0] + bufPtr + (sizeof(float) * 3), &modelInternal.colors[0][i][0], 3);
+    }
+    glBufferData(GL_ARRAY_BUFFER, combinedVertSize * modelInternal.positions.size(), buf.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * modelInternal.indices.size(), modelInternal.indices.data(), GL_STATIC_DRAW);
 
     // vertex positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, combinedVertSize, (void*)0);
+    glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, combinedVertSize, (void*)(sizeof(float) * 3));
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
     
     paintGL();
 }
@@ -62,11 +89,12 @@ void
 ModelRenderWidget::loadShaders()
 {
     const char* shaderCode = R"""(#version 420 core
+        in vec3 inCol;
         out vec4 FragColor;
 
         void main()
         {
-            FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            FragColor = vec4(inCol, 1.0);
         })""";
 
     unsigned int shader;
@@ -83,6 +111,9 @@ ModelRenderWidget::loadShaders()
     
     const char* vertexShaderCode = R"""(#version 420 core
         layout (location = 0) in vec3 aPos;
+        layout (location = 1) in vec3 aCol;
+
+        out vec3 inCol;
 
         layout(binding = 0) uniform MatrixBlock
         {
@@ -92,6 +123,7 @@ ModelRenderWidget::loadShaders()
         
         void main()
         {
+            inCol = aCol;
             gl_Position = projection * modelview * vec4(aPos, 1.0);
         })""";
 

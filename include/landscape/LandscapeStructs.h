@@ -33,7 +33,7 @@ namespace WarframeExporter::Landscape
     struct LandscapeInternal
     {
         std::vector<glm::vec3> positions;
-        std::vector<Physx::HeightFieldMeshSplit> chunks;
+        std::vector<Physx::HeightFieldMesh> chunks;
         std::vector<std::vector<std::string>> materialPathArrays;
         std::vector<glm::mat4> transforms;
     };

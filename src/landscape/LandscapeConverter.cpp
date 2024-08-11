@@ -17,11 +17,11 @@ LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader
 }
 
 void
-LandscapeConverter::scaleChunks(Physx::HeightFieldMeshSplit& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk)
+LandscapeConverter::scaleChunks(Physx::HeightFieldMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk)
 {
-    for (size_t i = 0; i < mesh.verts.size(); i++)
+    for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
     {
-        std::array<float, 3>& curVert = mesh.verts[i];
+        std::array<float, 3>& curVert = mesh.vertexPositions[i];
 
         // Bring into 0.0 - 1.0 range using Physx data
         curVert[0] = (curVert[0] - extBodyChunk.header.minBounds[0]) / (extBodyChunk.header.maxBounds[0] - extBodyChunk.header.minBounds[0]);
@@ -39,8 +39,6 @@ LandscapeConverter::addTransforms(LandscapeInternal& landscape)
 {
     for (size_t i = 0; i < landscape.chunks.size(); i++)
     {
-        const Physx::HeightFieldMeshSplit& curMesh = landscape.chunks[i];
-
         glm::mat4 translate = glm::translate(glm::mat4(1.0F), glm::vec3(landscape.positions[i][0], 0.0, landscape.positions[i][2]));
         glm::mat4 rotate = glm::rotate(glm::mat4(1.0F), glm::radians(90.0F), glm::vec3(0.0F, 1.0F, 0.0F));
         landscape.transforms.push_back(rotate * translate);

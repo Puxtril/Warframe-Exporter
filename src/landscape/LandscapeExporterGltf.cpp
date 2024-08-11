@@ -9,7 +9,7 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
     {
         int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
 
-        if (landscape.chunks[i].verts.size() == 4)
+        if (landscape.chunks[i].vertexPositions.size() <= 12)
             continue;
 
         Mesh gltfMesh = _addLandscapeChunk(gltfDoc, landscape.chunks[i]);
@@ -31,53 +31,42 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
 }
 
 Mesh
-LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh)
+LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const Physx::HeightFieldMesh& mesh)
 {
     gltfDoc.buffers.resize(1);
     Buffer& buf = gltfDoc.buffers[0];
 
     Attributes vertAttributes = _addLandscapeVertices(gltfDoc, mesh, buf);
 
+    Primitive primitive;
+    primitive.mode = Primitive::Mode::Triangles;
+    primitive.attributes = vertAttributes;
+
     Mesh gltfMesh;
-    _resizeMaterials(gltfDoc, mesh.indexArrays.size());
-
-    for (uint32_t materialIndex = 0; materialIndex < mesh.indexArrays.size(); materialIndex++)
-    {
-        if (mesh.indexArrays[materialIndex].size() == 0)
-            continue;
-
-        int32_t indicesIndex = _addLandscapeIndices(gltfDoc, mesh.indexArrays[materialIndex], buf);
-
-        Primitive primitive;
-        primitive.indices = indicesIndex;
-        primitive.mode = Primitive::Mode::Triangles;
-        primitive.attributes = vertAttributes;
-        primitive.material = materialIndex;
-
-        gltfMesh.primitives.push_back(std::move(primitive));
-    }
+    gltfMesh.primitives.push_back(std::move(primitive));
 
     return gltfMesh;
 }
 
 Attributes
-LandscapeExporterGltf::_addLandscapeVertices(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer)
+LandscapeExporterGltf::_addLandscapeVertices(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
 {
     Attributes attrs;
 	attrs["POSITION"] = _addPositions(gltfDoc, mesh, buffer);
     attrs["TEXCOORD_0"] = _generateAndAddUVs(gltfDoc, mesh, buffer);
+    attrs["COLOR_0"] = _addVertexColors(gltfDoc, mesh, buffer);
     return attrs;
 }
 
 int32_t
-LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer)
+LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
 {
-    const uint32_t vertexDataSize = static_cast<uint32_t>(mesh.verts.size()) * sizeof(std::array<float, 3>);
+    const uint32_t vertexDataSize = static_cast<uint32_t>(mesh.vertexPositions.size()) * sizeof(std::array<float, 3>);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + vertexDataSize;
     buffer.data.resize(newSize);
     buffer.byteLength = newSize;
-    memcpy(buffer.data.data() + curSize, mesh.verts.data(), vertexDataSize);
+    memcpy(buffer.data.data() + curSize, mesh.vertexPositions.data(), vertexDataSize);
     
     BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
@@ -92,7 +81,7 @@ LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightField
 	int32_t posAccIndex = (int32_t)gltfDoc.accessors.size();
 	posAcc.bufferView = bufViewIndex;
 	posAcc.byteOffset = 0;
-	posAcc.count = static_cast<uint32_t>(mesh.verts.size());
+	posAcc.count = static_cast<uint32_t>(mesh.vertexPositions.size());
 	posAcc.type = Accessor::Type::Vec3;
 	posAcc.componentType = Accessor::ComponentType::Float;
 	gltfDoc.accessors.push_back(posAcc);
@@ -101,9 +90,9 @@ LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightField
 }
 
 int32_t
-LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::HeightFieldMeshSplit& mesh, Buffer& buffer)
+LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
 {
-    const uint32_t uvDataSize = static_cast<uint32_t>(mesh.verts.size()) * (sizeof(float) * 2);
+    const uint32_t uvDataSize = static_cast<uint32_t>(mesh.vertexPositions.size()) * (sizeof(float) * 2);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + uvDataSize;
     buffer.data.resize(newSize);
@@ -111,18 +100,18 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::Height
 
     uint32_t maxU = 0;
     uint32_t maxV = 0;
-    for (size_t i = 0; i < mesh.verts.size(); i++)
+    for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
     {
-        if (mesh.verts[i][0] > maxU)
-            maxU = mesh.verts[i][0];
-        if (mesh.verts[i][2] > maxV)
-            maxV = mesh.verts[i][2];
+        if (mesh.vertexPositions[i][0] > maxU)
+            maxU = mesh.vertexPositions[i][0];
+        if (mesh.vertexPositions[i][2] > maxV)
+            maxV = mesh.vertexPositions[i][2];
     }
 
-    for (size_t i = 0; i < mesh.verts.size(); i++)
+    for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
     {
-        const float v = mesh.verts[i][2] / (float)maxV;
-        const float u = 1.0F - mesh.verts[i][0] / (float)maxU;
+        const float v = mesh.vertexPositions[i][2] / (float)maxV;
+        const float u = 1.0F - mesh.vertexPositions[i][0] / (float)maxU;
         memcpy(buffer.data.data() + curSize + (i * 2 * 4), &v, 4);
         memcpy(buffer.data.data() + curSize + (i * 2 * 4) + 4, &u, 4);
     }
@@ -140,7 +129,7 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::Height
 	int32_t uvAccIndex = (int32_t)gltfDoc.accessors.size();
 	uvAcc.bufferView = bufViewIndex;
 	uvAcc.byteOffset = 0;
-	uvAcc.count = static_cast<uint32_t>(mesh.verts.size());
+	uvAcc.count = static_cast<uint32_t>(mesh.vertexPositions.size());
 	uvAcc.type = Accessor::Type::Vec2;
 	uvAcc.componentType = Accessor::ComponentType::Float;
 	gltfDoc.accessors.push_back(uvAcc);
@@ -149,48 +138,41 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::Height
 }
 
 int32_t
-LandscapeExporterGltf::_addLandscapeIndices(Document& gltfDoc, const std::vector<uint32_t>& indices, Buffer& buffer)
+LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
 {
-    const uint32_t indexDataSize = static_cast<uint32_t>(indices.size()) * sizeof(uint32_t);
-	uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
-    uint32_t newSize = curSize + indexDataSize;
+    // * 3 for vertices
+    // * 3 for Vec3
+    const uint32_t colorDataSize = static_cast<uint32_t>(mesh.materials.size()) * 3 * 3;
+    uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
+    uint32_t newSize = curSize + colorDataSize;
     buffer.data.resize(newSize);
-	buffer.byteLength = newSize;
-	std::memcpy(buffer.data.data() + curSize, indices.data(), indexDataSize);
+    buffer.byteLength = newSize;
+
+    for (size_t i = 0; i < mesh.materials.size(); i++)
+    {
+        std::fill_n(buffer.data.data() + curSize + (i * 9), 9, mesh.materials[i]);
+    }
 
     BufferView bufView;
-	int32_t bufViewIndex2 = (int32_t)gltfDoc.bufferViews.size();
+	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
 	bufView.buffer = 0;
 	bufView.byteOffset = curSize;
-	bufView.byteLength = indexDataSize;
-	bufView.target = BufferView::TargetType::ElementArrayBuffer;
+	bufView.byteLength = colorDataSize;
+	bufView.byteStride = 3;
+	bufView.target = BufferView::TargetType::ArrayBuffer;
 	gltfDoc.bufferViews.push_back(bufView);
 
-    Accessor accessor;
-    int32_t accessorIndex = static_cast<int32_t>(gltfDoc.accessors.size());
-    accessor.bufferView = bufViewIndex2;
-    accessor.byteOffset = 0;
-    accessor.count = static_cast<uint32_t>(indices.size());
-    accessor.type = Accessor::Type::Scalar;
-    accessor.componentType = Accessor::ComponentType::UnsignedInt;
-    gltfDoc.accessors.push_back(accessor);
+    Accessor colAcc;
+	int32_t colAccIndex = (int32_t)gltfDoc.accessors.size();
+	colAcc.bufferView = bufViewIndex;
+	colAcc.byteOffset = 0;
+	colAcc.count = static_cast<uint32_t>(mesh.materials.size() * 3);
+	colAcc.type = Accessor::Type::Vec3;
+    colAcc.normalized = true;
+	colAcc.componentType = Accessor::ComponentType::UnsignedByte;
+	gltfDoc.accessors.push_back(colAcc);
 
-    return accessorIndex;
-}
-
-void
-LandscapeExporterGltf::_resizeMaterials(Document& gltfDoc, size_t newSize)
-{
-    if (gltfDoc.materials.size() >= newSize)
-        return;
-
-    for (size_t newMatIndex = gltfDoc.materials.size(); newMatIndex < (size_t)newSize; newMatIndex++)
-    {
-        Material newMat;
-        newMat.name = "Material " + std::to_string(newMatIndex);
-        newMat.extensionsAndExtras["extras"]["id"] = newMatIndex;
-        gltfDoc.materials.push_back(std::move(newMat));
-    }
+    return colAccIndex;
 }
 
 void

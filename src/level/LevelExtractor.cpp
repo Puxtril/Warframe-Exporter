@@ -63,6 +63,11 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 		if (curLevelObj.meshPath == "")
 			continue;
 
+		// HLOD variations of existing models
+		// No need for these in exports, they're annoying to delete manually
+		if (curLevelObj.objTypePath == "/EE/Types/Engine/HLODAggregateEntity")
+			continue;
+
 		try
 		{
 			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curLevelObj.meshPath);

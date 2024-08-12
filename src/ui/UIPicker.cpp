@@ -12,6 +12,7 @@ UiPicker::setupUi(QDialog *WindowPicker)
     
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
+    setupMessageBoxes();
     addShaderFormatOptions();
     addTextureFormatOptions();
     loadSettings();
@@ -32,6 +33,29 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
     QObject::connect(this, &UiPicker::pickerDone, &UiSettings::getInstance(), &UiSettings::setSettings);
     QObject::connect(this->CacheWindowsBrowse, &QPushButton::clicked, this, &UiPicker::browseCacheWindows);
     QObject::connect(this->ExportPathBrowse, &QPushButton::clicked, this, &UiPicker::browseExportPath);
+
+    QObject::connect(&this->m_invalidExportFolderBox, &QMessageBox::buttonClicked, this, &UiPicker::createExportFolderAndLoad);
+    QObject::connect(this, &UiPicker::retryLoadPickerOptions, this, &UiPicker::parsePickerOptions);
+}
+
+void
+UiPicker::setupMessageBoxes()
+{
+    m_invalidCacheFolderBox.setWindowTitle("Error");
+    m_invalidCacheFolderBox.setText("Cache.Windows folder is invalid");
+    m_invalidCacheFolderBox.setIcon(QMessageBox::Critical);
+    m_invalidCacheFolderBox.setFixedSize(500, 200);
+    m_invalidCacheFolderBox.setModal(true);
+    m_invalidCacheFolderBox.setVisible(false);
+
+    m_invalidExportFolderBox.setText("Export folder doesn't exist, create?");
+    m_invalidExportFolderBox.setWindowTitle("Error");
+    m_invalidExportFolderBox.setIcon(QMessageBox::Question);
+    m_invalidExportFolderBox.setFixedSize(500, 200);
+    m_invalidExportFolderBox.setModal(true);
+    m_invalidExportFolderBox.setVisible(false);
+
+    m_invalidExportFolderBox.addButton(QMessageBox::Cancel);
 }
 
 void
@@ -106,10 +130,7 @@ UiPicker::parsePickerOptions()
     std::filesystem::path cachePath(cachePathStr);
     if (!std::filesystem::is_directory(cachePath))
     {
-        QMessageBox errBox;
-        errBox.critical(nullptr, "Error", "Cache.Windows folder is invalid");
-        errBox.setFixedSize(500, 200);
-        errBox.show();
+        m_invalidCacheFolderBox.show();
         return;
     }
 
@@ -117,10 +138,7 @@ UiPicker::parsePickerOptions()
     std::filesystem::path exportPath(exportPathStr);
     if (!std::filesystem::is_directory(exportPath))
     {
-        QMessageBox errBox;
-        errBox.critical(nullptr, "Error", "Export folder is invalid");
-        errBox.setFixedSize(500, 200);
-        errBox.show();
+        m_invalidExportFolderBox.show();
         return;
     }
 
@@ -176,6 +194,28 @@ UiPicker::browseExportPath()
     {
         this->ExportPathInput->setText(directory);
     }
+}
+
+void
+UiPicker::createExportFolderAndLoad(QAbstractButton *button)
+{
+    if (m_invalidExportFolderBox.standardButton(button) != QMessageBox::Ok)
+        return;
+
+    std::string exportPathStr = this->ExportPathInput->text().toUtf8().constData();
+    std::filesystem::path exportPath(exportPathStr);
+    try
+    {
+        std::filesystem::create_directories(exportPath);
+    }
+    catch (std::exception& ex)
+    {
+        QMessageBox errBox;
+        errBox.critical(nullptr, "Error creating folder", ex.what());
+        return;
+    }
+
+    emit retryLoadPickerOptions();
 }
 
 void

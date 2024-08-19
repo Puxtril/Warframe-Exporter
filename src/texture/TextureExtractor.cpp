@@ -15,23 +15,20 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 	// Typically, textures above 256x256 are in F. Textures below are in B
 	BinaryReader::BinaryReaderBuffered& entry = fileEntry.fData.getLength() != 0 ? fileEntry.fData : fileEntry.bData;
 
-	// Read header
 	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader, ensmalleningData);
 
 	if (extHeader.format == (uint8_t)TextureCompression::BC6)
 		throw std::runtime_error("BC6 textures currently unsupported");
 
-	if (g_enumMapTexture[(int)extHeader.format] == nullptr)
+	if (internalFormatToDdsFormat.count(static_cast<TextureCompression>(extHeader.format)) == 0)
 		throw std::runtime_error("Unknown texture compression format: " + std::to_string(extHeader.format));
 
 	TextureInternal intTexture;
 	intTexture.header = TextureConverter::convertHeader(extHeader, static_cast<int32_t>(entry.getLength()));
+	intTexture.body = TextureReader::readBody(&entry, extHeader);
 
 	m_logger.debug(spdlog::fmt_lib::format("Format={} ResRaw={}x{} ResConv={}x{} Mip0Size={}", extHeader.format, extHeader.widthBase, extHeader.heightBase, intTexture.header.width, intTexture.header.height, intTexture.header.mip0Len));
-
-	// Read body
-	intTexture.body = TextureReader::readBody(&entry, intTexture.header, ensmalleningData);
-
+	
 	return intTexture;
 }
 
@@ -80,7 +77,7 @@ TextureExtractor::writeTextureToFile(TextureInternal& texture, const LotusLib::C
 		std::ofstream out;
 		out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
 		
-		DDSHeaderFull headerFull = DDSLib::encodeHeader(texture.header.formatClass->getFormat(), texture.header.width, texture.header.height);
+		DDSHeaderFull headerFull = DDSLib::encodeHeader(texture.header.ddsFormat, texture.header.width, texture.header.height);
 		DDSLib::serialize(out, headerFull);
 
 		out.write(data, dataLen);

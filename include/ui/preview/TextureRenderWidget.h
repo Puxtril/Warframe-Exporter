@@ -1,7 +1,6 @@
 #pragma once
 
 #include "texture/TextureExtractor.h"
-#include "texture/TextureInfo.h"
 #include "QtOpenGLViewer.h"
 
 #include <map>

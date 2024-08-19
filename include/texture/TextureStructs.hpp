@@ -1,10 +1,11 @@
 #pragma once
 
-#include "TextureInfo.h"
+#include "TextureTypes.h"
+#include "ddspp.h"
 
 #include <string>
 #include <cstdint>
-#include <memory>
+#include <vector>
 
 namespace WarframeExporter::Texture
 {
@@ -22,7 +23,7 @@ namespace WarframeExporter::Texture
 	struct TextureHeaderInternal
 	{
 		TextureCompression formatEnum;
-		TextureInfo* formatClass;
+		ddspp::DXGIFormat ddsFormat;
 		int32_t mip0Len;
 		int16_t width;
 		int16_t height;

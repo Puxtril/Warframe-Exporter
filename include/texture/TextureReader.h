@@ -12,6 +12,6 @@ namespace WarframeExporter::Texture
 	public:
 		static BinaryReader::BinaryReaderBuffered* getCorrectBodyReader(BinaryReader::BinaryReaderBuffered* FfileReader, BinaryReader::BinaryReaderBuffered* BfileReader);
 		static TextureHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader, const Ensmallening& ensmalleningData);
-		static std::vector<char> readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderInternal& headerInternal, const Ensmallening& postEnsmallening);
+		static std::vector<char> readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderExternal& headerExternal);
 	};
 }

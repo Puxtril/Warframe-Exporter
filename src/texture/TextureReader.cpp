@@ -39,19 +39,9 @@ TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 }
 
 std::vector<char>
-TextureReader::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderInternal& headerInternal, const Ensmallening& postEnsmallening)
+TextureReader::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderExternal& headerExternal)
 {
-	if (postEnsmallening.isPostPart1())
-	{
-		std::vector<char> data(bodyReader->getLength());
-		std::memcpy(data.data(), bodyReader->getPtr().data(), bodyReader->getLength());
-		return data;
-	}
-	else
-	{
-		std::vector<uint8_t> rawData = bodyReader->getPtr();
-		std::vector<char> unSwizzled(bodyReader->getLength());
-		headerInternal.formatClass->unSwizzle((char*)rawData.data(), (int)bodyReader->getLength(), unSwizzled.data());
-		return unSwizzled;
-	}
+	std::vector<char> data(bodyReader->getLength());
+	std::memcpy(data.data(), bodyReader->getPtr().data(), bodyReader->getLength());
+	return data;
 }

@@ -6,7 +6,6 @@
 #include "BinaryReaderBuffered.h"
 #include "texture/TextureReader.h"
 #include "texture/TextureConverter.h"
-#include "texture/TextureEnumMap.h"
 #include "texture/TextureExporterDDS.h"
 #include "texture/TextureExportTypes.h"
 #include "texture/TextureTypes.h"

@@ -5,18 +5,19 @@ using namespace WarframeExporter::Texture;
 TextureHeaderInternal
 TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize)
 {
-	TextureInfo* formatClass = g_enumMapTexture[(int)headerExternal.format];
+	TextureCompression compressionFormat = static_cast<TextureCompression>(headerExternal.format);
+	ddspp::DXGIFormat ddsFormat = internalFormatToDdsFormat.at(compressionFormat);
 
 	std::vector<std::string> subtextureNames = parseSubtextureString(headerExternal.textureNames);
 	size_t filesizeMinusTextureCount = subtextureNames.size() > 0 ? fileSize / subtextureNames.size() : fileSize;
 
-	bool isCompressed = ddspp::is_compressed(formatClass->getFormat());
-	int squareSize = ddspp::get_bits_per_pixel_or_block(formatClass->getFormat()) / 8;
+	bool isCompressed = ddspp::is_compressed(ddsFormat);
+	int squareSize = ddspp::get_bits_per_pixel_or_block(ddsFormat) / 8;
 	int32_t singleEntryFileSize = std::ceil(filesizeMinusTextureCount);
 	auto dimensions = getCorrectResolution(headerExternal.widthBase, headerExternal.heightBase, isCompressed, singleEntryFileSize, squareSize);
 	int32_t mip0Len = getMip0Len(std::get<0>(dimensions), std::get<1>(dimensions), isCompressed, squareSize);
 
-	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions), subtextureNames };
+	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), ddsFormat, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions), subtextureNames };
 }
 
 std::pair<int16_t, int16_t>

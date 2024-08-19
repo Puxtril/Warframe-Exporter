@@ -28,7 +28,7 @@ namespace WarframeExporter::Texture
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
 		{
 			size_t curOffset = hReader->tell();
-			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, {true, true, true});
+			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, commonHeader, {true, true, true});
 			hReader->seek(curOffset, std::ios::beg);
 
 			static const std::string hdr = "hdr";
@@ -100,5 +100,9 @@ namespace WarframeExporter::Texture
 		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
+
+	private:
+		static void writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile);
+		static void writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile);
 	};
 }

@@ -2,6 +2,7 @@
 
 #include "TextureInfo.h"
 
+#include <string>
 #include <cstdint>
 #include <memory>
 
@@ -15,6 +16,7 @@ namespace WarframeExporter::Texture
 		uint8_t format;
 		int16_t widthBase;
 		int16_t heightBase;
+		std::string textureNames;
 	};
 
 	struct TextureHeaderInternal
@@ -24,6 +26,7 @@ namespace WarframeExporter::Texture
 		int32_t mip0Len;
 		int16_t width;
 		int16_t height;
+		std::vector<std::string> textureNames;
 	};
 
 	struct TextureInternal

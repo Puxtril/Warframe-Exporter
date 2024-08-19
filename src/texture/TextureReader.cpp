@@ -9,7 +9,7 @@ TextureReader::getCorrectBodyReader(BinaryReader::BinaryReaderBuffered* FfileRea
 }
 
 TextureHeaderExternal
-TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData)
+TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader, const Ensmallening& ensmalleningData)
 {
 	uint8_t enum1 = headerReader->readUInt8();
 	uint8_t enum2 = headerReader->readUInt8();
@@ -25,7 +25,17 @@ TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 	int16_t width = headerReader->readInt16();
 	int16_t height = headerReader->readInt16();
 
-	return TextureHeaderExternal{ enum1, enum2, enum3, enum4, width, height };
+	std::string texPaths = "";
+
+	if (commonHeader.type == (uint32_t)TextureType::TEXTURE_COMPOSITE)
+	{
+		headerReader->seek(0x2F, std::ios::cur);
+
+		uint32_t pathLen = headerReader->readUInt32();
+		texPaths = headerReader->readAsciiString(pathLen);
+	}
+
+	return TextureHeaderExternal{ enum1, enum2, enum3, enum4, width, height, std::move(texPaths) };
 }
 
 std::vector<char>

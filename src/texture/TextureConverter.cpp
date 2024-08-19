@@ -7,12 +7,16 @@ TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t f
 {
 	TextureInfo* formatClass = g_enumMapTexture[(int)headerExternal.format];
 
+	std::vector<std::string> subtextureNames = parseSubtextureString(headerExternal.textureNames);
+	size_t filesizeMinusTextureCount = subtextureNames.size() > 0 ? fileSize / subtextureNames.size() : fileSize;
+
 	bool isCompressed = ddspp::is_compressed(formatClass->getFormat());
 	int squareSize = ddspp::get_bits_per_pixel_or_block(formatClass->getFormat()) / 8;
-	auto dimensions = getCorrectResolution(headerExternal.widthBase, headerExternal.heightBase, isCompressed, fileSize, squareSize);
+	int32_t singleEntryFileSize = std::ceil(filesizeMinusTextureCount);
+	auto dimensions = getCorrectResolution(headerExternal.widthBase, headerExternal.heightBase, isCompressed, singleEntryFileSize, squareSize);
 	int32_t mip0Len = getMip0Len(std::get<0>(dimensions), std::get<1>(dimensions), isCompressed, squareSize);
 
-	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions) };
+	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions), subtextureNames };
 }
 
 std::pair<int16_t, int16_t>
@@ -32,4 +36,24 @@ TextureConverter::getMip0Len(int16_t width, int16_t height, bool isCompressed, i
 	if (!isCompressed)
 		return width * height * 4;
 	return std::max(1, ((width + 3) / 4)) * std::max(1, ((height + 3) / 4)) * blockSize;
+}
+
+std::vector<std::string>
+TextureConverter::parseSubtextureString(const std::string& subtextureString)
+{
+	std::vector<std::string> subtexturePaths;
+
+	size_t cursor1 = 0;
+	size_t cursor2 = subtextureString.find('.', cursor1);
+
+	while(cursor2 < subtextureString.length())
+	{
+		size_t startOfNext = subtextureString.find('/', cursor2 + 1);
+		subtexturePaths.push_back(subtextureString.substr(cursor1, startOfNext - cursor1));
+
+		cursor1 = startOfNext;
+		cursor2 = subtextureString.find('.', cursor1);
+	}
+
+	return subtexturePaths;
 }

@@ -1,5 +1,4 @@
 #include "texture/TextureExtractor.h"
-#include <stdexcept>
 
 using namespace WarframeExporter::Texture;
 
@@ -17,7 +16,7 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 	BinaryReader::BinaryReaderBuffered& entry = fileEntry.fData.getLength() != 0 ? fileEntry.fData : fileEntry.bData;
 
 	// Read header
-	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, ensmalleningData);
+	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader, ensmalleningData);
 
 	if (extHeader.format == (uint8_t)TextureCompression::BC6)
 		throw std::runtime_error("BC6 textures currently unsupported");
@@ -39,10 +38,43 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 void
 TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile)
 {
-	uint32_t mip0Start = (uint32_t)texture.body.size() - texture.header.mip0Len;
-	char* dataStart = texture.body.data() + mip0Start;
-	size_t dataLen = texture.header.mip0Len;
+	if (texture.header.textureNames.size() > 0)
+	{
+		uint32_t mip0Start = (uint32_t)texture.body.size() - (texture.header.mip0Len * texture.header.textureNames.size());
+		writeArray(texture, commonHeader, texture.body.data() + mip0Start, texture.header.mip0Len, outputFile);
+	}
+	else
+	{
+		uint32_t mip0Start = (uint32_t)texture.body.size() - texture.header.mip0Len;
+		writeTextureToFile(texture, commonHeader, texture.body.data() + mip0Start, texture.header.mip0Len, outputFile);
+	}
+}
 
+void
+TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+{
+	TextureInternal intTexture = getTexture(fileEntry, pkgs, ensmalleningData);
+	writeData(intTexture, fileEntry.commonHeader, outputPath);
+}
+
+void
+TextureExtractor::writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile)
+{
+	std::filesystem::path baseOutputArray = std::filesystem::path(outputFile).replace_extension();
+	std::filesystem::create_directories(baseOutputArray);
+
+	const char* dataStart = data;
+	for (int i = 0; i < texture.header.textureNames.size(); i++)
+	{
+		std::string outPathStr = baseOutputArray / (outputFile.stem().string() + "_" + std::to_string(i) + outputFile.extension().string());		
+		TextureExtractor::writeTextureToFile(texture, commonHeader, dataStart, dataLen, outPathStr);
+		dataStart += dataLen;
+	}
+}
+
+void
+TextureExtractor::writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile)
+{
 	if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_DDS)
 	{
 		std::ofstream out;
@@ -51,23 +83,16 @@ TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHead
 		DDSHeaderFull headerFull = DDSLib::encodeHeader(texture.header.formatClass->getFormat(), texture.header.width, texture.header.height);
 		DDSLib::serialize(out, headerFull);
 
-		out.write(dataStart, dataLen);
+		out.write(data, dataLen);
 		out.close();
 	}
 
 	else if (texture.header.formatEnum == TextureCompression::BC6)
-		TextureExporterConvert::convertAndWriteToHdr(dataStart, dataLen, outputFile, texture.header.width, texture.header.height);
+		TextureExporterConvert::convertAndWriteToHdr(data, dataLen, outputFile, texture.header.width, texture.header.height);
 
 	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_PNG)
-		TextureExporterConvert::convertAndWriteToPng(dataStart, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
-	 
-	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_TGA)
-		TextureExporterConvert::convertAndWriteToTga(dataStart, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
-}
+		TextureExporterConvert::convertAndWriteToPng(data, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 
-void
-TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
-{
-	TextureInternal intTexture = getTexture(fileEntry, pkgs, ensmalleningData);
-	writeData(intTexture, fileEntry.commonHeader, outputPath);
+	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_TGA)
+		TextureExporterConvert::convertAndWriteToTga(data, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 }

@@ -35,7 +35,7 @@ int32_t
 TextureConverter::getMip0Len(int16_t width, int16_t height, bool isCompressed, int blockSize)
 {
 	if (!isCompressed)
-		return width * height * 4;
+		return width * height * blockSize;
 	return std::max(1, ((width + 3) / 4)) * std::max(1, ((height + 3) / 4)) * blockSize;
 }
 

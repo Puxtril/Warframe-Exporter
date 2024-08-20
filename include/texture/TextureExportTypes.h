@@ -3,7 +3,7 @@
 #include <map>
 
 #include "ddspp.h"
-#include "TextureStructs.hpp"
+#include "texture/TextureTypes.h"
 
 namespace WarframeExporter::Texture
 {
@@ -16,7 +16,8 @@ namespace WarframeExporter::Texture
 		{TextureCompression::BC5, ddspp::DXGIFormat::BC5_UNORM},
 		{TextureCompression::BC6, ddspp::DXGIFormat::BC6H_UF16},
 		{TextureCompression::BC7, ddspp::DXGIFormat::BC7_UNORM},
-		{TextureCompression::Uncompressed, ddspp::DXGIFormat::B8G8R8A8_UNORM}
+		{TextureCompression::Uncompressed, ddspp::DXGIFormat::B8G8R8A8_UNORM},
+		{TextureCompression::A8, ddspp::DXGIFormat::A8_UNORM}
 	};
 
     enum TextureExportType

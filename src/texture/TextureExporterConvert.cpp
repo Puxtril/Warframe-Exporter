@@ -1,4 +1,5 @@
 #include "texture/TextureExporterConvert.h"
+#include "spng.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define BCDEC_IMPLEMENTATION
@@ -20,6 +21,12 @@ TextureExporterConvert::convertAndWriteToPng(const char* data, size_t dataLen, c
     if (compression == TextureCompression::Uncompressed)
     {
         spng_ihdr ihdr = { width, height, 8, SPNG_COLOR_TYPE_TRUECOLOR_ALPHA };
+        spng_set_ihdr(pngEncodeContext, &ihdr);
+        ret = spng_encode_image(pngEncodeContext, data, dataLen, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
+    }
+    else if (compression == TextureCompression::A8)
+    {
+        spng_ihdr ihdr = { width, height, 8, SPNG_COLOR_TYPE_GRAYSCALE };
         spng_set_ihdr(pngEncodeContext, &ihdr);
         ret = spng_encode_image(pngEncodeContext, data, dataLen, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
     }
@@ -58,6 +65,13 @@ TextureExporterConvert::convertAndWriteToTga(const char* data, size_t dataLen, c
     if (compression == TextureCompression::Uncompressed)
     {
         stbi_write_tga(outPath.string().c_str(), width, height, 4, data);
+    }
+    else if (compression == TextureCompression::A8)
+    {
+        std::vector<char> aToRgbaBuffer(dataLen * 4);
+        for (size_t i = 0; i < dataLen; i++)
+            aToRgbaBuffer[i * 3] = aToRgbaBuffer[i * 3 + 1] = aToRgbaBuffer[i * 3 + 2] = data[i];
+        stbi_write_tga(outPath.string().c_str(), width, height, 3, aToRgbaBuffer.data());
     }
     else
     {

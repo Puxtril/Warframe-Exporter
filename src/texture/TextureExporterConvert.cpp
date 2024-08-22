@@ -30,6 +30,15 @@ TextureExporterConvert::convertAndWriteToPng(const char* data, size_t dataLen, c
         spng_set_ihdr(pngEncodeContext, &ihdr);
         ret = spng_encode_image(pngEncodeContext, data, dataLen, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
     }
+    else if (compression == TextureCompression::R16)
+    {
+        spng_ihdr ihdr = { width, height, 8, SPNG_COLOR_TYPE_GRAYSCALE };
+        spng_set_ihdr(pngEncodeContext, &ihdr);
+        std::vector<char> outData(dataLen / 2);
+        for (size_t i = 0; i < outData.size(); i++)
+            outData[i] = data[i * 2 + 1];
+        ret = spng_encode_image(pngEncodeContext, outData.data(), outData.size(), SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
+    }
     else
     {
         BCConvertInfo info = getConvertInfo(compression);
@@ -72,6 +81,14 @@ TextureExporterConvert::convertAndWriteToTga(const char* data, size_t dataLen, c
         for (size_t i = 0; i < dataLen; i++)
             aToRgbaBuffer[i * 3] = aToRgbaBuffer[i * 3 + 1] = aToRgbaBuffer[i * 3 + 2] = data[i];
         stbi_write_tga(outPath.string().c_str(), width, height, 3, aToRgbaBuffer.data());
+    }
+    else if (compression == TextureCompression::R16)
+    {
+        std::vector<char> rToRgbBuffer(dataLen / 2 * 3);
+        std::fill_n(rToRgbBuffer.data(), rToRgbBuffer.size(), 0);
+        for (size_t i = 0; i < dataLen; i++)
+            rToRgbBuffer[i * 3] = data[i * 2 + 1];
+        stbi_write_tga(outPath.string().c_str(), width, height, 3, rToRgbBuffer.data());
     }
     else
     {
@@ -133,8 +150,6 @@ TextureExporterConvert::getConvertInfo(TextureCompression compression)
             return TextureExporterConvert::BC6ConvertInfo;
         case TextureCompression::BC7:
             return TextureExporterConvert::BC7ConvertInfo;
-        case TextureCompression::Uncompressed:
-            throw std::runtime_error("No conversion info for uncompressed format");
         default:
             throw std::runtime_error("Compression format not implemented for conversion");
     }

@@ -29,6 +29,7 @@ namespace WarframeExporter::Texture
 		BC5 = 7,
 		Uncompressed = 10,
 		A8 = 12,
+		R16 = 30,
 		BC7 = 34,
 		BC6 = 35,
 	};

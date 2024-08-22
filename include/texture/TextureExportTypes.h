@@ -17,7 +17,8 @@ namespace WarframeExporter::Texture
 		{TextureCompression::BC6, ddspp::DXGIFormat::BC6H_UF16},
 		{TextureCompression::BC7, ddspp::DXGIFormat::BC7_UNORM},
 		{TextureCompression::Uncompressed, ddspp::DXGIFormat::B8G8R8A8_UNORM},
-		{TextureCompression::A8, ddspp::DXGIFormat::A8_UNORM}
+		{TextureCompression::A8, ddspp::DXGIFormat::A8_UNORM},
+		{TextureCompression::R16, ddspp::DXGIFormat::R16_UNORM}
 	};
 
     enum TextureExportType

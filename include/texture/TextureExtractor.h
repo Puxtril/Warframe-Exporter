@@ -85,6 +85,7 @@ namespace WarframeExporter::Texture
 				(int)TextureType::TEXTURE_174,
 				(int)TextureType::TEXTURE_176,
 				(int)TextureType::TEXTURE_CUBEMAP,
+				(int)TextureType::TEXTURE_HDR,
 				(int)TextureType::TEXTURE_NORMAL_MAP,
 				(int)TextureType::TEXTURE_PACKMAP,
 				(int)TextureType::TEXTURE_194,

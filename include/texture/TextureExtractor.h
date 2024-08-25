@@ -31,7 +31,7 @@ namespace WarframeExporter::Texture
 			hReader->seek(curOffset, std::ios::beg);
 
 			static const std::string hdr = "hdr";
-			if (extHeader.format == (uint8_t)TextureCompression::BC6)
+			if (extHeader.format == (uint8_t)TextureCompression::BC6 && m_exportType != TextureExportType::TEXTURE_EXPORT_DDS)
 				return hdr;
 
 			switch (m_exportType)

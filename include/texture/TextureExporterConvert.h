@@ -64,7 +64,7 @@ namespace WarframeExporter::Texture
         static constexpr BCConvertInfo BC3ConvertInfo {SPNG_COLOR_TYPE_TRUECOLOR_ALPHA, BCDEC_BC3_BLOCK_SIZE, 4, &bcdec_bc3};
         static constexpr BCConvertInfo BC4ConvertInfo {SPNG_COLOR_TYPE_GRAYSCALE, BCDEC_BC4_BLOCK_SIZE, 1, &bcdec_bc4};
         static constexpr BCConvertInfo BC5ConvertInfo {SPNG_COLOR_TYPE_TRUECOLOR, BCDEC_BC5_BLOCK_SIZE, 3, &TextureExporterConvert::bcdec_bc5_as_RGB};
-        static constexpr BCConvertInfo BC6ConvertInfo {0, BCDEC_BC6H_BLOCK_SIZE, 3, &TextureExporterConvert::bc6h_float};
+        static constexpr BCConvertInfo BC6ConvertInfo {0, BCDEC_BC6H_BLOCK_SIZE, 12, &TextureExporterConvert::bc6h_float};
         static constexpr BCConvertInfo BC7ConvertInfo {SPNG_COLOR_TYPE_TRUECOLOR_ALPHA, BCDEC_BC7_BLOCK_SIZE, 4, &bcdec_bc7};
     };
 };

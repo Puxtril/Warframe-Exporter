@@ -17,9 +17,6 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 
 	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader, ensmalleningData);
 
-	if (extHeader.format == (uint8_t)TextureCompression::BC6)
-		throw std::runtime_error("BC6 textures currently unsupported");
-
 	if (internalFormatToDdsFormat.count(static_cast<TextureCompression>(extHeader.format)) == 0)
 		throw std::runtime_error("Unknown texture compression format: " + std::to_string(extHeader.format));
 

@@ -62,8 +62,8 @@ TextureExporterConvert::convertAndWriteToHdr(const char* data, size_t dataLen, c
 { 
     BCConvertInfo info = getConvertInfo(TextureCompression::BC6);
 
-    std::vector<char> decompressed(width * height * info.blockSizeSource);
-    decompressDdsBlocks(data, dataLen, decompressed, width, height, info.blockSizeDecompressed, info.blockSizeSource, &TextureExporterConvert::bc6h_float);
+    std::vector<char> decompressed(width * height * info.blockSizeDecompressed);
+    decompressDdsBlocks(data, dataLen, decompressed, width, height, info.blockSizeSource, info.blockSizeDecompressed, &TextureExporterConvert::bc6h_float);
 
     stbi_write_hdr(outPath.string().c_str(), width, height, 3, (float*)decompressed.data());
 }
@@ -120,7 +120,7 @@ TextureExporterConvert::decompressDdsBlocks(const char* data, size_t dataLen, st
 void
 TextureExporterConvert::bc6h_float(const void* compressedBlock, void* decompressedBlock, int destinationPitch)
 {
-    bcdec_bc6h_float(compressedBlock, decompressedBlock, destinationPitch, false);
+    bcdec_bc6h_float(compressedBlock, decompressedBlock, destinationPitch / 4, false);
 }
 
 void

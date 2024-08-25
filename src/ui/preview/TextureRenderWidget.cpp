@@ -5,16 +5,21 @@ TextureRenderWidget::TextureRenderWidget(QWidget *parent)
 {
     setIs3D(false);
 
-    m_textureMap = {
-        {WarframeExporter::Texture::TextureCompression::Uncompressed, {GL_RGBA8, GL_RGBA}},
-        {WarframeExporter::Texture::TextureCompression::Default, {GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RGBA}},
-        {WarframeExporter::Texture::TextureCompression::BC1, {GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RGBA}},
-        {WarframeExporter::Texture::TextureCompression::BC2, {GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, GL_RGBA}},
-        {WarframeExporter::Texture::TextureCompression::BC3, {GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_RGBA}},
-        {WarframeExporter::Texture::TextureCompression::BC4, {GL_COMPRESSED_RED_RGTC1_EXT, GL_RED}},
-        {WarframeExporter::Texture::TextureCompression::BC5, {GL_COMPRESSED_RED_GREEN_RGTC2_EXT, GL_RG}},
-        {WarframeExporter::Texture::TextureCompression::BC6, {GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB, GL_RGB}},
-        {WarframeExporter::Texture::TextureCompression::BC7, {GL_COMPRESSED_RGBA_BPTC_UNORM, GL_RGBA}}
+    m_textureMapUncompressed = {
+        {WarframeExporter::Texture::TextureCompression::Uncompressed, {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE}},
+        {WarframeExporter::Texture::TextureCompression::A8, {GL_R8, GL_RED, GL_UNSIGNED_BYTE}},
+        {WarframeExporter::Texture::TextureCompression::R16, {GL_R16, GL_RED, GL_UNSIGNED_SHORT}},
+    };
+
+    m_textureMapCompressed = {
+        {WarframeExporter::Texture::TextureCompression::Default, GL_COMPRESSED_RGB_S3TC_DXT1_EXT},
+        {WarframeExporter::Texture::TextureCompression::BC1, GL_COMPRESSED_RGB_S3TC_DXT1_EXT},
+        {WarframeExporter::Texture::TextureCompression::BC2, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT},
+        {WarframeExporter::Texture::TextureCompression::BC3, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT},
+        {WarframeExporter::Texture::TextureCompression::BC4, GL_COMPRESSED_RED_RGTC1_EXT},
+        {WarframeExporter::Texture::TextureCompression::BC5, GL_COMPRESSED_RED_GREEN_RGTC2_EXT},
+        {WarframeExporter::Texture::TextureCompression::BC6, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB},
+        {WarframeExporter::Texture::TextureCompression::BC7, GL_COMPRESSED_RGBA_BPTC_UNORM}
     };
 }
 
@@ -72,9 +77,23 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
-    std::tuple<unsigned int, unsigned int> glFormats = m_textureMap[texture.header.formatEnum];
     size_t mip0Start = texture.body.size() - texture.header.mip0Len;
-    glCompressedTexImage2D(GL_TEXTURE_2D, 0, std::get<0>(glFormats), texture.header.width, texture.header.height, 0, texture.header.mip0Len, texture.body.data() + mip0Start);
+
+    if (m_textureMapUncompressed.count(texture.header.formatEnum) == 1)
+    {
+        std::tuple<int, int, int> glFormats = m_textureMapUncompressed[texture.header.formatEnum];
+        glTexImage2D(GL_TEXTURE_2D, 0, std::get<0>(glFormats), texture.header.width, texture.header.height, 0, std::get<1>(glFormats), std::get<2>(glFormats), texture.body.data() + mip0Start);
+    }
+    else if (m_textureMapCompressed.count(texture.header.formatEnum) == 1)
+    {
+        int glFormat = m_textureMapCompressed[texture.header.formatEnum];
+        glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, texture.header.width, texture.header.height, 0, texture.header.mip0Len, texture.body.data() + mip0Start);
+    }
+    else
+    {
+        throw std::runtime_error("Unable to preview texture compression format");
+    }
+
     glGenerateMipmap(GL_TEXTURE_2D);
     
     m_texWidth = texture.header.width;

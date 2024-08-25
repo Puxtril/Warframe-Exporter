@@ -22,7 +22,8 @@ class TextureRenderWidget : public QtOpenGLViewer
     int m_texHeight;
     bool m_showAlpha;
 
-    std::map<WarframeExporter::Texture::TextureCompression, std::tuple<unsigned int, unsigned int>> m_textureMap;
+    std::map<WarframeExporter::Texture::TextureCompression, std::tuple<int, int, int>> m_textureMapUncompressed;
+    std::map<WarframeExporter::Texture::TextureCompression, int> m_textureMapCompressed;
 
 public:
     TextureRenderWidget(QWidget *parent = NULL);

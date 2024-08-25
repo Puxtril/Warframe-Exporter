@@ -77,17 +77,21 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
-    size_t mip0Start = texture.body.size() - texture.header.mip0Len;
+    m_texWidth = texture.header.width;
+    m_texHeight = texture.header.textureNames.size() > 0 ? texture.header.height * texture.header.textureNames.size() : texture.header.height;
+
+    size_t mip0Len = texture.header.textureNames.size() > 0 ? texture.header.mip0Len * texture.header.textureNames.size() : texture.header.mip0Len;
+    size_t mip0Start = texture.body.size() - mip0Len;
 
     if (m_textureMapUncompressed.count(texture.header.formatEnum) == 1)
     {
         std::tuple<int, int, int> glFormats = m_textureMapUncompressed[texture.header.formatEnum];
-        glTexImage2D(GL_TEXTURE_2D, 0, std::get<0>(glFormats), texture.header.width, texture.header.height, 0, std::get<1>(glFormats), std::get<2>(glFormats), texture.body.data() + mip0Start);
+        glTexImage2D(GL_TEXTURE_2D, 0, std::get<0>(glFormats), m_texWidth, m_texHeight, 0, std::get<1>(glFormats), std::get<2>(glFormats), texture.body.data() + mip0Start);
     }
     else if (m_textureMapCompressed.count(texture.header.formatEnum) == 1)
     {
         int glFormat = m_textureMapCompressed[texture.header.formatEnum];
-        glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, texture.header.width, texture.header.height, 0, texture.header.mip0Len, texture.body.data() + mip0Start);
+        glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, m_texWidth, m_texHeight, 0, mip0Len, texture.body.data() + mip0Start);
     }
     else
     {
@@ -95,9 +99,6 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     }
 
     glGenerateMipmap(GL_TEXTURE_2D);
-    
-    m_texWidth = texture.header.width;
-    m_texHeight = texture.header.height;
     
     resizeGL(width(), height());
     paintGL();

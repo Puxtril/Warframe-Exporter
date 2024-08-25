@@ -3,12 +3,23 @@
 using namespace WarframeExporter::Texture;
 
 TextureHeaderInternal
-TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize)
+TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize, uint32_t fileFormat)
 {
 	TextureCompression compressionFormat = static_cast<TextureCompression>(headerExternal.format);
 	ddspp::DXGIFormat ddsFormat = internalFormatToDdsFormat.at(compressionFormat);
 
-	std::vector<std::string> subtextureNames = parseSubtextureString(headerExternal.textureNames);
+	std::vector<std::string> subtextureNames;
+	if (fileFormat == (uint32_t)TextureType::TEXTURE_CUBEMAP)
+	{
+		// Cubemaps will have exactly 6 sub-textures
+		subtextureNames = {"1", "2", "3", "4", "5", "6"};
+	}
+	else
+	{
+		// Textures of type TEXTURE_COMPOSITE will have X sub-textures
+		// But that is read by the external reader. This will just parse this field
+		subtextureNames = parseSubtextureString(headerExternal.textureNames);
+	}
 	size_t filesizeMinusTextureCount = subtextureNames.size() > 0 ? fileSize / subtextureNames.size() : fileSize;
 
 	bool isCompressed = ddspp::is_compressed(ddsFormat);

@@ -24,7 +24,7 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 		throw std::runtime_error("Unknown texture compression format: " + std::to_string(extHeader.format));
 
 	TextureInternal intTexture;
-	intTexture.header = TextureConverter::convertHeader(extHeader, static_cast<int32_t>(entry.getLength()));
+	intTexture.header = TextureConverter::convertHeader(extHeader, static_cast<int32_t>(entry.getLength()), fileEntry.commonHeader.type);
 	intTexture.body = TextureReader::readBody(&entry, extHeader);
 
 	m_logger.debug(spdlog::fmt_lib::format("Format={} ResRaw={}x{} ResConv={}x{} Mip0Size={}", extHeader.format, extHeader.widthBase, extHeader.heightBase, intTexture.header.width, intTexture.header.height, intTexture.header.mip0Len));

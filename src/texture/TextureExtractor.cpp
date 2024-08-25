@@ -60,8 +60,8 @@ TextureExtractor::writeArray(TextureInternal& texture, const LotusLib::CommonHea
 	const char* dataStart = data;
 	for (int i = 0; i < texture.header.textureNames.size(); i++)
 	{
-		std::string outPathStr = baseOutputArray / (outputFile.stem().string() + "_" + std::to_string(i) + outputFile.extension().string());		
-		TextureExtractor::writeTextureToFile(texture, commonHeader, dataStart, dataLen, outPathStr);
+		std::filesystem::path outPath = baseOutputArray / (outputFile.stem().string() + "_" + std::to_string(i) + outputFile.extension().string());		
+		TextureExtractor::writeTextureToFile(texture, commonHeader, dataStart, dataLen, outPath.string());
 		dataStart += dataLen;
 	}
 }

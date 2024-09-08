@@ -15,5 +15,6 @@ namespace WarframeExporter::Landscape::LandscapeExporterGltf
     int32_t _generateAndAddUVs(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer);
     int32_t _addVertexColors(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer);
 
+    Buffer& _getBuffer(Document& gltfDoc);
     void _addExtraAttributes(Document& gltfDoc, const std::vector<std::vector<std::string>>& materialPathArrays, Mesh& mesh, size_t chunkIndex);
 }

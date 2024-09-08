@@ -43,7 +43,17 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	m_logger.info("Level mesh count: " + std::to_string(levelInt.objs.size()));
 
 	Document gltfOut = createGltfCombined(pkgs, ensmalleningData, levelInt);
-	Model::ModelExporterGltf::save(gltfOut, outputPath);
+
+	if (gltfOut.buffers.size() > 1)
+	{
+		for (size_t i = 0; i < gltfOut.buffers.size(); i++)
+		{
+			Buffer& currentBuf = gltfOut.buffers[i];
+			currentBuf.uri = outputPath.stem().string() + std::to_string(i) + ".bin";
+		}
+	}
+
+	fx::gltf::Save(gltfOut, outputPath, gltfOut.buffers.size() > 1 ? false : true);
 }
 
 Document
@@ -58,6 +68,10 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
+		// >3GB
+		if (outGltf.buffers.size() > 0 && outGltf.buffers.back().data.size() > 3221225472)
+			outGltf.buffers.resize(outGltf.buffers.size() + 1);
+
 		LevelObjectInternal& curLevelObj = bodyInt.objs[x];
 
 		if (curLevelObj.meshPath == "")

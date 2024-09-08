@@ -33,8 +33,7 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
 Mesh
 LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const Physx::HeightFieldMesh& mesh)
 {
-    gltfDoc.buffers.resize(1);
-    Buffer& buf = gltfDoc.buffers[0];
+    Buffer& buf = _getBuffer(gltfDoc);
 
     Attributes vertAttributes = _addLandscapeVertices(gltfDoc, mesh, buf);
 
@@ -70,7 +69,7 @@ LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightField
     
     BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = curSize;
 	bufView.byteLength = vertexDataSize;
 	bufView.byteStride = sizeof(float) * 3;
@@ -118,7 +117,7 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::Height
     
     BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = curSize;
 	bufView.byteLength = uvDataSize;
 	bufView.byteStride = sizeof(float) * 2;
@@ -155,7 +154,7 @@ LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const Physx::HeightFi
 
     BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = curSize;
 	bufView.byteLength = colorDataSize;
 	bufView.byteStride = 3;
@@ -173,6 +172,20 @@ LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const Physx::HeightFi
 	gltfDoc.accessors.push_back(colAcc);
 
     return colAccIndex;
+}
+
+Buffer&
+LandscapeExporterGltf::_getBuffer(Document& gltfDoc)
+{
+	if (gltfDoc.buffers.size() == 0)
+	{
+		Buffer newBuf;
+		newBuf.name = "Model Data 1";
+		newBuf.byteLength = 0;
+		gltfDoc.buffers.push_back(newBuf);
+	}
+
+	return gltfDoc.buffers.back();
 }
 
 void

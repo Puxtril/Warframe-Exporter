@@ -135,10 +135,7 @@ ModelExporterGltf::_createSkin(Document& gltfDoc, const std::vector<int32_t>& we
 int32_t
 ModelExporterGltf::_addInverseBindMatrices(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices)
 {
-	if (gltfDoc.buffers.size() == 0)
-		_createBuffer(gltfDoc);
-
-	Buffer& buf = gltfDoc.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	uint32_t matSize = static_cast<uint32_t>(sizeof(boneTree[0].reverseBind));
 	uint32_t byteLen = static_cast<uint32_t>(boneTree.size()) * matSize;
 	byteLen += (byteLen % 4);
@@ -167,7 +164,7 @@ ModelExporterGltf::_addInverseBindMatrices(Document& gltfDoc, const std::vector<
 
 	BufferView bufView;
 	int32_t bufViewIndex = static_cast<int32_t>(gltfDoc.bufferViews.size());
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = 0;
@@ -249,10 +246,7 @@ ModelExporterGltf::_findOrCreateMaterial(Document& gltfDoc, const std::string& m
 Attributes
 ModelExporterGltf::_addVertexDataRigged(Document& gltfDoc, const ModelBodyInternal& body, int vertCount)
 {
-	if (gltfDoc.buffers.size() == 0)
-		_createBuffer(gltfDoc);
-
-	Buffer& buf = gltfDoc.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	// 1 colorLen is already factored into this vertex size
 	// Add the other 2
 	uint32_t byteLen = vertCount * body.vertexSizeRigged();
@@ -284,7 +278,7 @@ ModelExporterGltf::_addVertexDataRigged(Document& gltfDoc, const ModelBodyIntern
 	
 	BufferView bufView;
 	int32_t bufViewIndex = static_cast<int32_t>(gltfDoc.bufferViews.size());
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = body.vertexSizeRigged();
@@ -376,10 +370,7 @@ ModelExporterGltf::_addVertexDataRigged(Document& gltfDoc, const ModelBodyIntern
 Attributes
 ModelExporterGltf::_addVertexDataStatic(Document& gltfDoc, const ModelBodyInternal& body, int vertCount)
 {
-	if (gltfDoc.buffers.size() == 0)
-		_createBuffer(gltfDoc);
-
-	Buffer& buf = gltfDoc.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	uint32_t byteLen = vertCount * body.vertexSizeStatic();
 	uint32_t startOffset = buf.byteLength;
 
@@ -404,7 +395,7 @@ ModelExporterGltf::_addVertexDataStatic(Document& gltfDoc, const ModelBodyIntern
 
 	BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = body.vertexSizeStatic();
@@ -473,10 +464,7 @@ ModelExporterGltf::_addVertexDataStatic(Document& gltfDoc, const ModelBodyIntern
 int32_t
 ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body)
 {
-	if (gltfDoc.buffers.size() == 0)
-		_createBuffer(gltfDoc);
-	
-	Buffer& buf = gltfDoc.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 
 	uint32_t indexSize = (uint32_t)body.size() * (uint32_t)sizeof(body[0]);
 	uint32_t byteLen = indexSize + (indexSize % 4);
@@ -488,7 +476,7 @@ ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>&
 
 	BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
-	bufView.buffer = 0;
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.target = BufferView::TargetType::ElementArrayBuffer;
@@ -505,20 +493,9 @@ ModelExporterGltf::_modifyAsset(Document& gltfDoc)
 }
 
 void
-ModelExporterGltf::_createBuffer(Document& gltfDoc)
-{
-	assert(gltfDoc.buffers.size() == 0);
-
-	Buffer newBuf;
-	newBuf.name = "Model Data";
-	newBuf.byteLength = 0;
-	gltfDoc.buffers.push_back(newBuf);
-}
-
-void
 ModelExporterGltf::_checkAndFixBufferAllignment(Document& gltfDoc)
 {
-	Buffer& buf = gltfDoc.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	int mod = buf.byteLength % 4;
 	if (mod != 0)
 	{
@@ -527,6 +504,19 @@ ModelExporterGltf::_checkAndFixBufferAllignment(Document& gltfDoc)
 	}
 }
 
+Buffer&
+ModelExporterGltf::_getBuffer(Document& gltfDoc)
+{
+	if (gltfDoc.buffers.size() == 0)
+	{
+		Buffer newBuf;
+		newBuf.name = "Model Data 1";
+		newBuf.byteLength = 0;
+		gltfDoc.buffers.push_back(newBuf);
+	}
+
+	return gltfDoc.buffers.back();
+}
 
 std::vector<float>
 ModelExporterGltf::_findMaxVec3(const std::vector<glm::vec3>& body)

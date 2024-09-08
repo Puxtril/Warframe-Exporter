@@ -60,12 +60,6 @@ UiSettings::getExportShaders() const
     return m_settings.value(m_checkboxExportShaders).toBool();
 }
 
-bool
-UiSettings::getExportLandscapes() const
-{
-    return m_settings.value(m_checkboxExporLandscapes).toBool();
-}
-
 WarframeExporter::Shader::ShaderExportType
 UiSettings::getShaderFormat() const
 {
@@ -145,7 +139,6 @@ UiSettings::setSettings(
     m_settings.setValue(m_checkboxExportMaterials, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Material) > 0);
     m_settings.setValue(m_checkboxExportAudio, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0);
     m_settings.setValue(m_checkboxExportShaders, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0);
-    m_settings.setValue(m_checkboxExporLandscapes, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Landscape) > 0);
 
     m_settings.setValue(m_comboShaderFormat, (int)shaderExportType);
     m_settings.setValue(m_comboTextureFormat, (int)textureExportType);

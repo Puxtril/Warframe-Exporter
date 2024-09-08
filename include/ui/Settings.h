@@ -24,7 +24,6 @@ class UiSettings : public QObject
     static const inline QString m_checkboxExportMaterials = "load/export/materials";
     static const inline QString m_checkboxExportAudio = "load/export/audio";
     static const inline QString m_checkboxExportShaders = "load/export/shaders";
-    static const inline QString m_checkboxExporLandscapes = "load/export/landscapes";
 
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
@@ -52,7 +51,6 @@ public:
     bool getExportMaterials() const;
     bool getExportAudio() const;
     bool getExportShaders() const;
-    bool getExportLandscapes() const;
 
     void saveMainWindowData(QSize size);
     QSize getMainWindowSize();

@@ -9,6 +9,7 @@ CLIExtract::CLIExtract()
 	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
 	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract all levels", false);
 	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract all shaders", false);
+	m_extLandscape = std::make_shared<TCLAP::SwitchArg>("", "extract-landscapes", "Extract all Landscapes", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
 	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format", false, "Binary", "Binary | Decompiled");
@@ -39,7 +40,8 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extLevelCmd.get())
 		.add(m_extAudioCmd.get())
 		.add(m_extAllCmd.get())
-		.add(m_extShaderCmd.get());
+		.add(m_extShaderCmd.get())
+		.add(m_extLandscape.get());
 }
 
 void
@@ -54,7 +56,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
 {
-	if (!m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
+	if (!m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
 	WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = m_includeVertexColors->getValue();
@@ -74,6 +76,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		types |= (int)WarframeExporter::ExtractorType::Audio;
 	if (m_extShaderCmd->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Shader;
+	if (m_extLandscape->getValue() || m_extAllCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Landscape;
 
 	std::vector<std::string> pkgNames;
 	if (pkg.empty())
@@ -169,7 +173,8 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
 		(int)types & (int)WarframeExporter::ExtractorType::Material ||
-		(int)types & (int)WarframeExporter::ExtractorType::Audio)
+		(int)types & (int)WarframeExporter::ExtractorType::Audio || 
+		(int)types & (int)WarframeExporter::ExtractorType::Landscape)
 	{
 		pkgNames.push_back("Misc");
 		pkgNames.push_back("Misc_xx");

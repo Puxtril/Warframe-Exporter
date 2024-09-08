@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'PickerflCVGi.ui'
+** Form generated from reading UI file 'PickerDLuUOi.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.7.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef PICKERFLCVGI_H
-#define PICKERFLCVGI_H
+#ifndef PICKERDLUUOI_H
+#define PICKERDLUUOI_H
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
@@ -52,6 +52,10 @@ public:
     QLabel *AudioLabel;
     QCheckBox *AudioCheckbox;
     QLabel *AudioFormatLabel;
+    QHBoxLayout *LandscapeSection;
+    QLabel *LandscapeLabel;
+    QCheckBox *LandscapeCheckbox;
+    QLabel *LandscapeFormatLabel;
     QHBoxLayout *LevelSection;
     QLabel *LevelLabel;
     QCheckBox *LevelCheckbox;
@@ -86,7 +90,7 @@ public:
     {
         if (WindowPicker->objectName().isEmpty())
             WindowPicker->setObjectName("WindowPicker");
-        WindowPicker->resize(541, 484);
+        WindowPicker->resize(549, 507);
         verticalLayout_2 = new QVBoxLayout(WindowPicker);
         verticalLayout_2->setObjectName("verticalLayout_2");
         CacheWindowsFrame = new QGroupBox(WindowPicker);
@@ -222,6 +226,38 @@ public:
 
 
         verticalLayout->addLayout(AudioSection);
+
+        LandscapeSection = new QHBoxLayout();
+        LandscapeSection->setObjectName("LandscapeSection");
+        LandscapeLabel = new QLabel(WindowPicker);
+        LandscapeLabel->setObjectName("LandscapeLabel");
+        sizePolicy.setHeightForWidth(LandscapeLabel->sizePolicy().hasHeightForWidth());
+        LandscapeLabel->setSizePolicy(sizePolicy);
+        LandscapeLabel->setMinimumSize(QSize(70, 0));
+        LandscapeLabel->setFont(font1);
+
+        LandscapeSection->addWidget(LandscapeLabel);
+
+        LandscapeCheckbox = new QCheckBox(WindowPicker);
+        LandscapeCheckbox->setObjectName("LandscapeCheckbox");
+        sizePolicy2.setHeightForWidth(LandscapeCheckbox->sizePolicy().hasHeightForWidth());
+        LandscapeCheckbox->setSizePolicy(sizePolicy2);
+        LandscapeCheckbox->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
+        LandscapeCheckbox->setStyleSheet(QString::fromUtf8("margin-left:50%; margin-right:50%;"));
+        LandscapeCheckbox->setTristate(false);
+
+        LandscapeSection->addWidget(LandscapeCheckbox);
+
+        LandscapeFormatLabel = new QLabel(WindowPicker);
+        LandscapeFormatLabel->setObjectName("LandscapeFormatLabel");
+        sizePolicy1.setHeightForWidth(LandscapeFormatLabel->sizePolicy().hasHeightForWidth());
+        LandscapeFormatLabel->setSizePolicy(sizePolicy1);
+        LandscapeFormatLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        LandscapeSection->addWidget(LandscapeFormatLabel);
+
+
+        verticalLayout->addLayout(LandscapeSection);
 
         LevelSection = new QHBoxLayout();
         LevelSection->setObjectName("LevelSection");
@@ -456,6 +492,15 @@ public:
 #endif // QT_CONFIG(whatsthis)
         AudioFormatLabel->setText(QCoreApplication::translate("WindowPicker", "Wav/Opus", nullptr));
 #if QT_CONFIG(whatsthis)
+        LandscapeLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Landscape meshes for Levels. These are massive models.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        LandscapeLabel->setText(QCoreApplication::translate("WindowPicker", "Landscape", nullptr));
+        LandscapeCheckbox->setText(QString());
+#if QT_CONFIG(whatsthis)
+        LandscapeFormatLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Audio files are stored as both of these formats in-game, which determins the export format.</p></body></html>", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        LandscapeFormatLabel->setText(QCoreApplication::translate("WindowPicker", "glTF", nullptr));
+#if QT_CONFIG(whatsthis)
         LevelLabel->setWhatsThis(QCoreApplication::translate("WindowPicker", "<html><head/><body><p>Rooms and open areas. <span style=\" font-weight:700;\">Exported files are large.</span></p></body></html>", nullptr));
 #endif // QT_CONFIG(whatsthis)
         LevelLabel->setText(QCoreApplication::translate("WindowPicker", "Level", nullptr));
@@ -517,4 +562,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // PICKERFLCVGI_H
+#endif // PICKERDLUUOI_H

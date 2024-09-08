@@ -64,7 +64,7 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	m_logger.debug(spdlog::fmt_lib::format("Bones={} Verts={} Faces={} Morphs={} PhysXMeshes={} Colors={} Scale={},{},{}", headerExt.boneTree.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size(), vertexColors.size(), headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
 	
 	// Convert body/header into exportable format
-	ModelExporterGltf outModel;
-	outModel.addModelData(headerInt, bodyInt);
-	outModel.save(outputPath);
+	Document gltfDocument;
+	ModelExporterGltf::addModelData(gltfDocument, headerInt, bodyInt);
+	ModelExporterGltf::save(gltfDocument, outputPath);
 }

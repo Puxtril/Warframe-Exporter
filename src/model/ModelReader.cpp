@@ -100,6 +100,8 @@ ModelReader::readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::ve
         curPhysXMesh.typeEnum = reader->readUInt32();
         if (curPhysXMesh.typeEnum == 1)
             reader->seek(0x4C, std::ios_base::cur);
+        else if (curPhysXMesh.typeEnum == 7)
+            reader->seek(0x60, std::ios_base::cur);
         else
             reader->seek(0x50, std::ios_base::cur);
 

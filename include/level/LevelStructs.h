@@ -2,12 +2,12 @@
 
 #include "glm/vec3.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "nlohmann/json.hpp"
 
 #include <string>
 #include <string_view>
 #include <vector>
 #include <cstdint>
-#include <map>
 
 namespace WarframeExporter::Level
 {
@@ -31,13 +31,14 @@ namespace WarframeExporter::Level
 
 	struct LevelBodyExternal
 	{
-		std::vector<std::string> attributes;
+		std::vector<std::vector<char>> attributes;
 	};
 
 	struct LevelExternal
 	{
 		LevelHeaderExternal header;
 		LevelBodyExternal body;
+		int landscapeIndex;
 	};
 	
 	struct LevelObjectInternal
@@ -47,18 +48,23 @@ namespace WarframeExporter::Level
 		glm::vec3 pos;
 		glm::quat rot;
 		float scale;
-		// Cannot be string view, because it might need fixing
-		// See LevelConverter::fixInternalPath
 		std::string meshPath;
-		std::vector<std::string_view> materials;
-		std::map<std::string_view, std::string_view> attributes;
-		std::string rawAttributes;
+		std::vector<std::string> materials;
+		nlohmann::json attributes;
+	};
+
+	struct LandscapeObject
+	{
+		glm::vec3 pos;
+		std::string landscapePath;
+		nlohmann::json::object_t attributes;
 	};
 
 	// For optimization purposes, keep the entire attributes string as an std::string
 	// For each level object, use std::string_view to substring this
 	struct LevelInternal
 	{
+		LandscapeObject landscape;
 		std::vector<LevelObjectInternal> objs;
 	};
 }

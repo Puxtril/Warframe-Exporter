@@ -15,8 +15,12 @@ LevelExtractor::getLevelExternal(LotusLib::FileEntry& fileEntry)
 	LevelReader* levelReader = g_enumMapLevel[fileEntry.commonHeader.type];
 	
 	LevelExternal external;
+	external.landscapeIndex = -1;
 	levelReader->readHeader(fileEntry.headerData, external.header);
 	levelReader->readBody(fileEntry.bData, external.header, external.body);
+
+	findLandscape(external);
+	LevelObjectHeaderExternal& landscape = external.header.levelObjs[external.landscapeIndex];
 
 	return external;
 }
@@ -26,6 +30,7 @@ LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal&
 {
 	LevelInternal bodyInt;
 	LevelConverter::convertToInternal(levelExternal.header, levelExternal.body, fileEntry.internalPath, bodyInt);
+	LevelConverter::convertLandscapeToInternal(levelExternal, bodyInt);
 	return bodyInt;
 }
 
@@ -37,22 +42,44 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 
 	m_logger.info("Level mesh count: " + std::to_string(levelInt.objs.size()));
 
-	LevelExporterGltf gltfOut = createGltfCombined(pkgs, ensmalleningData, levelInt);
-	gltfOut.save(outputPath);
+	Document gltfOut = createGltfCombined(pkgs, ensmalleningData, levelInt);
+
+	if (gltfOut.buffers.size() > 1)
+	{
+		for (size_t i = 0; i < gltfOut.buffers.size(); i++)
+		{
+			Buffer& currentBuf = gltfOut.buffers[i];
+			currentBuf.uri = outputPath.stem().string() + std::to_string(i) + ".bin";
+		}
+	}
+
+	fx::gltf::Save(gltfOut, outputPath, gltfOut.buffers.size() > 1 ? false : true);
 }
 
-LevelExporterGltf
+Document
 LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt)
 {
-	LevelExporterGltf outGltf;
+	Document outGltf;
 
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc");
 
+	if (!bodyInt.landscape.landscapePath.empty())
+		addLandscapeToGltf(outGltf, bodyInt, pkgs);
+
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
+		// >3GB
+		if (outGltf.buffers.size() > 0 && outGltf.buffers.back().data.size() > 3221225472)
+			outGltf.buffers.resize(outGltf.buffers.size() + 1);
+
 		LevelObjectInternal& curLevelObj = bodyInt.objs[x];
 
 		if (curLevelObj.meshPath == "")
+			continue;
+
+		// HLOD variations of existing models
+		// No need for these in exports, they're annoying to delete manually
+		if (curLevelObj.objTypePath == "/EE/Types/Engine/HLODAggregateEntity")
 			continue;
 
 		try
@@ -88,7 +115,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 
 			m_logger.debug(spdlog::fmt_lib::format("Pos={},{},{} Scale={},{},{} Colors={} {}", curLevelObj.pos.x, curLevelObj.pos.y, curLevelObj.pos.z, headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z, vertexColors.size(), curLevelObj.meshPath));
 
-			outGltf.addModelData(headerInt, bodyInt, curLevelObj);
+			LevelExporterGltf::addModelData(outGltf, headerInt, bodyInt, curLevelObj);
 		}
 		catch (std::exception& ex)
 		{
@@ -99,4 +126,51 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 	}
 
 	return outGltf;
+}
+
+void
+LevelExtractor::findLandscape(LevelExternal& levelExternal)
+{
+	for (size_t i = 0; i < levelExternal.header.levelObjs.size(); i++)
+	{
+		if (levelExternal.header.levelObjs[i].objTypePath == "/EE/Types/Effects/Landscape")
+		{
+			levelExternal.landscapeIndex = i;
+			break;
+		}
+	}
+}
+
+void
+LevelExtractor::addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, LotusLib::PackagesReader& pkgs)
+{
+	auto landscapeExtractor = Landscape::LandscapeExtractor::getInstance();
+
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc");
+	LotusLib::FileEntry landscapeEntry;
+	try
+	{
+		landscapeEntry = pkg.getFile(bodyInt.landscape.landscapePath);
+	}
+	catch (std::exception& ex)
+	{
+		WarframeExporter::Logger::getInstance().error("Unable to find landscape " + bodyInt.landscape.landscapePath);
+		return;
+	}
+
+	auto extHeader = landscapeExtractor->readHeader(&landscapeEntry.headerData, landscapeEntry.commonHeader);
+    auto chunks = landscapeExtractor->readLandscapeChunks(&landscapeEntry.bData, extHeader, landscapeEntry.commonHeader);
+    auto intLandscape = landscapeExtractor->formatLandscape(extHeader, chunks);
+
+	size_t modelCountPre = gltfDoc.meshes.size();
+	Landscape::LandscapeExporterGltf::addLandscapeChunks(gltfDoc, intLandscape);
+	
+	// Add level-specific attributes to each landscape chunk
+	for (size_t modelIndex = modelCountPre; modelIndex < gltfDoc.meshes.size(); modelIndex++)
+	{
+		for (auto& attribute : bodyInt.landscape.attributes)
+		{
+			gltfDoc.meshes[modelIndex].extensionsAndExtras["extras"][attribute.first] = attribute.second;
+		}
+	}
 }

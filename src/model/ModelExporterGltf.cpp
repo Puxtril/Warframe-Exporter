@@ -2,122 +2,117 @@
 
 using namespace WarframeExporter::Model;
 
-ModelExporterGltf::ModelExporterGltf()
-	: m_logger(Logger::getInstance()), m_document()
-{
-}
-
 void
-ModelExporterGltf::addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
 	if (header.boneTree.size() > 0)
-		addModelDataRigged(header, body);
+		_addModelDataRigged(gltfDoc, header, body);
 	else
-		addModelDataStatic(header, body);
+		_addModelDataStatic(gltfDoc, header, body);
 }
 
 void
-ModelExporterGltf::addModelDataRigged(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::_addModelDataRigged(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
-	modifyAsset();
+	_modifyAsset(gltfDoc);
 
-	Attributes vertsAttrs = addVertexDataRigged(body, header.vertexCount);
-	unsigned int indicesBufViewIndex = addIndexData(body.indices);
-	std::vector<int32_t> meshIndices = createMeshes(header.meshInfos, vertsAttrs, indicesBufViewIndex);
+	Attributes vertsAttrs = _addVertexDataRigged(gltfDoc, body, header.vertexCount);
+	unsigned int indicesBufViewIndex = _addIndexData(gltfDoc, body.indices);
+	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
 
-	int32_t rootBoneNodeIndex = createBones(header.boneTree);
-	int32_t inverseMatricesIndex = addInverseBindMatrices(header.boneTree, header.weightedBones);
-	int32_t skinIndex = createSkin(header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
+	int32_t rootBoneNodeIndex = _createBones(gltfDoc, header.boneTree);
+	int32_t inverseMatricesIndex = _addInverseBindMatrices(gltfDoc, header.boneTree, header.weightedBones);
+	int32_t skinIndex = _createSkin(gltfDoc, header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
 
-	createSceneWithModelNodes(meshIndices, skinIndex);
-	m_document.scenes[0].nodes.push_back(rootBoneNodeIndex);
+	_createSceneWithModelNodes(gltfDoc, meshIndices, skinIndex);
+	gltfDoc.scenes[0].nodes.push_back(rootBoneNodeIndex);
 }
 
 void
-ModelExporterGltf::addModelDataStatic(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::_addModelDataStatic(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
-	modifyAsset();
+	_modifyAsset(gltfDoc);
 
-	Attributes vertsAttrs = addVertexDataStatic(body, header.vertexCount);
-	int32_t indicesBufViewIndex = addIndexData(body.indices);
-	std::vector<int32_t> meshIndices = createMeshes(header.meshInfos, vertsAttrs, indicesBufViewIndex);
+	Attributes vertsAttrs = _addVertexDataStatic(gltfDoc, body, header.vertexCount);
+	int32_t indicesBufViewIndex = _addIndexData(gltfDoc, body.indices);
+	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
 
-	createSceneWithModelNodes(meshIndices, -1);
+	_createSceneWithModelNodes(gltfDoc, meshIndices, -1);
 }
 
 void
-ModelExporterGltf::save(const std::filesystem::path& outPath)
+ModelExporterGltf::save(Document& gltfDoc, const std::filesystem::path& outPath)
 {
 	try
 	{
-		Save(m_document, outPath, true);
+		Save(gltfDoc, outPath, true);
 	}
 	catch (std::exception& ex)
 	{
-		print_exception(ex);
+		_print_exception(ex);
 	}
 }
 
 void
-ModelExporterGltf::print_exception(const std::exception& e, int level)
+ModelExporterGltf::_print_exception(const std::exception& e, int level)
 {
-	m_logger.error(std::string(level, ' ') + e.what());
+	WarframeExporter::Logger::getInstance().error(std::string(level, ' ') + e.what());
 	try {
 		std::rethrow_if_nested(e);
 	}
 	catch (const std::exception& nestedException) {
-		print_exception(nestedException, level + 1);
+		_print_exception(nestedException, level + 1);
 	}
 	catch (...) {}
 }
 
 void
-ModelExporterGltf::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t skinIndex)
+ModelExporterGltf::_createSceneWithModelNodes(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex)
 {
-	if (m_document.scenes.size() == 0)
+	if (gltfDoc.scenes.size() == 0)
 	{
 		Scene scene;
-		m_document.scenes.resize(1);
-		m_document.scene = 0;
+		gltfDoc.scenes.resize(1);
+		gltfDoc.scene = 0;
 	}
-	Scene& scene = m_document.scenes[0];
+	Scene& scene = gltfDoc.scenes[0];
 
 	for (size_t x = 0; x < meshes.size(); x++)
 	{
 		Node curNode;
 		curNode.mesh = meshes[x];
 		curNode.skin = skinIndex;
-		int curNodeIndex = static_cast<int>(m_document.nodes.size());
-		m_document.nodes.push_back(curNode);
+		int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
+		gltfDoc.nodes.push_back(curNode);
 		scene.nodes.push_back(curNodeIndex);
 	}
 }
 
 int32_t
-ModelExporterGltf::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
+ModelExporterGltf::_createBones(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree)
 {
 	int32_t rootIndex = -1;
 	if (boneTree.size() > 0)
-		rootIndex = static_cast<int32_t>(m_document.nodes.size());
+		rootIndex = static_cast<int32_t>(gltfDoc.nodes.size());
 	for (uint16_t x = 0; x < static_cast<uint16_t>(boneTree.size()); x++)
 	{
 		Node boneNode;
 		boneNode.name = boneTree[x].name;
-		findChildrenOfBone(boneTree, x, boneNode.children);
+		_findChildrenOfBone(boneTree, x, boneNode.children);
 
 		std::memcpy(&boneNode.rotation[0], &boneTree[x].rotation[0], sizeof(float) * 4);
 		std::memcpy(&boneNode.translation[0], &boneTree[x].position[0], sizeof(float) * 3);
 
-		m_document.nodes.push_back(boneNode);
+		gltfDoc.nodes.push_back(boneNode);
 	}
 	return rootIndex;
 }
 
 int32_t
-ModelExporterGltf::createSkin(const std::vector<int32_t>& weightedIndices, int totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
+ModelExporterGltf::_createSkin(Document& gltfDoc, const std::vector<int32_t>& weightedIndices, int totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
 {
 	Skin skin;
-	int32_t skinIndex = static_cast<int32_t>(m_document.skins.size());
+	int32_t skinIndex = static_cast<int32_t>(gltfDoc.skins.size());
 	skin.name = skinName;
 	skin.skeleton = rootBoneIndex;
 	std::vector<bool> addedBones(totalBoneCount, false);
@@ -133,20 +128,17 @@ ModelExporterGltf::createSkin(const std::vector<int32_t>& weightedIndices, int t
 	}
 
 	skin.inverseBindMatrices = inverseBindMatricesIndex;
-	m_document.skins.push_back(skin);
+	gltfDoc.skins.push_back(skin);
 	return skinIndex;
 }
 
 int32_t
-ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices)
+ModelExporterGltf::_addInverseBindMatrices(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-	checkAndFixBufferAllignment();
-
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	uint32_t matSize = static_cast<uint32_t>(sizeof(boneTree[0].reverseBind));
 	uint32_t byteLen = static_cast<uint32_t>(boneTree.size()) * matSize;
+	byteLen += (byteLen % 4);
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -171,27 +163,27 @@ ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal
 	}
 
 	BufferView bufView;
-	int32_t bufViewIndex = static_cast<int32_t>(m_document.bufferViews.size());
-	bufView.buffer = 0;
+	int32_t bufViewIndex = static_cast<int32_t>(gltfDoc.bufferViews.size());
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = 0;
-	m_document.bufferViews.push_back(bufView);
+	gltfDoc.bufferViews.push_back(bufView);
 
 	Accessor matAcc;
-	int32_t matAccIndex = static_cast<int32_t>(m_document.accessors.size());
+	int32_t matAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
 	matAcc.bufferView = bufViewIndex;
 	matAcc.byteOffset = 0;
 	matAcc.count = (uint32_t)boneTree.size();
 	matAcc.type = Accessor::Type::Mat4;
 	matAcc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(matAcc);
+	gltfDoc.accessors.push_back(matAcc);
 
 	return matAccIndex;
 }
 
 std::vector<int32_t>
-ModelExporterGltf::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex)
+ModelExporterGltf::_createMeshes(Document& gltfDoc, const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex)
 {
 	Mesh mesh;
 	std::vector<int32_t> meshIndices;
@@ -199,25 +191,25 @@ ModelExporterGltf::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, 
 	for (size_t x = 0; x < meshInfos.size(); x++)
 	{
 		Accessor curAcc;
-		int32_t curAccIndex = static_cast<int32_t>(m_document.accessors.size());
+		int32_t curAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
 		curAcc.bufferView = indicesBuffViewIndex;
 		curAcc.byteOffset = meshInfos[x].faceLODOffsets[0] * 2;
 		curAcc.count = meshInfos[x].faceLODCounts[0];
 		curAcc.type = Accessor::Type::Scalar;
 		curAcc.componentType = Accessor::ComponentType::UnsignedShort;
-		m_document.accessors.push_back(curAcc);
+		gltfDoc.accessors.push_back(curAcc);
 
 		Primitive curPrim;
 		curPrim.indices = curAccIndex;
-		curPrim.material = findOrCreateMaterial(meshInfos[x].matName);
+		curPrim.material = _findOrCreateMaterial(gltfDoc, meshInfos[x].matName);
 		curPrim.mode = Primitive::Mode::Triangles;
 		curPrim.attributes = attrs;
 
 		Mesh curMesh;
-		int32_t curMeshIndex = static_cast<int32_t>(m_document.meshes.size());
+		int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
 		curMesh.name = meshInfos[x].name;
 		curMesh.primitives.push_back(curPrim);
-		m_document.meshes.push_back(curMesh);
+		gltfDoc.meshes.push_back(curMesh);
 		
 		meshIndices.push_back(curMeshIndex);
 	}
@@ -226,25 +218,25 @@ ModelExporterGltf::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, 
 }
 
 int32_t
-ModelExporterGltf::findOrCreateMaterial(const std::string& materialPath)
+ModelExporterGltf::_findOrCreateMaterial(Document& gltfDoc, const std::string& materialPath)
 {
 	std::string materialName = materialPath;
 	size_t lastSlashOffset = materialPath.find_last_of("/");
 	if (lastSlashOffset != std::string::npos)
 		materialName = materialPath.substr(lastSlashOffset + 1);
 
-	for (int32_t x = 0; x < (int32_t)m_document.materials.size(); x++)
+	for (int32_t x = 0; x < (int32_t)gltfDoc.materials.size(); x++)
 	{
-		if (m_document.materials[x].name.compare(materialName) == 0)
+		if (gltfDoc.materials[x].name.compare(materialName) == 0)
 			return x;
 	}
 	
-	int32_t matIndex = static_cast<int32_t>(m_document.materials.size());
+	int32_t matIndex = static_cast<int32_t>(gltfDoc.materials.size());
 	Material mat;
 	mat.name = materialName;
 	mat.doubleSided = true;
 	mat.extensionsAndExtras["extras"]["FullPath"] = materialPath;
-	m_document.materials.push_back(mat);
+	gltfDoc.materials.push_back(mat);
 
 	return matIndex;
 }
@@ -252,15 +244,13 @@ ModelExporterGltf::findOrCreateMaterial(const std::string& materialPath)
 // Color must be in the format VEC4
 // https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
 Attributes
-ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCount)
+ModelExporterGltf::_addVertexDataRigged(Document& gltfDoc, const ModelBodyInternal& body, int vertCount)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	// 1 colorLen is already factored into this vertex size
 	// Add the other 2
 	uint32_t byteLen = vertCount * body.vertexSizeRigged();
+	byteLen += (byteLen % 4);
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -287,81 +277,81 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 	}
 	
 	BufferView bufView;
-	int32_t bufViewIndex = static_cast<int32_t>(m_document.bufferViews.size());
-	bufView.buffer = 0;
+	int32_t bufViewIndex = static_cast<int32_t>(gltfDoc.bufferViews.size());
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = body.vertexSizeRigged();
 	bufView.target = BufferView::TargetType::ArrayBuffer;
-	m_document.bufferViews.push_back(bufView);
+	gltfDoc.bufferViews.push_back(bufView);
 	
 	uint32_t curByteOffset = 0;
 
 	Accessor posAcc;
-	int32_t posAccIndex = static_cast<int32_t>(m_document.accessors.size());
+	int32_t posAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
 	posAcc.bufferView = bufViewIndex;
 	posAcc.byteOffset = curByteOffset;
 	posAcc.count = vertCount;
 	posAcc.type = Accessor::Type::Vec3;
 	posAcc.componentType = Accessor::ComponentType::Float;
-	posAcc.max = findMaxVec3(body.positions);
-	posAcc.min = findMinVec3(body.positions);
-	m_document.accessors.push_back(posAcc);
+	posAcc.max = _findMaxVec3(body.positions);
+	posAcc.min = _findMinVec3(body.positions);
+	gltfDoc.accessors.push_back(posAcc);
 	curByteOffset += ModelBodyInternal::positionLen;
 	
 	Accessor uv1Acc;
-	int32_t uv1AccIndex = (int32_t)m_document.accessors.size();
+	int32_t uv1AccIndex = (int32_t)gltfDoc.accessors.size();
 	uv1Acc.bufferView = bufViewIndex;
 	uv1Acc.byteOffset = curByteOffset;
 	uv1Acc.count = vertCount;
 	uv1Acc.type = Accessor::Type::Vec2;
 	uv1Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv1Acc);
+	gltfDoc.accessors.push_back(uv1Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	Accessor uv2Acc;
-	int32_t uv2AccIndex = (int32_t)m_document.accessors.size();
+	int32_t uv2AccIndex = (int32_t)gltfDoc.accessors.size();
 	uv2Acc.bufferView = bufViewIndex;
 	uv2Acc.byteOffset = curByteOffset;
 	uv2Acc.count = vertCount;
 	uv2Acc.type = Accessor::Type::Vec2;
 	uv2Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv2Acc);
+	gltfDoc.accessors.push_back(uv2Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	std::vector<int32_t> vertexColAccIndices;
 	for (size_t x = 0; x < body.colors.size(); x++)
 	{
 		Accessor colAcc;
-		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
+		vertexColAccIndices.push_back((int32_t)gltfDoc.accessors.size());
 		colAcc.bufferView = bufViewIndex;
 		colAcc.byteOffset = curByteOffset;
 		colAcc.count = vertCount;
 		colAcc.type = Accessor::Type::Vec4;
 		colAcc.componentType = Accessor::ComponentType::UnsignedByte;
 		colAcc.normalized = true;
-		m_document.accessors.push_back(colAcc);
+		gltfDoc.accessors.push_back(colAcc);
 		curByteOffset += ModelBodyInternal::colorLen;
 	}
 
 	Accessor boneIndexAcc;
-	int32_t boneIndexAccIndex = (int32_t)m_document.accessors.size();
+	int32_t boneIndexAccIndex = (int32_t)gltfDoc.accessors.size();
 	boneIndexAcc.bufferView = bufViewIndex;
 	boneIndexAcc.byteOffset = curByteOffset;
 	boneIndexAcc.count = vertCount;
 	boneIndexAcc.type = Accessor::Type::Vec4;
 	boneIndexAcc.componentType = Accessor::ComponentType::UnsignedShort;
-	m_document.accessors.push_back(boneIndexAcc);
+	gltfDoc.accessors.push_back(boneIndexAcc);
 	curByteOffset += ModelBodyInternal::boneIndexLen;
 
 	Accessor boneWeightAcc;
-	int32_t boneWeightAccIndex = (int32_t)m_document.accessors.size();
+	int32_t boneWeightAccIndex = (int32_t)gltfDoc.accessors.size();
 	boneWeightAcc.bufferView = bufViewIndex;
 	boneWeightAcc.byteOffset = curByteOffset;
 	boneWeightAcc.count = vertCount;
 	boneWeightAcc.type = Accessor::Type::Vec4;
 	boneWeightAcc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(boneWeightAcc);
+	gltfDoc.accessors.push_back(boneWeightAcc);
 
 	Attributes attrs;
 	attrs["POSITION"] = posAccIndex;
@@ -378,12 +368,9 @@ ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCo
 // Color must be in the format VEC4
 // https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
 Attributes
-ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCount)
+ModelExporterGltf::_addVertexDataStatic(Document& gltfDoc, const ModelBodyInternal& body, int vertCount)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	uint32_t byteLen = vertCount * body.vertexSizeStatic();
 	uint32_t startOffset = buf.byteLength;
 
@@ -407,60 +394,60 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 	}
 
 	BufferView bufView;
-	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
-	bufView.buffer = 0;
+	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = body.vertexSizeStatic();
 	bufView.target = BufferView::TargetType::ArrayBuffer;
-	m_document.bufferViews.push_back(bufView);
+	gltfDoc.bufferViews.push_back(bufView);
 
 	uint32_t curByteOffset = 0;
 
 	Accessor posAcc;
-	int32_t posAccIndex = (int32_t)m_document.accessors.size();
+	int32_t posAccIndex = (int32_t)gltfDoc.accessors.size();
 	posAcc.bufferView = bufViewIndex;
 	posAcc.byteOffset = curByteOffset;
 	posAcc.count = vertCount;
 	posAcc.type = Accessor::Type::Vec3;
 	posAcc.componentType = Accessor::ComponentType::Float;
-	posAcc.max = findMaxVec3(body.positions);
-	posAcc.min = findMinVec3(body.positions);
-	m_document.accessors.push_back(posAcc);
+	posAcc.max = _findMaxVec3(body.positions);
+	posAcc.min = _findMinVec3(body.positions);
+	gltfDoc.accessors.push_back(posAcc);
 	curByteOffset += ModelBodyInternal::positionLen;
 	
 	Accessor uv1Acc;
-	int32_t uv1AccIndex = (int32_t)m_document.accessors.size();
+	int32_t uv1AccIndex = (int32_t)gltfDoc.accessors.size();
 	uv1Acc.bufferView = bufViewIndex;
 	uv1Acc.byteOffset = curByteOffset;
 	uv1Acc.count = vertCount;
 	uv1Acc.type = Accessor::Type::Vec2;
 	uv1Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv1Acc);
+	gltfDoc.accessors.push_back(uv1Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	Accessor uv2Acc;
-	int32_t uv2AccIndex = (int32_t)m_document.accessors.size();
+	int32_t uv2AccIndex = (int32_t)gltfDoc.accessors.size();
 	uv2Acc.bufferView = bufViewIndex;
 	uv2Acc.byteOffset = curByteOffset;
 	uv2Acc.count = vertCount;
 	uv2Acc.type = Accessor::Type::Vec2;
 	uv2Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv2Acc);
+	gltfDoc.accessors.push_back(uv2Acc);
 	curByteOffset += ModelBodyInternal::UVLen;
 
 	std::vector<int32_t> vertexColAccIndices;
 	for (size_t x = 0; x < body.colors.size(); x++)
 	{
 		Accessor colAcc;
-		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
+		vertexColAccIndices.push_back((int32_t)gltfDoc.accessors.size());
 		colAcc.bufferView = bufViewIndex;
 		colAcc.byteOffset = curByteOffset;
 		colAcc.count = vertCount;
 		colAcc.type = Accessor::Type::Vec4;
 		colAcc.componentType = Accessor::ComponentType::UnsignedByte;
 		colAcc.normalized = true;
-		m_document.accessors.push_back(colAcc);
+		gltfDoc.accessors.push_back(colAcc);
 		curByteOffset += ModelBodyInternal::colorLen;
 	}
 
@@ -475,53 +462,40 @@ ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCo
 }
 
 int32_t
-ModelExporterGltf::addIndexData(const std::vector<uint16_t>& body)
+ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-	
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 
-	uint32_t byteLen = (uint32_t)body.size() * (uint32_t)sizeof(body[0]);
+	uint32_t indexSize = (uint32_t)body.size() * (uint32_t)sizeof(body[0]);
+	uint32_t byteLen = indexSize + (indexSize % 4);
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
-	std::memcpy(&buf.data[startOffset], body.data(), byteLen);
+	std::memcpy(&buf.data[startOffset], body.data(), indexSize);
 	buf.byteLength += byteLen;
 
 	BufferView bufView;
-	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
-	bufView.buffer = 0;
+	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.target = BufferView::TargetType::ElementArrayBuffer;
-	m_document.bufferViews.push_back(bufView);
+	gltfDoc.bufferViews.push_back(bufView);
 
 	return bufViewIndex;
 }
 
 void
-ModelExporterGltf::modifyAsset()
+ModelExporterGltf::_modifyAsset(Document& gltfDoc)
 {
-	m_document.asset.generator = m_generatorName;
-	m_document.asset.copyright = m_copyright;
+	gltfDoc.asset.generator = m_generatorName;
+	gltfDoc.asset.copyright = m_copyright;
 }
 
 void
-ModelExporterGltf::createBuffer()
+ModelExporterGltf::_checkAndFixBufferAllignment(Document& gltfDoc)
 {
-	assert(m_document.buffers.size() == 0);
-
-	Buffer newBuf;
-	newBuf.name = "Model Data";
-	newBuf.byteLength = 0;
-	m_document.buffers.push_back(newBuf);
-}
-
-void
-ModelExporterGltf::checkAndFixBufferAllignment()
-{
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	int mod = buf.byteLength % 4;
 	if (mod != 0)
 	{
@@ -530,8 +504,22 @@ ModelExporterGltf::checkAndFixBufferAllignment()
 	}
 }
 
+Buffer&
+ModelExporterGltf::_getBuffer(Document& gltfDoc)
+{
+	if (gltfDoc.buffers.size() == 0)
+	{
+		Buffer newBuf;
+		newBuf.name = "Model Data 1";
+		newBuf.byteLength = 0;
+		gltfDoc.buffers.push_back(newBuf);
+	}
+
+	return gltfDoc.buffers.back();
+}
+
 std::vector<float>
-ModelExporterGltf::findMaxVec3(const std::vector<glm::vec3>& body)
+ModelExporterGltf::_findMaxVec3(const std::vector<glm::vec3>& body)
 {
 	std::vector<float> max = { -100.0F, -100.0F, -100.0F };
 	for (size_t x = 0; x < body.size(); x++)
@@ -547,7 +535,7 @@ ModelExporterGltf::findMaxVec3(const std::vector<glm::vec3>& body)
 }
 
 std::vector<float>
-ModelExporterGltf::findMinVec3(const std::vector<glm::vec3>& body)
+ModelExporterGltf::_findMinVec3(const std::vector<glm::vec3>& body)
 {
 	std::vector<float> min = { 100.0F, 100.0F, 100.0F };
 	for (size_t x = 0; x < body.size(); x++)
@@ -563,7 +551,7 @@ ModelExporterGltf::findMinVec3(const std::vector<glm::vec3>& body)
 }
 
 void
-ModelExporterGltf::findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree, uint16_t boneIndex, std::vector<int32_t>& out)
+ModelExporterGltf::_findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree, uint16_t boneIndex, std::vector<int32_t>& out)
 {
 	for (uint16_t x = 0; x < boneTree.size(); x++)
 	{

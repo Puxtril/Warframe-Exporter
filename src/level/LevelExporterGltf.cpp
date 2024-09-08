@@ -3,41 +3,41 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelExporterGltf::addModelData(const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& body, const LevelObjectInternal& levelObj)
+LevelExporterGltf::addModelData(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& body, const LevelObjectInternal& levelObj)
 {
-	int32_t nodeCountInit = static_cast<int32_t>(m_document.nodes.size());
-	ModelExporterGltf::addModelData(header, body);
-	int32_t nodeCountAfter = static_cast<int32_t>(m_document.nodes.size());
+	int32_t nodeCountInit = static_cast<int32_t>(gltfDoc.nodes.size());
+	Model::ModelExporterGltf::addModelData(gltfDoc, header, body);
+	int32_t nodeCountAfter = static_cast<int32_t>(gltfDoc.nodes.size());
 
-	std::vector<int32_t> meshNodeIndices = getMeshNodeIndices(nodeCountInit, nodeCountAfter);
-	addLevelInformation(levelObj, meshNodeIndices);
+	std::vector<int32_t> meshNodeIndices = _getMeshNodeIndices(gltfDoc, nodeCountInit, nodeCountAfter);
+	_addLevelInformation(gltfDoc, levelObj, meshNodeIndices);
 }
 
 void
-LevelExporterGltf::addLevelInformation(const LevelObjectInternal& levelObj, std::vector<int32_t> meshIndices)
+LevelExporterGltf::_addLevelInformation(Document& gltfDoc, const LevelObjectInternal& levelObj, std::vector<int32_t> meshIndices)
 {
 	for (size_t x = 0; x < meshIndices.size(); x++)
 	{
 		int32_t meshIndex = meshIndices[x];
-		Node& curNode = m_document.nodes[meshIndex];
+		Node& curNode = gltfDoc.nodes[meshIndex];
 
 		curNode.translation = std::array<float, 3>{levelObj.pos.x, levelObj.pos.y, levelObj.pos.z};
 
-		Mesh& curMesh = m_document.meshes[curNode.mesh];
+		Mesh& curMesh = gltfDoc.meshes[curNode.mesh];
 		curMesh.extensionsAndExtras["extras"]["MeshPath"] = levelObj.meshPath;
 		curMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
-		for (const auto& x : levelObj.attributes)
-			curMesh.extensionsAndExtras["extras"][std::get<0>(x)] = std::get<1>(x);
+		for (const auto& x : levelObj.attributes.items())
+			curMesh.extensionsAndExtras["extras"][x.key()] = x.value();
 	}
 }
 
 std::vector<int32_t>
-LevelExporterGltf::getMeshNodeIndices(int32_t startIndex, int32_t endIndex)
+LevelExporterGltf::_getMeshNodeIndices(Document& gltfDoc, int32_t startIndex, int32_t endIndex)
 {
 	std::vector<int32_t> indices;
 	for (int32_t x = startIndex; x < endIndex; x++)
 	{
-		if (m_document.nodes[x].mesh != -1)
+		if (gltfDoc.nodes[x].mesh != -1)
 			indices.push_back(x);
 	}
 	return indices;

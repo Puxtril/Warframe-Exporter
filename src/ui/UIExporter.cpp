@@ -90,7 +90,8 @@ UiExporter::getPackageNames(LotusLib::PackagesReader& packages, WarframeExporter
     std::vector<std::string> pkgNames;
     if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 ||
         ((int)extractTypes & (int)WarframeExporter::ExtractorType::Material) > 0 ||
-        ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0)
+        ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0 || 
+        ((int)extractTypes & (int)WarframeExporter::ExtractorType::Landscape) > 0)
     {
         pkgNames.push_back("Misc");
         pkgNames.push_back("Misc_xx");

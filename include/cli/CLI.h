@@ -46,5 +46,4 @@ int main(int argc, char** argv);
 
 void checkDirs(const std::filesystem::path& cacheDir);
 LotusLib::LotusPath forgiveLotusPath(LotusLib::LotusPath inPath);
-bool checkIfDoubleClicked();
 void createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath);

@@ -16,6 +16,7 @@
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
 #include "ui/preview/PreviewManager.h"
+#include "ui/MetadataPreview.h"
 
 #include "ui/UILoading.h"
 
@@ -34,7 +35,9 @@ class UiExporter : public QObject, private Ui_MainWindow
     std::vector<std::string> m_exportPkgNames;
     ExporterDirectoryThread m_exporterDirectoryThread;
     ExporterFileThread m_exporterFileThread;
+
     PreviewManager m_previewManager;
+    MetdataPreview m_metadataPreview;
 
     LoadTreeThread m_loadTreeThread;
     QDialog m_loadingDialog;

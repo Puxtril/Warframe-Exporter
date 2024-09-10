@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExporterAOWjlh.ui'
+** Form generated from reading UI file 'ExportertFVWWe.ui'
 **
-** Created by: Qt User Interface Compiler version 6.6.2
+** Created by: Qt User Interface Compiler version 6.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTERAOWJLH_H
-#define EXPORTERAOWJLH_H
+#ifndef EXPORTERTFVWWE_H
+#define EXPORTERTFVWWE_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -47,6 +47,8 @@ public:
     QTabWidget *tabWidget;
     QWidget *Preview;
     QVBoxLayout *verticalLayout_3;
+    QWidget *Metadata;
+    QVBoxLayout *verticalLayout;
     QWidget *PreviewButtonsArea;
     QHBoxLayout *horizontalLayout_5;
     QStatusBar *statusbar;
@@ -67,7 +69,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(splitter->sizePolicy().hasHeightForWidth());
         splitter->setSizePolicy(sizePolicy);
-        splitter->setOrientation(Qt::Horizontal);
+        splitter->setOrientation(Qt::Orientation::Horizontal);
         layoutWidget = new QWidget(splitter);
         layoutWidget->setObjectName("layoutWidget");
         horizontalLayout = new QHBoxLayout(layoutWidget);
@@ -84,8 +86,8 @@ public:
         horizontalLayout_3->setObjectName("horizontalLayout_3");
         frame = new QFrame(layoutWidget);
         frame->setObjectName("frame");
-        frame->setFrameShape(QFrame::NoFrame);
-        frame->setFrameShadow(QFrame::Raised);
+        frame->setFrameShape(QFrame::Shape::NoFrame);
+        frame->setFrameShadow(QFrame::Shadow::Raised);
         horizontalLayout_2 = new QHBoxLayout(frame);
         horizontalLayout_2->setObjectName("horizontalLayout_2");
         horizontalLayout_2->setContentsMargins(-1, -1, 0, -1);
@@ -132,6 +134,11 @@ public:
         verticalLayout_3 = new QVBoxLayout(Preview);
         verticalLayout_3->setObjectName("verticalLayout_3");
         tabWidget->addTab(Preview, QString());
+        Metadata = new QWidget();
+        Metadata->setObjectName("Metadata");
+        verticalLayout = new QVBoxLayout(Metadata);
+        verticalLayout->setObjectName("verticalLayout");
+        tabWidget->addTab(Metadata, QString());
 
         verticalLayout_4->addWidget(tabWidget);
 
@@ -180,6 +187,7 @@ public:
 #endif // QT_CONFIG(shortcut)
         ExtractProgressBar->setFormat(QCoreApplication::translate("MainWindow", "%p%", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(Preview), QCoreApplication::translate("MainWindow", "Preview", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(Metadata), QCoreApplication::translate("MainWindow", "Metadata", nullptr));
     } // retranslateUi
 
 };
@@ -190,4 +198,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTERAOWJLH_H
+#endif // EXPORTERTFVWWE_H

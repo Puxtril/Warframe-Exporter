@@ -15,6 +15,7 @@ UiExporter::setup(UiMainWindow *MainWindow)
     Ui_MainWindow::setupUi(MainWindow);
     connect(this->treeWidget, &QTreeWidget::itemSelectionChanged, this, &UiExporter::itemChanged);
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
+    connect(this->tabWidget, &QTabWidget::currentChanged, this, &UiExporter::itemChanged);
 
     loadGeometry();
     connect(MainWindow, &UiMainWindow::mainWindowClose, this, &UiExporter::aboutToClose);
@@ -38,6 +39,7 @@ UiExporter::setup(UiMainWindow *MainWindow)
     connect(&m_exporterFileThread, &ExporterFileThread::extractComplete, this, &UiExporter::extractComplete);
 
     m_previewManager.setupUis(this->Preview, this->verticalLayout_3, this->PreviewButtonsArea, this->horizontalLayout_5);
+    m_metadataPreview.setupUis(this->Metadata, this->verticalLayout);
 }
 
 void
@@ -61,13 +63,22 @@ void
 UiExporter::clearPreview()
 {
     m_previewManager.clearPreview();
+    m_metadataPreview.clearPreview();
 }
 
 void
 UiExporter::setPreview(TreeItemFile* file)
-{ 
-    LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).getFile(file->getQFullpath().toStdString());
-    m_previewManager.swapToFilePreview(fileEntry);
+{
+    if (this->tabWidget->currentWidget() == this->Preview)
+    {
+        LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).getFile(file->getQFullpath().toStdString());
+        m_previewManager.swapToFilePreview(fileEntry);
+    }
+    else if (this->tabWidget->currentWidget() == this->Metadata)
+    {
+        m_metadataPreview.clearPreview();
+        m_metadataPreview.setData(&m_packages, file->getPkg(), file->getQFullpath().toStdString());
+    }
 }
 
 void

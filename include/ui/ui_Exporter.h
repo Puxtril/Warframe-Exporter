@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'ExportertFVWWe.ui'
+** Form generated from reading UI file 'ExporterUELiox.ui'
 **
 ** Created by: Qt User Interface Compiler version 6.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef EXPORTERTFVWWE_H
-#define EXPORTERTFVWWE_H
+#ifndef EXPORTERUELIOX_H
+#define EXPORTERUELIOX_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -49,6 +49,8 @@ public:
     QVBoxLayout *verticalLayout_3;
     QWidget *Metadata;
     QVBoxLayout *verticalLayout;
+    QWidget *Format;
+    QVBoxLayout *verticalLayout_6;
     QWidget *PreviewButtonsArea;
     QHBoxLayout *horizontalLayout_5;
     QStatusBar *statusbar;
@@ -57,7 +59,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(649, 562);
+        MainWindow->resize(699, 562);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout_5 = new QVBoxLayout(centralwidget);
@@ -139,6 +141,11 @@ public:
         verticalLayout = new QVBoxLayout(Metadata);
         verticalLayout->setObjectName("verticalLayout");
         tabWidget->addTab(Metadata, QString());
+        Format = new QWidget();
+        Format->setObjectName("Format");
+        verticalLayout_6 = new QVBoxLayout(Format);
+        verticalLayout_6->setObjectName("verticalLayout_6");
+        tabWidget->addTab(Format, QString());
 
         verticalLayout_4->addWidget(tabWidget);
 
@@ -188,6 +195,7 @@ public:
         ExtractProgressBar->setFormat(QCoreApplication::translate("MainWindow", "%p%", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(Preview), QCoreApplication::translate("MainWindow", "Preview", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(Metadata), QCoreApplication::translate("MainWindow", "Metadata", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(Format), QCoreApplication::translate("MainWindow", "Format", nullptr));
     } // retranslateUi
 
 };
@@ -198,4 +206,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // EXPORTERTFVWWE_H
+#endif // EXPORTERUELIOX_H

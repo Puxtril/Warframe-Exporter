@@ -40,6 +40,7 @@ UiExporter::setup(UiMainWindow *MainWindow)
 
     m_previewManager.setupUis(this->Preview, this->verticalLayout_3, this->PreviewButtonsArea, this->horizontalLayout_5);
     m_metadataPreview.setupUis(this->Metadata, this->verticalLayout);
+    m_formatPreview.setupUis(this->Format, this->verticalLayout_6);
 }
 
 void
@@ -64,6 +65,7 @@ UiExporter::clearPreview()
 {
     m_previewManager.clearPreview();
     m_metadataPreview.clearPreview();
+    m_formatPreview.clearPreview();
 }
 
 void
@@ -78,6 +80,11 @@ UiExporter::setPreview(TreeItemFile* file)
     {
         m_metadataPreview.clearPreview();
         m_metadataPreview.setData(&m_packages, file->getPkg(), file->getQFullpath().toStdString());
+    }
+    else if (this->tabWidget->currentWidget() == this->Format)
+    {
+        m_formatPreview.clearPreview();
+        m_formatPreview.setData(&m_packages, file->getPkg(), file->getQFullpath().toStdString());
     }
 }
 

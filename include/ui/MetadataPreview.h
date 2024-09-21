@@ -4,8 +4,8 @@
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QLabel>
 
+#include "LotusLib.h"
 #include "EnumMapExtractor.h"
-#include "Extractor.h"
 
 class MetdataPreview
 {

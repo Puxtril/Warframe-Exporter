@@ -17,6 +17,7 @@
 #include "ui/TreeItemSubtypes.h"
 #include "ui/preview/PreviewManager.h"
 #include "ui/MetadataPreview.h"
+#include "ui/FormatPreview1.h"
 
 #include "ui/UILoading.h"
 
@@ -38,6 +39,7 @@ class UiExporter : public QObject, private Ui_MainWindow
 
     PreviewManager m_previewManager;
     MetdataPreview m_metadataPreview;
+    FormatPreview m_formatPreview;
 
     LoadTreeThread m_loadTreeThread;
     QDialog m_loadingDialog;

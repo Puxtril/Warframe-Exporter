@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
+    <width>699</width>
     <height>562</height>
    </rect>
   </property>
@@ -120,6 +120,12 @@
               <string>Metadata</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout"/>
+            </widget>
+            <widget class="QWidget" name="Format">
+             <attribute name="title">
+              <string>Format</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_6"/>
             </widget>
            </widget>
           </item>

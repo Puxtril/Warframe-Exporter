@@ -10,8 +10,6 @@ BatchIterator::BatchIterator()
 void
 BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types)
 {
-	this->validatePackages(pkgsDir, packages);
-
 	for (const std::string& curPackageName : packages)
 	{
 		std::optional<LotusLib::PackageReader> curPkg = pkgsDir.getPackage(curPackageName);
@@ -62,21 +60,70 @@ BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallenin
 	}
 }
 
-void
-BatchIterator::validatePackages(LotusLib::PackagesReader& pkgsDir, const std::vector<std::string>& packages)
+std::vector<std::string>
+BatchIterator::getPackageNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath)
 {
-	for (auto& curPkgStr : packages)
+	LotusLib::PackagesReader pkgs(cacheDirPath);
+	std::vector<std::string> pkgNames;
+	if ((int)types & (int)WarframeExporter::ExtractorType::Texture)
 	{
-		try
+		if (pkgs.getPackage("Texture"))
 		{
-			pkgsDir.getPackage(curPkgStr);
+			pkgNames.push_back("Texture");
 		}
-		catch (std::exception&)
+		else
 		{
-			m_logger.error("Package does not exist: " + curPkgStr);
-			throw std::runtime_error("Package does not exist: " + curPkgStr);
+			pkgNames.push_back("TextureDx9");
+		}
+
+		if (pkgs.getPackage("LightMap"))
+			pkgNames.push_back("LightMap");
+	}
+
+	if ((int)types & (int)WarframeExporter::ExtractorType::Level)
+	{
+		pkgNames.push_back("AnimRetarget");
+	}
+
+	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
+		(int)types & (int)WarframeExporter::ExtractorType::Material ||
+		(int)types & (int)WarframeExporter::ExtractorType::Audio)
+	{
+		if (pkgs.getPackage("Misc_xx"))
+		{
+			pkgNames.push_back("Misc");
+			pkgNames.push_back("Misc_xx");
 		}
 	}
+	
+	if ((int)types & (int)WarframeExporter::ExtractorType::Shader)
+	{
+		if (pkgs.getPackage("ShaderDx9"))
+		{
+			pkgNames.push_back("ShaderDx9");
+			pkgNames.push_back("ShaderPermutationDx9");
+		}
+
+		if (pkgs.getPackage("ShaderDx10"))
+		{
+			pkgNames.push_back("ShaderDx10");
+			pkgNames.push_back("ShaderPermutationDx10");
+		}
+		
+		if (pkgs.getPackage("ShaderDx11"))
+		{
+			pkgNames.push_back("ShaderDx11");
+			pkgNames.push_back("ShaderPermutationDx11");
+		}
+
+		if (pkgs.getPackage("ShaderDx12"))
+		{
+			pkgNames.push_back("ShaderDx12");
+			pkgNames.push_back("ShaderPermutationDx12");
+		}
+	}
+
+	return pkgNames;
 }
 
 bool

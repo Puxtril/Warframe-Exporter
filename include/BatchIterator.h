@@ -25,6 +25,7 @@ namespace WarframeExporter
 		BatchIterator();
 
 		void batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types);
+		static std::vector<std::string> getPackageNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath);
 
 	protected:
 		// fileEntry will only contain the Common Header and H package header
@@ -52,7 +53,6 @@ namespace WarframeExporter
 			const Extractor* extractor
 		) = 0;
 
-		void validatePackages(LotusLib::PackagesReader& pkgsDir, const std::vector<std::string>& packages);
 		bool pkgHasDir(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& path);
 	};
 }

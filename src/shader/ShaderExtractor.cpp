@@ -78,20 +78,10 @@ void
 ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputDir)
 {
     ShaderHeaderExternal externalHeader = getHeader(fileEntry);
-    
-    LotusLib::FileEntry fullFileEntry;
-    try
-    {
-        fullFileEntry = pkgs.getPackage("ShaderPermutationDx11").getFile(fileEntry.metadata->getFullPath());
-    }
-    catch (std::exception&)
-    {
-        fullFileEntry = pkgs.getPackage("ShaderDx11").getFile(fileEntry.metadata->getFullPath());
-    }
-    
-    ShaderReader* shaderReader = g_enumMapShader[fullFileEntry.commonHeader.type];
+        
+    ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
 
-    std::vector<ShaderEntry> bodyEntries = readAllEntries(shaderReader, &fullFileEntry.bData, externalHeader);
+    std::vector<ShaderEntry> bodyEntries = readAllEntries(shaderReader, &fileEntry.bData, externalHeader);
 
     for (int iShader = 0; iShader < bodyEntries.size(); iShader++)
     {

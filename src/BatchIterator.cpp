@@ -14,16 +14,24 @@ BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallenin
 
 	for (const std::string& curPackageName : packages)
 	{
-		LotusLib::PackageReader curPkg = pkgsDir.getPackage(curPackageName);
-		
-		if (!pkgHasDir(curPkg, basePath))
+		std::optional<LotusLib::PackageReader> curPkg = pkgsDir.getPackage(curPackageName);
+		if (!curPkg)
+		{
+			m_logger.warn("Package doesn't exist: " + curPackageName);
 			continue;
+		}
+		
+		if (!pkgHasDir(*curPkg, basePath))
+		{
+			m_logger.warn("Folder doesn't exist inside " + curPackageName + ": " + basePath.string());
+			continue;
+		}
 
-		for (auto iter = curPkg.getIter(basePath); iter != curPkg.getIter(); iter++)
+		for (auto iter = curPkg->getIter(basePath); iter != curPkg->getIter(); iter++)
 		{
 			try
 			{
-				LotusLib::FileEntry curEntry = curPkg.getFile((*iter), LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
+				LotusLib::FileEntry curEntry = curPkg->getFile((*iter), LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
 
 				Extractor* extractor = g_enumMapExtractor[curEntry.commonHeader.type];
 

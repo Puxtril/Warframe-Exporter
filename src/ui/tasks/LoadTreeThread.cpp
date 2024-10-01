@@ -40,7 +40,10 @@ LoadTreeThread::setupTree()
     for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
         std::string& curPkgName = m_exportPkgNames[iPkg];
-        const LotusLib::FileEntries::DirNode* curEntry = m_pkgs->getPackage(curPkgName).getDirNode("/");
+        if (!m_pkgs->getPackage(curPkgName))
+            continue;
+
+        const LotusLib::FileEntries::DirNode* curEntry = m_pkgs->getPackage(curPkgName).value().getDirNode("/");
 
         // Purposefully commented out because these clutter the root directory
         // Misc package has lots of root files that can't be extracted
@@ -72,7 +75,10 @@ LoadTreeThread::setupTree()
         for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
             const std::string& curPkgName = m_exportPkgNames[iPkg];
-            const LotusLib::FileEntries::DirNode* curEntry = m_pkgs->getPackage(curPkgName).getDirNode("/")->getChildDir(curDirName);
+            if (!m_pkgs->getPackage(curPkgName))
+                continue;
+
+            const LotusLib::FileEntries::DirNode* curEntry = m_pkgs->getPackage(curPkgName).value().getDirNode("/")->getChildDir(curDirName);
 
             // Ensure relation in pkgNames and curEntries
             if (curEntry == nullptr)
@@ -136,7 +142,7 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
             {   
                 try
                 {
-                    int format = m_pkgs->getPackage(m_exportPkgNames[iPkg]).getFileFormat(curNode);
+                    int format = m_pkgs->getPackage(m_exportPkgNames[iPkg]).value().getFileFormat(curNode);
                     WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[format];
                     if (extractor == nullptr)
                         continue;

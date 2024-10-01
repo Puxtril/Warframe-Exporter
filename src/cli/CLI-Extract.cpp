@@ -154,16 +154,17 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 	std::vector<std::string> pkgNames;
 	if ((int)types & (int)WarframeExporter::ExtractorType::Texture)
 	{
-		try
+		if (pkgs.getPackage("Texture"))
 		{
-			pkgs.getPackage("Texture");
 			pkgNames.push_back("Texture");
-			pkgNames.push_back("LightMap");
 		}
-		catch (LotusLib::LotusException&)
+		else
 		{
 			pkgNames.push_back("TextureDx9");
 		}
+
+		if (pkgs.getPackage("LightMap"))
+			pkgNames.push_back("LightMap");
 	}
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Level)
@@ -173,25 +174,40 @@ CLIExtract::getPkgsNames(WarframeExporter::ExtractorType types, const std::files
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Model ||
 		(int)types & (int)WarframeExporter::ExtractorType::Material ||
-		(int)types & (int)WarframeExporter::ExtractorType::Audio || 
-		(int)types & (int)WarframeExporter::ExtractorType::Landscape)
+		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
-		pkgNames.push_back("Misc");
-		pkgNames.push_back("Misc_xx");
+		if (pkgs.getPackage("Misc_xx"))
+		{
+			pkgNames.push_back("Misc");
+			pkgNames.push_back("Misc_xx");
+		}
 	}
 	
 	if ((int)types & (int)WarframeExporter::ExtractorType::Shader)
 	{
-		pkgNames.push_back("ShaderDx11");
-		pkgNames.push_back("ShaderPermutationDx11");
-		
-		try
+		if (pkgs.getPackage("ShaderDx9"))
 		{
-			pkgs.getPackage("ShaderDx12");
+			pkgNames.push_back("ShaderDx9");
+			pkgNames.push_back("ShaderPermutationDx9");
+		}
+
+		if (pkgs.getPackage("ShaderDx10"))
+		{
+			pkgNames.push_back("ShaderDx10");
+			pkgNames.push_back("ShaderPermutationDx10");
+		}
+		
+		if (pkgs.getPackage("ShaderDx11"))
+		{
+			pkgNames.push_back("ShaderDx11");
+			pkgNames.push_back("ShaderPermutationDx11");
+		}
+
+		if (pkgs.getPackage("ShaderDx12"))
+		{
 			pkgNames.push_back("ShaderDx12");
 			pkgNames.push_back("ShaderPermutationDx12");
 		}
-		catch (LotusLib::LotusException&) { }
 	}
 
 	return pkgNames;

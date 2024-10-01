@@ -21,8 +21,11 @@ UILoading::getTotalFileCount(LotusLib::PackagesReader& pkgs, std::vector<std::st
 
     for (const std::string& curPkg : exportPkgNames)
     {
-        auto iter = pkgs.getPackage(curPkg).begin();
-        while (iter++ != pkgs.getPackage(curPkg).end())
+        std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(curPkg);
+        if (!pkg)
+            continue;
+        auto iter = pkg.value().begin();
+        while (iter++ != pkg.value().end())
             fileCount++;
     }
 

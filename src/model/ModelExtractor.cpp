@@ -54,7 +54,7 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 		throw unknown_format_error("Mesh has zero MeshInfos");
 
 	auto pkg = pkgs.getPackage("Misc");
-	auto vertexColors = getVertexColors(fileEntry.internalPath, pkg);
+	auto vertexColors = getVertexColors(fileEntry.internalPath, pkg.value());
 
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;

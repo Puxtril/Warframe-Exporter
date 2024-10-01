@@ -73,7 +73,7 @@ UiExporter::setPreview(TreeItemFile* file)
 {
     if (this->tabWidget->currentWidget() == this->Preview)
     {
-        LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).getFile(file->getQFullpath().toStdString());
+        LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).value().getFile(file->getQFullpath().toStdString());
         m_previewManager.swapToFilePreview(fileEntry);
     }
     else if (this->tabWidget->currentWidget() == this->Metadata)
@@ -106,41 +106,65 @@ std::vector<std::string>
 UiExporter::getPackageNames(LotusLib::PackagesReader& packages, WarframeExporter::ExtractorType extractTypes)
 {
     std::vector<std::string> pkgNames;
-    if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Model) > 0 ||
-        ((int)extractTypes & (int)WarframeExporter::ExtractorType::Material) > 0 ||
-        ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0 || 
-        ((int)extractTypes & (int)WarframeExporter::ExtractorType::Landscape) > 0)
-    {
-        pkgNames.push_back("Misc");
-        pkgNames.push_back("Misc_xx");
-    }
-
-    if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Level) > 0)
-    {
-        pkgNames.push_back("AnimRetarget");
-    }
-
-    if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Texture) > 0)
-    {
-        pkgNames.push_back("Texture");
-        pkgNames.push_back("LightMap");
-    }
-
-    if (((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0)
-    {
-        pkgNames.push_back("ShaderDx11");
-        pkgNames.push_back("ShaderPermutationDx11");
-        
-        try
+	if ((int)extractTypes & (int)WarframeExporter::ExtractorType::Texture)
+	{
+		if (packages.getPackage("Texture"))
 		{
-			packages.getPackage("ShaderDx12");
+			pkgNames.push_back("Texture");
+		}
+		else
+		{
+			pkgNames.push_back("TextureDx9");
+		}
+
+		if (packages.getPackage("LightMap"))
+			pkgNames.push_back("LightMap");
+	}
+
+	if ((int)extractTypes & (int)WarframeExporter::ExtractorType::Level)
+	{
+		pkgNames.push_back("AnimRetarget");
+	}
+
+	if ((int)extractTypes & (int)WarframeExporter::ExtractorType::Model ||
+		(int)extractTypes & (int)WarframeExporter::ExtractorType::Material ||
+		(int)extractTypes & (int)WarframeExporter::ExtractorType::Audio)
+	{
+		if (packages.getPackage("Misc_xx"))
+		{
+			pkgNames.push_back("Misc");
+			pkgNames.push_back("Misc_xx");
+		}
+	}
+	
+	if ((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader)
+	{
+		if (packages.getPackage("ShaderDx9"))
+		{
+			pkgNames.push_back("ShaderDx9");
+			pkgNames.push_back("ShaderPermutationDx9");
+		}
+
+		if (packages.getPackage("ShaderDx10"))
+		{
+			pkgNames.push_back("ShaderDx10");
+			pkgNames.push_back("ShaderPermutationDx10");
+		}
+		
+		if (packages.getPackage("ShaderDx11"))
+		{
+			pkgNames.push_back("ShaderDx11");
+			pkgNames.push_back("ShaderPermutationDx11");
+		}
+
+		if (packages.getPackage("ShaderDx12"))
+		{
 			pkgNames.push_back("ShaderDx12");
 			pkgNames.push_back("ShaderPermutationDx12");
 		}
-		catch (LotusLib::LotusException&) { }
-    }
+	}
 
-    return pkgNames;
+	return pkgNames;
 }
 
 void

@@ -11,7 +11,11 @@ WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string&
 {
     static _FileExport fileExporter;
 
-    LotusLib::FileEntry fileEntry = pkgs.getPackage(pkgName).getFile(fileNode, LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
+    std::optional<LotusLib::PackageReader> pkgReader = pkgs.getPackage(pkgName);
+    if (!pkgReader)
+        throw std::runtime_error("Package does not exist");
+    
+    LotusLib::FileEntry fileEntry = pkgReader->getFile(fileNode, LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
 
     Extractor* extractor = g_enumMapExtractor[fileEntry.commonHeader.type];
 
@@ -26,6 +30,10 @@ WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string&
 void
 WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
 {
-    const LotusLib::FileEntries::FileNode* fileNode = pkgs.getPackage(pkgName).getFileNode(internalPath);
+    std::optional<LotusLib::PackageReader> pkgReader = pkgs.getPackage(pkgName);
+    if (!pkgReader)
+        throw std::runtime_error("Package does not exist");
+
+    const LotusLib::FileEntries::FileNode* fileNode = pkgReader->getFileNode(internalPath);
     WarframeExporter::extractFile(pkgs, pkgName, fileNode, ensmalleningData, outputPath);
 }

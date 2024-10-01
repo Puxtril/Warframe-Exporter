@@ -41,8 +41,10 @@ CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusP
 			exit(1);
 		}
 		LotusLib::PackagesReader pkgs(cacheDirPath);
-		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+		std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
+		if (!pkg)
+			throw std::runtime_error("Package does not exist: " + pkgName);
 
-		pkg.lsDir(internalPath);
+		pkg.value().lsDir(internalPath);
 	}
 }

@@ -28,7 +28,7 @@ MaterialExtractor::formatMaterial(const MaterialExternal& materialExternal)
 void
 MaterialExtractor::addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, LotusLib::LotusPath internalPath, MaterialExternal& materialExternal)
 {
-	LotusLib::PackageReader pkg = pkgs.getPackage("Misc");
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
 	LotusLib::LotusPath currentPath = internalPath;
 
 	pkgs.initilizePackagesBin();

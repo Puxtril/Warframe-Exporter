@@ -1,11 +1,4 @@
 #include "ui/FormatPreview1.h"
-#include "audio/AudioExtractorProxy.h"
-#include "audio/AudioStructs.h"
-#include "level/LevelExtractor.h"
-#include "level/LevelStructs.h"
-#include "shader/ShaderStructs.h"
-#include "texture/TextureExtractor.h"
-#include "texture/TextureTypes.h"
 
 FormatPreview::FormatPreview()
     : m_parentWidget(nullptr), m_layout(nullptr)
@@ -21,7 +14,7 @@ FormatPreview::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout)
 void
 FormatPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
-    LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).getFile(internalPath, LotusLib::READ_COMMON_HEADER | LotusLib::READ_H_CACHE | LotusLib::READ_F_CACHE | LotusLib::READ_B_CACHE);
+    LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER | LotusLib::READ_H_CACHE | LotusLib::READ_F_CACHE | LotusLib::READ_B_CACHE);
     WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[fileEntry.commonHeader.type];
     
     if (extractor == nullptr)
@@ -87,8 +80,8 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
     }
     else
     {
-        auto pkg = pkgs->getPackage("Misc");
-        auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(fileEntry.internalPath, pkg);
+        std::optional<LotusLib::PackageReader> pkg = pkgs->getPackage("Misc");
+        auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(fileEntry.internalPath, pkg.value());
 
         // Convert body/header data into internal format
         WarframeExporter::Model::ModelHeaderInternal headerInt;

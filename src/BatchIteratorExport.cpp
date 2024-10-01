@@ -37,7 +37,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 
 	try
 	{
-		LotusLib::FileEntry fullFileEntry = pkgs.getPackage(pkgName).getFile(fileEntry.metadata);
+		LotusLib::FileEntry fullFileEntry = pkgs.getPackage(pkgName).value().getFile(fileEntry.metadata);
 		
 		m_logger.info("Extracting " + fullFileEntry.internalPath.string());
 		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fullFileEntry.commonHeader.type));

@@ -74,8 +74,11 @@ CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::strin
 			return;
 		}
 		LotusLib::PackagesReader pkgs(cacheDirPath);
-		LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
-		WarframeExporter::DebugUtils::printEnumCounts(pkg, internalPath);
+		std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
+		if (!pkg)
+			throw std::runtime_error("Package does not exist: " + pkgName);
+
+		WarframeExporter::DebugUtils::printEnumCounts(pkg.value(), internalPath);
 	}
 }
 
@@ -83,23 +86,25 @@ void
 CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath)
 {
 	LotusLib::PackagesReader pkgs(cacheDirPath);
-	LotusLib::PackageReader pkg = pkgs.getPackage(pkgName);
+	std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
+	if (!pkg)
+		throw std::runtime_error("Package does not exist: " + pkgName);
 
 	try
 	{
 		// Test if `internalPath` is a directory
-		pkg.getDirNode(internalPath);
+		pkg.value().getDirNode(internalPath);
 
-		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
+		for (auto iter = pkg.value().getIter(internalPath); iter != pkg.value().getIter(); iter++)
 		{
-			LotusLib::FileEntry fileEntry = pkg.getFile(*iter, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
-			WarframeExporter::DebugUtils::writeAllDebugs(pkg, fileEntry, outPath);
+			LotusLib::FileEntry fileEntry = pkg.value().getFile(*iter, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
+			WarframeExporter::DebugUtils::writeAllDebugs(pkg.value(), fileEntry, outPath);
 		}
 	}
 	catch (std::exception&)
 	{
-		LotusLib::FileEntry fileEntry = pkg.getFile(internalPath, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
-		WarframeExporter::DebugUtils::writeAllDebugs(pkg, fileEntry, outPath);
+		LotusLib::FileEntry fileEntry = pkg.value().getFile(internalPath, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
+		WarframeExporter::DebugUtils::writeAllDebugs(pkg.value(), fileEntry, outPath);
 	}
 }
 
@@ -111,16 +116,17 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesys
 	std::vector<std::string> pkgNames;
 	if ((int)types & (int)WarframeExporter::ExtractorType::Texture)
 	{
-		try
+		if (pkgs.getPackage("Texture"))
 		{
-			pkgs.getPackage("Texture");
 			pkgNames.push_back("Texture");
-			pkgNames.push_back("LightMap");
 		}
-		catch (LotusLib::LotusException&)
+		else
 		{
 			pkgNames.push_back("TextureDx9");
 		}
+
+		if (pkgs.getPackage("LightMap"))
+			pkgNames.push_back("LightMap");
 	}
 
 	if ((int)types & (int)WarframeExporter::ExtractorType::Level)
@@ -132,23 +138,38 @@ CLIDebug::getPkgsNames(WarframeExporter::ExtractorType types, const std::filesys
 		(int)types & (int)WarframeExporter::ExtractorType::Material ||
 		(int)types & (int)WarframeExporter::ExtractorType::Audio)
 	{
-		pkgNames.push_back("Misc");
-		pkgNames.push_back("Misc_xx");
+		if (pkgs.getPackage("Misc_xx"))
+		{
+			pkgNames.push_back("Misc");
+			pkgNames.push_back("Misc_xx");
+		}
 	}
 	
 	if ((int)types & (int)WarframeExporter::ExtractorType::Shader)
 	{
-		pkgNames.push_back("ShaderDx11");
-		pkgNames.push_back("ShaderPermutationDx11");
-
-		try
+		if (pkgs.getPackage("ShaderDx9"))
 		{
-			pkgs.getPackage("ShaderDx12");
+			pkgNames.push_back("ShaderDx9");
+			pkgNames.push_back("ShaderPermutationDx9");
+		}
+
+		if (pkgs.getPackage("ShaderDx10"))
+		{
+			pkgNames.push_back("ShaderDx10");
+			pkgNames.push_back("ShaderPermutationDx10");
+		}
+
+		if (pkgs.getPackage("ShaderDx11"))
+		{
+			pkgNames.push_back("ShaderDx11");
+			pkgNames.push_back("ShaderPermutationDx11");
+		}
+
+		if (pkgs.getPackage("ShaderDx12"))
+		{
 			pkgNames.push_back("ShaderDx12");
 			pkgNames.push_back("ShaderPermutationDx12");
 		}
-		catch (LotusLib::LotusException&) { }
-		
 	}
 
 	return pkgNames;

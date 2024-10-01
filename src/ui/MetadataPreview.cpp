@@ -14,7 +14,7 @@ MetdataPreview::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout)
 void
 MetdataPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
-    LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).getFile(internalPath, LotusLib::READ_COMMON_HEADER);
+    LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER);
     setupCommonHeader(fileEntry);
 }
 

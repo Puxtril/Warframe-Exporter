@@ -61,7 +61,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 {
 	Document outGltf;
 
-	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc");
+	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
 
 	if (!bodyInt.landscape.landscapePath.empty())
 		addLandscapeToGltf(outGltf, bodyInt, pkgs);
@@ -146,7 +146,7 @@ LevelExtractor::addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyI
 {
 	auto landscapeExtractor = Landscape::LandscapeExtractor::getInstance();
 
-	LotusLib::PackageReader pkg = pkgs.getPackage("Misc");
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
 	LotusLib::FileEntry landscapeEntry;
 	try
 	{

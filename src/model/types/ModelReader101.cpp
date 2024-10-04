@@ -101,4 +101,7 @@ ModelReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
 
     outBody.indices.resize(extHeader.faceCount);
     bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
+
+    if (extHeader.faceCount > 0 && outBody.indices[0] != 0)
+        throw unknown_format_error("First index not 0, probably read model incorrectly");
 }

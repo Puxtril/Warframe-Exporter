@@ -7,6 +7,9 @@
 #include "LotusLib.h"
 #include "EnumMapExtractor.h"
 
+// Windows...
+#undef max
+
 class MetdataPreview
 {
     QPlainTextEdit* m_textWidget;

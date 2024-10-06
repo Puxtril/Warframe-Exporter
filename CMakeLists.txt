@@ -176,6 +176,10 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 		# Auto-runs the Qt MOC tool
 		# Needed for those extra files inside WARFRAME_EXPORTER_UI_SOURCES
 		set(CMAKE_AUTOMOC ON)
+
+		# Auto-compile .ui files into headers for C++ compilation
+		set(CMAKE_AUTOUIC ON)
+		set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
 		
 		# Qt resources file (assets/resources.qrc)
 		set(CMAKE_AUTORCC ON)

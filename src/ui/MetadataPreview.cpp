@@ -1,14 +1,16 @@
 #include "ui/MetadataPreview.h"
 
 MetdataPreview::MetdataPreview()
-    : m_parentWidget(nullptr), m_layout(nullptr)
+    : m_textWidget(nullptr)
 { }
 
 void
-MetdataPreview::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout)
+MetdataPreview::setupUis(QPlainTextEdit* textWidget, QLabel* compressed, QLabel* decompressed, QLabel* modified)
 {
-    m_parentWidget = parentWidget;
-    m_layout = parentLayout;
+    m_textWidget = textWidget;
+    m_labelCompressed = compressed;
+    m_labelDecompressed = decompressed;
+    m_labelModified = modified;
 }
 
 void
@@ -16,26 +18,22 @@ MetdataPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgNa
 {
     LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER);
     setupCommonHeader(fileEntry);
+    auto pkg = pkgs->getPackage(pkgName).value();
+    setFiledata(pkg, fileEntry);
 }
 
 void
 MetdataPreview::clearPreview()
 {
-    for (QWidget* x : m_parentWidget->findChildren<QWidget*>(Qt::FindDirectChildrenOnly))
-        delete x;
+    m_textWidget->clear();
+    m_labelModified->clear();
+    m_labelCompressed->clear();
+    m_labelDecompressed->clear();
 }
 
 void
 MetdataPreview::setupCommonHeader(LotusLib::FileEntry& fileEntry)
 {
-    QLabel* label = new QLabel(m_parentWidget);
-    m_layout->addWidget(label);
-
-    label->setText("Common Header");
-
-    QPlainTextEdit* textEdit = new QPlainTextEdit(m_parentWidget);
-    m_layout->addWidget(textEdit);
-
     std::stringstream outStr;
 
     outStr << "Type Enum: ";
@@ -59,5 +57,61 @@ MetdataPreview::setupCommonHeader(LotusLib::FileEntry& fileEntry)
 
 
     std::string outStrTmp = outStr.str();
-    textEdit->setPlainText(QString(outStrTmp.c_str()));
+    m_textWidget->setPlainText(QString(outStrTmp.c_str()));
+}
+
+void
+MetdataPreview::setFiledata(LotusLib::PackageReader& pkgs, LotusLib::FileEntry& fileEntry)
+{
+    m_labelModified->setText(timestampToQString(fileEntry.metadata->getTimeStamp()));
+    int totalCompressed = fileEntry.metadata->getCompLen();
+    int totalDecompressed = fileEntry.metadata->getLen();
+
+    try
+    {
+        const LotusLib::FileEntries::FileNode* bNode = pkgs.getFileNode(fileEntry.internalPath, LotusLib::PackageTrioType::B);
+        totalCompressed += bNode->getCompLen();
+        totalDecompressed += bNode->getLen();
+    }
+    catch (LotusLib::LotusException& ex) {}
+
+    try
+    {
+        const LotusLib::FileEntries::FileNode* fNode = pkgs.getFileNode(fileEntry.internalPath, LotusLib::PackageTrioType::F);
+        totalCompressed += fNode->getCompLen();
+        totalDecompressed += fNode->getLen();
+    }
+    catch (LotusLib::LotusException& ex) {}
+
+    m_labelCompressed->setText(filesizeToQString(totalCompressed));
+    m_labelDecompressed->setText(filesizeToQString(totalDecompressed));
+}
+
+QString
+MetdataPreview::timestampToQString(int64_t input)
+{
+    time_t epochTime = input / 10000000UL - 11644473600UL;
+	const tm* timeInfo = gmtime(&std::max((time_t)0, epochTime));
+
+    char s[16];
+    strftime(s, 16, "%b %d, %Y", timeInfo);
+    return QString(s);
+}
+
+QString
+MetdataPreview::filesizeToQString(int input)
+{
+    static std::array<std::string, 5> prefixes {"B", "KB", "MB", "GB", "TB"};
+
+    int prefixIndex = 0;
+    float sizedDown = input;
+
+    while (sizedDown > 1024 && prefixIndex < 4)
+    {
+        sizedDown /= 1024;
+        prefixIndex++;
+    }
+
+    std::string sizeStr = std::to_string((int)sizedDown) + " " + prefixes[prefixIndex];
+    return QString(sizeStr.c_str());
 }

@@ -70,18 +70,24 @@ MetdataPreview::setFiledata(LotusLib::PackageReader& pkgs, LotusLib::FileEntry& 
     try
     {
         const LotusLib::FileEntries::FileNode* bNode = pkgs.getFileNode(fileEntry.internalPath, LotusLib::PackageTrioType::B);
-        totalCompressed += bNode->getCompLen();
-        totalDecompressed += bNode->getLen();
+        if (bNode != nullptr)
+        {
+            totalCompressed += bNode->getCompLen();
+            totalDecompressed += bNode->getLen();
+        }
     }
-    catch (LotusLib::LotusException& ex) {}
+    catch (LotusLib::InternalEntryNotFound& ex) {}
 
     try
     {
         const LotusLib::FileEntries::FileNode* fNode = pkgs.getFileNode(fileEntry.internalPath, LotusLib::PackageTrioType::F);
-        totalCompressed += fNode->getCompLen();
-        totalDecompressed += fNode->getLen();
+        if (fNode != nullptr)
+        {
+            totalCompressed += fNode->getCompLen();
+            totalDecompressed += fNode->getLen();
+        }
     }
-    catch (LotusLib::LotusException& ex) {}
+    catch (LotusLib::InternalEntryNotFound& ex) {}
 
     m_labelCompressed->setText(filesizeToQString(totalCompressed));
     m_labelDecompressed->setText(filesizeToQString(totalDecompressed));

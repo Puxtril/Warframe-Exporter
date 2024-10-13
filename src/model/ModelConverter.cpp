@@ -1,7 +1,4 @@
 #include "model/ModelConverter.h"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/vector_uint4_sized.hpp"
-#include <iterator>
 
 using namespace WarframeExporter::Model;
 
@@ -16,7 +13,6 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
 
     getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
-    ModelConverter::addVertexColors(outBody, vertexColors);
 }
 
 void
@@ -154,22 +150,6 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
                 }
             }
         }
-    }
-}
-
-void
-ModelConverter::addVertexColors(ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors)
-{
-    // Unfortunately, Blender doesn't like RGBA vertex colors
-    // So we split into RGB and A.
-    for (auto& curVColors : vertexColors)
-    {
-        std::vector<glm::u8vec4> newA;
-        for (glm::u8vec4& curColor : curVColors)
-            newA.push_back(glm::u8vec4(curColor.a, curColor.a, curColor.a, curColor.a));
-
-        outBody.colors.push_back(std::move(curVColors));
-        outBody.colors.push_back(std::move(newA));
     }
 }
 

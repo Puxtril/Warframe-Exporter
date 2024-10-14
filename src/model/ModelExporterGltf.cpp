@@ -241,12 +241,12 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		addBoneWeight = body.boneWeights.size() > 0 ? true : false;
 
 	uint32_t modelTotalByteLen = (
-		body.positionTypeSize() +
-		body.UVTypeSize() +
-		body.UVTypeSize() +
+		(addPosition ? body.positionTypeSize() : 0) +
+		(addUV1 ? body.UVTypeSize() : 0) +
+		(addUV2 ? body.UVTypeSize() : 0) +
 		(body.colorTypeSize() * body.colors.size()) +
-		body.boneIndexTypeSize() +
-		body.boneWeightTypeSize()
+		(addBoneIndex ? body.boneIndexTypeSize() : 0) +
+		(addBoneWeight ? body.boneWeightTypeSize() : 0)
 	) * vertCount;
 
 	// Assert 32-bit allignment
@@ -268,7 +268,6 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = modelTotalByteLen;
-	//bufView.byteStride = body.vertexSizeRigged();
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	gltfDoc.bufferViews.push_back(bufView);
 

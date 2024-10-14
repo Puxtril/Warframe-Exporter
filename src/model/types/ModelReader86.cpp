@@ -5,9 +5,9 @@ using namespace WarframeExporter::Model;
 void
 ModelReader86::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
-    headerReader->seek(0x2E, std::ios_base::cur);
+    headerReader->seek(0x26, std::ios_base::cur);
 
-    skipPhysicsPath1(headerReader);
+    skipPhysicsStruct(headerReader);
 
     headerReader->seek(0x2C, std::ios_base::cur);
 
@@ -39,9 +39,7 @@ ModelReader86::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
     uint32_t shortCount = headerReader->readUInt32();
     headerReader->seek(shortCount * 2U, std::ios_base::cur);
 
-    headerReader->seek(0x8, std::ios_base::cur);
-
-    skipPhysicsPath1(headerReader);
+    skipPhysicsStruct(headerReader);
 
     readPhysxMeshes(headerReader, outHeader.physXMeshes);
 

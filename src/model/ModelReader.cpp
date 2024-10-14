@@ -201,58 +201,13 @@ ModelReader::skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* rea
 }
 
 void
-ModelReader::skipPhysicsPath1(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader)
 {
-    uint32_t physicsPathCheck = reader->readUInt16();
-    if (physicsPathCheck > 0)
-    {
-        uint32_t physPathLen;
-        if (physicsPathCheck == 255)
-        {
-            physPathLen = reader->readUInt32();
-        }
-        else
-        {
-            physPathLen = physicsPathCheck;
-            reader->seek(0x2, std::ios_base::cur);
-        }
-
-        // Because the path may not actually exist...
-        if (physPathLen > 0)
-        {
-            uint16_t nullCheck = reader->readUInt16();
-            if (nullCheck != 0)
-                reader->seek(physPathLen - 2, std::ios_base::cur);
-        }
-    }
-    else
-        reader->seek(0x2, std::ios_base::cur);
-}
-
-void
-ModelReader::skipPhysicsPath2(BinaryReader::BinaryReaderBuffered* reader)
-{
-    uint32_t physicsPathLen = reader->readUInt32();
-    if (physicsPathLen != 0)
-    {
-        uint16_t physPathCheck = reader->readUInt16();
-        if (physPathCheck != 0)
-            reader->seek(physicsPathLen - 2, std::ios_base::cur);
-    }
-}
-
-void
-ModelReader::skipPhysicsPath3(BinaryReader::BinaryReaderBuffered* reader)
-{
-    reader->readUInt32();
+    uint32_t type = reader->readUInt32();
     uint32_t subType = reader->readUInt32();
 
-    // Perhaps these 2 numbers are flags?
-    // Doesn't matter... debugging this took long enough. It works.
-    if (subType & 8)
-    {
+    if (type & 8 || subType & 8)
         reader->seek(2, std::ios::cur);
-    }
 
     uint32_t pathLen = reader->readUInt32();
     reader->seek(pathLen, std::ios::cur);

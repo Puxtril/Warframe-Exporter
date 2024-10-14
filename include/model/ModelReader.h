@@ -32,8 +32,6 @@ namespace WarframeExporter::Model
 		uint32_t skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader);
 		void skipMorphs(BinaryReader::BinaryReaderBuffered* reader);
 		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader);
-		void skipPhysicsPath1(BinaryReader::BinaryReaderBuffered* reader);
-		void skipPhysicsPath2(BinaryReader::BinaryReaderBuffered* reader);
-		void skipPhysicsPath3(BinaryReader::BinaryReaderBuffered* reader);
+		void skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader);
 	};
 }

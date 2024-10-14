@@ -7,7 +7,7 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
-    this->skipPhysicsPath3(headerReader);
+    skipPhysicsStruct(headerReader);
 
     headerReader->seek(0x4E, std::ios_base::cur);
 
@@ -42,7 +42,7 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
         headerReader->seek(0x4, std::ios::cur);
     }
 
-    skipPhysicsPath3(headerReader);
+    skipPhysicsStruct(headerReader);
 
     readPhysxMeshes(headerReader, outHeader.physXMeshes);
 }

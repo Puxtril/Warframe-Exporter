@@ -22,10 +22,7 @@ namespace WarframeExporter::Model::ModelExporterGltf
 
 	void _print_exception(const std::exception& e, int level = 0);
 
-	void _addModelDataRigged(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body);
-	void _addModelDataStatic(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body);
-
-	void _createSceneWithModelNodes(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex);
+	void _addModelsToScene(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex = -1);
 
 	// Returns index of root bone in tree
 	// Garuntees same order as boneTree
@@ -47,7 +44,6 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	int32_t _addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body);
 
 	void _modifyAsset(Document& gltfDoc);
-	void _checkAndFixBufferAllignment(Document& gltfDoc);
 
 	Buffer& _getBuffer(Document& gltfDoc);
 

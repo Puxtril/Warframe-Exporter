@@ -5,39 +5,26 @@ using namespace WarframeExporter::Model;
 void
 ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
 {
-	if (header.boneTree.size() > 0)
-		_addModelDataRigged(gltfDoc, header, body);
-	else
-		_addModelDataStatic(gltfDoc, header, body);
-}
-
-void
-ModelExporterGltf::_addModelDataRigged(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
-{
 	_modifyAsset(gltfDoc);
 
 	Attributes vertsAttrs = _addVertexData(gltfDoc, body, header.vertexCount);
 	unsigned int indicesBufViewIndex = _addIndexData(gltfDoc, body.indices);
 	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
 
-	int32_t rootBoneNodeIndex = _createBones(gltfDoc, header.boneTree);
-	int32_t inverseMatricesIndex = _addInverseBindMatrices(gltfDoc, header.boneTree, header.weightedBones);
-	int32_t skinIndex = _createSkin(gltfDoc, header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
+	if (header.boneTree.size() > 0)
+	{
+		int32_t rootBoneNodeIndex = _createBones(gltfDoc, header.boneTree);
+		int32_t inverseMatricesIndex = _addInverseBindMatrices(gltfDoc, header.boneTree, header.weightedBones);
+		int32_t skinIndex = _createSkin(gltfDoc, header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
 
-	_createSceneWithModelNodes(gltfDoc, meshIndices, skinIndex);
-	gltfDoc.scenes[0].nodes.push_back(rootBoneNodeIndex);
-}
-
-void
-ModelExporterGltf::_addModelDataStatic(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
-{
-	_modifyAsset(gltfDoc);
-
-	Attributes vertsAttrs = _addVertexData(gltfDoc, body, header.vertexCount);
-	int32_t indicesBufViewIndex = _addIndexData(gltfDoc, body.indices);
-	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
-
-	_createSceneWithModelNodes(gltfDoc, meshIndices, -1);
+		_addModelsToScene(gltfDoc, meshIndices, skinIndex);
+		
+		gltfDoc.scenes[0].nodes.push_back(rootBoneNodeIndex);
+	}
+	else
+	{
+		_addModelsToScene(gltfDoc, meshIndices);
+	}
 }
 
 void
@@ -67,7 +54,7 @@ ModelExporterGltf::_print_exception(const std::exception& e, int level)
 }
 
 void
-ModelExporterGltf::_createSceneWithModelNodes(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex)
+ModelExporterGltf::_addModelsToScene(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex)
 {
 	if (gltfDoc.scenes.size() == 0)
 	{
@@ -436,18 +423,6 @@ ModelExporterGltf::_modifyAsset(Document& gltfDoc)
 {
 	gltfDoc.asset.generator = m_generatorName;
 	gltfDoc.asset.copyright = m_copyright;
-}
-
-void
-ModelExporterGltf::_checkAndFixBufferAllignment(Document& gltfDoc)
-{
-	Buffer& buf = _getBuffer(gltfDoc);
-	int mod = buf.byteLength % 4;
-	if (mod != 0)
-	{
-		buf.data.resize(buf.data.size() + mod);
-		buf.byteLength += mod;
-	}
 }
 
 Buffer&

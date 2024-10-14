@@ -113,21 +113,21 @@ namespace WarframeExporter::Model
 		std::vector<std::vector<glm::u8vec4>> colors;
 		std::vector<glm::u16vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
-			
-		static const int positionLen = 12;
-		static const int colorLen = 4;
-		static const int UVLen = 8;
-		static const int boneIndexLen = 8;
-		static const int boneWeightLen = 16;
+
+		constexpr int32_t positionTypeSize() const { return sizeof(positions[0]); }
+		constexpr int32_t UVTypeSize() const { return sizeof(UV1[0]); }
+		constexpr int32_t colorTypeSize() const { return sizeof(colors[0][0]); }
+		constexpr int32_t boneIndexTypeSize() const { return sizeof(boneIndices[0]); }
+		constexpr int32_t boneWeightTypeSize() const { return sizeof(boneWeights[0]); }
 
 		int32_t vertexSizeRigged() const
 		{
-			return static_cast<int32_t>(positionLen + (UVLen * 2) + (colorLen * colors.size()) + boneIndexLen + boneWeightLen);
+			return static_cast<int32_t>(positionTypeSize() + (UVTypeSize() * 2) + (colorTypeSize() * colors.size()) + boneIndexTypeSize() + boneWeightTypeSize());
 		}
 
 		int32_t vertexSizeStatic() const
 		{
-			return static_cast<int32_t>(positionLen + (UVLen * 2) + (colorLen * colors.size()));
+			return static_cast<int32_t>(positionTypeSize() + (UVTypeSize() * 2) + (colorTypeSize() * colors.size()));
 		}
 	};
 }

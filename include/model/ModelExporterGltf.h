@@ -41,8 +41,7 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	int32_t _findOrCreateMaterial(Document& gltfDoc, const std::string& materialPath);
 
 	// Returns Attributes for Primetives
-	Attributes _addVertexDataRigged(Document& gltfDoc, const ModelBodyInternal& body, int vertCount);
-	Attributes _addVertexDataStatic(Document& gltfDoc, const ModelBodyInternal& body, int vertCount);
+	Attributes _addVertexData(Document& gltfDoc, const ModelBodyInternal& body, int vertCount);
 
 	// Returns index of the created BufferView
 	int32_t _addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body);

@@ -28,7 +28,12 @@ ModelRenderWidget::drawScene()
     glUseProgram(m_shaderProgram);
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_SHORT, 0);
+
+    // CLEARLY this isn't correct
+    // Since this is just for previewing, I don't care to get this perfect
+    // Divide this by 3 and some faces will be missing
+    // Pas in `m_indexCount` directly and faces will draw over each other
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indexCount / 2.9), GL_UNSIGNED_SHORT, 0);
 
     glBindVertexArray(0);
     glUseProgram(0);

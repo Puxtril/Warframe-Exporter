@@ -96,7 +96,7 @@ namespace WarframeExporter::Model
 		std::vector<glm::quat> boneRotations;
 		std::vector<glm::vec3> bonePositions;
 		std::vector<uint16_t> indices;
-		std::vector<glm::vec3> positions;
+		std::vector<glm::vec4> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
 		std::vector<std::vector<glm::u8vec4>> colors;

@@ -3,10 +3,10 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelExporterGltf::addModelData(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& body, const LevelObjectInternal& levelObj)
+LevelExporterGltf::addModelData(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj)
 {
 	int32_t nodeCountInit = static_cast<int32_t>(gltfDoc.nodes.size());
-	Model::ModelExporterGltf::addModelData(gltfDoc, header, body);
+	Model::ModelExporterGltf::addModelData(gltfDoc, header, bodyInt, bodyExt);
 	int32_t nodeCountAfter = static_cast<int32_t>(gltfDoc.nodes.size());
 
 	std::vector<int32_t> meshNodeIndices = _getMeshNodeIndices(gltfDoc, nodeCountInit, nodeCountAfter);

@@ -118,7 +118,9 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     newPositions.resize(extBody.positions.size());
     for (size_t x = 0; x < extBody.positions.size(); x++)
     {
-        newPositions[x] = extBody.positions[x] * modelScale;
+        newPositions[x][0] = extBody.positions[x][0] * modelScale[0];
+        newPositions[x][1] = extBody.positions[x][1] * modelScale[1];
+        newPositions[x][2] = extBody.positions[x][2] * modelScale[2];
     }
     outBody.positions = newPositions;
     outBody.UV1 = extBody.UV1;
@@ -174,7 +176,7 @@ ModelConverter::flipXAxis(ModelBodyExternal& extBody)
     // For static models
     if (extBody.bonePositions.empty())
     {
-        for (glm::vec3& curPos : extBody.positions)
+        for (glm::vec4& curPos : extBody.positions)
         {
             curPos.z *= -1.0f;
         }

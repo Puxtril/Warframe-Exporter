@@ -3,12 +3,12 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt)
 {
 	_modifyAsset(gltfDoc);
 
-	Attributes vertsAttrs = _addVertexData(gltfDoc, body, header.vertexCount);
-	unsigned int indicesBufViewIndex = _addIndexData(gltfDoc, body.indices);
+	Attributes vertsAttrs = _addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
+	unsigned int indicesBufViewIndex = _addIndexData(gltfDoc, bodyInt.indices);
 	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
 
 	if (header.boneTree.size() > 0)
@@ -229,24 +229,26 @@ ModelExporterGltf::_findOrCreateMaterial(Document& gltfDoc, const std::string& m
 }
 
 Attributes
-ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& body, int vertCount)
+ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, int vertCount)
 {
 	Buffer& buf = _getBuffer(gltfDoc);
 
 	bool 
 		addPosition = true,
-		addUV1 = body.UV1.size() > 0 ? true : false,
-		addUV2 = body.UV2.size() > 0 ? true : false,
-		addBoneIndex = body.boneIndices.size() > 0 ? true : false,
-		addBoneWeight = body.boneWeights.size() > 0 ? true : false;
+		addUV1 = bodyInt.UV1.size() > 0 ? true : false,
+		addUV2 = bodyInt.UV2.size() > 0 ? true : false,
+		addBoneIndex = bodyInt.boneIndices.size() > 0 ? true : false,
+		addBoneWeight = bodyInt.boneWeights.size() > 0 ? true : false,
+		addRawPosition = bodyExt.positions.size() > 0 ? true : false;
 
 	uint32_t modelTotalByteLen = (
-		(addPosition ? body.positionTypeSize() : 0) +
-		(addUV1 ? body.UVTypeSize() : 0) +
-		(addUV2 ? body.UVTypeSize() : 0) +
-		(body.colorTypeSize() * body.colors.size()) +
-		(addBoneIndex ? body.boneIndexTypeSize() : 0) +
-		(addBoneWeight ? body.boneWeightTypeSize() : 0)
+		(addPosition ? bodyInt.positionTypeSize() : 0) +
+		(addUV1 ? bodyInt.UVTypeSize() : 0) +
+		(addUV2 ? bodyInt.UVTypeSize() : 0) +
+		(bodyInt.colorTypeSize() * bodyInt.colors.size()) +
+		(addBoneIndex ? bodyInt.boneIndexTypeSize() : 0) +
+		(addBoneWeight ? bodyInt.boneWeightTypeSize() : 0) + 
+		(addRawPosition ? sizeof(bodyExt.positions[0]) : 0)
 	) * vertCount;
 
 	// Assert 32-bit allignment
@@ -275,8 +277,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 
 	if (addPosition)
 	{
-		uint32_t byteSize = body.positionTypeSize() * body.positions.size();
-		memcpy(bufferCursor, &body.positions[0], byteSize);
+		uint32_t byteSize = bodyInt.positionTypeSize() * bodyInt.positions.size();
+		memcpy(bufferCursor, &bodyInt.positions[0], byteSize);
 		bufferCursor += byteSize;
 
 		Accessor posAcc;
@@ -286,8 +288,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		posAcc.count = vertCount;
 		posAcc.type = Accessor::Type::Vec3;
 		posAcc.componentType = Accessor::ComponentType::Float;
-		posAcc.max = _findMaxVec3(body.positions);
-		posAcc.min = _findMinVec3(body.positions);
+		posAcc.max = _findMaxVec3(bodyInt.positions);
+		posAcc.min = _findMinVec3(bodyInt.positions);
 		gltfDoc.accessors.push_back(posAcc);
 		bufferViewCursor += byteSize;
 
@@ -296,8 +298,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 
 	if (addUV1)
 	{
-		uint32_t byteSize = body.UVTypeSize() * body.UV1.size();
-		memcpy(bufferCursor, &body.UV1[0], byteSize);
+		uint32_t byteSize = bodyInt.UVTypeSize() * bodyInt.UV1.size();
+		memcpy(bufferCursor, &bodyInt.UV1[0], byteSize);
 		bufferCursor += byteSize;
 
 		Accessor uv1Acc;
@@ -315,8 +317,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 
 	if (addUV2)
 	{
-		uint32_t byteSize = body.UVTypeSize() * body.UV2.size();
-		memcpy(bufferCursor, &body.UV2[0], byteSize);
+		uint32_t byteSize = bodyInt.UVTypeSize() * bodyInt.UV2.size();
+		memcpy(bufferCursor, &bodyInt.UV2[0], byteSize);
 		bufferCursor += byteSize;
 
 		Accessor uv2Acc;
@@ -332,10 +334,10 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		attrs["TEXCOORD_1"] = uv2AccIndex;
 	}
 
-	for (size_t x = 0; x < body.colors.size(); x++)
+	for (size_t x = 0; x < bodyInt.colors.size(); x++)
 	{
-		uint32_t byteSize = body.colorTypeSize() * body.colors[x].size();
-		memcpy(bufferCursor, &body.colors[x][0], byteSize);
+		uint32_t byteSize = bodyInt.colorTypeSize() * bodyInt.colors[x].size();
+		memcpy(bufferCursor, &bodyInt.colors[x][0], byteSize);
 		bufferCursor += byteSize;
 
 		Accessor colAcc;
@@ -354,8 +356,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 
 	if (addBoneIndex)
 	{
-		uint32_t byteSize = body.boneIndexTypeSize() * body.boneIndices.size();
-		memcpy(bufferCursor, &body.boneIndices[0], byteSize);
+		uint32_t byteSize = bodyInt.boneIndexTypeSize() * bodyInt.boneIndices.size();
+		memcpy(bufferCursor, &bodyInt.boneIndices[0], byteSize);
 		bufferCursor += byteSize;
 
 		Accessor boneIndexAcc;
@@ -373,8 +375,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 
 	if (addBoneWeight)
 	{
-		uint32_t byteSize = body.boneWeightTypeSize() * body.boneWeights.size();
-		memcpy(bufferCursor, &body.boneWeights[0], byteSize);
+		uint32_t byteSize = bodyInt.boneWeightTypeSize() * bodyInt.boneWeights.size();
+		memcpy(bufferCursor, &bodyInt.boneWeights[0], byteSize);
 		bufferCursor += byteSize;
 
 		Accessor boneWeightAcc;
@@ -388,6 +390,25 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		bufferViewCursor += byteSize;
 
 		attrs["WEIGHTS_0"] = boneWeightAccIndex;
+	}
+
+	if (addRawPosition)
+	{
+		uint32_t byteSize = sizeof(bodyExt.positions[0]) * bodyExt.positions.size();
+		memcpy(bufferCursor, &bodyExt.positions[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor posAcc;
+		int32_t posAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		posAcc.bufferView = bufViewIndex;
+		posAcc.byteOffset = bufferViewCursor;
+		posAcc.count = vertCount;
+		posAcc.type = Accessor::Type::Vec4;
+		posAcc.componentType = Accessor::ComponentType::Float;
+		gltfDoc.accessors.push_back(posAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["_RawPosition"] = posAccIndex;
 	}
 
 	return attrs;

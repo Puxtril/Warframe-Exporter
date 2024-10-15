@@ -118,8 +118,9 @@ ModelReader290::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
         outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
         outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
         outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
+        outBody.positions[x][3] = bodyReader->readInt16() / 32767.0F;
 
-        bodyReader->seek(6, std::ios_base::cur); // Normals?
+        bodyReader->seek(4, std::ios_base::cur); // Normals?
 
         bodyReader->seek(3, std::ios::cur); // Tangent data?
         

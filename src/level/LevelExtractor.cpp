@@ -115,7 +115,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 
 			m_logger.debug(spdlog::fmt_lib::format("Pos={},{},{} Scale={},{},{} Colors={} {}", curLevelObj.pos.x, curLevelObj.pos.y, curLevelObj.pos.z, headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z, vertexColors.size(), curLevelObj.meshPath));
 
-			LevelExporterGltf::addModelData(outGltf, headerInt, bodyInt, curLevelObj);
+			LevelExporterGltf::addModelData(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
 		}
 		catch (std::exception& ex)
 		{

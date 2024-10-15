@@ -65,6 +65,6 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	
 	// Convert body/header into exportable format
 	Document gltfDocument;
-	ModelExporterGltf::addModelData(gltfDocument, headerInt, bodyInt);
+	ModelExporterGltf::addModelData(gltfDocument, headerInt, bodyInt, bodyExt);
 	ModelExporterGltf::save(gltfDocument, outputPath);
 }

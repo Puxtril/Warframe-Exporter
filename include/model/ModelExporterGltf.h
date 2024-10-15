@@ -17,7 +17,7 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	static const std::string m_generatorName = "Puxtrils Warframe Model Exporter";
 	static const std::string m_copyright = "DIGITAL EXTREMES Ltd.";
 
-	void addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& body);
+	void addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt);
 	void save(Document& gltfDoc, const std::filesystem::path& outPath);
 
 	void _print_exception(const std::exception& e, int level = 0);
@@ -38,7 +38,7 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	int32_t _findOrCreateMaterial(Document& gltfDoc, const std::string& materialPath);
 
 	// Returns Attributes for Primetives
-	Attributes _addVertexData(Document& gltfDoc, const ModelBodyInternal& body, int vertCount);
+	Attributes _addVertexData(Document& gltfDoc, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, int vertCount);
 
 	// Returns index of the created BufferView
 	int32_t _addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body);

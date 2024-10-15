@@ -65,9 +65,10 @@ ModelReader102::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
         outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
         outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
         outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
+        outBody.positions[x][3] = bodyReader->readInt16() / 32767.0F;
 
         // /shrug
-        bodyReader->seek(10, std::ios_base::cur);
+        bodyReader->seek(8, std::ios_base::cur);
 
         outBody.UV1[x][0] = bodyReader->readHalf();
         outBody.UV1[x][1] = bodyReader->readHalf();

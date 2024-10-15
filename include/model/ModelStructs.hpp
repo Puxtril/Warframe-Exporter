@@ -99,6 +99,7 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec4> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> AO;
 		std::vector<std::vector<glm::u8vec4>> colors;
 		std::vector<glm::u8vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
@@ -110,6 +111,7 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> AO;
 		std::vector<std::vector<glm::u8vec4>> colors;
 		std::vector<glm::u16vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
@@ -117,6 +119,7 @@ namespace WarframeExporter::Model
 		constexpr int32_t positionTypeSize() const { return sizeof(positions[0]); }
 		constexpr int32_t UVTypeSize() const { return sizeof(UV1[0]); }
 		constexpr int32_t colorTypeSize() const { return sizeof(colors[0][0]); }
+		constexpr int32_t AOTypeSize() const { return sizeof(AO[0]); }
 		constexpr int32_t boneIndexTypeSize() const { return sizeof(boneIndices[0]); }
 		constexpr int32_t boneWeightTypeSize() const { return sizeof(boneWeights[0]); }
 

@@ -62,8 +62,7 @@ ModelReader96::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bina
     outBody.positions.resize(extHeader.vertexCount);
     outBody.UV1.resize(extHeader.vertexCount);
     outBody.UV2.resize(extHeader.vertexCount);
-    outBody.colors.resize(1);
-    outBody.colors[0].resize(extHeader.vertexCount);
+    outBody.AO.resize(extHeader.vertexCount);
     for (uint32_t x = 0; x < extHeader.vertexCount; x++)
     {
         outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
@@ -74,12 +73,7 @@ ModelReader96::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bina
         bodyReader->seek(4, std::ios_base::cur); // Normals?
         
         bodyReader->seek(3, std::ios::cur); // Tangent data?
-
-        // Ambient Occlusion
-        uint8_t col = bodyReader->readUInt8();
-        outBody.colors[0][x][0] = col;
-        outBody.colors[0][x][1] = col;
-        outBody.colors[0][x][2] = col;
+        outBody.AO[x] = bodyReader->readUInt8();
 
         outBody.UV1[x][0] = bodyReader->readHalf();
         outBody.UV1[x][1] = bodyReader->readHalf();

@@ -237,6 +237,7 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		addPosition = true,
 		addUV1 = bodyInt.UV1.size() > 0 ? true : false,
 		addUV2 = bodyInt.UV2.size() > 0 ? true : false,
+		addAO = bodyInt.AO.size() > 0 ? true : false,
 		addBoneIndex = bodyInt.boneIndices.size() > 0 ? true : false,
 		addBoneWeight = bodyInt.boneWeights.size() > 0 ? true : false,
 		addRawPosition = bodyExt.positions.size() > 0 ? true : false;
@@ -245,6 +246,7 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		(addPosition ? bodyInt.positionTypeSize() : 0) +
 		(addUV1 ? bodyInt.UVTypeSize() : 0) +
 		(addUV2 ? bodyInt.UVTypeSize() : 0) +
+		(addAO ? bodyInt.AOTypeSize() * 4 : 0) + // Colors must be exported as Vec4
 		(bodyInt.colorTypeSize() * bodyInt.colors.size()) +
 		(addBoneIndex ? bodyInt.boneIndexTypeSize() : 0) +
 		(addBoneWeight ? bodyInt.boneWeightTypeSize() : 0) + 
@@ -332,6 +334,31 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		bufferViewCursor += byteSize;
 
 		attrs["TEXCOORD_1"] = uv2AccIndex;
+	}
+
+	if (addAO)
+	{
+		uint32_t byteSize = bodyInt.AOTypeSize() * bodyInt.AO.size();
+		for (const uint8_t& curAO : bodyInt.AO)
+		{
+			memcpy(bufferCursor++, &curAO, 1);
+			memcpy(bufferCursor++, &curAO, 1);
+			memcpy(bufferCursor++, &curAO, 1);
+			memcpy(bufferCursor++, &curAO, 1);
+		}
+
+		Accessor aoAcc;
+		int32_t aoAccIndex = (int32_t)gltfDoc.accessors.size();
+		aoAcc.bufferView = bufViewIndex;
+		aoAcc.byteOffset = bufferViewCursor;
+		aoAcc.count = vertCount;
+		aoAcc.type = Accessor::Type::Vec4;
+		aoAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		aoAcc.normalized = true;
+		gltfDoc.accessors.push_back(aoAcc);
+		bufferViewCursor += (byteSize * 4);
+
+		attrs["_AmbientOcclusion"] = aoAccIndex;
 	}
 
 	for (size_t x = 0; x < bodyInt.colors.size(); x++)

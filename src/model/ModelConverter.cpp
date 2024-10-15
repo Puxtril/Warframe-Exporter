@@ -128,6 +128,7 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.boneWeights = extBody.boneWeights;
 
     outBody.colors = std::move(extBody.colors);
+    outBody.AO = std::move(extBody.AO);
 
     // Convert local bone indices to global
     std::vector<glm::u16vec4>& newIndices = outBody.boneIndices;

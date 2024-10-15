@@ -49,13 +49,13 @@ ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelIn
 
     // Check if model has no/empty vertex colors
     bool fillWithWhite = false;
-    if (modelInternal.colors.size() == 0)
+    if (modelInternal.AO.size() == 0)
         fillWithWhite = true;
     else
     {
         size_t sum = 0;
-        for (const glm::u8vec4& x : modelInternal.colors[0])
-            sum += x[0] + x[1] + x[2] + x[3];
+        for (const uint8_t& x : modelInternal.AO)
+            sum += x;
         if (sum == 0)
             fillWithWhite = true;
     }
@@ -65,11 +65,18 @@ ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelIn
     for (size_t i = 0; i < modelInternal.positions.size(); i++)
     {
         size_t bufPtr = i * combinedVertSize;
+
         memcpy(&buf[0] + bufPtr, &modelInternal.positions[i][0], sizeof(float) * 3);
+        bufPtr += sizeof(float) * 3;
+
         if (fillWithWhite)
-            memcpy(&buf[0] + bufPtr + (sizeof(float) * 3), &all1, 3);
+            memcpy(&buf[0] + bufPtr, &all1, 3);
         else
-            memcpy(&buf[0] + bufPtr + (sizeof(float) * 3), &modelInternal.colors[0][i][0], 3);
+        {
+            memcpy(&buf[0] + bufPtr++, &modelInternal.AO[i], 1);
+            memcpy(&buf[0] + bufPtr++, &modelInternal.AO[i], 1);
+            memcpy(&buf[0] + bufPtr++, &modelInternal.AO[i], 1);
+        }
     }
     glBufferData(GL_ARRAY_BUFFER, combinedVertSize * modelInternal.positions.size(), buf.data(), GL_STATIC_DRAW);
 

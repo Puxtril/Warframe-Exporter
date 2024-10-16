@@ -240,17 +240,22 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		addAO = bodyInt.AO.size() > 0 ? true : false,
 		addBoneIndex = bodyInt.boneIndices.size() > 0 ? true : false,
 		addBoneWeight = bodyInt.boneWeights.size() > 0 ? true : false,
-		addRawPosition = bodyExt.positions.size() > 0 ? true : false;
+		addRawPosition = bodyExt.positions.size() > 0 ? true : false,
+		addRawNormal = bodyExt.normals.size() > 0 ? true : false,
+		addRawTangent = bodyExt.tangents.size() > 0 ? true : false;
 
+	// Custom attributes/colors as Uint8 must be exported as Vec4
 	uint32_t modelTotalByteLen = (
 		(addPosition ? bodyInt.positionTypeSize() : 0) +
 		(addUV1 ? bodyInt.UVTypeSize() : 0) +
 		(addUV2 ? bodyInt.UVTypeSize() : 0) +
-		(addAO ? bodyInt.AOTypeSize() * 4 : 0) + // Colors must be exported as Vec4
+		(addAO ? bodyInt.AOTypeSize() * 4 : 0) + // 1 -> 4
 		(bodyInt.colorTypeSize() * bodyInt.colors.size()) +
 		(addBoneIndex ? bodyInt.boneIndexTypeSize() : 0) +
 		(addBoneWeight ? bodyInt.boneWeightTypeSize() : 0) + 
-		(addRawPosition ? sizeof(bodyExt.positions[0]) : 0)
+		(addRawPosition ? sizeof(bodyExt.positions[0]) : 0) +
+		(addRawNormal ? sizeof(bodyExt.normals[0]) : 0) +
+		(addRawTangent ? 4 : 0) // 3 -> 4
 	) * vertCount;
 
 	// Assert 32-bit allignment
@@ -432,10 +437,55 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 		posAcc.count = vertCount;
 		posAcc.type = Accessor::Type::Vec4;
 		posAcc.componentType = Accessor::ComponentType::Float;
+		posAcc.normalized = true;
 		gltfDoc.accessors.push_back(posAcc);
 		bufferViewCursor += byteSize;
 
 		attrs["_RawPosition"] = posAccIndex;
+	}
+
+	if (addRawNormal)
+	{
+		uint32_t byteSize = sizeof(bodyExt.normals[0]) * bodyExt.normals.size();
+		memcpy(bufferCursor, &bodyExt.normals[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor normalAcc;
+		int32_t normalAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		normalAcc.bufferView = bufViewIndex;
+		normalAcc.byteOffset = bufferViewCursor;
+		normalAcc.count = vertCount;
+		normalAcc.type = Accessor::Type::Vec4;
+		normalAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		normalAcc.normalized = true;
+		gltfDoc.accessors.push_back(normalAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["_RawNormal"] = normalAccIndex;
+	}
+
+	if (addRawTangent)
+	{
+		uint32_t byteSize = 4 * bodyExt.tangents.size();
+		for (const glm::u8vec3& x : bodyExt.tangents)
+		{
+			memcpy(bufferCursor, &x[0], 3);
+			*(bufferCursor + 3) = 0;
+			bufferCursor += 4;
+		}
+
+		Accessor tangentAcc;
+		int32_t tangentAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		tangentAcc.bufferView = bufViewIndex;
+		tangentAcc.byteOffset = bufferViewCursor;
+		tangentAcc.count = vertCount;
+		tangentAcc.type = Accessor::Type::Vec4;
+		tangentAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		tangentAcc.normalized = true;
+		gltfDoc.accessors.push_back(tangentAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["_RawTangent"] = tangentAccIndex;
 	}
 
 	return attrs;

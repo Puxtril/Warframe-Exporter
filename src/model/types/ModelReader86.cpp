@@ -60,6 +60,8 @@ ModelReader86::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bina
     bodyReader->seek(0x2, std::ios_base::cur);
 
     outBody.positions.resize(extHeader.vertexCount);
+    outBody.normals.resize(extHeader.vertexCount);
+    outBody.tangents.resize(extHeader.vertexCount);
     outBody.UV1.resize(extHeader.vertexCount);
     outBody.UV2.resize(extHeader.vertexCount);
     outBody.AO.resize(extHeader.vertexCount);
@@ -70,9 +72,14 @@ ModelReader86::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bina
         outBody.positions[x][2] = bodyReader->readHalf();
         outBody.positions[x][3] = bodyReader->readHalf();
 
-        bodyReader->seek(4, std::ios_base::cur); // Normals?
+        outBody.normals[x][0] = bodyReader->readUInt8();
+        outBody.normals[x][1] = bodyReader->readUInt8();
+        outBody.normals[x][2] = bodyReader->readUInt8();
+        outBody.normals[x][3] = bodyReader->readUInt8();
         
-        bodyReader->seek(3, std::ios::cur); // Tangent data?
+        outBody.tangents[x][0] = bodyReader->readUInt8();
+        outBody.tangents[x][1] = bodyReader->readUInt8();
+        outBody.tangents[x][2] = bodyReader->readUInt8();
         outBody.AO[x] = bodyReader->readUInt8();
 
         outBody.UV1[x][0] = bodyReader->readHalf();

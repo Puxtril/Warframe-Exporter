@@ -13,7 +13,7 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32();
+    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
     outHeader.boneCount = headerReader->readUInt32();
 
     headerReader->seek(0x18, std::ios_base::cur);

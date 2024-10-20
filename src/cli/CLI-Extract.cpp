@@ -94,6 +94,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	WarframeExporter::Logger::getInstance().debug("Loading packages: " + pkgs.str());
 
 	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
+	WarframeExporter::Logger::getInstance().info("Extraction completed successfully");
 }
 
 void

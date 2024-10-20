@@ -18,7 +18,7 @@ LandscapeReader42::readHeader(BinaryReader::BinaryReaderBuffered* reader)
     
     reader->seek((4 * 2), std::ios::cur);
 
-    outHeader.rowCount = reader->readUInt32();
+    outHeader.rowCount = reader->readUInt32(1, 1000, "Landscape row count");
     outHeader.columnCount = reader->readUInt32();
 
     reader->seek(2, std::ios::cur);

@@ -131,6 +131,15 @@ ModelReader::readErrors(BinaryReader::BinaryReaderBuffered* reader, std::vector<
     }
 }
 
+void
+ModelReader::skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader)
+{
+    // I really don't know
+    uint16_t vecCheck = reader->readUInt16();
+    if (vecCheck != 256 && vecCheck != 257 && vecCheck != 258 && vecCheck != 260 && vecCheck != 0)
+        reader->seek(-2, std::ios_base::cur);
+}
+
 uint32_t
 ModelReader::skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader)
 {

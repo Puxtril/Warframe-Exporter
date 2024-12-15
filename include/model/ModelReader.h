@@ -29,6 +29,7 @@ namespace WarframeExporter::Model
 		void readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::vector<PhysXMesh>& outPhysxMeshes);
 		void readErrors(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outErrors);
 
+		void skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader);
 		uint32_t skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader);
 		void skipMorphs(BinaryReader::BinaryReaderBuffered* reader);
 		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader);

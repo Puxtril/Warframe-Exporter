@@ -467,10 +467,10 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 	if (addRawTangent)
 	{
 		uint32_t byteSize = 4 * bodyExt.tangents.size();
-		for (const glm::u8vec3& x : bodyExt.tangents)
+		for (size_t i = 0; i < bodyExt.tangents.size(); i++)
 		{
-			memcpy(bufferCursor, &x[0], 3);
-			*(bufferCursor + 3) = 0;
+			memcpy(bufferCursor, &bodyExt.tangents[i][0], 3);
+			memcpy(bufferCursor + 3, &bodyInt.AO[i], 1);
 			bufferCursor += 4;
 		}
 

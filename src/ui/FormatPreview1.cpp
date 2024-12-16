@@ -263,7 +263,7 @@ void
 FormatPreview::setupShader(std::stringstream& outStr, LotusLib::FileEntry& fileEntry)
 {
     WarframeExporter::Shader::ShaderReader* shaderReader = WarframeExporter::Shader::g_enumMapShader[fileEntry.commonHeader.type];
-    WarframeExporter::Shader::ShaderHeaderExternal shaderHeader = shaderReader->readHeader(&fileEntry.headerData);
+    WarframeExporter::Shader::ShaderHeaderExternal shaderHeader = shaderReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader.type);
 
     outStr << "Shader count: " << shaderHeader.shaderCount << std::endl;
 }

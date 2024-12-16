@@ -22,20 +22,22 @@ ShaderExtractor::getInstance()
 ShaderHeaderExternal
 ShaderExtractor::getHeader(LotusLib::FileEntry& fileEntry)
 {
-    ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
-    return shaderReader->readHeader(&fileEntry.headerData);
+	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
+	return shaderReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader.type);
 }
 
 ShaderEntry
-ShaderExtractor::readEntry(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header, int index)
+ShaderExtractor::readEntry(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header, int index)
 {
-    return shaderReader->readShader(bReader, header, index);
+	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
+	return shaderReader->readShader(&fileEntry.bData, header, index);
 }
 
 std::vector<ShaderEntry>
-ShaderExtractor::readAllEntries(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header)
+ShaderExtractor::readAllEntries(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header)
 {
-    return shaderReader->readAllShaders(bReader, header);
+	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
+	return shaderReader->readAllShaders(&fileEntry.bData, header);
 }
 
 void
@@ -78,10 +80,8 @@ void
 ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputDir)
 {
     ShaderHeaderExternal externalHeader = getHeader(fileEntry);
-        
-    ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
 
-    std::vector<ShaderEntry> bodyEntries = readAllEntries(shaderReader, &fileEntry.bData, externalHeader);
+    std::vector<ShaderEntry> bodyEntries = readAllEntries(fileEntry, externalHeader);
 
     for (int iShader = 0; iShader < bodyEntries.size(); iShader++)
     {

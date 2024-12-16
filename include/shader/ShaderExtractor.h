@@ -51,6 +51,7 @@ namespace WarframeExporter::Shader
 				(int)ShaderType::SHADER_18,
 				(int)ShaderType::SHADER_21,
 				//(int)ShaderType::SHADER_22,
+				(int)ShaderType::SHADER_23,
 				(int)ShaderType::SHADER_26,
 			};
 			return extTypes;
@@ -60,8 +61,8 @@ namespace WarframeExporter::Shader
 
         ShaderHeaderExternal getHeader(LotusLib::FileEntry& fileEntry);
 
-        ShaderEntry readEntry(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header, int index);
-        std::vector<ShaderEntry> readAllEntries(ShaderReader* shaderReader, BinaryReader::BinaryReaderBuffered* bReader, const ShaderHeaderExternal& header);
+        ShaderEntry readEntry(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header, int index);
+        std::vector<ShaderEntry> readAllEntries(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header);
 		
 		void decompileShader(ShaderEntry& shaderEntry);
 		void decompileShaders(std::vector<ShaderEntry>& shaderEntries);

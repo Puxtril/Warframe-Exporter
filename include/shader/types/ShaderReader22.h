@@ -22,7 +22,7 @@ namespace WarframeExporter::Shader
 			return extTypes;
 		}
 
-        ShaderHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader) override;
+        ShaderHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int shaderEnumType) override;
     
     protected:
         void skipStringArray(BinaryReader::BinaryReaderBuffered* headerReader, const std::string& msg);

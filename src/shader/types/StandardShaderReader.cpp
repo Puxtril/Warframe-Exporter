@@ -10,11 +10,14 @@ StandardShaderReader::getInstance()
 }
 
 ShaderHeaderExternal
-StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader)
+StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int shaderTypeEnum)
 {
     ShaderHeaderExternal shaderHeader;
 
-    headerReader->seek(8, std::ios::cur);
+    if (shaderTypeEnum == 23)
+        headerReader->seek(20, std::ios::cur);
+    else
+        headerReader->seek(8, std::ios::cur);
 
     uint32_t shaderPathLen = headerReader->readUInt32();
     headerReader->seek(shaderPathLen, std::ios::cur);

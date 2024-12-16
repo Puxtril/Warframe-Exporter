@@ -10,7 +10,7 @@ ShaderReader22::getInstance()
 }
 
 ShaderHeaderExternal
-ShaderReader22::readHeader(BinaryReader::BinaryReaderBuffered* headerReader)
+ShaderReader22::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int shaderEnumType)
 {
     // Intentional
     // I don't know what to do with this data

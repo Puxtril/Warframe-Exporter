@@ -20,8 +20,9 @@ ModelReader269::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     outHeader.morphCount = headerReader->readUInt32();
 
     headerReader->seek(0x8, std::ios_base::cur);
-    uint32_t unkArrLen = headerReader->readUInt32();
-    headerReader->seek(unkArrLen * 8U, std::ios_base::cur);
+    
+    skipUnk64Array(headerReader);
+
     headerReader->seek(0x31, std::ios_base::cur);
 
     readBoneTree(headerReader, outHeader.boneTree);
@@ -29,14 +30,13 @@ ModelReader269::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     uint32_t unkStructCount = skipUnknownStructs(headerReader);
 
     headerReader->seek(0x1A, std::ios_base::cur);
-    outHeader.bodySkipLen1 = headerReader->readUInt32();
+    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 5000, "BodySkipLen1");
     headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
     headerReader->seek(0x8, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
-    uint32_t unkWordCount = headerReader->readUInt32();
-    headerReader->seek(2U * unkWordCount, std::ios_base::cur);
+    skipUnk16Array(headerReader);
 
     skipMorphs(headerReader);
 

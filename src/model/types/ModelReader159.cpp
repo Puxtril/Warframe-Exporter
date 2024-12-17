@@ -5,10 +5,10 @@ using namespace WarframeExporter::Model;
 void
 ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
-    uint32_t strLen = headerReader->readUInt32();
+    uint32_t strLen = headerReader->readUInt32(0, 200, "First strLen");
     headerReader->seek(strLen, std::ios::cur);
     
-    uint32_t strLen2 = headerReader->readUInt32();
+    uint32_t strLen2 = headerReader->readUInt32(0, 200, "Second strLen");
     headerReader->seek(strLen2, std::ios::cur);
 
     headerReader->seek(0x20, std::ios::cur);
@@ -26,11 +26,11 @@ ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     headerReader->seek(0x10, std::ios::cur);
 
-    outHeader.bodySkipLen1 = headerReader->readUInt32();
+    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 1000, "BodySkipLen1");
 
     headerReader->seek(0x20, std::ios::cur);
 
-    uint32_t unkStructCount = headerReader->readUInt32();
+    uint32_t unkStructCount = headerReader->readUInt32(0, 100, "UnkStructCount");
     for (uint32_t x = 0; x < unkStructCount; x++)
     {
         uint32_t arrCount = headerReader->readUInt32();

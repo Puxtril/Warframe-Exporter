@@ -7,6 +7,8 @@
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
 
+#include "model/types/ModelReader269.h"
+
 #include <cassert>
 #include <iomanip>
 #include <vector>

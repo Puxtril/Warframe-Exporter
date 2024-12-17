@@ -14,19 +14,17 @@ ModelReader99::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
     outHeader.morphCount = headerReader->readUInt32();
-    outHeader.boneCount = headerReader->readUInt32();
+    outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
     headerReader->seek(0x18, std::ios_base::cur);
 
-    uint32_t skipLongCount = headerReader->readUInt32();
-    headerReader->seek(8 * skipLongCount, std::ios::cur);
+    skipUnk64Array(headerReader);
 
     headerReader->seek(0x51, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
-    uint32_t shortCount = headerReader->readUInt32();
-    headerReader->seek(shortCount * 2U, std::ios_base::cur);
+    skipUnk16Array(headerReader);
 
     readMaterialPaths(headerReader, outHeader.materialPaths);
 

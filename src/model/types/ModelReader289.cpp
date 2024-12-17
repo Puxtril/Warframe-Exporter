@@ -17,27 +17,26 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     outHeader.faceCount = headerReader->readUInt32();
     outHeader.boneCount = headerReader->readUInt32();
     outHeader.vertexCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32();
+    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
 
     headerReader->seek(0x8, std::ios_base::cur);
-    uint32_t unkArrLen = headerReader->readUInt32();
-    headerReader->seek(unkArrLen * 8U, std::ios_base::cur);
+    
+    skipUnk64Array(headerReader);
+
     headerReader->seek(0x31, std::ios_base::cur);
 
-    // Parent bone set to 0?
     readBoneTree(headerReader, outHeader.boneTree);
 
     uint32_t unkStructCount = skipUnknownStructs(headerReader);
 
     headerReader->seek(0x1A, std::ios_base::cur);
-    outHeader.bodySkipLen1 = headerReader->readUInt32();
+    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 1000, "BodySkipLen1");
     headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
     headerReader->seek(0x8, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
-    uint32_t unkWordCount = headerReader->readUInt32();
-    headerReader->seek(2U * unkWordCount, std::ios_base::cur);
+    skipUnk16Array(headerReader);
 
     skipMorphs(headerReader);
 
@@ -48,12 +47,11 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     headerReader->seek(0x2F, std::ios_base::cur);
 
     // Sub models?
-    static const std::string subModelCountMsg = "Submodel count";
-    uint32_t subModelCount = headerReader->readUInt32(0, 30, subModelCountMsg);
+    uint32_t subModelCount = headerReader->readUInt32(0, 30, "Submodel count");
     for (uint32_t x = 0; x < subModelCount; x++)
     {
         headerReader->seek(0xC, std::ios::cur);
-        uint32_t nameCount = headerReader->readUInt32();
+        uint32_t nameCount = headerReader->readUInt32(0, 100, "Sub-model name");
         headerReader->seek(nameCount, std::ios::cur);
         headerReader->seek(72, std::ios::cur);
     }

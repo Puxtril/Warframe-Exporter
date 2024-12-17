@@ -86,7 +86,7 @@ ModelReader::readMaterialPaths(BinaryReader::BinaryReaderBuffered* reader, std::
         outMaterialpaths.push_back(reader->readAsciiString(curMaterialPathLen));
     }
 }
-\
+
 void
 ModelReader::readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::vector<PhysXMesh>& outPhysxMeshes)
 {
@@ -138,6 +138,20 @@ ModelReader::skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader)
     uint16_t vecCheck = reader->readUInt16();
     if (vecCheck != 256 && vecCheck != 257 && vecCheck != 258 && vecCheck != 260 && vecCheck != 0)
         reader->seek(-2, std::ios_base::cur);
+}
+
+void
+ModelReader::skipUnk16Array(BinaryReader::BinaryReaderBuffered* reader)
+{
+    uint32_t unkShortLen = reader->readUInt32(0, 30, "Too many UnkShort values");
+    reader->seek(unkShortLen * 2, std::ios_base::cur);
+}
+
+void
+ModelReader::skipUnk64Array(BinaryReader::BinaryReaderBuffered* reader)
+{
+    uint32_t uint64LODUnkLen = reader->readUInt32(0, 10, "Too many Unk64 values");
+    reader->seek(uint64LODUnkLen * 8U, std::ios_base::cur);
 }
 
 uint32_t

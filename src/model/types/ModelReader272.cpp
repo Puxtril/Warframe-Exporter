@@ -5,55 +5,7 @@ using namespace WarframeExporter::Model;
 void
 ModelReader272::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
-    headerReader->seek(0x30, std::ios_base::cur);
-
-    skipPhysicsStruct(headerReader);
-
-    headerReader->seek(0x4C, std::ios_base::cur);
-
-    readWeightedBones(headerReader, outHeader.weightedBoneNames);
-
-    // Main vertex counts
-    outHeader.faceCount = headerReader->readUInt32();
-    outHeader.boneCount = headerReader->readUInt32();
-    outHeader.vertexCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32();
-
-    headerReader->seek(0x8, std::ios_base::cur);
-    uint32_t unkArrLen = headerReader->readUInt32();
-    headerReader->seek(unkArrLen * 8U, std::ios_base::cur);
-    headerReader->seek(0x31, std::ios_base::cur);
-
-    readBoneTree(headerReader, outHeader.boneTree);
-
-    uint32_t unkStructCount = skipUnknownStructs(headerReader);
-
-    headerReader->seek(0x1A, std::ios_base::cur);
-    outHeader.bodySkipLen1 = headerReader->readUInt32();
-    headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
-    headerReader->seek(0x8, std::ios_base::cur);
-
-    readMeshInfos(headerReader, outHeader.meshInfos);
-
-    uint32_t unkWordCount = headerReader->readUInt32();
-    headerReader->seek(2U * unkWordCount, std::ios_base::cur);
-
-    skipMorphs(headerReader);
-
-    readBoneMaps(headerReader, outHeader.boneMaps);
-
-    outHeader.bodySkipLen2 = skipMorphStructsAndFindSkip(headerReader);
-
-    headerReader->seek(0x2F, std::ios_base::cur);
-
-    skipPhysicsStruct(headerReader);
-
-    readPhysxMeshes(headerReader, outHeader.physXMeshes);
-
-    readErrors(headerReader, outHeader.errorMsgs);
-
-    if (headerReader->tell() != headerReader->getLength())
-        throw unknown_format_error("Did not reach end of file");
+    return ModelReader269::getInstance()->readHeader(headerReader, ensmalleningData, header, outHeader);
 }
 
 void

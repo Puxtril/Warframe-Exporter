@@ -15,8 +15,11 @@ namespace WarframeExporter
 {
 	class BatchIteratorExport : public BatchIterator
 	{
+		bool m_dryRun;
+
 	public:
 		BatchIteratorExport();
+		BatchIteratorExport(bool dryRun);
 
 	protected:
 		void processKnownFile(

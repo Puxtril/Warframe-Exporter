@@ -35,7 +35,7 @@ LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal&
 }
 
 void
-LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
 {
 	LevelExternal levelExt = getLevelExternal(fileEntry);
 	LevelInternal levelInt = convertToInternal(fileEntry, levelExt);
@@ -53,7 +53,8 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 		}
 	}
 
-	fx::gltf::Save(gltfOut, outputPath, gltfOut.buffers.size() > 1 ? false : true);
+	if (!dryRun)
+		fx::gltf::Save(gltfOut, outputPath, gltfOut.buffers.size() > 1 ? false : true);
 }
 
 Document

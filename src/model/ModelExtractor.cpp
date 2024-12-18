@@ -44,7 +44,7 @@ ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::
 }
 
 void
-ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
 {
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
@@ -66,5 +66,6 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	// Convert body/header into exportable format
 	Document gltfDocument;
 	ModelExporterGltf::addModelData(gltfDocument, headerInt, bodyInt, bodyExt);
-	ModelExporterGltf::save(gltfDocument, outputPath);
+	if (!dryRun)
+		ModelExporterGltf::save(gltfDocument, outputPath);
 }

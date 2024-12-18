@@ -58,7 +58,7 @@ namespace WarframeExporter::Level
 		LevelInternal convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal);
 		Document createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun = false) override;
 	
 	private:
 		void writeAndAdvanceBuffer(Document& gltfDoc, const std::filesystem::path& outputPath);

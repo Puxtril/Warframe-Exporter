@@ -29,12 +29,16 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_shaderExportType;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_textureFormat;
 
+	bool m_dryRun;
+
 	CLIExtract();
 
 public:
 	CLIExtract(const CLIExtract& other) = delete;
 	CLIExtract& operator=(const CLIExtract& other) = delete;
 	static CLIExtract* getInstance();
+
+	void setDryRun(bool dryRun);
 
 	const std::string& getFeatureName() override;
 	void addMainCmds(TCLAP::OneOf& oneOfCmd) override;

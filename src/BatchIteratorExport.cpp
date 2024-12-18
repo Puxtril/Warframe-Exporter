@@ -3,7 +3,12 @@
 using namespace WarframeExporter;
 
 BatchIteratorExport::BatchIteratorExport()
-	: BatchIterator()
+	: BatchIterator(), m_dryRun(false)
+{
+}
+
+BatchIteratorExport::BatchIteratorExport(bool dryRun)
+	: BatchIterator(), m_dryRun(dryRun)
 {
 }
 
@@ -17,7 +22,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 		savePath = outputPath / fileEntry.internalPath.relative_path();
 		savePath.replace_extension("");
 
-		if (!std::filesystem::exists(savePath))
+		if (!std::filesystem::exists(savePath) && !m_dryRun)
 			std::filesystem::create_directories(savePath);
 	}
 	else
@@ -31,7 +36,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 		return;
 	}
 
-		if (!std::filesystem::exists(savePath.parent_path()))
+		if (!std::filesystem::exists(savePath.parent_path()) && !m_dryRun)
 			std::filesystem::create_directories(savePath.parent_path());
 	}
 
@@ -42,7 +47,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 		m_logger.info("Extracting " + fullFileEntry.internalPath.string());
 		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fullFileEntry.commonHeader.type));
 
-		extractor->extract(fullFileEntry, pkgs, ensmalleningData, savePath);
+		extractor->extract(fullFileEntry, pkgs, ensmalleningData, savePath, m_dryRun);
 		writeFileProperties(savePath, fullFileEntry);
 	}
 	catch (not_imeplemented_error& err)

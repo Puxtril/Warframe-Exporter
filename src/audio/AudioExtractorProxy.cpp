@@ -18,11 +18,11 @@ AudioExtractorProxy::getInstance()
 }
 
 void
-AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
 {
 	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.headerData);
 	Extractor* extractor = g_enumMapAudioExtractor[(int)compressionEnum];
-	extractor->extract(fileEntry, pkgs, ensmalleningData, outputPath);
+	extractor->extract(fileEntry, pkgs, ensmalleningData, outputPath, dryRun);
 }
 
 AudioCompression

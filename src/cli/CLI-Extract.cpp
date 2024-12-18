@@ -24,6 +24,12 @@ CLIExtract::getInstance()
 	return instance;
 }
 
+void
+CLIExtract::setDryRun(bool dryRun)
+{
+	m_dryRun = dryRun;
+}
+
 const std::string&
 CLIExtract::getFeatureName()
 {
@@ -142,7 +148,7 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 void
 CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
 {
-	WarframeExporter::BatchIteratorExport extractor;
+	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 
 	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types);

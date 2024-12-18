@@ -45,10 +45,11 @@ TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHead
 }
 
 void
-TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
 {
 	TextureInternal intTexture = getTexture(fileEntry, pkgs, ensmalleningData);
-	writeData(intTexture, fileEntry.commonHeader, outputPath);
+	if (!dryRun)
+		writeData(intTexture, fileEntry.commonHeader, outputPath);
 }
 
 void

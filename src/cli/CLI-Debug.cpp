@@ -1,9 +1,11 @@
 #include "cli/CLI-Debug.h"
+#include "cli/CLI-Extract.h"
 
 CLIDebug::CLIDebug()
 {
 	m_printEnums = std::make_shared<TCLAP::SwitchArg>("", "print-enums", "Print file enums", false);
 	m_writeRaw = std::make_shared<TCLAP::SwitchArg>("", "write-raw", "Write unprocessed decompressed file(s)", false);
+	m_dryRun = std::make_shared<TCLAP::SwitchArg>("", "dry-run", "Extract without writing files to disk", false);
 }
 
 CLIDebug*
@@ -31,6 +33,7 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 void
 CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 {
+	cmdLine.add(m_dryRun.get());
 }
 
 void
@@ -57,7 +60,16 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 			WarframeExporter::Logger::getInstance().error("Must use --internal-path with --write-raw");
 			return;
 		}
+		if (m_dryRun->getValue())
+		{
+			WarframeExporter::Logger::getInstance().error("--dry-run isn't supported with --write-raw");
+			return;
+		}
 		writeRaw(outPath, internalPath, pkgName, cacheDirPath);
+	}
+	else if (m_dryRun->getValue())
+	{
+		CLIExtract::getInstance()->setDryRun(m_dryRun->getValue());
 	}
 }
 

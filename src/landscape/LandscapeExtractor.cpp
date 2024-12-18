@@ -61,11 +61,12 @@ LandscapeExtractor::write(Document& gltf, const std::filesystem::path& outputPat
 }
 
 void
-LandscapeExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+LandscapeExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
 {
     LandscapeHeaderExternal extHeader = readHeader(&fileEntry.headerData, fileEntry.commonHeader);
     std::vector<LandscapeBodyChunkExternal> chunks = readLandscapeChunks(&fileEntry.bData, extHeader, fileEntry.commonHeader);
     LandscapeInternal intLandscape = formatLandscape(extHeader, chunks);
     Document gltf = convertToGltf(intLandscape);
-    write(gltf, outputPath);
+    if (!dryRun)
+        write(gltf, outputPath);
 }

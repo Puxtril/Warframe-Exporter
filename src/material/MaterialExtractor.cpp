@@ -57,10 +57,11 @@ MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std:
 }
 
 void
-MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
 {
 	MaterialExternal external = getExternalMaterial(&fileEntry.headerData, fileEntry.commonHeader);
 	addPackgesBinAttributes(pkgs, fileEntry.internalPath, external);
 	MaterialInternal internal = formatMaterial(external);
-	writeOut(internal, outputPath);
+	if (!dryRun)
+		writeOut(internal, outputPath);
 }

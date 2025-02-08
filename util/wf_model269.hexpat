@@ -4,18 +4,7 @@
 #include <wf_common-header.hexpat>
 #include <wf_models.hexpat>
 
-struct SubModel {
-    padding[0xC];
-    str32 name;
-    padding[0x48];
-};
-
-struct SubModels {
-    u32 count;
-    SubModel models[count];
-};
-
-struct Model289 {
+struct Model269 {
     padding[0x30];
     PhysicsPath physicsPath1;
     padding[0x4C];
@@ -39,12 +28,10 @@ struct Model289 {
     BoneMapCollection boneMaps;
     Morphs2 morphs2;
     padding[0x2F];
-    SubModels subModels;
-    padding[0x1D];
     PhysicsPath physicsPath2;
-    PhysXMeshes physxMeshes;
+    PhysXMeshes physXMeshes;
     Errors errors;
 };
 
 CommonHeader Header @ $;
-Model289 model @ $;
+Model269 model @ $;

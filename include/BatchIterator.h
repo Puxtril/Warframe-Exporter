@@ -9,6 +9,7 @@
 #include "ExporterExceptions.h"
 #include "FileProperties.h"
 #include "EnumMapExtractor.h"
+#include "LotusUtils.h"
 
 #include <filesystem>
 
@@ -24,7 +25,7 @@ namespace WarframeExporter
 	public:
 		BatchIterator();
 
-		void batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types);
+		void batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types, LotusLib::Game game);
 		static std::vector<std::string> getPackageNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath);
 
 	protected:

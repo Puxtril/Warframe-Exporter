@@ -41,10 +41,10 @@ namespace WarframeExporter::Landscape
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
-				(int)LandscapeType::LANDSCAPE_42,
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)LandscapeType::LANDSCAPE_42 },
 			};
 			return extTypes;
 		}

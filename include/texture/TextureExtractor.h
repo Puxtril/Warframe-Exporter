@@ -73,23 +73,23 @@ namespace WarframeExporter::Texture
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			static std::vector<int> extTypes = {
-				(int)TextureType::TEXTURE_DIFFUSE_EMISSION_TINT,
-				(int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE,
-				(int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL,
-				(int)TextureType::TEXTURE_COMPOSITE,
-				(int)TextureType::TEXTURE_ROUGHNESS,
-				(int)TextureType::TEXTURE_SKYBOX,
-				(int)TextureType::TEXTURE_174,
-				(int)TextureType::TEXTURE_176,
-				(int)TextureType::TEXTURE_CUBEMAP,
-				(int)TextureType::TEXTURE_HDR,
-				(int)TextureType::TEXTURE_NORMAL_MAP,
-				(int)TextureType::TEXTURE_PACKMAP,
-				(int)TextureType::TEXTURE_194,
-				(int)TextureType::TEXTURE_DETAILSPACK
+			static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DIFFUSE_EMISSION_TINT },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_COMPOSITE },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ROUGHNESS },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_SKYBOX },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_174 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_176 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_CUBEMAP },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_HDR },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_NORMAL_MAP },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_PACKMAP },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_194 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DETAILSPACK }
 			};
 			return extTypes;
 		};

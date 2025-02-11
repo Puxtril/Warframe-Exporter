@@ -1,7 +1,6 @@
 #pragma once
 
-#include "EnumMap.h"
-#include "Extractor.h"
+#include "EnumMapExtractorClass.h"
 #include "model/ModelExtractor.h"
 #include "texture/TextureExtractor.h"
 #include "material/MaterialExtractor.h"
@@ -12,12 +11,12 @@
 
 namespace WarframeExporter
 {
-	const static EnumMap<Extractor> g_enumMapExtractor = EnumMap<Extractor>()
-		.registerClass(Model::ModelExtractor::getInstance())
-		.registerClass(Texture::TextureExtractor::getInstance())
-		.registerClass(Material::MaterialExtractor::getInstance())
-		.registerClass(Level::LevelExtractor::getInstance())
-		.registerClass(Audio::AudioExtractorProxy::getInstance())
-		.registerClass(Shader::ShaderExtractor::getInstance())
-		.registerClass(Landscape::LandscapeExtractor::getInstance());
-}
+    const static EnumMapExtractor g_enumMapExtractor = EnumMapExtractor()
+            .registerClass(Model::ModelExtractor::getInstance())
+            .registerClass(Texture::TextureExtractor::getInstance())
+            .registerClass(Material::MaterialExtractor::getInstance())
+            .registerClass(Level::LevelExtractor::getInstance())
+            .registerClass(Audio::AudioExtractorProxy::getInstance())
+            .registerClass(Shader::ShaderExtractor::getInstance())
+            .registerClass(Landscape::LandscapeExtractor::getInstance());
+};

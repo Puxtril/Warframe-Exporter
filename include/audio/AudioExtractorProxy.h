@@ -32,12 +32,12 @@ namespace WarframeExporter::Audio
 			return false;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				//(int)AudioType::AUDIO_6,
 				//(int)AudioType::AUDIO_23,
-				(int)AudioType::AUDIO_139	
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioType::AUDIO_139 }
 			};
 			return extTypes;
 		}

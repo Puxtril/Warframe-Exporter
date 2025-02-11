@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EnumMapExtractorValue.h"
 #include "Extractor.h"
 #include "LevelEnumMap.h"
 #include "BinaryReaderBuffered.h"
@@ -43,11 +44,11 @@ namespace WarframeExporter::Level
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = {
-				(int)LevelType::LEVEL_201,
-				(int)LevelType::LEVEL_202
+			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_201 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_202 }
 			};
 			return extTypes;
 		}

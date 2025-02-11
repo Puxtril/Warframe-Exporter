@@ -1,5 +1,4 @@
 #include "cli/CLI-Extract.h"
-#include "BatchIterator.h"
 
 CLIExtract::CLIExtract()
 {
@@ -151,5 +150,5 @@ CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::
 	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 
-	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types);
+	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types, LotusLib::Game::WARFRAME);
 }

@@ -45,14 +45,14 @@ namespace WarframeExporter::Shader
 			return type;
         }
 
-        inline std::vector<int> getEnumMapKeys() const override
+        inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
-				(int)ShaderType::SHADER_18,
-				(int)ShaderType::SHADER_21,
-				//(int)ShaderType::SHADER_22,
-				(int)ShaderType::SHADER_23,
-				(int)ShaderType::SHADER_26,
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_18 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_21 },
+				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_22 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_23 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_26 },
 			};
 			return extTypes;
 		}

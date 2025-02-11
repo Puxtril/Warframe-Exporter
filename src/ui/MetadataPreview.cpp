@@ -38,7 +38,7 @@ MetdataPreview::setupCommonHeader(LotusLib::FileEntry& fileEntry)
 
     outStr << "Type Enum: ";
     outStr << fileEntry.commonHeader.type << " ";
-    auto extractor = WarframeExporter::g_enumMapExtractor[fileEntry.commonHeader.type];
+    auto extractor = WarframeExporter::g_enumMapExtractor.at(LotusLib::Game::WARFRAME, LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
     if (extractor != nullptr)
         outStr << "(" << extractor->getFriendlyName() << ")";
     else

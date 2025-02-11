@@ -28,7 +28,8 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			const LotusLib::FileEntries::FileNode* fileNode,
 			const Ensmallening& ensmalleningData,
-			const std::filesystem::path& outputPath
+			const std::filesystem::path& outputPath,
+			LotusLib::Game game
     );
 
     void
@@ -36,6 +37,7 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			LotusLib::LotusPath& internalPath,
 			const Ensmallening& ensmalleningData,
-			const std::filesystem::path& outputPath
+			const std::filesystem::path& outputPath,
+			LotusLib::Game game
     );
 }

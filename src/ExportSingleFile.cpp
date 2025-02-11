@@ -7,7 +7,7 @@ WarframeExporter::_FileExport::extractFile(LotusLib::PackagesReader& pkgs, const
 }
 
 void
-WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, const LotusLib::FileEntries::FileNode* fileNode, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, const LotusLib::FileEntries::FileNode* fileNode, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, LotusLib::Game game)
 {
     static _FileExport fileExporter;
 
@@ -17,7 +17,7 @@ WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string&
     
     LotusLib::FileEntry fileEntry = pkgReader->getFile(fileNode, LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
 
-    Extractor* extractor = g_enumMapExtractor[fileEntry.commonHeader.type];
+    Extractor* extractor = g_enumMapExtractor.at(game, pkgReader->getPkgCategory(), fileEntry.commonHeader.type);
 
     if (extractor == nullptr)
     {
@@ -28,12 +28,12 @@ WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string&
 }
 
 void
-WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, LotusLib::Game game)
 {
     std::optional<LotusLib::PackageReader> pkgReader = pkgs.getPackage(pkgName);
     if (!pkgReader)
         throw std::runtime_error("Package does not exist");
 
     const LotusLib::FileEntries::FileNode* fileNode = pkgReader->getFileNode(internalPath);
-    WarframeExporter::extractFile(pkgs, pkgName, fileNode, ensmalleningData, outputPath);
+    WarframeExporter::extractFile(pkgs, pkgName, fileNode, ensmalleningData, outputPath, game);
 }

@@ -15,7 +15,7 @@ void
 FormatPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
     LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER | LotusLib::READ_H_CACHE | LotusLib::READ_F_CACHE | LotusLib::READ_B_CACHE);
-    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[fileEntry.commonHeader.type];
+    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(LotusLib::Game::WARFRAME, pkgs->getPackage(pkgName)->getPkgCategory(), fileEntry.commonHeader.type);
     
     if (extractor == nullptr)
         return;

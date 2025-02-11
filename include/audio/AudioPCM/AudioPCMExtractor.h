@@ -37,11 +37,11 @@ namespace WarframeExporter::Audio {
 			return outFileExt;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
-				(int)AudioCompression::PCM,
-				(int)AudioCompression::ADPCM
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioCompression::PCM },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioCompression::ADPCM }
 			};
 			return extTypes;
 		}

@@ -8,7 +8,7 @@ BatchIterator::BatchIterator()
 }
 
 void
-BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types)
+BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types, LotusLib::Game game)
 {
 	for (const std::string& curPackageName : packages)
 	{
@@ -31,7 +31,7 @@ BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallenin
 			{
 				LotusLib::FileEntry curEntry = curPkg->getFile((*iter), LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
 
-				Extractor* extractor = g_enumMapExtractor[curEntry.commonHeader.type];
+				Extractor* extractor = g_enumMapExtractor.at(game, curPkg->getPkgCategory(), curEntry.commonHeader.type);
 
 				if (extractor == nullptr)
 				{

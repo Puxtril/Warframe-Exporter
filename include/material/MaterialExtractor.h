@@ -40,16 +40,16 @@ namespace WarframeExporter::Material
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
-				(int)MaterialType::MATERIAL_203,
-				(int)MaterialType::MATERIAL_204,
-				(int)MaterialType::MATERIAL_205,
-				(int)MaterialType::MATERIAL_206,
-				(int)MaterialType::MATERIAL_208,
-				(int)MaterialType::MATERIAL_214,
-				(int)MaterialType::MATERIAL_216
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_203 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_204 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_205 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_206 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_208 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_214 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_216 }
 			};
 			return extTypes;
 		}

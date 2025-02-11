@@ -64,7 +64,7 @@ PreviewManager::clearPreview()
 Preview*
 PreviewManager::getPreview(LotusLib::FileEntry& fileEntry)
 {
-    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[fileEntry.commonHeader.type];
+    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(LotusLib::Game::WARFRAME, LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
 
     if (extractor == nullptr)
     {

@@ -143,7 +143,7 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
                 try
                 {
                     int format = m_pkgs->getPackage(m_exportPkgNames[iPkg]).value().getFileFormat(curNode);
-                    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor[format];
+                    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(LotusLib::Game::WARFRAME, m_pkgs->getPackage(m_exportPkgNames[iPkg])->getPkgCategory() ,format);
                     if (extractor == nullptr)
                         continue;
                     WarframeExporter::ExtractorType curEntryType = extractor->getExtractorType();

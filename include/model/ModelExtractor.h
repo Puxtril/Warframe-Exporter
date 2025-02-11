@@ -48,21 +48,21 @@ namespace WarframeExporter::Model
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = {
-				(int)ModelType::MODEL_STATIC_86,
-				(int)ModelType::MODEL_STATIC_96,
-				(int)ModelType::MODEL_LEVEL_99,
-				(int)ModelType::MODEL_DCM_101,
-				(int)ModelType::MODEL_HLOD_OR_DCM_102,
-				(int)ModelType::MODEL_LEVEL_103,
-				(int)ModelType::MODEL_TERRAIN_159,
-				(int)ModelType::MODEL_TERRAIN_160,
-				(int)ModelType::MODEL_RIGGED_269,
-				(int)ModelType::MODEL_RIGGED_272,
-				(int)ModelType::MODEL_PACKED_289,
-				(int)ModelType::MODEL_PACKED_290
+			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_86 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_96 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_99 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_DCM_101 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_HLOD_OR_DCM_102 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_103 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_159 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_160 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_269 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_272 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_289 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_290 },
 			};
 			return extTypes;
 		}

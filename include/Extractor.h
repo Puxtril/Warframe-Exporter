@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EnumMapValue.h"
+#include "EnumMapExtractorValue.h"
 #include "BinaryReaderBuffered.h"
 #include "CommonHeader.h"
 #include "Ensmallening.hpp"
@@ -13,19 +13,7 @@
 
 namespace WarframeExporter
 {
-	enum class ExtractorType
-	{
-		Model = 1,
-		Texture = 2,
-		Material = 4,
-		VERTEX_COLOR = 8,
-		Level = 32,
-		Audio = 64,
-		Shader = 128,
-		Landscape = 256,
-	};
-	
-	class Extractor : public EnumMapValue
+	class Extractor : public EnumMapExtractorValue
 	{
 	protected:
 		Logger& m_logger;

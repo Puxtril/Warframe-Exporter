@@ -37,7 +37,7 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
+CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game)
 {
 	if (m_printEnums->getValue())
 	{

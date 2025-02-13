@@ -37,7 +37,7 @@ CLIAdvanced::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIAdvanced::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
+CLIAdvanced::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game)
 {
 	WarframeExporter::Ensmallening& ensmalleningMutable = const_cast<WarframeExporter::Ensmallening&>(ensmallening);
 

@@ -60,7 +60,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
  
 void
-CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening)
+CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game)
 {
 	if (!m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
@@ -98,7 +98,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 		pkgs << (pkgNames[i]) << " ";
 	WarframeExporter::Logger::getInstance().debug("Loading packages: " + pkgs.str());
 
-	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening);
+	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, ensmallening, game);
 	WarframeExporter::Logger::getInstance().info("Extraction completed successfully");
 }
 
@@ -145,10 +145,10 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening)
+CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game)
 {
 	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 
-	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types, LotusLib::Game::WARFRAME);
+	extractor.batchIterate(pkgs, ensmallening, outPath, intPath, pkgNames, types, game);
 }

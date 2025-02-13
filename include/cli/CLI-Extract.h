@@ -43,11 +43,11 @@ public:
 	const std::string& getFeatureName() override;
 	void addMainCmds(TCLAP::OneOf& oneOfCmd) override;
 	void addMiscCmds(TCLAP::CmdLine& cmdLine) override;
-	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening) override;
+	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game) override;
 
 private:
 	void setShaderFormat(const std::string& cmdValue);
 	void setTextureFormat(const std::string& commandValue);
 	void checkOutputDir(const std::string& outPath);
-	void extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening);
+	void extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game);
 };

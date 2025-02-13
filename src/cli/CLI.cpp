@@ -25,8 +25,9 @@ main(int argc, char** argv)
 	TCLAP::ValueArg<std::string> outPathCmd("", "output-path", "Destination of extracted assets. Ex: C:\\Users\\Puxtril\\Downloads\\Extracted (Default: Current directory)", false, "Extracted", "Output path");
 	TCLAP::ValueArg<std::string> intPathCmd("", "internal-path", "Internal path base. Ex: /Lotus/Characters/Tenno/Excalibur", false, "/", "Internal Path");
 	TCLAP::ValueArg<std::string> pkgCmd("", "package", "Warframe package. Ex: \"Misc\" or \"Texture\"", false, "", "Package name");
+	TCLAP::ValueArg<std::string> gameCmd("", "game", "Target game (Warframe)", false, "Warframe", "Game name");
 	TCLAP::ValueArg<std::string> cacheDirCmd("", "cache-dir", "Cache directory. Ex: C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows", true, "", "Cache.Windows path");
-	cmd.add(intPathCmd).add(pkgCmd).add(cacheDirCmd).add(outPathCmd);
+	cmd.add(intPathCmd).add(pkgCmd).add(cacheDirCmd).add(outPathCmd).add(gameCmd);
 
 	for (CLIFeature* feat : g_features)
 		feat->addMiscCmds(cmd);
@@ -50,7 +51,8 @@ main(int argc, char** argv)
 	checkDirs(cacheDirCmd.getValue());
 	createLoggers(g_logLevel, outPathCmd.getValue());
 	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
-
+	LotusLib::Game game = getGame(gameCmd.getValue());
+	
 	// Basic logs
 	WarframeExporter::Logger::getInstance().debug(("Version: " + std::string(g_version)));
 
@@ -67,7 +69,7 @@ main(int argc, char** argv)
 	try
 	{
 		for (CLIFeature* feat : g_features)
-			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDirCmd.getValue(), ensmallening);
+			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDirCmd.getValue(), ensmallening, game);
 	}
 	catch (std::exception& e)
 	{
@@ -118,6 +120,21 @@ forgiveLotusPath(LotusLib::LotusPath inPath)
 		fixedPath << "/" << token;
 	}
 	return fixedPath.str();
+}
+
+LotusLib::Game
+getGame(const std::string& gameStr)
+{
+	std::string lower(gameStr);
+	std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c){ return std::tolower(c); });
+	LotusLib::Game game = LotusLib::stringToGame(lower);
+	if (game == LotusLib::Game::UNKNOWN)
+	{
+		WarframeExporter::Logger::getInstance().error("Game is Unknown, cannot continue");
+		exit(1);
+	}
+	WarframeExporter::Logger::getInstance().info("Extracting as game: " + LotusLib::gameToString(game));
+	return game;
 }
 
 void

@@ -30,7 +30,7 @@ public:
 	const std::string& getFeatureName() override;
 	void addMainCmds(TCLAP::OneOf& oneOfCmd) override;
 	void addMiscCmds(TCLAP::CmdLine& cmdLine) override;
-	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening) override;
+	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game) override;
 
 private:
 	void printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath);

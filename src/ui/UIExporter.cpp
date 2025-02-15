@@ -161,7 +161,7 @@ UiExporter::setData(
     m_exportPkgNames = WarframeExporter::BatchIterator::getPackageNames(extractTypes, m_cacheDirPath);
     m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
     m_exporterFileThread.setData(&m_packages, exportPath);
-    m_previewManager.setData(&m_packages, {true, true, true});
+    m_previewManager.setData(&m_packages);
 
     WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = false;
     WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = shaderExportType;

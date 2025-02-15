@@ -10,12 +10,12 @@ AudioOpusExtractor::getInstance()
 }
 
 void
-AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
+AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
 	AudioReader* reader = g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
 	
 	AudioHeader audioHeader;
-	reader->readHeader(&fileEntry.headerData, ensmalleningData, fileEntry.commonHeader, audioHeader);
+	reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
 
 	AudioBody audioBody;
 	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);

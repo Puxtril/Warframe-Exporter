@@ -27,10 +27,8 @@ ExporterDirectoryThread::run()
 {
     emit ExporterDirectoryThread::extractIndexingStarted();
 
-    WarframeExporter::Ensmallening ensmalleningData(true, true, true);
-
     BatchIteratorCountQt totalItemsIter;
-    totalItemsIter.batchIterate(*m_pkgsReader, ensmalleningData, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes, LotusLib::Game::WARFRAME);
+    totalItemsIter.batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes, LotusLib::Game::WARFRAME);
     int totalItems = static_cast<int>(totalItemsIter.getFileCount());
 
     emit ExporterDirectoryThread::extractStart(totalItems);
@@ -40,7 +38,7 @@ ExporterDirectoryThread::run()
 
     try
     {
-        m_exporter->batchIterate(*m_pkgsReader, ensmalleningData, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes, LotusLib::Game::WARFRAME);
+        m_exporter->batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_exportPkgNames, m_extractTypes, LotusLib::Game::WARFRAME);
     }
     catch (ExtractionCancelled&)
     {

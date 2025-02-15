@@ -9,7 +9,7 @@ TextureReader::getCorrectBodyReader(BinaryReader::BinaryReaderBuffered* FfileRea
 }
 
 TextureHeaderExternal
-TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader, const Ensmallening& ensmalleningData)
+TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
 	uint8_t enum1 = headerReader->readUInt8();
 	uint8_t enum2 = headerReader->readUInt8();
@@ -19,8 +19,8 @@ TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 	uint32_t unkArrCount = headerReader->readUInt32();
 	headerReader->seek(4U * unkArrCount, std::ios_base::cur);
 
-	if (!ensmalleningData.isPostPart1())
-		headerReader->seek(9, std::ios_base::cur);
+	//if (!ensmalleningData.isPostPart1())
+	//	headerReader->seek(9, std::ios_base::cur);
 
 	int16_t width = headerReader->readInt16();
 	int16_t height = headerReader->readInt16();

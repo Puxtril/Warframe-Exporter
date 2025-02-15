@@ -61,15 +61,11 @@ main(int argc, char** argv)
 		args << (argv[i]) << " ";
 	WarframeExporter::Logger::getInstance().debug(("Args: " + args.str()));
 
-	// Create base objects
-	//LotusLib::PackagesReader pkgsReader(cacheDirCmd.getValue());
-	WarframeExporter::Ensmallening ensmallening(true, true, true);
-
 	// Parse commands
 	try
 	{
 		for (CLIFeature* feat : g_features)
-			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDirCmd.getValue(), ensmallening, game);
+			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDirCmd.getValue(), game);
 	}
 	catch (std::exception& e)
 	{

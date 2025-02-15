@@ -40,6 +40,6 @@ PreviewUnsupported::show()
 }
 
 void
-PreviewUnsupported::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const WarframeExporter::Ensmallening& ensmalleningData)
+PreviewUnsupported::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
 {
 }

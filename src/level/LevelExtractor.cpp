@@ -35,14 +35,14 @@ LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal&
 }
 
 void
-LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
+LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
 	LevelExternal levelExt = getLevelExternal(fileEntry);
 	LevelInternal levelInt = convertToInternal(fileEntry, levelExt);
 
 	m_logger.info("Level mesh count: " + std::to_string(levelInt.objs.size()));
 
-	Document gltfOut = createGltfCombined(pkgs, ensmalleningData, levelInt);
+	Document gltfOut = createGltfCombined(pkgs, levelInt);
 
 	if (gltfOut.buffers.size() > 1)
 	{
@@ -58,7 +58,7 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 }
 
 Document
-LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, LevelInternal& bodyInt)
+LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt)
 {
 	Document outGltf;
 
@@ -95,7 +95,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, const Ensmall
 
 			WarframeExporter::Model::ModelHeaderExternal headerExt;
 			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, ensmalleningData, headerExt, bodyExt);
+			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, headerExt, bodyExt);
 
 			if (headerExt.meshInfos.size() == 0)
 			{

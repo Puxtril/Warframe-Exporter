@@ -31,7 +31,7 @@ CLIMain::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game)
+CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
 	if (m_lsCmd->getValue())
 	{

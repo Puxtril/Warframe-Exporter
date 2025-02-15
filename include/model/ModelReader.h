@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BinaryReaderBuffered.h"
-#include "Ensmallening.hpp"
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
 #include "EnumMapValue.h"
@@ -17,7 +16,7 @@ namespace WarframeExporter::Model
 	public:
 		virtual ScaleType ensmalleningScale() const = 0;
 
-		virtual void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
+		virtual void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
 		virtual void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) = 0;
 
 	protected:

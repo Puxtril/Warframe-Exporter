@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelReader103::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader103::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 

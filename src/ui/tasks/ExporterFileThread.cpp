@@ -22,13 +22,11 @@ ExporterFileThread::setFileData(LotusLib::LotusPath internalFilePath, std::strin
 void
 ExporterFileThread::run()
 {
-    WarframeExporter::Ensmallening ensmalleningData(true, true, true);
-
     emit ExporterFileThread::extractStart(1);
 
     try
     {
-        WarframeExporter::extractFile(*m_pkgsReader, m_pkgName, m_internalFilePath, ensmalleningData, m_exportPath, LotusLib::Game::WARFRAME);
+        WarframeExporter::extractFile(*m_pkgsReader, m_pkgName, m_internalFilePath, m_exportPath, LotusLib::Game::WARFRAME);
     }
     catch (std::exception& ex)
     {

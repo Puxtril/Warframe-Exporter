@@ -1,13 +1,13 @@
 #include "ExportSingleFile.h"
 
 void
-WarframeExporter::_FileExport::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+WarframeExporter::_FileExport::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const std::filesystem::path& outputPath)
 {
-    processKnownFile(pkgs, pkgName, fileEntry, extractor, ensmalleningData, outputPath);
+    processKnownFile(pkgs, pkgName, fileEntry, extractor, outputPath);
 }
 
 void
-WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, const LotusLib::FileEntries::FileNode* fileNode, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, LotusLib::Game game)
+WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, const LotusLib::FileEntries::FileNode* fileNode, const std::filesystem::path& outputPath, LotusLib::Game game)
 {
     static _FileExport fileExporter;
 
@@ -24,16 +24,16 @@ WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string&
         throw unknown_format_error("File format not supported");
     }
 
-    fileExporter.extractFile(pkgs, pkgName, fileEntry, extractor, ensmalleningData, outputPath);
+    fileExporter.extractFile(pkgs, pkgName, fileEntry, extractor, outputPath);
 }
 
 void
-WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, LotusLib::Game game)
+WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::LotusPath& internalPath, const std::filesystem::path& outputPath, LotusLib::Game game)
 {
     std::optional<LotusLib::PackageReader> pkgReader = pkgs.getPackage(pkgName);
     if (!pkgReader)
         throw std::runtime_error("Package does not exist");
 
     const LotusLib::FileEntries::FileNode* fileNode = pkgReader->getFileNode(internalPath);
-    WarframeExporter::extractFile(pkgs, pkgName, fileNode, ensmalleningData, outputPath, game);
+    WarframeExporter::extractFile(pkgs, pkgName, fileNode, outputPath, game);
 }

@@ -39,7 +39,7 @@ PreviewMaterial::show()
 }
 
 void
-PreviewMaterial::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const WarframeExporter::Ensmallening& ensmalleningData)
+PreviewMaterial::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
 {
     auto materialExtractor = WarframeExporter::Material::MaterialExtractor::getInstance();
 

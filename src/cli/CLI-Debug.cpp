@@ -1,5 +1,4 @@
 #include "cli/CLI-Debug.h"
-#include "cli/CLI-Extract.h"
 
 CLIDebug::CLIDebug()
 {
@@ -37,7 +36,7 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game)
+CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
 	if (m_printEnums->getValue())
 	{
@@ -76,8 +75,6 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 void
 CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
-	static WarframeExporter::Ensmallening ensmall(true, true, true);
-
 	if (m_printEnums->getValue())
 	{
 		if (pkgName.empty())

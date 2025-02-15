@@ -22,7 +22,7 @@ ModelExtractor::cancelVertexColorIndexing()
 }
 
 void
-ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, const Ensmallening& ensmalleningData, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
+ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
 {
 	if (fileEntry.bData.getLength() == 0)
 		throw unknown_format_error("Mesh has no body");
@@ -30,7 +30,7 @@ ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, const Ensmalleni
 	// Read body/header data
 	ModelReader* modelReader = g_enumMapModel[fileEntry.commonHeader.type];
 
-	modelReader->readHeader(&fileEntry.headerData, ensmalleningData, fileEntry.commonHeader, outHeaderExt);
+	modelReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, outHeaderExt);
 	modelReader->readBody(outHeaderExt, &fileEntry.bData, outBodyExt);
 }
 
@@ -44,11 +44,11 @@ ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::
 }
 
 void
-ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
+ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
-	extractExternal(fileEntry, ensmalleningData, headerExt, bodyExt);
+	extractExternal(fileEntry, headerExt, bodyExt);
 
 	if (headerExt.meshInfos.size() == 0)
 		throw unknown_format_error("Mesh has zero MeshInfos");

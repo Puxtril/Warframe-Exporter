@@ -3,7 +3,6 @@
 #include "EnumMapExtractorValue.h"
 #include "BinaryReaderBuffered.h"
 #include "CommonHeader.h"
-#include "Ensmallening.hpp"
 #include "PackageCollection.h"
 #include "ExporterLogger.h"
 #include "LotusLib.h"
@@ -27,6 +26,6 @@ namespace WarframeExporter
 		// Otherwise, will be a file with the correct extension
 		virtual bool isMultiExport() const = 0;
 		virtual ExtractorType getExtractorType() const = 0;
-		virtual void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun = false) = 0;
+		virtual void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) = 0;
 	};
 }

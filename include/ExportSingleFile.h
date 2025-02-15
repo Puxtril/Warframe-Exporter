@@ -2,7 +2,6 @@
 
 #include "Extractor.h"
 #include "EnumMapExtractor.h"
-#include "Ensmallening.hpp"
 #include "FileNode.h"
 #include "LotusLib.h"
 #include "ExporterExceptions.h"
@@ -18,7 +17,6 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath
 		);
     };
@@ -27,7 +25,6 @@ namespace WarframeExporter
     extractFile(LotusLib::PackagesReader& pkgs,
 			const std::string& pkgName,
 			const LotusLib::FileEntries::FileNode* fileNode,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath,
 			LotusLib::Game game
     );
@@ -36,7 +33,6 @@ namespace WarframeExporter
     extractFile(LotusLib::PackagesReader& pkgs,
 			const std::string& pkgName,
 			LotusLib::LotusPath& internalPath,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath,
 			LotusLib::Game game
     );

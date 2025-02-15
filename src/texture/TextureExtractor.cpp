@@ -10,12 +10,12 @@ TextureExtractor::getInstance()
 }
 
 TextureInternal
-TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData)
+TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
 {
 	// Typically, textures above 256x256 are in F. Textures below are in B
 	BinaryReader::BinaryReaderBuffered& entry = fileEntry.fData.getLength() != 0 ? fileEntry.fData : fileEntry.bData;
 
-	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader, ensmalleningData);
+	TextureHeaderExternal extHeader = TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader);
 
 	if (internalFormatToDdsFormat.count(static_cast<TextureCompression>(extHeader.format)) == 0)
 		throw std::runtime_error("Unknown texture compression format: " + std::to_string(extHeader.format));
@@ -45,9 +45,9 @@ TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHead
 }
 
 void
-TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun)
+TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
-	TextureInternal intTexture = getTexture(fileEntry, pkgs, ensmalleningData);
+	TextureInternal intTexture = getTexture(fileEntry, pkgs);
 	if (!dryRun)
 		writeData(intTexture, fileEntry.commonHeader, outputPath);
 }

@@ -13,7 +13,7 @@ BatchIteratorExport::BatchIteratorExport(bool dryRun)
 }
 
 void
-BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const std::filesystem::path& outputPath)
 {
 	std::filesystem::path savePath;
 
@@ -47,7 +47,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 		m_logger.info("Extracting " + fullFileEntry.internalPath.string());
 		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fullFileEntry.commonHeader.type));
 
-		extractor->extract(fullFileEntry, pkgs, ensmalleningData, savePath, m_dryRun);
+		extractor->extract(fullFileEntry, pkgs, savePath, m_dryRun);
 		writeFileProperties(savePath, fullFileEntry);
 	}
 	catch (not_imeplemented_error& err)
@@ -65,7 +65,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 }
 
 void
-BatchIteratorExport::processUnknownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+BatchIteratorExport::processUnknownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const std::filesystem::path& outputPath)
 {
 }
 

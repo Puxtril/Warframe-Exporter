@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Audio;
 
 void
-AudioReader139::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, AudioHeader& outHeader)
+AudioReader139::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, AudioHeader& outHeader)
 {
 	outHeader.compression = (AudioCompression)headerReader->readUInt32();
 	headerReader->seek(28, std::ios::cur);

@@ -6,7 +6,7 @@ BatchIteratorExportQt::BatchIteratorExportQt()
 }
 
 void
-BatchIteratorExportQt::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor, const WarframeExporter::Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+BatchIteratorExportQt::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor, const std::filesystem::path& outputPath)
 {
     if (m_killExtraction)
     {
@@ -14,7 +14,7 @@ BatchIteratorExportQt::processKnownFile(LotusLib::PackagesReader& pkgs, const st
         resetFileCount();
         throw ExtractionCancelled();
     }
-    BatchIteratorExport::processKnownFile(pkgs, pkgName, fileEntry, extractor, ensmalleningData, outputPath);
+    BatchIteratorExport::processKnownFile(pkgs, pkgName, fileEntry, extractor, outputPath);
     emit extractedFileCount(++m_fileCountExtracted);
 }
 
@@ -42,7 +42,7 @@ BatchIteratorCountQt::getFileCount() const
 }
 
 void
-BatchIteratorCountQt::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor, const WarframeExporter::Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+BatchIteratorCountQt::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor, const std::filesystem::path& outputPath)
 {
     m_fileCount++;
 }

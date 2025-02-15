@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BinaryReaderBuffered.h"
-#include "../Ensmallening.hpp"
 #include "TextureStructs.hpp"
 #include "TextureExportTypes.h"
 

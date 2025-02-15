@@ -16,14 +16,13 @@
 class PreviewManager
 {
     LotusLib::PackagesReader* m_pkgs;
-    WarframeExporter::Ensmallening m_ensmallening;
     std::map<WarframeExporter::ExtractorType, Preview*> m_previewWidgets;
 
 public:
     PreviewManager();
 
     void setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonArea, QHBoxLayout* previewButtonLayout);
-    void setData(LotusLib::PackagesReader* pkgs, const WarframeExporter::Ensmallening& ensmalleningData);
+    void setData(LotusLib::PackagesReader* pkgs);
 
     void swapToFilePreview(LotusLib::FileEntry& fileEntry);
     void clearPreview();

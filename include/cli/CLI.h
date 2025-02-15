@@ -12,7 +12,6 @@
 #include "cli/CLI-Extract.h"
 #include "cli/CLI-Debug.h"
 #include "cli/CLI-Main.h"
-#include "cli/CLI-Advanced.h"
 #include "cli/CLI-Output.h"
 
 #include <filesystem>
@@ -32,9 +31,6 @@ const static std::string_view g_description = "https://github.com/Puxtril/Warfra
 const std::vector<CLIFeature*> g_features = {
 #ifdef WF_DEBUG
 	CLIDebug::getInstance(),
-#endif
-#ifdef WF_ADVANCED
-	CLIAdvanced::getInstance(),
 #endif
 #ifdef WF_EXTRACT
 	CLIExtract::getInstance(),

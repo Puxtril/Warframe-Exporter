@@ -3,7 +3,6 @@
 #include "cli/CLI-Feature.h"
 #include "tclap/ValueArg.h"
 #include "tclap/CmdLine.h"
-#include "Ensmallening.hpp"
 #include "ExporterLogger.h"
 
 #include "CachePair.h"
@@ -26,5 +25,5 @@ public:
 	const std::string& getFeatureName();
 	void addMainCmds(TCLAP::OneOf& oneOfCmd);
 	void addMiscCmds(TCLAP::CmdLine& cmdLine);
-	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, const WarframeExporter::Ensmallening& ensmallening, LotusLib::Game game) override;
+	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
 };

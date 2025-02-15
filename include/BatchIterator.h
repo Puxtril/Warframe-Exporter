@@ -3,7 +3,6 @@
 #include "ExporterLogger.h"
 #include "BinaryReaderBuffered.h"
 #include "CommonHeader.h"
-#include "Ensmallening.hpp"
 #include "FileNode.h"
 #include "PackageCollection.h"
 #include "ExporterExceptions.h"
@@ -25,7 +24,7 @@ namespace WarframeExporter
 	public:
 		BatchIterator();
 
-		void batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types, LotusLib::Game game);
+		void batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types, LotusLib::Game game);
 		static std::vector<std::string> getPackageNames(WarframeExporter::ExtractorType types, const std::filesystem::path& cacheDirPath);
 
 	protected:
@@ -35,7 +34,6 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath
 		) = 0;
 		
@@ -43,7 +41,6 @@ namespace WarframeExporter
 			LotusLib::PackagesReader& pkg,
 			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath
 		) = 0;
 		

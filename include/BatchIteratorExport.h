@@ -27,7 +27,6 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath
 		) override;
 		
@@ -35,7 +34,6 @@ namespace WarframeExporter
 			LotusLib::PackagesReader& pkgs,
 			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
-			const Ensmallening& ensmalleningData,
 			const std::filesystem::path& outputPath
 		) override;
 		

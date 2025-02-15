@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Extractor.h"
-#include "../Ensmallening.hpp"
 #include "texture/TextureStructs.hpp"
 #include "BinaryReaderBuffered.h"
 #include "texture/TextureReader.h"
@@ -27,7 +26,7 @@ namespace WarframeExporter::Texture
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
 		{
 			size_t curOffset = hReader->tell();
-			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, commonHeader, {true, true, true});
+			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, commonHeader);
 			hReader->seek(curOffset, std::ios::beg);
 
 			static const std::string hdr = "hdr";
@@ -96,10 +95,10 @@ namespace WarframeExporter::Texture
 
 		static TextureExtractor* getInstance();
 
-		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData);
+		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs);
 		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
 
 	private:
 		static void writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile);

@@ -72,7 +72,7 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
 {
     WarframeExporter::Model::ModelHeaderExternal headerExt;
     WarframeExporter::Model::ModelBodyExternal bodyExt;
-    WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(fileEntry, {true, true, true}, headerExt, bodyExt);
+    WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(fileEntry, headerExt, bodyExt);
 
     if (headerExt.meshInfos.size() == 0)
     {
@@ -123,7 +123,7 @@ void
 FormatPreview::setupTexture(std::stringstream& outStr, LotusLib::PackagesReader* pkgs, LotusLib::FileEntry& fileEntry)
 {
     BinaryReader::BinaryReaderBuffered& entry = fileEntry.fData.getLength() != 0 ? fileEntry.fData : fileEntry.bData;
-    WarframeExporter::Texture::TextureHeaderExternal extHeader = WarframeExporter::Texture::TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader, {true, true, true});
+    WarframeExporter::Texture::TextureHeaderExternal extHeader = WarframeExporter::Texture::TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader);
 
     bool knownFormat = WarframeExporter::Texture::internalFormatToDdsFormat.count(static_cast<WarframeExporter::Texture::TextureCompression>(extHeader.format)) != 0;
     WarframeExporter::Texture::TextureInternal intTexture;
@@ -227,21 +227,21 @@ FormatPreview::setupAudio(std::stringstream& outStr, LotusLib::FileEntry& fileEn
         {
             compressionName = "ADPCM";
             WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioPCMReader[fileEntry.commonHeader.type];
-            reader->readHeader(&fileEntry.headerData, {true, true, true}, fileEntry.commonHeader, audioHeader);
+            reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
             break;
         }
         case WarframeExporter::Audio::AudioCompression::PCM:
         {
             compressionName = "PCM";
             WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioPCMReader[fileEntry.commonHeader.type];
-            reader->readHeader(&fileEntry.headerData, {true, true, true}, fileEntry.commonHeader, audioHeader);
+            reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
             break;
         }
         case WarframeExporter::Audio::AudioCompression::OPUS:
         {
             compressionName = "Opus";
             WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
-            reader->readHeader(&fileEntry.headerData, {true, true, true}, fileEntry.commonHeader, audioHeader);
+            reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
             break;
         }
         default:

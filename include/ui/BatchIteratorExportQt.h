@@ -3,7 +3,6 @@
 #include <QtWidgets/QProgressBar>
 
 #include "BatchIteratorExport.h"
-#include "Ensmallening.hpp"
 
 // Exception that doesn't inherit from std::exception
 // This shouldn't be caught by LotusLib
@@ -24,7 +23,6 @@ public:
         const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
         WarframeExporter::Extractor* extractor,
-        const WarframeExporter::Ensmallening& ensmalleningData,
         const std::filesystem::path& outputPath
     ) override;
 
@@ -49,7 +47,6 @@ public:
         const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
         WarframeExporter::Extractor* extractor,
-        const WarframeExporter::Ensmallening& ensmalleningData,
         const std::filesystem::path& outputPath
     ) override;
 		
@@ -57,7 +54,6 @@ public:
         LotusLib::PackagesReader& pkgs,
         const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
-        const WarframeExporter::Ensmallening& ensmalleningData,
         const std::filesystem::path& outputPath
     ) override
     {}

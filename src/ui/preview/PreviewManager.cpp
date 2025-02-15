@@ -1,7 +1,6 @@
 #include "ui/preview/PreviewManager.h"
 
 PreviewManager::PreviewManager()
-    : m_ensmallening(true, true, true)
 {
     m_previewWidgets = {
         {WarframeExporter::ExtractorType::Material, PreviewMaterial::getInstance()},
@@ -21,10 +20,9 @@ PreviewManager::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidg
 }
 
 void
-PreviewManager::setData(LotusLib::PackagesReader* pkgs, const WarframeExporter::Ensmallening& ensmalleningData)
+PreviewManager::setData(LotusLib::PackagesReader* pkgs)
 {
     m_pkgs = pkgs;
-    m_ensmallening = ensmalleningData;
 }
 
 void
@@ -39,7 +37,7 @@ PreviewManager::swapToFilePreview(LotusLib::FileEntry& fileEntry)
         // OpenGL widgets do initlization before the first draw call.
         // So lets initilize OpenGL (by rendering once) before setting textures/models.
         preview->show();
-        preview->setupWidget(fileEntry, *m_pkgs, m_ensmallening);
+        preview->setupWidget(fileEntry, *m_pkgs);
     }
     catch (std::exception&)
     {

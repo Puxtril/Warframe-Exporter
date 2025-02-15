@@ -34,13 +34,13 @@ PreviewModel::show()
 }
 
 void
-PreviewModel::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const WarframeExporter::Ensmallening& ensmalleningData)
+PreviewModel::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
 {
     auto modelExtractor = WarframeExporter::Model::ModelExtractor::getInstance();
 
     WarframeExporter::Model::ModelHeaderExternal modelHeaderExt;
     WarframeExporter::Model::ModelBodyExternal modelBodyExt;
-    modelExtractor->extractExternal(fileEntry, ensmalleningData, modelHeaderExt, modelBodyExt);
+    modelExtractor->extractExternal(fileEntry, modelHeaderExt, modelBodyExt);
 
     WarframeExporter::Model::ModelHeaderInternal headerInt;
 	WarframeExporter::Model::ModelBodyInternal bodyInt;

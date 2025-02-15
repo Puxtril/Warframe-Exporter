@@ -42,10 +42,10 @@ PreviewTexture::show()
 }
 
 void
-PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const WarframeExporter::Ensmallening& ensmalleningData)
+PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
 {
     auto textureExtractor = WarframeExporter::Texture::TextureExtractor::getInstance();
 
-    WarframeExporter::Texture::TextureInternal textureData = textureExtractor->getTexture(fileEntry, pkgs, ensmalleningData);
+    WarframeExporter::Texture::TextureInternal textureData = textureExtractor->getTexture(fileEntry, pkgs);
     m_textureWidget->setTexture(textureData);
 }

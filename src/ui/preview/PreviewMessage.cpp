@@ -45,6 +45,6 @@ PreviewMessage::show()
 }
 
 void
-PreviewMessage::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const WarframeExporter::Ensmallening& ensmalleningData)
+PreviewMessage::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
 {
 }

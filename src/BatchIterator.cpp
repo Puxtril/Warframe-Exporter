@@ -8,7 +8,7 @@ BatchIterator::BatchIterator()
 }
 
 void
-BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types, LotusLib::Game game)
+BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types, LotusLib::Game game)
 {
 	for (const std::string& curPackageName : packages)
 	{
@@ -35,7 +35,7 @@ BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallenin
 
 				if (extractor == nullptr)
 				{
-					processUnknownFile(pkgsDir, curPackageName, curEntry, ensmalleningData, outputPath);
+					processUnknownFile(pkgsDir, curPackageName, curEntry, outputPath);
 					continue;
 				}
 
@@ -45,7 +45,7 @@ BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const Ensmallenin
 					continue;
 				}
 
-				processKnownFile(pkgsDir, curPackageName, curEntry, extractor, ensmalleningData, outputPath);
+				processKnownFile(pkgsDir, curPackageName, curEntry, extractor, outputPath);
 			}
 			catch (LotusLib::DecompressionException&)
 			{

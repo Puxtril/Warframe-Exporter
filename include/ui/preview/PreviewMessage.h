@@ -20,5 +20,5 @@ public:
     void unloadData() override;
     void hide() override;
     void show() override;
-    void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const WarframeExporter::Ensmallening& ensmalleningData) override;
+    void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;
 };

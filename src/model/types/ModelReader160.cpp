@@ -3,9 +3,9 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelReader160::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader160::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
-    ModelReader159::getInstance()->readHeader(headerReader, ensmalleningData, header, outHeader);
+    ModelReader159::getInstance()->readHeader(headerReader, header, outHeader);
 }
 
 void

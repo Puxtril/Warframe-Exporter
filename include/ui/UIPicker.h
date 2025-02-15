@@ -36,6 +36,7 @@ private:
     void setupMessageBoxes();
     void addShaderFormatOptions();
     void addTextureFormatOptions();
+    void addGameOptions();
     void loadSettings();
     void loadVersion();
 
@@ -45,7 +46,8 @@ signals:
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType    
+        WarframeExporter::Texture::TextureExportType textureExportType,
+        LotusLib::Game game
     );
     void retryLoadPickerOptions();
 

@@ -15,6 +15,7 @@ UiPicker::setupUi(QDialog *WindowPicker)
     setupMessageBoxes();
     addShaderFormatOptions();
     addTextureFormatOptions();
+    addGameOptions();
     loadSettings();
     loadVersion();
 }
@@ -76,6 +77,12 @@ UiPicker::addTextureFormatOptions()
 }
 
 void
+UiPicker::addGameOptions()
+{
+    this->GamePickerCombo->addItem("Warframe", (int)LotusLib::Game::WARFRAME);
+}
+
+void
 UiPicker::loadSettings()
 {
     UiSettings& settings = UiSettings::getInstance();
@@ -112,6 +119,21 @@ UiPicker::loadSettings()
             break;
         case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_D3DDECOMPILE:
             this->ShaderFormatCombo->setCurrentIndex(1);
+            break;
+    }
+
+    LotusLib::Game game = settings.getGame();
+    switch(game)
+    {
+        case LotusLib::Game::UNKNOWN:
+        case LotusLib::Game::WARFRAME:
+            this->ShaderFormatCombo->setCurrentIndex(0);
+            break;
+        case LotusLib::Game::SOULFRAME:
+            this->ShaderFormatCombo->setCurrentIndex(1);
+            break;
+        case LotusLib::Game::WARFRAME_PE:
+            this->ShaderFormatCombo->setCurrentIndex(2);
             break;
     }
 }
@@ -172,9 +194,12 @@ UiPicker::parsePickerOptions()
     int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
     WarframeExporter::Shader::ShaderExportType shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
 
+    int selectedGame = this->GamePickerCombo->itemData(this->GamePickerCombo->currentIndex()).toInt();
+    LotusLib::Game gameType = static_cast<LotusLib::Game>(selectedGame);
+
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
     LotusLib::Logger::setLogProperties(spdlog::level::info);
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType);
+    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType, gameType);
 }
 
 void

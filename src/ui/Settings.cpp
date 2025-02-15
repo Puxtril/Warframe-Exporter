@@ -74,6 +74,13 @@ UiSettings::getTextureFormat() const
     return static_cast<WarframeExporter::Texture::TextureExportType>(value);
 }
 
+LotusLib::Game
+UiSettings::getGame() const
+{
+    int value = m_settings.value(m_comboGame).toInt();
+    return static_cast<LotusLib::Game>(value);
+}
+
 void
 UiSettings::setFilterFiles(bool filter)
 {
@@ -124,7 +131,8 @@ UiSettings::setSettings(
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType    
+        WarframeExporter::Texture::TextureExportType textureExportType,
+        LotusLib::Game game
     )
 {
     QString qCachePath = QString(cachePath.string().c_str());
@@ -142,4 +150,6 @@ UiSettings::setSettings(
 
     m_settings.setValue(m_comboShaderFormat, (int)shaderExportType);
     m_settings.setValue(m_comboTextureFormat, (int)textureExportType);
+
+    m_settings.setValue(m_comboGame, (int)game);
 }

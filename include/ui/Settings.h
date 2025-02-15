@@ -28,6 +28,8 @@ class UiSettings : public QObject
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
 
+    static const inline QString m_comboGame = "load/export/game";
+
     static const inline QString m_mainWindowSize = "mainwindow/size";
 
     static const inline QString m_exporterSplitGeometry = "splitter/geometry";
@@ -62,6 +64,8 @@ public:
     WarframeExporter::Shader::ShaderExportType getShaderFormat() const;
     WarframeExporter::Texture::TextureExportType getTextureFormat() const;
 
+    LotusLib::Game getGame() const;
+
     void setFilterFiles(bool filter);
     bool getFilterFiles();
 
@@ -71,6 +75,7 @@ public slots:
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType    
+        WarframeExporter::Texture::TextureExportType textureExportType,
+        LotusLib::Game game
     );
 };

@@ -150,7 +150,8 @@ UiExporter::setData(
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType    
+        WarframeExporter::Texture::TextureExportType textureExportType,
+        LotusLib::Game game
 )
 {
     m_packages.setData(cachePath);

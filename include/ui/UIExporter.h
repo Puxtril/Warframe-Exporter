@@ -71,7 +71,8 @@ public slots:
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType    
+        WarframeExporter::Texture::TextureExportType textureExportType,
+        LotusLib::Game game
     );
     void loadTreeFinished();
     void extractButtonClicked();

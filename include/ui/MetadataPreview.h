@@ -25,7 +25,7 @@ public:
     void clearPreview();
 
 private:
-    void setupCommonHeader(LotusLib::FileEntry& fileEntry);
+    void setupCommonHeader(LotusLib::Game game, LotusLib::FileEntry& fileEntry);
     void setFiledata(LotusLib::PackageReader& pkgs, LotusLib::FileEntry& fileEntry);
     static QString timestampToQString(int64_t input);
     static QString filesizeToQString(int input);

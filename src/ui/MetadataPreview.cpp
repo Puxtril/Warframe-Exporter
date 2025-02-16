@@ -17,7 +17,7 @@ void
 MetdataPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
     LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER);
-    setupCommonHeader(fileEntry);
+    setupCommonHeader(pkgs->getGame(), fileEntry);
     auto pkg = pkgs->getPackage(pkgName).value();
     setFiledata(pkg, fileEntry);
 }
@@ -32,13 +32,13 @@ MetdataPreview::clearPreview()
 }
 
 void
-MetdataPreview::setupCommonHeader(LotusLib::FileEntry& fileEntry)
+MetdataPreview::setupCommonHeader(LotusLib::Game game, LotusLib::FileEntry& fileEntry)
 {
     std::stringstream outStr;
 
     outStr << "Type Enum: ";
     outStr << fileEntry.commonHeader.type << " ";
-    auto extractor = WarframeExporter::g_enumMapExtractor.at(LotusLib::Game::WARFRAME, LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
+    auto extractor = WarframeExporter::g_enumMapExtractor.at(game, LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
     if (extractor != nullptr)
         outStr << "(" << extractor->getFriendlyName() << ")";
     else

@@ -26,7 +26,7 @@ ExporterFileThread::run()
 
     try
     {
-        WarframeExporter::extractFile(*m_pkgsReader, m_pkgName, m_internalFilePath, m_exportPath, LotusLib::Game::WARFRAME);
+        WarframeExporter::extractFile(*m_pkgsReader, m_pkgName, m_internalFilePath, m_exportPath, m_pkgsReader->getGame());
     }
     catch (std::exception& ex)
     {

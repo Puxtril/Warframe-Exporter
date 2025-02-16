@@ -27,7 +27,7 @@ ExporterDirectoryThread::run()
     emit ExporterDirectoryThread::extractIndexingStarted();
 
     BatchIteratorCountQt totalItemsIter;
-    totalItemsIter.batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, LotusLib::Game::WARFRAME);
+    totalItemsIter.batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, m_pkgsReader->getGame());
     int totalItems = static_cast<int>(totalItemsIter.getFileCount());
 
     emit ExporterDirectoryThread::extractStart(totalItems);
@@ -37,7 +37,7 @@ ExporterDirectoryThread::run()
 
     try
     {
-        m_exporter->batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, LotusLib::Game::WARFRAME);
+        m_exporter->batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, m_pkgsReader->getGame());
     }
     catch (ExtractionCancelled&)
     {

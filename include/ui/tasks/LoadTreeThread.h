@@ -32,7 +32,6 @@ public:
     LoadTreeThread();
 
     void setData(
-        std::vector<std::string> exportPkgNames,
         WarframeExporter::ExtractorType extractTypes,
         LotusLib::PackagesReader& pkgs,
         QTreeWidget* parentWidget,
@@ -52,6 +51,9 @@ private:
     // Increments the processed file count
     // Determines when to emit the signal `treeItemLoaded`
     void incrementFileCounter();
+
+    // Derrive package names from extractor types
+    std::vector<std::string> findPkgNames(LotusLib::PackagesReader& pkgsReader, WarframeExporter::ExtractorType extractTypes);
 
 signals:
     void treeItemsLoaded(size_t newSize);

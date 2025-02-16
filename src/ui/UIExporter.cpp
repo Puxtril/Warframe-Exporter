@@ -158,8 +158,7 @@ UiExporter::setData(
     m_cacheDirPath = cachePath;
     m_exportPath = exportPath / "Extracted";
     m_extractTypes = extractTypes;
-    m_exportPkgNames = WarframeExporter::BatchIterator::getPackageNames(extractTypes, m_cacheDirPath);
-    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, m_exportPkgNames);
+    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes);
     m_exporterFileThread.setData(&m_packages, exportPath);
     m_previewManager.setData(&m_packages);
 
@@ -167,10 +166,10 @@ UiExporter::setData(
     WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = shaderExportType;
     WarframeExporter::Texture::TextureExtractor::m_exportType = textureExportType;
 
-    m_loading.initProgressBar(m_exportPkgNames, m_packages);
+    m_loading.initProgressBar(m_packages, extractTypes);
     m_loadingDialog.show();
 
-    m_loadTreeThread.setData(m_exportPkgNames, m_extractTypes, m_packages, this->treeWidget, UiSettings::getInstance().getFilterFiles());
+    m_loadTreeThread.setData(m_extractTypes, m_packages, this->treeWidget, UiSettings::getInstance().getFilterFiles());
     m_loadTreeThread.start();
 }
 

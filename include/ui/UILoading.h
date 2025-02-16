@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EnumMapExtractor.h"
 #include "ui/ui_Loading.h"
 
 #include "LotusLib.h"
@@ -10,10 +11,10 @@ class UILoading : public QObject, private Ui_Loading
 
 public:
     void setupUi(QDialog* dialog);
-    void initProgressBar(std::vector<std::string> exportPkgNames, LotusLib::PackagesReader& pkgs);
+    void initProgressBar(LotusLib::PackagesReader& pkgs, WarframeExporter::ExtractorType extractTypes);
 
 private:
-    size_t getTotalFileCount(LotusLib::PackagesReader& pkgs, std::vector<std::string> exportPkgNames);
+    size_t getTotalFileCount(LotusLib::PackagesReader& pkgs, WarframeExporter::ExtractorType extractTypes);
 
 public slots:
     void treeItemLoaded(size_t newSize);

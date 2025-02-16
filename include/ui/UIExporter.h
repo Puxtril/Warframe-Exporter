@@ -33,7 +33,6 @@ class UiExporter : public QObject, private Ui_MainWindow
     std::filesystem::path m_cacheDirPath;
     std::filesystem::path m_exportPath;
     WarframeExporter::ExtractorType m_extractTypes;
-    std::vector<std::string> m_exportPkgNames;
     ExporterDirectoryThread m_exporterDirectoryThread;
     ExporterFileThread m_exporterFileThread;
 

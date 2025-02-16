@@ -15,14 +15,13 @@ class ExporterDirectoryThread : public QThread
     LotusLib::PackagesReader* m_pkgsReader;
     std::filesystem::path m_exportPath;
     WarframeExporter::ExtractorType m_extractTypes;
-    std::vector<std::string> m_exportPkgNames;
     LotusLib::LotusPath m_internalPath;
     std::shared_ptr<BatchIteratorExportQt> m_exporter;
 
 public:
     ExporterDirectoryThread();
 
-    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, std::vector<std::string> pkgNames);
+    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes);
     void setInternalPath(LotusLib::LotusPath internalPath);
     void extractCancelled();
     void run();

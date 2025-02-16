@@ -14,7 +14,6 @@ namespace WarframeExporter
     {
     public:
         void extractFile(LotusLib::PackagesReader& pkgs,
-			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
 			const std::filesystem::path& outputPath

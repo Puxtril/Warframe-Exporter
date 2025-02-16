@@ -34,5 +34,4 @@ public:
 private:
 	void printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath);
 	void writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath);
-	void testExtract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types);
 };

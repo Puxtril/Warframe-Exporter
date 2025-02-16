@@ -13,7 +13,7 @@ BatchIteratorExport::BatchIteratorExport(bool dryRun)
 }
 
 void
-BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const std::filesystem::path& outputPath)
+BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, LotusLib::FileEntry& fileEntry, Extractor* extractor, const std::filesystem::path& outputPath)
 {
 	std::filesystem::path savePath;
 
@@ -42,7 +42,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 
 	try
 	{
-		LotusLib::FileEntry fullFileEntry = pkgs.getPackage(pkgName).value().getFile(fileEntry.metadata);
+		LotusLib::FileEntry fullFileEntry = pkgs.getPackage(fileEntry.srcPkgName).value().getFile(fileEntry.metadata);
 		
 		m_logger.info("Extracting " + fullFileEntry.internalPath.string());
 		m_logger.debug(spdlog::fmt_lib::format("Extracting as {}, Enum={}", extractor->getFriendlyName(), fullFileEntry.commonHeader.type));
@@ -65,12 +65,12 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, const std:
 }
 
 void
-BatchIteratorExport::processUnknownFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const std::filesystem::path& outputPath)
+BatchIteratorExport::processUnknownFile(LotusLib::PackagesReader& pkgs, LotusLib::FileEntry& fileEntry, const std::filesystem::path& outputPath)
 {
 }
 
 void
-BatchIteratorExport::processSkipFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
+BatchIteratorExport::processSkipFile(LotusLib::PackagesReader& pkgs, LotusLib::FileEntry& fileEntry, const Extractor* extractor)
 {
 }
 

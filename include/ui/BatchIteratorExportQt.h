@@ -20,7 +20,6 @@ public:
 
     void processKnownFile(
         LotusLib::PackagesReader& pkgs,
-        const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
         WarframeExporter::Extractor* extractor,
         const std::filesystem::path& outputPath
@@ -44,7 +43,6 @@ public:
 
     void processKnownFile(
         LotusLib::PackagesReader& pkgs,
-        const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
         WarframeExporter::Extractor* extractor,
         const std::filesystem::path& outputPath
@@ -52,7 +50,6 @@ public:
 		
     void processUnknownFile(
         LotusLib::PackagesReader& pkgs,
-        const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
         const std::filesystem::path& outputPath
     ) override
@@ -60,7 +57,6 @@ public:
 		
     void processSkipFile(
         LotusLib::PackagesReader& pkgs,
-        const std::string& pkgName,
         LotusLib::FileEntry& fileEntry,
         const WarframeExporter::Extractor* extractor
     ) override

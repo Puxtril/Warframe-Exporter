@@ -1,9 +1,9 @@
 #include "ExportSingleFile.h"
 
 void
-WarframeExporter::_FileExport::extractFile(LotusLib::PackagesReader& pkgs, const std::string& pkgName, LotusLib::FileEntry& fileEntry, Extractor* extractor, const std::filesystem::path& outputPath)
+WarframeExporter::_FileExport::extractFile(LotusLib::PackagesReader& pkgs, LotusLib::FileEntry& fileEntry, Extractor* extractor, const std::filesystem::path& outputPath)
 {
-    processKnownFile(pkgs, pkgName, fileEntry, extractor, outputPath);
+    processKnownFile(pkgs, fileEntry, extractor, outputPath);
 }
 
 void
@@ -24,7 +24,7 @@ WarframeExporter::extractFile(LotusLib::PackagesReader& pkgs, const std::string&
         throw unknown_format_error("File format not supported");
     }
 
-    fileExporter.extractFile(pkgs, pkgName, fileEntry, extractor, outputPath);
+    fileExporter.extractFile(pkgs, fileEntry, extractor, outputPath);
 }
 
 void

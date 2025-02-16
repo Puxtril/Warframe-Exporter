@@ -85,20 +85,11 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	if (m_extLandscape->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::Landscape;
 
-	std::vector<std::string> pkgNames;
-	if (pkg.empty())
-		pkgNames = WarframeExporter::BatchIterator::getPackageNames((WarframeExporter::ExtractorType)types, cacheDirPath);
-	else
-		pkgNames = { pkg };
-
 	// Debug information
 	WarframeExporter::Logger::getInstance().debug("Type Flags: " + std::to_string(types));
 	std::stringstream pkgs;
-	for (size_t i = 0; i < pkgNames.size(); i++)
-		pkgs << (pkgNames[i]) << " ";
-	WarframeExporter::Logger::getInstance().debug("Loading packages: " + pkgs.str());
 
-	extract(cacheDirPath, pkgNames, internalPath, outPath, (WarframeExporter::ExtractorType)types, game);
+	extract(cacheDirPath, internalPath, outPath, (WarframeExporter::ExtractorType)types, game);
 	WarframeExporter::Logger::getInstance().info("Extraction completed successfully");
 }
 
@@ -145,10 +136,10 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(const std::filesystem::path& cacheDirPath, std::vector<std::string> pkgNames, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game)
+CLIExtract::extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game)
 {
 	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
 	LotusLib::PackagesReader pkgs(cacheDirPath);
 
-	extractor.batchIterate(pkgs, outPath, intPath, pkgNames, types, game);
+	extractor.batchIterate(pkgs, outPath, intPath, types, game);
 }

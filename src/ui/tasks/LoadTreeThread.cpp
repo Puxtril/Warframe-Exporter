@@ -10,7 +10,6 @@ LoadTreeThread::LoadTreeThread()
 
 void
 LoadTreeThread::setData(
-    std::vector<std::string> exportPkgNames,
     WarframeExporter::ExtractorType extractTypes,
     LotusLib::PackagesReader& pkgs,
     QTreeWidget* parentWidget,
@@ -18,10 +17,10 @@ LoadTreeThread::setData(
 )
 {
     m_pkgs = &pkgs;
-    m_exportPkgNames = exportPkgNames;
     m_extractTypes = extractTypes;
     m_treeWidget = parentWidget;
     m_shouldFilterFiles = shouldFilterFiles;
+    m_exportPkgNames = findPkgNames(pkgs, extractTypes);
 }
 
 void
@@ -222,4 +221,21 @@ LoadTreeThread::incrementFileCounter()
     m_processedFileCount++;
     if (m_processedFileCount % 1000 == 0)
         emit treeItemsLoaded(m_processedFileCount);
+}
+
+std::vector<std::string>
+LoadTreeThread::findPkgNames(LotusLib::PackagesReader& pkgsReader, WarframeExporter::ExtractorType extractTypes)
+{
+    std::vector<std::string> pkgNames;
+
+    LotusLib::PackageCategory pkgCategories = WarframeExporter::g_enumMapExtractor.getPkgCategories(pkgsReader.getGame(), extractTypes);
+    for (const std::string& curPkgName : pkgsReader)
+    {
+        std::optional<LotusLib::PackageReader> pkg = pkgsReader.getPackage(curPkgName);
+        if (!pkg || ((int)pkg->getPkgCategory() & (int)pkgCategories) == 0)
+            continue;
+        pkgNames.push_back(pkg->getName());
+    }
+
+    return pkgNames;
 }

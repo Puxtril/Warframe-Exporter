@@ -665,11 +665,6 @@
           <property name="frame">
            <bool>true</bool>
           </property>
-          <item>
-           <property name="text">
-            <string>Warframe</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item>

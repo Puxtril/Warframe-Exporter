@@ -24,7 +24,6 @@ namespace WarframeExporter
 	protected:
 		void processKnownFile(
 			LotusLib::PackagesReader& pkgs,
-			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
 			const std::filesystem::path& outputPath
@@ -32,14 +31,12 @@ namespace WarframeExporter
 		
 		void processUnknownFile(
 			LotusLib::PackagesReader& pkgs,
-			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			const std::filesystem::path& outputPath
 		) override;
 		
 		void processSkipFile(
 			LotusLib::PackagesReader& pkgs,
-			const std::string& pkgName,
 			LotusLib::FileEntry& fileEntry,
 			const Extractor* extractor
 		) override;

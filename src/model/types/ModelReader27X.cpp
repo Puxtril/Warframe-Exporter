@@ -1,15 +1,15 @@
-#include "model/types/ModelReader272.h"
+#include "model/types/ModelReader27X.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader272::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader27X::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     return ModelReader269::getInstance()->readHeader(headerReader, header, outHeader);
 }
 
 void
-ModelReader272::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
+ModelReader27X::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
 {
     bodyReader->seek(0, std::ios_base::beg);
 

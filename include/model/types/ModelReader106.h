@@ -8,8 +8,6 @@
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
 
-#include "model/types/ModelReader159.h"
-
 #include <cassert>
 #include <iomanip>
 #include <vector>
@@ -19,32 +17,35 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader160 : public ModelReader
+	class ModelReader106 : public ModelReader
 	{
-		ModelReader160() = default;
+		ModelReader106() = default;
 
 	public:
-		inline static ModelReader160* getInstance()
+		inline static ModelReader106* getInstance()
 		{
-			static ModelReader160* instance = new ModelReader160();
+			static ModelReader106* instance = new ModelReader106();
 			return instance;
 		}
 
 		inline std::vector<int> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = {
-				(int)ModelType::MODEL_TERRAIN_160,
-				(int)ModelType::MODEL_TERRAIN_163
-			};
+			std::vector<int> extTypes = { (int)ModelType::MODEL_LEVEL_106 };
 			return extTypes;
 		}
 
 		inline ScaleType ensmalleningScale() const override
 		{
-			return ScaleType::XZ;
+			return ScaleType::NONE;
 		}
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override;
-	};
+	
+	private:
+		// This is 100% a workaround
+		bool isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader);
+};
+
+	
 }

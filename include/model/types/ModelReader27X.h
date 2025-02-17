@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BinaryReaderExceptions.h"
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
@@ -8,7 +7,7 @@
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
 
-#include "model/types/ModelReader159.h"
+#include "model/types/ModelReader269.h"
 
 #include <cassert>
 #include <iomanip>
@@ -19,29 +18,31 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader160 : public ModelReader
+	class ModelReader27X : public ModelReader
 	{
-		ModelReader160() = default;
+		ModelReader27X() = default;
 
 	public:
-		inline static ModelReader160* getInstance()
+		inline static ModelReader27X* getInstance()
 		{
-			static ModelReader160* instance = new ModelReader160();
+			static ModelReader27X* instance = new ModelReader27X();
 			return instance;
 		}
 
 		inline std::vector<int> getEnumMapKeys() const override
 		{
 			std::vector<int> extTypes = {
-				(int)ModelType::MODEL_TERRAIN_160,
-				(int)ModelType::MODEL_TERRAIN_163
+				(int)ModelType::MODEL_RIGGED_272,
+				(int)ModelType::MODEL_RIGGED_275,
+				(int)ModelType::MODEL_RIGGED_277,
+				(int)ModelType::MODEL_RIGGED_278
 			};
 			return extTypes;
 		}
 
 		inline ScaleType ensmalleningScale() const override
 		{
-			return ScaleType::XZ;
+			return ScaleType::XYZ;
 		}
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;

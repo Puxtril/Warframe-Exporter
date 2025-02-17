@@ -7,8 +7,6 @@
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
 
-#include "model/types/ModelReader269.h"
-
 #include <cassert>
 #include <iomanip>
 #include <vector>
@@ -16,22 +14,27 @@
 #include <iostream>
 #include <algorithm>
 
+#include "model/types/ModelReader290.h"
+
 namespace WarframeExporter::Model
 {
-	class ModelReader272 : public ModelReader
+	class ModelReader300 : public ModelReader
 	{
-		ModelReader272() = default;
+		ModelReader300() = default;
 
 	public:
-		inline static ModelReader272* getInstance()
+		inline static ModelReader300* getInstance()
 		{
-			static ModelReader272* instance = new ModelReader272();
+			static ModelReader300* instance = new ModelReader300();
 			return instance;
 		}
 
 		inline std::vector<int> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = { (int)ModelType::MODEL_RIGGED_272 };
+			std::vector<int> extTypes = {
+				(int)ModelType::MODEL_PACKED_300,
+				(int)ModelType::MODEL_PACKED_301
+			};
 			return extTypes;
 		}
 

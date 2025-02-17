@@ -50,6 +50,7 @@ namespace WarframeExporter::Shader
 			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_18 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_21 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_21 },
 				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_22 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_23 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_26 },

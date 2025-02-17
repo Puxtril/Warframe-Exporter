@@ -45,6 +45,7 @@ namespace WarframeExporter::Landscape
 		{
 			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)LandscapeType::LANDSCAPE_42 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)LandscapeType::LANDSCAPE_42 },
 			};
 			return extTypes;
 		}

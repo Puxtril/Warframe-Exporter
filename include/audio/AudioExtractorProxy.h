@@ -37,7 +37,8 @@ namespace WarframeExporter::Audio
 			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				//(int)AudioType::AUDIO_6,
 				//(int)AudioType::AUDIO_23,
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioType::AUDIO_139 }
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioType::AUDIO_139 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)AudioType::AUDIO_139 }
 			};
 			return extTypes;
 		}

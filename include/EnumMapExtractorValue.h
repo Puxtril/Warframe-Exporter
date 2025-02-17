@@ -19,6 +19,8 @@ namespace WarframeExporter
 		Landscape = 256,
 	};
 
+	// This is how Extractors register with specific Games and Package Categories.
+	// `EnumMapExtractor` will statically check for double-registers.
     class EnumMapExtractorValue
 	{
 	public:

@@ -128,13 +128,13 @@ UiPicker::loadSettings()
     {
         case LotusLib::Game::UNKNOWN:
         case LotusLib::Game::WARFRAME:
-            this->ShaderFormatCombo->setCurrentIndex(0);
+            this->GamePickerCombo->setCurrentIndex(0);
             break;
         case LotusLib::Game::SOULFRAME:
-            this->ShaderFormatCombo->setCurrentIndex(1);
+            this->GamePickerCombo->setCurrentIndex(1);
             break;
         case LotusLib::Game::WARFRAME_PE:
-            this->ShaderFormatCombo->setCurrentIndex(2);
+            this->GamePickerCombo->setCurrentIndex(2);
             break;
     }
 }

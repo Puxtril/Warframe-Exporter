@@ -139,7 +139,7 @@ void
 CLIExtract::extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game)
 {
 	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
-	LotusLib::PackagesReader pkgs(cacheDirPath);
+	LotusLib::PackagesReader pkgs(cacheDirPath, game);
 
 	extractor.batchIterate(pkgs, outPath, intPath, types, game);
 }

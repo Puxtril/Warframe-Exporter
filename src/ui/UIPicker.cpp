@@ -80,6 +80,7 @@ void
 UiPicker::addGameOptions()
 {
     this->GamePickerCombo->addItem("Warframe", (int)LotusLib::Game::WARFRAME);
+    this->GamePickerCombo->addItem("Soulframe", (int)LotusLib::Game::SOULFRAME);
 }
 
 void

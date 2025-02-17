@@ -40,7 +40,7 @@ CLIMain::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusP
 			WarframeExporter::Logger::getInstance().error("Must specify package with --ls");
 			exit(1);
 		}
-		LotusLib::PackagesReader pkgs(cacheDirPath);
+		LotusLib::PackagesReader pkgs(cacheDirPath, game);
 		std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
 		if (!pkg)
 			throw std::runtime_error("Package does not exist: " + pkgName);

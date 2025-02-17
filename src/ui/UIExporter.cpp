@@ -154,7 +154,7 @@ UiExporter::setData(
         LotusLib::Game game
 )
 {
-    m_packages.setData(cachePath);
+    m_packages.setData(cachePath, game);
     m_cacheDirPath = cachePath;
     m_exportPath = exportPath / "Extracted";
     m_extractTypes = extractTypes;

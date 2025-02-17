@@ -45,7 +45,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
 			return;
 		}
-		printEnums(cacheDirPath, pkgName, internalPath);
+		printEnums(cacheDirPath, pkgName, internalPath, game);
 	}
 	else if (m_writeRaw->getValue())
 	{
@@ -64,7 +64,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 			WarframeExporter::Logger::getInstance().error("--dry-run isn't supported with --write-raw");
 			return;
 		}
-		writeRaw(outPath, internalPath, pkgName, cacheDirPath);
+		writeRaw(outPath, internalPath, pkgName, cacheDirPath, game);
 	}
 	else if (m_dryRun->getValue())
 	{
@@ -73,7 +73,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 }
 
 void
-CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
+CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath, LotusLib::Game game)
 {
 	if (m_printEnums->getValue())
 	{
@@ -82,7 +82,7 @@ CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::strin
 			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
 			return;
 		}
-		LotusLib::PackagesReader pkgs(cacheDirPath);
+		LotusLib::PackagesReader pkgs(cacheDirPath, game);
 		std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
 		if (!pkg)
 			throw std::runtime_error("Package does not exist: " + pkgName);
@@ -92,9 +92,9 @@ CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::strin
 }
 
 void
-CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath)
+CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
-	LotusLib::PackagesReader pkgs(cacheDirPath);
+	LotusLib::PackagesReader pkgs(cacheDirPath, game);
 	std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
 	if (!pkg)
 		throw std::runtime_error("Package does not exist: " + pkgName);

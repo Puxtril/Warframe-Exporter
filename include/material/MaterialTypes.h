@@ -9,6 +9,7 @@ namespace WarframeExporter::Material
 		MATERIAL_205 = 205,
 		MATERIAL_206 = 206,
 		MATERIAL_208 = 208,
+		MATERIAL_210 = 210,
 		MATERIAL_214 = 214,
 		MATERIAL_216 = 216
 	};

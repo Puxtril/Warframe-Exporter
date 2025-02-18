@@ -89,6 +89,7 @@ namespace WarframeExporter::Texture
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_SKYBOX },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_174 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_174 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_RAW_175 },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_176 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_176 },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_CUBEMAP },

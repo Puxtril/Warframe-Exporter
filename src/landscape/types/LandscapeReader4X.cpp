@@ -1,16 +1,16 @@
-#include "landscape/types/LandscapeReader42.h"
+#include "landscape/types/LandscapeReader4X.h"
 
 using namespace WarframeExporter::Landscape;
 
-LandscapeReader42*
-LandscapeReader42::getInstance()
+LandscapeReader4X*
+LandscapeReader4X::getInstance()
 {
-    static LandscapeReader42 instance;
+    static LandscapeReader4X instance;
     return &instance;
 }
 
 LandscapeHeaderExternal
-LandscapeReader42::readHeader(BinaryReader::BinaryReaderBuffered* reader)
+LandscapeReader4X::readHeader(BinaryReader::BinaryReaderBuffered* reader)
 {
     LandscapeHeaderExternal outHeader;
 
@@ -72,7 +72,7 @@ LandscapeReader42::readHeader(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 std::vector<LandscapeBodyChunkExternal>
-LandscapeReader42::readBody(BinaryReader::BinaryReaderBuffered* reader, const LandscapeHeaderExternal& header)
+LandscapeReader4X::readBody(BinaryReader::BinaryReaderBuffered* reader, const LandscapeHeaderExternal& header)
 {
     std::vector<LandscapeBodyChunkExternal> heightfieldChunks;
 

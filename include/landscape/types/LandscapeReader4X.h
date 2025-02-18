@@ -4,18 +4,19 @@
 
 namespace WarframeExporter::Landscape
 {
-    class LandscapeReader42 : public LandscapeReader
+    class LandscapeReader4X : public LandscapeReader
     {
-        LandscapeReader42() = default;
-        LandscapeReader42(const LandscapeReader42&) = default;
+        LandscapeReader4X() = default;
+        LandscapeReader4X(const LandscapeReader4X&) = default;
 
     public:
-        static LandscapeReader42* getInstance();
+        static LandscapeReader4X* getInstance();
 
         inline std::vector<int> getEnumMapKeys() const override
         {
             std::vector<int> extTypes = {
                 (int)LandscapeType::LANDSCAPE_42,
+                (int)LandscapeType::LANDSCAPE_43
             };
 			return extTypes;
         }

@@ -76,7 +76,7 @@ jobs:
         run: |
           cp build\Release\Warframe-Exporter-CLI.exe artifacts
           cp build\Release\Warframe-Exporter-CLI-Advanced.exe artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Warframe-Exporter-Windows
           path: artifacts/

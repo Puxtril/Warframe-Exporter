@@ -58,6 +58,7 @@ namespace WarframeExporter::Model
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_HLOD_OR_DCM_102 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_103 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_106 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_HLOD_OR_DCM_105 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_159 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_160 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_269 },

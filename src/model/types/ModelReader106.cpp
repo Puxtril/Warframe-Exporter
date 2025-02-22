@@ -48,18 +48,27 @@ ModelReader106::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     bodyReader->seek(0x2, std::ios_base::cur);
 
     outBody.positions.resize(extHeader.vertexCount);
+    outBody.normals.resize(extHeader.vertexCount);
+    outBody.tangents.resize(extHeader.vertexCount);
     outBody.UV1.resize(extHeader.vertexCount);
     outBody.UV2.resize(extHeader.vertexCount);
-    outBody.boneIndices.resize(extHeader.vertexCount);
-    outBody.boneWeights.resize(extHeader.vertexCount);
+    outBody.AO.resize(extHeader.vertexCount);
     for (uint32_t x = 0; x < extHeader.vertexCount; x++)
     {
         outBody.positions[x][0] = bodyReader->readFloat();
         outBody.positions[x][1] = bodyReader->readFloat();
         outBody.positions[x][2] = bodyReader->readFloat();
+        bodyReader->seek(4, std::ios_base::cur);
 
-        // /shrug
-        bodyReader->seek(12, std::ios_base::cur);
+        outBody.normals[x][0] = bodyReader->readUInt8();
+        outBody.normals[x][1] = bodyReader->readUInt8();
+        outBody.normals[x][2] = bodyReader->readUInt8();
+        outBody.normals[x][3] = bodyReader->readUInt8();
+        
+        outBody.tangents[x][0] = bodyReader->readUInt8();
+        outBody.tangents[x][1] = bodyReader->readUInt8();
+        outBody.tangents[x][2] = bodyReader->readUInt8();
+        outBody.AO[x] = bodyReader->readUInt8();
 
         outBody.UV1[x][0] = bodyReader->readHalf();
         outBody.UV1[x][1] = bodyReader->readHalf();

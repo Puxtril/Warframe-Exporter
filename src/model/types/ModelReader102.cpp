@@ -24,21 +24,19 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
-    uint32_t someSkip = headerReader->readUInt32();
-    if (someSkip == 2)
-        headerReader->seek(4, std::ios::cur);
-    else if (someSkip == 3)
-        headerReader->seek(6, std::ios::cur);
+    skipUnk16Array(headerReader);
 
-    bool isDCM = this->isDCM(header);
-
-    if (isDCM)
+    if (this->isDCM(header))
     {
-        headerReader->seek(0x5, std::ios::cur);
+        headerReader->seek(0x1, std::ios::cur);
+
+        int dcmSubEnum = headerReader->readUInt32();
+        if (dcmSubEnum == 2)
+            headerReader->seek(6, std::ios::cur);
     }
     else
     {
-        headerReader->seek(0x4, std::ios::cur);
+        headerReader->seek(4, std::ios::cur);
     }
 
     skipPhysicsStruct(headerReader);
@@ -108,6 +106,5 @@ ModelReader102::isDCM(const LotusLib::CommonHeader& header)
 
     if (dcmExt1 == ext1 || dcmExt2 == ext2)
         return true;
-    
     return false;
 }

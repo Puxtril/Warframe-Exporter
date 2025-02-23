@@ -91,7 +91,7 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
         outStr << "Vertices: " << headerInt.vertexCount << std::endl;
         outStr << "Total faces: " << headerInt.faceCount / 3 << std::endl;
         outStr << "Bones: " << headerInt.boneCount << std::endl;
-        outStr << "Ensmallening scale: (" << headerInt.modelScale[0] << ", " << headerInt.modelScale[1] << ", " << headerInt.modelScale[2] << ")" << std::endl;
+        outStr << "Ensmallening scale: (" << headerInt.modelScale[0] << ", " << headerInt.modelScale[1] << ", " << headerInt.modelScale[2] << ", " << headerInt.modelScale[3] << ")" << std::endl;
 
         outStr << std::endl;
         outStr << "Submeshes" << std::endl;

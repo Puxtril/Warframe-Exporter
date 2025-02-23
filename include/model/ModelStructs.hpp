@@ -87,7 +87,7 @@ namespace WarframeExporter::Model
 		int morphCount;
 		std::vector<MeshInfoInternal> meshInfos;
 		std::vector<std::string> errorMsgs;
-		glm::vec3 modelScale;
+		glm::vec4 modelScale;
 	};
 
 	struct ModelBodyExternal

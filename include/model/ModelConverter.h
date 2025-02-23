@@ -26,11 +26,11 @@ namespace WarframeExporter::Model
 	private:	
 		static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelHeaderInternal& outHeader);
 		static void convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader);
-		static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale);
+		static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec4& modelScale);
 		static void addVertexColors(ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors);
 
 		static void flipXAxis(ModelBodyExternal& extBody);
 		static std::vector<std::string> extractMaterialNames(const std::string& attributes);
-		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec3& outScale);
+		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec4& outScale);
 	};
 }

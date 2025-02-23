@@ -22,6 +22,8 @@ namespace WarframeExporter::Model::ModelExporterGltf
 
 	void _print_exception(const std::exception& e, int level = 0);
 
+	void _addModelExtraInformation(Document& gltfDoc, std::vector<int32_t> meshIndices, const ModelHeaderInternal& header);
+
 	void _addModelsToScene(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex = -1);
 
 	// Returns index of root bone in tree

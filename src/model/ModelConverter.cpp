@@ -109,7 +109,7 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
 }
 
 void
-ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale)
+ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec4& modelScale)
 {
     outBody.indices = extBody.indices;
 
@@ -206,13 +206,14 @@ ModelConverter::extractMaterialNames(const std::string& attributes)
 }
 
 void
-ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec3& outScale)
+ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec4& outScale)
 {
     outScale.x = 0.0;
     outScale.y = 0.0;
     outScale.z = 0.0;
+    outScale.w = 0.0;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         for (MeshInfoExternal curMeshInfo : meshInfos)
         {
@@ -240,4 +241,6 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, Sc
 	outScale.x = (outScale.x == 0.0f) ? 1.0f : outScale.x;
 	outScale.y = (outScale.y == 0.0f) ? 1.0f : outScale.y;
 	outScale.z = (outScale.z == 0.0f) ? 1.0f : outScale.z;
+    // Intentionally commented out
+    //outScale.w = (outScale.w == 0.0f) ? 1.0f : outScale.w;
 }

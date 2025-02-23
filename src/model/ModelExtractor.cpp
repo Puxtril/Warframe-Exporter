@@ -61,7 +61,7 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	ModelBodyInternal bodyInt;
 	ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, g_enumMapModel[fileEntry.commonHeader.type]->ensmalleningScale());
 
-	m_logger.debug(spdlog::fmt_lib::format("Bones={} Verts={} Faces={} Morphs={} PhysXMeshes={} Colors={} Scale={},{},{}", headerExt.boneTree.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size(), vertexColors.size(), headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
+	m_logger.debug(spdlog::fmt_lib::format("Bones={} Verts={} Faces={} Morphs={} PhysXMeshes={} Colors={} Scale={},{},{}", headerExt.boneTree.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size(), vertexColors.size(), headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z, headerInt.modelScale.w));
 	
 	// Convert body/header into exportable format
 	Document gltfDocument;

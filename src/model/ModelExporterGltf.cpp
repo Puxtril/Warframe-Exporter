@@ -10,6 +10,7 @@ ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& he
 	Attributes vertsAttrs = _addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
 	unsigned int indicesBufViewIndex = _addIndexData(gltfDoc, bodyInt.indices);
 	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
+	_addModelExtraInformation(gltfDoc, meshIndices, header);
 
 	if (header.boneTree.size() > 0)
 	{
@@ -51,6 +52,16 @@ ModelExporterGltf::_print_exception(const std::exception& e, int level)
 		_print_exception(nestedException, level + 1);
 	}
 	catch (...) {}
+}
+
+void
+ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, std::vector<int32_t> meshIndices, const ModelHeaderInternal& header)
+{
+	for (size_t x = 0; x < meshIndices.size(); x++)
+	{
+		Mesh& curMesh = gltfDoc.meshes[meshIndices[x]];
+		curMesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
+	}
 }
 
 void

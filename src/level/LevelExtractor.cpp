@@ -20,8 +20,6 @@ LevelExtractor::getLevelExternal(LotusLib::FileEntry& fileEntry)
 	levelReader->readBody(fileEntry.bData, external.header, external.body);
 
 	findLandscape(external);
-	LevelObjectHeaderExternal& landscape = external.header.levelObjs[external.landscapeIndex];
-
 	return external;
 }
 
@@ -35,12 +33,33 @@ LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal&
 }
 
 void
+LevelExtractor::findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal)
+{
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
+
+	for (size_t i = 0; i < levelExternal.header.levelObjs.size(); i++)
+	{
+		std::vector<char>& curAttributes = levelExternal.body.attributes[i];
+
+		LotusLib::FileEntry entry = pkg.getFile(levelExternal.header.levelObjs[i].objTypePath, LotusLib::READ_EXTRA_ATTRIBUTES);
+		if (entry.extra.attributes.size() > curAttributes.size())
+		{
+			size_t oldSize = curAttributes.size();
+			curAttributes.resize(oldSize + entry.extra.attributes.length());
+			memcpy(&curAttributes[oldSize-1], entry.extra.attributes.c_str(), entry.extra.attributes.length());
+		}
+	}
+}
+
+void
 LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
 	LevelExternal levelExt = getLevelExternal(fileEntry);
+	pkgs.initilizePackagesBin();
+	findExtraAttributes(pkgs, levelExt);
 	LevelInternal levelInt = convertToInternal(fileEntry, levelExt);
 
-	m_logger.info("Level mesh count: " + std::to_string(levelInt.objs.size()));
+	m_logger.info("Level object count: " + std::to_string(levelInt.objs.size()));
 
 	Document gltfOut = createGltfCombined(pkgs, levelInt);
 

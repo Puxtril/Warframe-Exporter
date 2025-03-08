@@ -26,6 +26,8 @@ This guide is only for compiling on Linux. A pre-compiled version is already ava
 1. Browse to `lib/Linux`
 1. Download `liboo2corelinux64.a`
 
+Or just run this: `wget https://github.com/WorkingRobot/OodleUE/raw/refs/heads/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.13/lib/Linux/liboo2corelinux64.a`
+
 ## Option 2: Obtain directly from Unreal Engine
 
 1. Download and install [Epic Launcher](https://store.epicgames.com)

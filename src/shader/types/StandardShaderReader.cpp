@@ -15,7 +15,28 @@ StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReade
     ShaderHeaderExternal shaderHeader;
 
     if (shaderTypeEnum == 23)
-        headerReader->seek(20, std::ios::cur);
+    {
+        headerReader->seek(8, std::ios::cur);
+
+        // Techrot Encore added another 8 bytes to this section
+        // Luckily all shaders have an int32 of value -1 that we can anchor with
+
+        // Pre-Techrot
+        if (headerReader->readInt32() == -1)
+        {
+            headerReader->seek(10, std::ios::cur);
+        }
+        // Post-Techrot
+        else
+        {
+            headerReader->seek(4, std::ios::cur);
+            if (headerReader->readInt32() == -1)
+                headerReader->seek(8, std::ios::cur);
+            else
+                throw unknown_format_error("Unknown shader header");
+        }
+        
+    }
     else
         headerReader->seek(8, std::ios::cur);
 

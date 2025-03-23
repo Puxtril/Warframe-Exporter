@@ -73,7 +73,7 @@ StandardShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader,
 
     ShaderEntry shader;
 
-    int bytecodeSize = shaderHeader.shaderLengths[index] - 18;
+    int bytecodeSize = shaderHeader.shaderLengths[index] - 20;
     shader.bytecode.resize(bytecodeSize);
     bodyReader->readUInt8Array((uint8_t*)shader.bytecode.data(), bytecodeSize);
 
@@ -96,7 +96,7 @@ StandardShaderReader::readAllShaders(BinaryReader::BinaryReaderBuffered* bodyRea
     {
         ShaderEntry& curShader = shaders[iShader];
 
-        int bytecodeSize = shaderHeader.shaderLengths[iShader] - 18;
+        int bytecodeSize = shaderHeader.shaderLengths[iShader] - 20;
         curShader.bytecode.resize(bytecodeSize);
         bodyReader->readUInt8Array((uint8_t*)curShader.bytecode.data(), bytecodeSize);
 
@@ -104,7 +104,7 @@ StandardShaderReader::readAllShaders(BinaryReader::BinaryReaderBuffered* bodyRea
         
         curShader.stage = bodyReader->readUInt16();
 
-        bodyReader->seek(14, std::ios::cur);
+        bodyReader->seek(16, std::ios::cur);
     }
 
     return shaders;

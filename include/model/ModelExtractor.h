@@ -81,7 +81,7 @@ namespace WarframeExporter::Model
 		void indexVertexColors(LotusLib::PackageReader& pkgs);
 		void cancelVertexColorIndexing();
 
-		void extractExternal(LotusLib::FileEntry& fileEntry, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
+		void extractExternal(LotusLib::FileEntry& fileEntry, LotusLib::Game game, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
 		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;

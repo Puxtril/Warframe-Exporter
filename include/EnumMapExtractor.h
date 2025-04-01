@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EnumMapExtractorClass.h"
+#include "EnumMapExtractor.h"
 #include "model/ModelExtractor.h"
 #include "texture/TextureExtractor.h"
 #include "material/MaterialExtractor.h"

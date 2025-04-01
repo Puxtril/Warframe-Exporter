@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EnumMapExtractorValue.h"
 #include "Extractor.h"
 #include "LevelEnumMap.h"
 #include "BinaryReaderBuffered.h"

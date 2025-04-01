@@ -2,7 +2,7 @@
 
 #include "BinaryReaderBuffered.h"
 #include "model/vertexcolor/VertexColorStructs.h"
-#include "EnumMapValue.h"
+#include "EnumMap.h"
 #include "glm/vec4.hpp"
 
 namespace WarframeExporter::Model::VertexColor

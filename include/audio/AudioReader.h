@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EnumMapValue.h"
+#include "EnumMap.h"
 #include "BinaryReaderBuffered.h"
 #include "CommonHeader.h"
 #include "AudioStructs.h"

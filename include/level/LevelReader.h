@@ -3,7 +3,7 @@
 #include "LevelStructs.h"
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
-#include "EnumMapValue.h"
+#include "EnumMap.h"
 #include "level/LevelTypes.h"
 
 #include <string>

@@ -3,7 +3,7 @@
 #include "BinaryReaderBuffered.h"
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
-#include "EnumMapValue.h"
+#include "EnumMap.h"
 #include "model/ModelTypes.h"
 
 namespace WarframeExporter::Model

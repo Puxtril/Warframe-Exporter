@@ -3,6 +3,8 @@ name: Compile
 run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on:
   push:
+    tags:
+      - '**'
 
 defaults:
   run:
@@ -44,7 +46,8 @@ jobs:
           cd lib
           git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
           git submodule update --init tclap-code
-      # The TCLAP repository doesn't contain an option to toggle tests...
+      # The TCLAP repository doesn't contain an option to toggle tests
+      # The test directory adds a requirement for Python and somehow an archaic CMake version
       - name: Patch TCLAP test directory
         run: |
           (Get-Content "lib\tclap-code\CMakeLists.txt").replace("add_subdirectory(tests)", "#add_subdirectory(tests)") | Set-Content "lib\tclap-code\CMakeLists.txt"

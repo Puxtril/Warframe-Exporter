@@ -17,6 +17,7 @@ namespace WarframeExporter
 		Audio = 64,
 		Shader = 128,
 		Landscape = 256,
+		LevelStatic = 512,
 	};
 
 	// This is how Extractors register with specific Games and Package Categories.

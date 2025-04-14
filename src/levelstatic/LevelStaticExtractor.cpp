@@ -1,6 +1,4 @@
 #include "levelstatic/LevelStaticExtractor.h"
-#include "levelstatic/LevelStaticConverter.h"
-#include "levelstatic/LevelStaticStructs.h"
 
 using namespace WarframeExporter::LevelStatic;
 
@@ -32,10 +30,6 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 	{
 		LevelStaticObjectExternal& curLevelObj = external.body.objects[i];
 		LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(external.header.modelPaths[curLevelObj.modelIndex]);
-
-		// TESTING
-		if (external.header.modelPaths[curLevelObj.modelIndex] == "/EE/Editor/Darkitect/Objects/DeferredDecalProjector.fbx")
-			continue;
 
 		if (WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type] == nullptr)
 		{
@@ -70,8 +64,6 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 void
 LevelStaticExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
-	if (fileEntry.internalPath != "/Lotus/Levels/1999/StartGarageTunneltoStreets/0.static")
-		return;
 	LevelStaticExternal external = read(fileEntry);
 	fx::gltf::Document gltf;
 	addModelsToGltf(external, pkgs, gltf);

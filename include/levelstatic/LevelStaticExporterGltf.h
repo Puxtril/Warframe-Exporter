@@ -4,20 +4,28 @@
 #include "levelstatic/LevelStaticStructs.h"
 #include "level/LevelExporterGltf.h"
 
-#include <iostream>
-
-using namespace fx::gltf;
+using namespace fx::gltf; 
 
 namespace WarframeExporter::LevelStatic::ExporterGltf
 {
-	void addModelData(
+    struct ModelInfo
+    {
+        Attributes attributes;
+        std::vector<int32_t> indexIndices;
+        std::vector<WarframeExporter::Model::MeshInfoInternal> meshInfos;
+    };
+
+	ModelInfo addModel(
         Document& gltfDoc,
         const WarframeExporter::Model::ModelHeaderInternal& header,
         const WarframeExporter::Model::ModelBodyInternal& modelBodyInt,
-        const WarframeExporter::Model::ModelBodyExternal& modelBodyExt,
-        const LevelStaticHeaderExternal& levelStaticHeaderExt,
-        const LevelStaticObjectExternal& levelStaticObj
+        const WarframeExporter::Model::ModelBodyExternal& modelBodyExt
     );
 
-	void _addLevelInformation(Document& gltfDoc, const LevelStaticHeaderExternal& levelStaticHeaderExt, const LevelStaticObjectExternal& levelObj, std::vector<int32_t> meshIndices);
+	void addModelInstance(
+        Document& gltfDoc,
+        const LevelStaticHeaderExternal& levelStaticHeaderExt,
+        const LevelStaticObjectExternal& levelObj,
+        WarframeExporter::LevelStatic::ExporterGltf::ModelInfo modelInfo
+    );
 }

@@ -25,39 +25,54 @@ void
 LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf)
 {
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
+	
+	// Mimics the model array from the external LevelStatic header
+	// Mapped to gltf Mesh indicies
+	std::vector<ExporterGltf::ModelInfo> models(external.header.modelPaths.size());
 
 	for (int i = 0; i < external.body.objects.size(); i++)
 	{
 		LevelStaticObjectExternal& curLevelObj = external.body.objects[i];
-		LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(external.header.modelPaths[curLevelObj.modelIndex]);
 
-		if (WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type] == nullptr)
+		if (external.header.modelPaths[curLevelObj.modelIndex] == "/EE/Editor/Darkitect/Objects/DeferredDecalProjector.fbx")
+       		continue;
+
+		// We have not extracted this model into the output gltf file
+		if (models[curLevelObj.modelIndex].indexIndices.size() == 0)
 		{
-			m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, external.header.modelPaths[curLevelObj.modelIndex]));
-			continue;
+			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(external.header.modelPaths[curLevelObj.modelIndex]);
+
+			if (WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type] == nullptr)
+			{
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, external.header.modelPaths[curLevelObj.modelIndex]));
+				continue;
+			}
+
+			WarframeExporter::Model::ModelHeaderExternal headerExt;
+			WarframeExporter::Model::ModelBodyExternal bodyExt;
+			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, headerExt, bodyExt);
+
+			if (headerExt.meshInfos.size() == 0)
+			{
+				m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", external.header.modelPaths[curLevelObj.modelIndex]));
+				continue;
+			}
+
+			// Gltf exporter doesn't like multiple rigged models
+			headerExt.boneTree.clear();
+
+			WarframeExporter::Model::ModelHeaderInternal headerInt;
+			WarframeExporter::Model::ModelBodyInternal bodyInt;
+			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(external.header.modelPaths[curLevelObj.modelIndex], miscPkg);
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type]->ensmalleningScale());
+		
+			WarframeExporter::LevelStatic::Converter::applyTransformation(bodyInt.positions);
+		
+			models[curLevelObj.modelIndex] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
 		}
 
-		WarframeExporter::Model::ModelHeaderExternal headerExt;
-		WarframeExporter::Model::ModelBodyExternal bodyExt;
-		WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, headerExt, bodyExt);
-
-		if (headerExt.meshInfos.size() == 0)
-		{
-			m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", external.header.modelPaths[curLevelObj.modelIndex]));
-			continue;
-		}
-
-		// Gltf exporter doesn't like multiple rigged models
-		headerExt.boneTree.clear();
-
-		WarframeExporter::Model::ModelHeaderInternal headerInt;
-		WarframeExporter::Model::ModelBodyInternal bodyInt;
-		auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(external.header.modelPaths[curLevelObj.modelIndex], miscPkg);
-		WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type]->ensmalleningScale());
-	
-		WarframeExporter::LevelStatic::Converter::applyTransformation(curLevelObj, bodyInt.positions);
-
-		ExporterGltf::addModelData(gltf, headerInt, bodyInt, bodyExt, external.header, curLevelObj);
+		WarframeExporter::LevelStatic::Converter::applyTransformation(curLevelObj);
+		ExporterGltf::addModelInstance(gltf, external.header, curLevelObj, models[curLevelObj.modelIndex]);
 	}
 }
 

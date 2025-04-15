@@ -22,7 +22,7 @@ namespace WarframeExporter::Model::ModelExporterGltf
 
 	void _print_exception(const std::exception& e, int level = 0);
 
-	void _addModelExtraInformation(Document& gltfDoc, std::vector<int32_t> meshIndices, const ModelHeaderInternal& header);
+	void _addModelExtraInformation(Document& gltfDoc, int32_t meshIndex, const ModelHeaderInternal& header);
 
 	void _addModelsToScene(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex = -1);
 
@@ -34,16 +34,16 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	// Add Inverse Bind Matrices to the buffer and return the accessor index
 	int32_t _addInverseBindMatrices(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices);
 
-	// Returns index of new Mesh
-	std::vector<int32_t> _createMeshes(Document& gltfDoc, const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex);
+	int32_t _createMesh(Document& gltfDoc, Attributes attrs, int32_t indices, const std::string& materialName, const std::string& modelName);
 
 	int32_t _findOrCreateMaterial(Document& gltfDoc, const std::string& materialPath);
 
 	// Returns Attributes for Primetives
 	Attributes _addVertexData(Document& gltfDoc, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, int vertCount);
 
-	// Returns index of the created BufferView
-	int32_t _addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body);
+	// Returns Indexes to Accessors for indices
+	// One is created for each MeshInfo
+	std::vector<int32_t> _addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body, const std::vector<MeshInfoInternal>& meshInfos);
 
 	void _modifyAsset(Document& gltfDoc);
 

@@ -13,5 +13,6 @@
 
 namespace WarframeExporter::LevelStatic::Converter
 {
-    void applyTransformation(LevelStaticObjectExternal& levelObj, std::vector<glm::vec3>& verts);
+    void applyTransformation(LevelStaticObjectExternal& levelObj);
+    void applyTransformation(std::vector<glm::vec3>& verts);
 };

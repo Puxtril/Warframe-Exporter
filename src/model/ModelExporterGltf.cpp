@@ -8,9 +8,15 @@ ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& he
 	_modifyAsset(gltfDoc);
 
 	Attributes vertsAttrs = _addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
-	unsigned int indicesBufViewIndex = _addIndexData(gltfDoc, bodyInt.indices);
-	std::vector<int32_t> meshIndices = _createMeshes(gltfDoc, header.meshInfos, vertsAttrs, indicesBufViewIndex);
-	_addModelExtraInformation(gltfDoc, meshIndices, header);
+	std::vector<int32_t> indicesAccessors = _addIndexData(gltfDoc, bodyInt.indices, header.meshInfos);
+
+	std::vector<int32_t> meshIndices;
+	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
+	{
+		int32_t index = _createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
+		_addModelExtraInformation(gltfDoc, index, header);
+		meshIndices.push_back(index);
+	}
 
 	if (header.boneTree.size() > 0)
 	{
@@ -55,13 +61,10 @@ ModelExporterGltf::_print_exception(const std::exception& e, int level)
 }
 
 void
-ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, std::vector<int32_t> meshIndices, const ModelHeaderInternal& header)
+ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, int32_t meshIndex, const ModelHeaderInternal& header)
 {
-	for (size_t x = 0; x < meshIndices.size(); x++)
-	{
-		Mesh& curMesh = gltfDoc.meshes[meshIndices[x]];
-		curMesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
-	}
+	Mesh& curMesh = gltfDoc.meshes[meshIndex];
+	curMesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
 }
 
 void
@@ -180,39 +183,22 @@ ModelExporterGltf::_addInverseBindMatrices(Document& gltfDoc, const std::vector<
 	return matAccIndex;
 }
 
-std::vector<int32_t>
-ModelExporterGltf::_createMeshes(Document& gltfDoc, const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex)
+int32_t
+ModelExporterGltf::_createMesh(Document& gltfDoc, Attributes attrs, int32_t indicies, const std::string& materialName, const std::string& modelName)
 {
-	Mesh mesh;
-	std::vector<int32_t> meshIndices;
+	Primitive curPrim;
+	curPrim.indices = indicies;
+	curPrim.material = _findOrCreateMaterial(gltfDoc, materialName);
+	curPrim.mode = Primitive::Mode::Triangles;
+	curPrim.attributes = attrs;
 
-	for (size_t x = 0; x < meshInfos.size(); x++)
-	{
-		Accessor curAcc;
-		int32_t curAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
-		curAcc.bufferView = indicesBuffViewIndex;
-		curAcc.byteOffset = meshInfos[x].faceLODOffsets[0] * 2;
-		curAcc.count = meshInfos[x].faceLODCounts[0];
-		curAcc.type = Accessor::Type::Scalar;
-		curAcc.componentType = Accessor::ComponentType::UnsignedShort;
-		gltfDoc.accessors.push_back(curAcc);
+	Mesh curMesh;
+	int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
+	curMesh.name = modelName;
+	curMesh.primitives.push_back(curPrim);
+	gltfDoc.meshes.push_back(curMesh);
 
-		Primitive curPrim;
-		curPrim.indices = curAccIndex;
-		curPrim.material = _findOrCreateMaterial(gltfDoc, meshInfos[x].matName);
-		curPrim.mode = Primitive::Mode::Triangles;
-		curPrim.attributes = attrs;
-
-		Mesh curMesh;
-		int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
-		curMesh.name = meshInfos[x].name;
-		curMesh.primitives.push_back(curPrim);
-		gltfDoc.meshes.push_back(curMesh);
-		
-		meshIndices.push_back(curMeshIndex);
-	}
-
-	return meshIndices;
+	return curMeshIndex;
 }
 
 int32_t
@@ -502,8 +488,8 @@ ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bo
 	return attrs;
 }
 
-int32_t
-ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body)
+std::vector<int32_t>
+ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body, const std::vector<MeshInfoInternal>& meshInfos)
 {
 	Buffer& buf = _getBuffer(gltfDoc);
 
@@ -523,7 +509,22 @@ ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>&
 	bufView.target = BufferView::TargetType::ElementArrayBuffer;
 	gltfDoc.bufferViews.push_back(bufView);
 
-	return bufViewIndex;
+	std::vector<int32_t> accessorIndicies;
+	for (size_t x = 0; x < meshInfos.size(); x++)
+	{
+		Accessor curAcc;
+		int32_t curAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		curAcc.bufferView = bufViewIndex;
+		curAcc.byteOffset = meshInfos[x].faceLODOffsets[0] * 2;
+		curAcc.count = meshInfos[x].faceLODCounts[0];
+		curAcc.type = Accessor::Type::Scalar;
+		curAcc.componentType = Accessor::ComponentType::UnsignedShort;
+		gltfDoc.accessors.push_back(curAcc);
+		
+		accessorIndicies.push_back(curAccIndex);
+	}
+
+	return accessorIndicies;
 }
 
 void

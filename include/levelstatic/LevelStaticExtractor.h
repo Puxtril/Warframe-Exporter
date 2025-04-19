@@ -8,7 +8,6 @@
 #include "levelstatic/LevelStaticStructs.h"
 #include "levelstatic/LevelStaticEnumMap.h"
 #include "levelstatic/LevelStaticExporterGltf.h"
-#include "levelstatic/LevelStaticConverter.h"
 
 #include "model/ModelExtractor.h"
 

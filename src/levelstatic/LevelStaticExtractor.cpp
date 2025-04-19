@@ -34,6 +34,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 	{
 		LevelStaticObjectExternal& curLevelObj = external.body.objects[i];
 
+		// Too much crap
 		if (external.header.modelPaths[curLevelObj.modelIndex] == "/EE/Editor/Darkitect/Objects/DeferredDecalProjector.fbx")
        		continue;
 
@@ -65,13 +66,10 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
 			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(external.header.modelPaths[curLevelObj.modelIndex], miscPkg);
 			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type]->ensmalleningScale());
-		
-			WarframeExporter::LevelStatic::Converter::applyTransformation(bodyInt.positions);
-		
+				
 			models[curLevelObj.modelIndex] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
 		}
 
-		WarframeExporter::LevelStatic::Converter::applyTransformation(curLevelObj);
 		ExporterGltf::addModelInstance(gltf, external.header, curLevelObj, models[curLevelObj.modelIndex]);
 	}
 }

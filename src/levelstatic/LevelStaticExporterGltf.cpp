@@ -41,7 +41,7 @@ WarframeExporter::LevelStatic::ExporterGltf::addModelInstance(
 		Node node;
 
         glm::mat4 matrix(1.0f);
-        matrix = glm::translate(matrix, {levelObj.pos.x / 2.0f, levelObj.pos.y / 2.0f, levelObj.pos.z / 2.0f});
+        matrix = glm::translate(matrix, {levelObj.pos.x / 2.0f, levelObj.pos.y / 2.0f, -levelObj.pos.z / 2.0f});
         matrix *= glm::scale(matrix, {1.0, 1.0, -1.0});
         matrix *= glm::toMat4(levelObj.rot);
         matrix = glm::scale(matrix, {levelObj.scale, levelObj.scale, levelObj.scale});

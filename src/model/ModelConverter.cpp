@@ -5,8 +5,6 @@ using namespace WarframeExporter::Model;
 void
 ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType)
 {
-    ModelConverter::flipXAxis(extBody);
-
     if (extHeader.boneTree.size() > 1)
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
     ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
@@ -157,27 +155,21 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
 }
 
 void
-ModelConverter::flipXAxis(ModelBodyExternal& extBody)
+ModelConverter::mirrorX(ModelHeaderInternal& intHeader, ModelBodyInternal& intBody)
 {
-    // For rigged models
-    for (auto& x : extBody.reverseBinds)
+    // Rigged models
+    for (auto& curBone : intHeader.boneTree)
     {
-        x = glm::transpose(glm::scale(glm::transpose(x), { -1, 1, 1 }));
-    }
-    for (auto& x : extBody.boneRotations)
-    {
-        x.x *= -1;
-        x.y *= -1;
-    }
-    for (auto& x : extBody.bonePositions)
-    {
-        x.x *= -1;
+        curBone.reverseBind = glm::transpose(glm::scale(glm::transpose(curBone.reverseBind), { -1, 1, 1 }));
+        curBone.rotation.x *= -1;
+        curBone.rotation.y *= -1;
+        curBone.position.x *= -1;
     }
     
-    // For static models
-    if (extBody.bonePositions.empty())
+    // Static models
+    if (intHeader.boneTree.empty())
     {
-        for (glm::vec4& curPos : extBody.positions)
+        for (glm::vec3& curPos : intBody.positions)
         {
             curPos.z *= -1.0f;
         }

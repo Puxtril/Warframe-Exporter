@@ -130,7 +130,6 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg);
 			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type]->ensmalleningScale());
 
-			LevelConverter::applyTransformation(curLevelObj, bodyInt.positions);
 			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
 
 			LevelExporterGltf::addModelData(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);

@@ -8,14 +8,7 @@ using namespace fx::gltf;
 
 namespace WarframeExporter::LevelStatic::ExporterGltf
 {
-    struct ModelInfo
-    {
-        Attributes attributes;
-        std::vector<int32_t> indexIndices;
-        std::vector<WarframeExporter::Model::MeshInfoInternal> meshInfos;
-    };
-
-	ModelInfo addModel(
+	WarframeExporter::Level::LevelExporterGltf::ModelInfo addModel(
         Document& gltfDoc,
         const WarframeExporter::Model::ModelHeaderInternal& header,
         const WarframeExporter::Model::ModelBodyInternal& modelBodyInt,
@@ -26,6 +19,6 @@ namespace WarframeExporter::LevelStatic::ExporterGltf
         Document& gltfDoc,
         const LevelStaticHeaderExternal& levelStaticHeaderExt,
         const LevelStaticObjectExternal& levelObj,
-        WarframeExporter::LevelStatic::ExporterGltf::ModelInfo modelInfo
+        WarframeExporter::Level::LevelExporterGltf::ModelInfo modelInfo
     );
 }

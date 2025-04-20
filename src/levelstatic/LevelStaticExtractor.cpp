@@ -24,28 +24,32 @@ LevelStaticExtractor::read(LotusLib::FileEntry& fileEntry)
 void
 LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf)
 {
+	std::unordered_map<std::string, WarframeExporter::Level::LevelExporterGltf::ModelInfo> modelPathsInGltf;
+	addModelsToGltf(external, pkgs, gltf, modelPathsInGltf);
+}
+
+void
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, WarframeExporter::Level::LevelExporterGltf::ModelInfo> modelPathsInGltf)
+{
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
 	
-	// Mimics the model array from the external LevelStatic header
-	// Mapped to gltf Mesh indicies
-	std::vector<ExporterGltf::ModelInfo> models(external.header.modelPaths.size());
-
 	for (int i = 0; i < external.body.objects.size(); i++)
 	{
 		LevelStaticObjectExternal& curLevelObj = external.body.objects[i];
+		const std::string& curMeshPath = external.header.modelPaths[curLevelObj.modelIndex];
 
 		// Too much crap
-		if (external.header.modelPaths[curLevelObj.modelIndex] == "/EE/Editor/Darkitect/Objects/DeferredDecalProjector.fbx")
+		if (curMeshPath == "/EE/Editor/Darkitect/Objects/DeferredDecalProjector.fbx")
        		continue;
 
 		// We have not extracted this model into the output gltf file
-		if (models[curLevelObj.modelIndex].indexIndices.size() == 0)
+		if (modelPathsInGltf.count(curMeshPath) == 0)
 		{
-			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(external.header.modelPaths[curLevelObj.modelIndex]);
+			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curMeshPath);
 
 			if (WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type] == nullptr)
 			{
-				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, external.header.modelPaths[curLevelObj.modelIndex]));
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curMeshPath));
 				continue;
 			}
 
@@ -55,7 +59,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 
 			if (headerExt.meshInfos.size() == 0)
 			{
-				m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", external.header.modelPaths[curLevelObj.modelIndex]));
+				m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", curMeshPath));
 				continue;
 			}
 
@@ -64,13 +68,13 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(external.header.modelPaths[curLevelObj.modelIndex], miscPkg);
+			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg);
 			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type]->ensmalleningScale());
 				
-			models[curLevelObj.modelIndex] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
+			modelPathsInGltf[curMeshPath] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
 		}
 
-		ExporterGltf::addModelInstance(gltf, external.header, curLevelObj, models[curLevelObj.modelIndex]);
+		ExporterGltf::addModelInstance(gltf, external.header, curLevelObj, modelPathsInGltf[curMeshPath]);
 	}
 }
 

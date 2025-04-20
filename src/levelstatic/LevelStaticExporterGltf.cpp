@@ -1,6 +1,6 @@
 #include "levelstatic/LevelStaticExporterGltf.h"
 
-WarframeExporter::LevelStatic::ExporterGltf::ModelInfo
+WarframeExporter::Level::LevelExporterGltf::ModelInfo
 WarframeExporter::LevelStatic::ExporterGltf::addModel(
     Document& gltfDoc,
     const WarframeExporter::Model::ModelHeaderInternal& header,
@@ -21,7 +21,7 @@ WarframeExporter::LevelStatic::ExporterGltf::addModelInstance(
     Document& gltfDoc,
     const LevelStaticHeaderExternal& levelStaticHeaderExt,
     const LevelStaticObjectExternal& levelObj,
-    WarframeExporter::LevelStatic::ExporterGltf::ModelInfo modelInfo
+    WarframeExporter::Level::LevelExporterGltf::ModelInfo modelInfo
 )
 {
     if (gltfDoc.scenes.size() == 0)

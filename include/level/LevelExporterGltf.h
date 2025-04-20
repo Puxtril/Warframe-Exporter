@@ -9,9 +9,16 @@ using namespace fx::gltf;
 
 namespace WarframeExporter::Level::LevelExporterGltf
 {
-	void addModelData(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj);
+	struct ModelInfo
+	{
+		Attributes attributes;
+		std::vector<int32_t> indexIndices;
+		std::vector<WarframeExporter::Model::MeshInfoInternal> meshInfos;
+	};
+
+	ModelInfo addModel(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj);
+	void addModelInstance(Document& gltfDoc, const LevelObjectInternal& levelObj, const ModelInfo& modelInfo);
 
 	void _applyTransforms();
-	void _addLevelInformation(Document& gltfDoc, const LevelObjectInternal& levelObj, std::vector<int32_t> meshIndices);
 	std::vector<int32_t> _getMeshNodeIndices(Document& gltfDoc, int32_t startIndex, int32_t endIndex);
 }

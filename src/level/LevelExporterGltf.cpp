@@ -2,24 +2,34 @@
 
 using namespace WarframeExporter::Level;
 
-void
-LevelExporterGltf::addModelData(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj)
+LevelExporterGltf::ModelInfo
+LevelExporterGltf::addModel(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj)
 {
-	int32_t nodeCountInit = static_cast<int32_t>(gltfDoc.nodes.size());
-	Model::ModelExporterGltf::addModelData(gltfDoc, header, bodyInt, bodyExt);
-	int32_t nodeCountAfter = static_cast<int32_t>(gltfDoc.nodes.size());
+	WarframeExporter::Model::ModelExporterGltf::_modifyAsset(gltfDoc);
 
-	std::vector<int32_t> meshNodeIndices = _getMeshNodeIndices(gltfDoc, nodeCountInit, nodeCountAfter);
-	_addLevelInformation(gltfDoc, levelObj, meshNodeIndices);
+	Attributes vertsAttrs = WarframeExporter::Model::ModelExporterGltf::_addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
+	std::vector<int32_t> indicesAccessors = WarframeExporter::Model::ModelExporterGltf::_addIndexData(gltfDoc, bodyInt.indices, header.meshInfos);
+
+	return {vertsAttrs, indicesAccessors, header.meshInfos};
 }
 
 void
-LevelExporterGltf::_addLevelInformation(Document& gltfDoc, const LevelObjectInternal& levelObj, std::vector<int32_t> meshIndices)
+LevelExporterGltf::addModelInstance(Document& gltfDoc, const LevelObjectInternal& levelObj, const ModelInfo& modelInfo)
 {
-	for (size_t x = 0; x < meshIndices.size(); x++)
+	if (gltfDoc.scenes.size() == 0)
 	{
-		int32_t meshIndex = meshIndices[x];
-		Node& curNode = gltfDoc.nodes[meshIndex];
+		Scene scene;
+		gltfDoc.scenes.resize(1);
+		gltfDoc.scene = 0;
+	}
+	Scene& scene = gltfDoc.scenes[0];
+
+	for (size_t x = 0; x < modelInfo.indexIndices.size(); x++)
+	{
+		int32_t indicesIndex = modelInfo.indexIndices[x];
+		int32_t meshIndex = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, modelInfo.attributes, indicesIndex, modelInfo.meshInfos[x].matName, modelInfo.meshInfos[x].name);
+
+		Node node;
 
 		glm::mat4 matrix(1.0f);
 		matrix = glm::translate(matrix, {levelObj.pos.x / 2.0f, levelObj.pos.y / 2.0f, -levelObj.pos.z / 2.0f});
@@ -27,14 +37,19 @@ LevelExporterGltf::_addLevelInformation(Document& gltfDoc, const LevelObjectInte
 		matrix *= glm::toMat4(levelObj.rot);
 		matrix = glm::scale(matrix, {levelObj.scale, levelObj.scale, levelObj.scale});
 
-		curNode.matrix = {
+		node.matrix = {
 			matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
 			matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
 			matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
 			matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3],
 		};
 
-		Mesh& curMesh = gltfDoc.meshes[curNode.mesh];
+		node.mesh = meshIndex;
+		int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
+		gltfDoc.nodes.push_back(node);
+		scene.nodes.push_back(curNodeIndex);
+
+		Mesh& curMesh = gltfDoc.meshes[meshIndex];
 		curMesh.extensionsAndExtras["extras"]["MeshPath"] = levelObj.meshPath;
 		curMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
 		for (const auto& x : levelObj.attributes.items())

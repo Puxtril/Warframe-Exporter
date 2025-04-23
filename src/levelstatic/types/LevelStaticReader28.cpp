@@ -25,7 +25,7 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
 
     uint32_t modelPathLen = headerReader->readUInt32();
     outHeader.modelPaths.resize(modelPathLen);
-    for (uint i = 0; i < modelPathLen; i++)
+    for (uint32_t i = 0; i < modelPathLen; i++)
     {
         uint32_t curPathLen = headerReader->readUInt32();
         outHeader.modelPaths[i] = headerReader->readAsciiString(curPathLen);
@@ -54,7 +54,7 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
 
     uint32_t naturalLen = headerReader->readUInt32(0, 1000, "Natural Paths");
     outHeader.naturalPaths.resize(naturalLen);
-    for (uint i = 0; i < naturalLen; i++)
+    for (uint32_t i = 0; i < naturalLen; i++)
     {
         uint32_t curPathLen = headerReader->readUInt32();
         outHeader.naturalPaths[i] = headerReader->readAsciiString(curPathLen);
@@ -62,7 +62,7 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
 
     uint32_t attributeLen = headerReader->readUInt32(0, 1000, "Attribute Paths");
     outHeader.attributes.resize(attributeLen);
-    for (uint i = 0; i < attributeLen; i++)
+    for (uint32_t i = 0; i < attributeLen; i++)
     {
         uint32_t curPathLen = headerReader->readUInt32();
         outHeader.attributes[i] = headerReader->readAsciiString(curPathLen);
@@ -70,7 +70,7 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
 
     uint32_t materialLen = headerReader->readUInt32(0, 1000, "Material Paths");
     outHeader.materialPaths.resize(materialLen);
-    for (uint i = 0; i < materialLen; i++)
+    for (uint32_t i = 0; i < materialLen; i++)
     {
         uint32_t curPathLen = headerReader->readUInt32();
         outHeader.materialPaths[i] = headerReader->readAsciiString(curPathLen);
@@ -93,7 +93,7 @@ LevelStaticReader28::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, co
 {
     outBody.objects.resize(extHeader.vertexCount);
 
-    for (uint i = 0; i < extHeader.vertexCount; i++)
+    for (uint32_t i = 0; i < extHeader.vertexCount; i++)
     {
         bodyReader->readSingleArray(&outBody.objects[i].pos[0], 3);
         bodyReader->seek(4, std::ios::cur);
@@ -114,7 +114,7 @@ LevelStaticReader28::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, co
     bodyReader->seek(extHeader.unk2Count * 48, std::ios::cur);
     bodyReader->seek(extHeader.matrixCount * 36, std::ios::cur);
 
-    for (uint i = 0; i < extHeader.vertexCount; i++)
+    for (uint32_t i = 0; i < extHeader.vertexCount; i++)
     {
         bodyReader->seek(120, std::ios::cur);
         outBody.objects[i].modelIndex = bodyReader->readUInt16(0, extHeader.modelPaths.size(), "Model index");

@@ -24,12 +24,12 @@ LevelStaticExtractor::read(LotusLib::FileEntry& fileEntry)
 void
 LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf)
 {
-	std::unordered_map<std::string, WarframeExporter::Level::LevelExporterGltf::ModelInfo> modelPathsInGltf;
+	std::unordered_map<std::string, std::vector<Mesh>> modelPathsInGltf;
 	addModelsToGltf(external, pkgs, gltf, modelPathsInGltf);
 }
 
 void
-LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, WarframeExporter::Level::LevelExporterGltf::ModelInfo> modelPathsInGltf)
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<Mesh>> modelPathsInGltf)
 {
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
 	

@@ -2,7 +2,7 @@
 
 using namespace WarframeExporter::Level;
 
-LevelExporterGltf::ModelInfo
+std::vector<Mesh>
 LevelExporterGltf::addModel(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj)
 {
 	WarframeExporter::Model::ModelExporterGltf::_modifyAsset(gltfDoc);
@@ -10,11 +10,18 @@ LevelExporterGltf::addModel(Document& gltfDoc, const WarframeExporter::Model::Mo
 	Attributes vertsAttrs = WarframeExporter::Model::ModelExporterGltf::_addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
 	std::vector<int32_t> indicesAccessors = WarframeExporter::Model::ModelExporterGltf::_addIndexData(gltfDoc, bodyInt.indices, header.meshInfos);
 
-	return {vertsAttrs, indicesAccessors, header.meshInfos};
+	std::vector<Mesh> meshes(indicesAccessors.size());
+	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
+	{
+		meshes[meshIndex] = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex]);
+		WarframeExporter::Model::ModelExporterGltf::_addModelExtraInformation(gltfDoc, meshes[meshIndex], header);
+	}
+
+	return meshes;
 }
 
 void
-LevelExporterGltf::addModelInstance(Document& gltfDoc, const LevelObjectInternal& levelObj, const ModelInfo& modelInfo)
+LevelExporterGltf::addModelInstance(Document& gltfDoc, const LevelObjectInternal& levelObj, const std::vector<Mesh>& meshes)
 {
 	if (gltfDoc.scenes.size() == 0)
 	{
@@ -24,13 +31,11 @@ LevelExporterGltf::addModelInstance(Document& gltfDoc, const LevelObjectInternal
 	}
 	Scene& scene = gltfDoc.scenes[0];
 
-	for (size_t x = 0; x < modelInfo.indexIndices.size(); x++)
+	for (size_t i = 0; i < meshes.size(); i++)
 	{
-		int32_t indicesIndex = modelInfo.indexIndices[x];
-		int32_t meshIndex = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, modelInfo.attributes, indicesIndex, modelInfo.meshInfos[x].matName, modelInfo.meshInfos[x].name);
-
+		const Mesh& curMesh = meshes[i];
+		
 		Node node;
-
 		glm::mat4 matrix(1.0f);
 		matrix = glm::translate(matrix, {levelObj.pos.x / 2.0f, levelObj.pos.y / 2.0f, -levelObj.pos.z / 2.0f});
 		matrix *= glm::scale(matrix, {1.0, 1.0, -1.0});
@@ -44,16 +49,21 @@ LevelExporterGltf::addModelInstance(Document& gltfDoc, const LevelObjectInternal
 			matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3],
 		};
 
-		node.mesh = meshIndex;
+		int curMeshIndex = static_cast<int>(gltfDoc.meshes.size());
+		gltfDoc.meshes.push_back(curMesh);
+		node.mesh = curMeshIndex;
 		int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
 		gltfDoc.nodes.push_back(node);
 		scene.nodes.push_back(curNodeIndex);
 
-		Mesh& curMesh = gltfDoc.meshes[meshIndex];
-		curMesh.extensionsAndExtras["extras"]["MeshPath"] = levelObj.meshPath;
-		curMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
+		Mesh& insertedMesh = gltfDoc.meshes.back();
+
+		insertedMesh.name = levelObj.objName;
+
+		insertedMesh.extensionsAndExtras["extras"]["MeshPath"] = levelObj.meshPath;
+		insertedMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
 		for (const auto& x : levelObj.attributes.items())
-			curMesh.extensionsAndExtras["extras"][x.key()] = x.value();
+			insertedMesh.extensionsAndExtras["extras"][x.key()] = x.value();
 	}
 }
 

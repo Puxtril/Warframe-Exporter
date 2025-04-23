@@ -10,12 +10,11 @@ ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& he
 	Attributes vertsAttrs = _addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
 	std::vector<int32_t> indicesAccessors = _addIndexData(gltfDoc, bodyInt.indices, header.meshInfos);
 
-	std::vector<int32_t> meshIndices;
+	std::vector<Mesh> meshes(indicesAccessors.size());
 	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
 	{
-		int32_t index = _createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
-		_addModelExtraInformation(gltfDoc, index, header);
-		meshIndices.push_back(index);
+		meshes[meshIndex] = _createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
+		_addModelExtraInformation(gltfDoc, meshes[meshIndex], header);
 	}
 
 	if (header.boneTree.size() > 0)
@@ -24,13 +23,13 @@ ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& he
 		int32_t inverseMatricesIndex = _addInverseBindMatrices(gltfDoc, header.boneTree, header.weightedBones);
 		int32_t skinIndex = _createSkin(gltfDoc, header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
 
-		_addModelsToScene(gltfDoc, meshIndices, skinIndex);
+		_addModelsToScene(gltfDoc, meshes, skinIndex);
 		
 		gltfDoc.scenes[0].nodes.push_back(rootBoneNodeIndex);
 	}
 	else
 	{
-		_addModelsToScene(gltfDoc, meshIndices);
+		_addModelsToScene(gltfDoc, meshes);
 	}
 }
 
@@ -61,14 +60,13 @@ ModelExporterGltf::_print_exception(const std::exception& e, int level)
 }
 
 void
-ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, int32_t meshIndex, const ModelHeaderInternal& header)
+ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header)
 {
-	Mesh& curMesh = gltfDoc.meshes[meshIndex];
-	curMesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
+	mesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
 }
 
 void
-ModelExporterGltf::_addModelsToScene(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex)
+ModelExporterGltf::_addModelsToScene(Document& gltfDoc, const std::vector<Mesh>& meshes, int32_t skinIndex)
 {
 	if (gltfDoc.scenes.size() == 0)
 	{
@@ -81,7 +79,9 @@ ModelExporterGltf::_addModelsToScene(Document& gltfDoc, const std::vector<int32_
 	for (size_t x = 0; x < meshes.size(); x++)
 	{
 		Node curNode;
-		curNode.mesh = meshes[x];
+		int curMeshIndex = static_cast<int>(gltfDoc.meshes.size());
+		gltfDoc.meshes.push_back(meshes[x]);
+		curNode.mesh = curMeshIndex;
 		curNode.skin = skinIndex;
 		int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
 		gltfDoc.nodes.push_back(curNode);
@@ -183,7 +183,7 @@ ModelExporterGltf::_addInverseBindMatrices(Document& gltfDoc, const std::vector<
 	return matAccIndex;
 }
 
-int32_t
+Mesh
 ModelExporterGltf::_createMesh(Document& gltfDoc, Attributes attrs, int32_t indicies, const std::string& materialName, const std::string& modelName)
 {
 	Primitive curPrim;
@@ -193,12 +193,24 @@ ModelExporterGltf::_createMesh(Document& gltfDoc, Attributes attrs, int32_t indi
 	curPrim.attributes = attrs;
 
 	Mesh curMesh;
-	int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
 	curMesh.name = modelName;
 	curMesh.primitives.push_back(curPrim);
-	gltfDoc.meshes.push_back(curMesh);
 
-	return curMeshIndex;
+	return curMesh;
+}
+
+Mesh
+ModelExporterGltf::_createMesh(Document& gltfDoc, Attributes attrs, int32_t indicies)
+{
+	Primitive curPrim;
+	curPrim.indices = indicies;
+	curPrim.mode = Primitive::Mode::Triangles;
+	curPrim.attributes = attrs;
+
+	Mesh curMesh;
+	curMesh.primitives.push_back(curPrim);
+
+	return curMesh;
 }
 
 int32_t

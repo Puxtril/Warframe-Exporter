@@ -1,6 +1,6 @@
 #include "levelstatic/LevelStaticExporterGltf.h"
 
-WarframeExporter::Level::LevelExporterGltf::ModelInfo
+std::vector<Mesh>
 WarframeExporter::LevelStatic::ExporterGltf::addModel(
     Document& gltfDoc,
     const WarframeExporter::Model::ModelHeaderInternal& header,
@@ -13,7 +13,14 @@ WarframeExporter::LevelStatic::ExporterGltf::addModel(
 	Attributes vertsAttrs = WarframeExporter::Model::ModelExporterGltf::_addVertexData(gltfDoc, modelBodyInt, modelBodyExt, header.vertexCount);
 	std::vector<int32_t> indicesAccessors = WarframeExporter::Model::ModelExporterGltf::_addIndexData(gltfDoc, modelBodyInt.indices, header.meshInfos);
 
-    return {vertsAttrs, indicesAccessors, header.meshInfos};
+    std::vector<Mesh> meshes(indicesAccessors.size());
+	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
+	{
+		meshes[meshIndex] = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex]);
+		WarframeExporter::Model::ModelExporterGltf::_addModelExtraInformation(gltfDoc, meshes[meshIndex], header);
+	}
+
+	return meshes;
 }
 
 void
@@ -21,7 +28,7 @@ WarframeExporter::LevelStatic::ExporterGltf::addModelInstance(
     Document& gltfDoc,
     const LevelStaticHeaderExternal& levelStaticHeaderExt,
     const LevelStaticObjectExternal& levelObj,
-    WarframeExporter::Level::LevelExporterGltf::ModelInfo modelInfo
+    std::vector<Mesh> models
 )
 {
     if (gltfDoc.scenes.size() == 0)
@@ -32,14 +39,11 @@ WarframeExporter::LevelStatic::ExporterGltf::addModelInstance(
     }
     Scene& scene = gltfDoc.scenes[0];
 
-    for (size_t i = 0; i < modelInfo.indexIndices.size(); i++)
+    for (size_t i = 0; i < models.size(); i++)
 	{
-        int32_t indicesIndex = modelInfo.indexIndices[i];
-        int32_t meshIndex = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, modelInfo.attributes, indicesIndex, modelInfo.meshInfos[i].matName, modelInfo.meshInfos[i].name);
-		//WarframeExporter::Model::ModelExporterGltf::_addModelExtraInformation(gltfDoc, meshIndex, modelHeader);
-
-		Node node;
-
+        const Mesh& curMesh = models[i];
+		
+        Node node;
         glm::mat4 matrix(1.0f);
         matrix = glm::translate(matrix, {levelObj.pos.x / 2.0f, levelObj.pos.y / 2.0f, -levelObj.pos.z / 2.0f});
         matrix *= glm::scale(matrix, {1.0, 1.0, -1.0});
@@ -53,17 +57,20 @@ WarframeExporter::LevelStatic::ExporterGltf::addModelInstance(
             matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3],
         };
 
-        node.mesh = meshIndex;
+        int curMeshIndex = static_cast<int>(gltfDoc.meshes.size());
+		gltfDoc.meshes.push_back(curMesh);
+		node.mesh = curMeshIndex;
         int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
         gltfDoc.nodes.push_back(node);
         scene.nodes.push_back(curNodeIndex);
 
-        Mesh& curMesh = gltfDoc.meshes[meshIndex];
-		curMesh.extensionsAndExtras["extras"]["Mesh"] = levelStaticHeaderExt.modelPaths[levelObj.modelIndex];
+        Mesh& insertedMesh = gltfDoc.meshes.back();
+
+		insertedMesh.extensionsAndExtras["extras"]["Mesh"] = levelStaticHeaderExt.modelPaths[levelObj.modelIndex];
         if (levelObj.materialIndex < levelStaticHeaderExt.materialPaths.size())
-            curMesh.extensionsAndExtras["extras"]["Material"] = levelStaticHeaderExt.materialPaths[levelObj.materialIndex];
+            insertedMesh.extensionsAndExtras["extras"]["Material"] = levelStaticHeaderExt.materialPaths[levelObj.materialIndex];
         if (levelObj.naturalIndex < levelStaticHeaderExt.naturalPaths.size())
-            curMesh.extensionsAndExtras["extras"]["Natural"] = levelStaticHeaderExt.naturalPaths[levelObj.naturalIndex];
-		curMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
+            insertedMesh.extensionsAndExtras["extras"]["Natural"] = levelStaticHeaderExt.naturalPaths[levelObj.naturalIndex];
+		insertedMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
     }
 }

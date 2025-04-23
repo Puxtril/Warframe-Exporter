@@ -87,7 +87,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 		addLandscapeToGltf(outGltf, bodyInt, pkgs);
 
 	// Deduplicate model data
-	std::unordered_map<std::string, LevelExporterGltf::ModelInfo> modelsAddedToGltf;
+	std::unordered_map<std::string, std::vector<Mesh>> modelsAddedToGltf;
 
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{

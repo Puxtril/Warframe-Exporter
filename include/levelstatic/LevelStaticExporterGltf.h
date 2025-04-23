@@ -8,7 +8,7 @@ using namespace fx::gltf;
 
 namespace WarframeExporter::LevelStatic::ExporterGltf
 {
-	WarframeExporter::Level::LevelExporterGltf::ModelInfo addModel(
+	std::vector<Mesh> addModel(
         Document& gltfDoc,
         const WarframeExporter::Model::ModelHeaderInternal& header,
         const WarframeExporter::Model::ModelBodyInternal& modelBodyInt,
@@ -19,6 +19,6 @@ namespace WarframeExporter::LevelStatic::ExporterGltf
         Document& gltfDoc,
         const LevelStaticHeaderExternal& levelStaticHeaderExt,
         const LevelStaticObjectExternal& levelObj,
-        WarframeExporter::Level::LevelExporterGltf::ModelInfo modelInfo
+        std::vector<Mesh> models
     );
 }

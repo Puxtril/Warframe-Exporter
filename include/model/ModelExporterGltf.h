@@ -22,9 +22,9 @@ namespace WarframeExporter::Model::ModelExporterGltf
 
 	void _print_exception(const std::exception& e, int level = 0);
 
-	void _addModelExtraInformation(Document& gltfDoc, int32_t meshIndex, const ModelHeaderInternal& header);
+	void _addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header);
 
-	void _addModelsToScene(Document& gltfDoc, const std::vector<int32_t>& meshes, int32_t skinIndex = -1);
+	void _addModelsToScene(Document& gltfDoc, const std::vector<Mesh>& meshes, int32_t skinIndex = -1);
 
 	// Returns index of root bone in tree
 	// Garuntees same order as boneTree
@@ -34,7 +34,8 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	// Add Inverse Bind Matrices to the buffer and return the accessor index
 	int32_t _addInverseBindMatrices(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices);
 
-	int32_t _createMesh(Document& gltfDoc, Attributes attrs, int32_t indices, const std::string& materialName, const std::string& modelName);
+	Mesh _createMesh(Document& gltfDoc, Attributes attrs, int32_t indices, const std::string& materialName, const std::string& modelName);
+	Mesh _createMesh(Document& gltfDoc, Attributes attrs, int32_t indices);
 
 	int32_t _findOrCreateMaterial(Document& gltfDoc, const std::string& materialPath);
 

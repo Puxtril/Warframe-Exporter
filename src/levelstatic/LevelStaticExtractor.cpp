@@ -47,6 +47,12 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 		{
 			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curMeshPath);
 
+			if (curLevelObjFile.headerData.getLength() == 0)
+			{
+				m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curMeshPath));
+				continue;
+			}
+
 			if (WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type] == nullptr)
 			{
 				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curMeshPath));

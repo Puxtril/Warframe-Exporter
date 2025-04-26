@@ -102,7 +102,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 
 		// HLOD variations of existing models
 		// No need for these in exports, they're annoying to delete manually
-		if (curLevelObj.objTypePath == "/EE/Types/Engine/HLODAggregateEntity")
+		if (curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0)
 			continue;
 
 		try

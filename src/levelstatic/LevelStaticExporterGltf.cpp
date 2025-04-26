@@ -16,7 +16,7 @@ WarframeExporter::LevelStatic::ExporterGltf::addModel(
     std::vector<Mesh> meshes(indicesAccessors.size());
 	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
 	{
-		meshes[meshIndex] = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex]);
+		meshes[meshIndex] = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
 		WarframeExporter::Model::ModelExporterGltf::_addModelExtraInformation(gltfDoc, meshes[meshIndex], header);
 	}
 

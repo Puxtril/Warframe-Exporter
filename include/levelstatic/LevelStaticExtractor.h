@@ -57,7 +57,7 @@ namespace WarframeExporter::LevelStatic
 		LevelStaticExternal read(LotusLib::FileEntry& fileEntry);
 		// TODO: Make separate function for conversion
 		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf);
-		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<Mesh>> modelPathsInGltf);
+		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf);
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
 	};
 }

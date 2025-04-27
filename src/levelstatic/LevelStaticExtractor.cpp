@@ -24,12 +24,12 @@ LevelStaticExtractor::read(LotusLib::FileEntry& fileEntry)
 void
 LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf)
 {
-	std::unordered_map<std::string, std::vector<Mesh>> modelPathsInGltf;
+	std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf;
 	addModelsToGltf(external, pkgs, gltf, modelPathsInGltf);
 }
 
 void
-LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<Mesh>> modelPathsInGltf)
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf)
 {
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
 	

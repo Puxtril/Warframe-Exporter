@@ -170,7 +170,7 @@ UiPicker::parsePickerOptions()
     if (this->AudioCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Audio;
     if (this->LevelCheckbox->isChecked())
-        exportTypes |= (int)WarframeExporter::ExtractorType::Level;
+        exportTypes |= (int)WarframeExporter::ExtractorType::Level | (int)WarframeExporter::ExtractorType::LevelStatic;
     if (this->MaterialCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Material;
     if (this->ModelCheckbox->isChecked())

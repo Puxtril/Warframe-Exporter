@@ -63,6 +63,8 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/shader/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/landscape/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/landscape/types/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/levelstatic/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/levelstatic/types/*.cpp
 )
 
 file(GLOB WARFRAME_EXPORTER_CLI_SOURCES CONFIGURE_DEPENDS 

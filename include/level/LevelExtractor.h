@@ -59,6 +59,9 @@ namespace WarframeExporter::Level
 		Document createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		
+		// More attribute may exist in Packages.bin
+		void findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal);
 	
 	private:
 		void writeAndAdvanceBuffer(Document& gltfDoc, const std::filesystem::path& outputPath);

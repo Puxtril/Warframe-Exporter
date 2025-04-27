@@ -16,7 +16,6 @@ namespace WarframeExporter::Level
 	public:
 		static void convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody);
 		static void replaceOverrideMaterials(const std::vector<std::string>& materialNames, Model::ModelHeaderInternal& modelHeader);
-		static void applyTransformation(LevelObjectInternal& levelObj, std::vector<glm::vec3>& verts);
 		static void convertLandscapeToInternal(const LevelExternal& levelExternal, LevelInternal& levelInternal);
 
 	private:

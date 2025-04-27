@@ -104,7 +104,9 @@ endif()
 # Include dirs
 
 include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}/include" 
+	"${CMAKE_CURRENT_SOURCE_DIR}/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/fx-gltf/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/ddspp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include"
@@ -128,17 +130,8 @@ include_directories(
 # It adds a library target `zstd_static` which needs to be linked to executables
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib")
 
-set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
-set(BUILD_UNITTESTS OFF CACHE INTERNAL "")
-set(BUILD_DOC OFF CACHE INTERNAL "")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code")
-
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build glm static libs")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
-
-set(FX_GLTF_BUILD_TESTS OFF CACHE BOOL "If the tests should be built")
-set(FX_GLTF_INSTALL OFF CACHE BOOL "If the library should be installed")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/fx-gltf")
 
 set(SPNG_SHARED OFF CACHE BOOL "Build spng shared library")
 set(SPNG_STATIC ON CACHE BOOL "Build spng shared library")
@@ -148,7 +141,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/libspng")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/PhysxParser")
 
 add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
-target_link_libraries(Warframe-Exporter-Lib spdlog glm_static nlohmann_json::nlohmann_json fx-gltf spng_static TCLAP PhysxParser)
+target_link_libraries(Warframe-Exporter-Lib spdlog glm::glm nlohmann_json::nlohmann_json spng_static PhysxParser)
 
 if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 

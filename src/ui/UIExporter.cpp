@@ -16,6 +16,7 @@ UiExporter::setup(UiMainWindow *MainWindow)
     connect(this->treeWidget, &QTreeWidget::itemSelectionChanged, this, &UiExporter::itemChanged);
     connect(this->ExtractButton, &QPushButton::clicked, this, &UiExporter::extractButtonClicked);
     connect(this->tabWidget, &QTabWidget::currentChanged, this, &UiExporter::itemChanged);
+    connect(this->searchLineEdit, &QLineEdit::textChanged, this, &UiExporter::onSearchTextChanged);
 
     loadGeometry();
     connect(MainWindow, &UiMainWindow::mainWindowClose, this, &UiExporter::aboutToClose);
@@ -37,6 +38,10 @@ UiExporter::setup(UiMainWindow *MainWindow)
     connect(&m_exporterFileThread, &ExporterFileThread::extractError, this, &UiExporter::extractError);
     connect(&m_exporterFileThread, &ExporterFileThread::extractItemComplete, this, &UiExporter::extractItemComplete);
     connect(&m_exporterFileThread, &ExporterFileThread::extractComplete, this, &UiExporter::extractComplete);
+
+    connect(&m_searchTimer, &QTimer::timeout, this, &UiExporter::filterTree);
+
+    m_searchTimer.setSingleShot(true);
 
     m_previewManager.setupUis(this->Preview, this->verticalLayout_3, this->PreviewButtonsArea, this->horizontalLayout_5);
     m_metadataPreview.setupUis(this->MetadataCommonHeader, this->MetadataCompressedValue, this->MetadataDecompressedValue, this->MetadataModifiedValue);
@@ -176,6 +181,7 @@ UiExporter::setData(
 void
 UiExporter::loadTreeFinished()
 {
+    buildSearchIndex(treeWidget->invisibleRootItem());
     m_loadingDialog.hide();
 }
 
@@ -267,4 +273,57 @@ UiExporter::extractComplete()
 {
     this->ExtractProgressBar->setFormat("Done %v/%m");\
     swapToExtractButton();
+}
+
+void UiExporter::buildSearchIndex(QTreeWidgetItem* parent)
+{
+    for (int i = 0; i < parent->childCount(); ++i) {
+        QTreeWidgetItem* item = parent->child(i);
+        QString text;
+        if (item->type() == TreeItemFile::QTreeWidgetItemType) {
+            TreeItemFile* fileItem = static_cast<TreeItemFile*>(item);
+            text = fileItem->getQFullpath().toLower();
+        } else if (item->type() == TreeItemDirectory::QTreeWidgetItemType) {
+            TreeItemDirectory* dirItem = static_cast<TreeItemDirectory*>(item);
+            text = QString::fromStdString(dirItem->getFullInternalPath()).toLower();
+        }
+        m_searchIndex.append(qMakePair(text, item));
+        buildSearchIndex(item);
+    }
+}
+
+void 
+UiExporter::onSearchTextChanged(const QString& text) 
+{
+    m_searchTimer.start(300);
+}
+
+void 
+UiExporter::filterTree() 
+{
+    const QString searchText = searchLineEdit->text().trimmed().toLower();
+    const bool isSearching = !searchText.isEmpty();
+
+    if (!isSearching) {
+        for (const auto& pair : m_searchIndex) {
+            pair.second->setHidden(false);
+        }
+        return;
+    }
+
+    for (const auto& pair : m_searchIndex) {
+        const QString& itemText = pair.first;
+        QTreeWidgetItem* item = pair.second;
+        item->setHidden(true);
+        item->setExpanded(false);
+        if (itemText.contains(searchText)) {
+            item->setHidden(false);
+            QTreeWidgetItem* parent = item->parent();
+            while (parent) {
+                parent->setHidden(false);
+                parent->setExpanded(true);
+                parent = parent->parent();
+            }
+        }
+    }
 }

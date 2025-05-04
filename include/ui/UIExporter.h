@@ -6,6 +6,10 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtGui/QBrush>
 #include <QtWidgets/QMessageBox>
+#include <QLineEdit>
+#include <QTimer>
+#include <QHash>
+#include <QSet>
 
 #include "LotusLib.h"
 #include "Extractor.h"
@@ -42,7 +46,10 @@ class UiExporter : public QObject, private Ui_MainWindow
 
     LoadTreeThread m_loadTreeThread;
     QDialog m_loadingDialog;
-    UILoading m_loading;
+    UILoading m_loading;    
+    
+    QTimer m_searchTimer;    
+    QList<QPair<QString, QTreeWidgetItem*>> m_searchIndex;
 
 public:
     virtual ~UiExporter();
@@ -81,4 +88,7 @@ public slots:
     void extractItemComplete(int curItemCount);
     void extractError(std::string msg);
     void extractComplete();
+    void onSearchTextChanged(const QString& text);
+    void filterTree();
+    void buildSearchIndex(QTreeWidgetItem* parent);
 };

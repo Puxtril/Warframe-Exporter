@@ -5,9 +5,10 @@
 #include "ui/preview/TextureRenderWidget.h"
 
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QSlider>
 #include <QtCore/QObject>
 
-class PreviewTexture : public Preview
+class PreviewTexture : public Preview, public QObject
 {
     PreviewTexture() = default;
     PreviewTexture(const PreviewTexture&) = delete;
@@ -15,6 +16,8 @@ class PreviewTexture : public Preview
 
     TextureRenderWidget* m_textureWidget;
     QCheckBox* m_showAlphaCheckbox;
+    QSlider* m_exposureSlider;
+    bool m_hasAlpha;
 
 public:
     static PreviewTexture* getInstance(); 
@@ -23,5 +26,5 @@ public:
     void unloadData() override;
     void hide() override;
     void show() override;
-    void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;
+    void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;    
 };

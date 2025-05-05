@@ -1,7 +1,7 @@
 #include "ui/preview/TextureRenderWidget.h"
 
 TextureRenderWidget::TextureRenderWidget(QWidget *parent)
-    : QtOpenGLViewer(parent), m_showAlpha(false)
+    : QtOpenGLViewer(parent), m_showAlpha(false), m_hasAlpha(false), m_exposure(1.0f), m_gamma(2.2f), m_isHDR(false)
 {
     setIs3D(false);
 
@@ -36,6 +36,14 @@ void
 TextureRenderWidget::drawScene()
 {
     glUseProgram(m_shaderProgram);
+    GLint exposureLoc = glGetUniformLocation(m_shaderProgram, "exposure");
+    glUniform1f(exposureLoc, m_exposure);
+
+    GLint isHdrLoc = glGetUniformLocation(m_shaderProgram, "isHDR");
+    glUniform1i(isHdrLoc, m_isHDR);
+
+    GLint gammaLoc = glGetUniformLocation(m_shaderProgram, "gamma");
+    glUniform1f(gammaLoc, m_gamma);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
@@ -44,6 +52,12 @@ TextureRenderWidget::drawScene()
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ZERO);
+        
     }
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -71,12 +85,12 @@ TextureRenderWidget::resizeGL(int width, int height)
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, &data[0], GL_DYNAMIC_DRAW);
 }
 
-void
+bool
 TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& texture)
 {
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, m_texture);
-
+    m_hasAlpha = false;
     m_texWidth = texture.header.width;
     m_texHeight = texture.header.textureNames.size() > 0 ? texture.header.height * texture.header.textureNames.size() : texture.header.height;
 
@@ -86,22 +100,27 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     if (m_textureMapUncompressed.count(texture.header.formatEnum) == 1)
     {
         std::tuple<int, int, int> glFormats = m_textureMapUncompressed[texture.header.formatEnum];
+        m_hasAlpha = (std::get<1>(glFormats) == GL_RGBA);
         glTexImage2D(GL_TEXTURE_2D, 0, std::get<0>(glFormats), m_texWidth, m_texHeight, 0, std::get<1>(glFormats), std::get<2>(glFormats), texture.body.data() + mip0Start);
     }
     else if (m_textureMapCompressed.count(texture.header.formatEnum) == 1)
     {
         int glFormat = m_textureMapCompressed[texture.header.formatEnum];
+        m_hasAlpha = (glFormat == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
+            glFormat == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT ||
+            glFormat == GL_COMPRESSED_RGBA_BPTC_UNORM);
+        m_isHDR = glFormat == GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB;
         glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, m_texWidth, m_texHeight, 0, mip0Len, texture.body.data() + mip0Start);
     }
     else
     {
         throw std::runtime_error("Unable to preview texture compression format");
     }
-
     glGenerateMipmap(GL_TEXTURE_2D);
     
     resizeGL(width(), height());
     paintGL();
+    return m_hasAlpha;
 }
 
 void
@@ -160,14 +179,23 @@ TextureRenderWidget::loadShaders()
 {
     const char* shaderCode = R"""(#version 330 core
         out vec4 FragColor;
-
         in vec2 TexCoord;
-
         uniform sampler2D ourTexture;
+        uniform float exposure;
+        uniform bool isHDR;
+        uniform float gamma;
 
-        void main()
-        {
-            FragColor = texture(ourTexture, TexCoord);
+        void main() {
+            vec4 texColor = texture(ourTexture, TexCoord);
+            vec3 color = texColor.rgb;
+
+            color *= exposure;
+            if (isHDR) {
+                color = vec3(1.0) - exp(-color);
+                color = pow(color, vec3(1.0 / gamma));
+            }
+
+            FragColor = vec4(color, texColor.a);
         })""";
 
     unsigned int shader;
@@ -210,6 +238,11 @@ TextureRenderWidget::loadShaders()
 std::tuple<float, float>
 TextureRenderWidget::getMeshCoordsForTexture(int screenWidth, int screenHeight, int texWidth, int texHeight)
 {
+    if (texWidth <= screenWidth && texHeight <= screenHeight)
+    {
+        return { static_cast<float>(texWidth) / screenWidth,
+                 static_cast<float>(texHeight) / screenHeight };
+    }
     if (texWidth == texHeight)
     {
         if (screenHeight > screenWidth)
@@ -230,5 +263,12 @@ TextureRenderWidget::showAlpha(int state)
     else if (state == Qt::CheckState::Unchecked)
         m_showAlpha = false;
 
+    update();
+}
+
+void
+TextureRenderWidget::changeExposure(int exposure)
+{
+    m_exposure = exposure / 10.0f;
     update();
 }

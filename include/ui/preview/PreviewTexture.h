@@ -16,7 +16,6 @@ class PreviewTexture : public Preview, public QObject
 
     TextureRenderWidget* m_textureWidget;
     QCheckBox* m_showAlphaCheckbox;
-    QSlider* m_exposureSlider;
     bool m_hasAlpha;
 
 public:

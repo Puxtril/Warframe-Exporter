@@ -14,19 +14,12 @@ PreviewTexture::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidge
     parentLayout->addWidget(m_textureWidget);
     m_textureWidget->hide();
 
-    m_exposureSlider = new QSlider(Qt::Horizontal, previewButtonsArea);
-    m_exposureSlider->setValue(10);
-    m_exposureSlider->setRange(1, 100);
-    layout->addWidget(m_exposureSlider);
-    m_exposureSlider->hide();
-
     m_showAlphaCheckbox = new QCheckBox(previewButtonsArea);
     layout->addWidget(m_showAlphaCheckbox);
     m_showAlphaCheckbox->setText("Apply Alpha");
     m_showAlphaCheckbox->hide();
 
     QObject::connect(m_showAlphaCheckbox, &QCheckBox::stateChanged, m_textureWidget, &TextureRenderWidget::showAlpha);
-    QObject::connect(m_exposureSlider, &QSlider::valueChanged, m_textureWidget, &TextureRenderWidget::changeExposure);
 }
 
 void
@@ -39,7 +32,6 @@ PreviewTexture::hide()
 {
     m_textureWidget->hide();
     m_showAlphaCheckbox->hide();
-    m_exposureSlider->hide();
 }
 
 void
@@ -47,7 +39,6 @@ PreviewTexture::show()
 {
     m_textureWidget->show();
     m_showAlphaCheckbox->show();
-    m_exposureSlider->show();
 }
 
 void
@@ -56,8 +47,6 @@ PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRe
     auto textureExtractor = WarframeExporter::Texture::TextureExtractor::getInstance();
 
     WarframeExporter::Texture::TextureInternal textureData = textureExtractor->getTexture(fileEntry, pkgs);
-    m_exposureSlider->setValue(10);
-    m_textureWidget->changeExposure(10);
     bool hasAlpha = m_textureWidget->setTexture(textureData);
     m_showAlphaCheckbox->setHidden(!hasAlpha);
 }

@@ -1,7 +1,7 @@
 #include "ui/preview/TextureRenderWidget.h"
 
 TextureRenderWidget::TextureRenderWidget(QWidget *parent)
-    : QtOpenGLViewer(parent), m_showAlpha(false), m_hasAlpha(false), m_exposure(1.0f), m_gamma(2.2f), m_isHDR(false)
+    : QtOpenGLViewer(parent), m_showAlpha(false), m_hasAlpha(false), m_gamma(2.2f), m_isHDR(false)
 {
     setIs3D(false);
 
@@ -36,9 +36,6 @@ void
 TextureRenderWidget::drawScene()
 {
     glUseProgram(m_shaderProgram);
-    GLint exposureLoc = glGetUniformLocation(m_shaderProgram, "exposure");
-    glUniform1f(exposureLoc, m_exposure);
-
     GLint isHdrLoc = glGetUniformLocation(m_shaderProgram, "isHDR");
     glUniform1i(isHdrLoc, m_isHDR);
 
@@ -181,7 +178,6 @@ TextureRenderWidget::loadShaders()
         out vec4 FragColor;
         in vec2 TexCoord;
         uniform sampler2D ourTexture;
-        uniform float exposure;
         uniform bool isHDR;
         uniform float gamma;
 
@@ -189,7 +185,6 @@ TextureRenderWidget::loadShaders()
             vec4 texColor = texture(ourTexture, TexCoord);
             vec3 color = texColor.rgb;
 
-            color *= exposure;
             if (isHDR) {
                 color = vec3(1.0) - exp(-color);
                 color = pow(color, vec3(1.0 / gamma));
@@ -263,12 +258,5 @@ TextureRenderWidget::showAlpha(int state)
     else if (state == Qt::CheckState::Unchecked)
         m_showAlpha = false;
 
-    update();
-}
-
-void
-TextureRenderWidget::changeExposure(int exposure)
-{
-    m_exposure = exposure / 10.0f;
     update();
 }

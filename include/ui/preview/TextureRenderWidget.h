@@ -22,7 +22,6 @@ class TextureRenderWidget : public QtOpenGLViewer
     int m_texHeight;
     bool m_showAlpha;
     bool m_isHDR;
-    float m_exposure;
     float m_gamma;
 
     std::map<WarframeExporter::Texture::TextureCompression, std::tuple<int, int, int>> m_textureMapUncompressed;
@@ -46,5 +45,4 @@ private:
 
 public slots:
     void showAlpha(int state);
-    void changeExposure(int exposure);
 };

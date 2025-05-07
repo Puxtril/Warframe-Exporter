@@ -21,21 +21,20 @@ class TextureRenderWidget : public QtOpenGLViewer
     int m_texWidth;
     int m_texHeight;
     bool m_showAlpha;
-    bool m_isHDR;
     float m_gamma;
+    bool m_isHDR;
 
     std::map<WarframeExporter::Texture::TextureCompression, std::tuple<int, int, int>> m_textureMapUncompressed;
     std::map<WarframeExporter::Texture::TextureCompression, int> m_textureMapCompressed;
 
 public:
-    bool m_hasAlpha;
     TextureRenderWidget(QWidget *parent = NULL);
 
     void initializeGL() override;
     void drawScene() override;
     void resizeGL(int width, int height) override;
 
-    bool setTexture(WarframeExporter::Texture::TextureInternal& texture);
+    void setTexture(WarframeExporter::Texture::TextureInternal& texture);
 private:
     void loadTexture();
     void loadSquare();

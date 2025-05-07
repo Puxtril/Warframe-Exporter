@@ -1,7 +1,7 @@
 #include "ui/preview/TextureRenderWidget.h"
 
 TextureRenderWidget::TextureRenderWidget(QWidget *parent)
-    : QtOpenGLViewer(parent), m_showAlpha(false), m_hasAlpha(false), m_gamma(2.2f), m_isHDR(false)
+    : QtOpenGLViewer(parent), m_showAlpha(false), m_isHDR(false)
 {
     setIs3D(false);
 
@@ -39,8 +39,6 @@ TextureRenderWidget::drawScene()
     GLint isHdrLoc = glGetUniformLocation(m_shaderProgram, "isHDR");
     glUniform1i(isHdrLoc, m_isHDR);
 
-    GLint gammaLoc = glGetUniformLocation(m_shaderProgram, "gamma");
-    glUniform1f(gammaLoc, m_gamma);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
@@ -82,12 +80,12 @@ TextureRenderWidget::resizeGL(int width, int height)
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, &data[0], GL_DYNAMIC_DRAW);
 }
 
-bool
+void
 TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& texture)
 {
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    m_hasAlpha = false;
+
     m_texWidth = texture.header.width;
     m_texHeight = texture.header.textureNames.size() > 0 ? texture.header.height * texture.header.textureNames.size() : texture.header.height;
 
@@ -97,15 +95,11 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     if (m_textureMapUncompressed.count(texture.header.formatEnum) == 1)
     {
         std::tuple<int, int, int> glFormats = m_textureMapUncompressed[texture.header.formatEnum];
-        m_hasAlpha = (std::get<1>(glFormats) == GL_RGBA);
         glTexImage2D(GL_TEXTURE_2D, 0, std::get<0>(glFormats), m_texWidth, m_texHeight, 0, std::get<1>(glFormats), std::get<2>(glFormats), texture.body.data() + mip0Start);
     }
     else if (m_textureMapCompressed.count(texture.header.formatEnum) == 1)
     {
         int glFormat = m_textureMapCompressed[texture.header.formatEnum];
-        m_hasAlpha = (glFormat == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-            glFormat == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT ||
-            glFormat == GL_COMPRESSED_RGBA_BPTC_UNORM);
         m_isHDR = glFormat == GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB;
         glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, m_texWidth, m_texHeight, 0, mip0Len, texture.body.data() + mip0Start);
     }
@@ -117,7 +111,6 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     
     resizeGL(width(), height());
     paintGL();
-    return m_hasAlpha;
 }
 
 void
@@ -179,13 +172,13 @@ TextureRenderWidget::loadShaders()
         in vec2 TexCoord;
         uniform sampler2D ourTexture;
         uniform bool isHDR;
-        uniform float gamma;
 
         void main() {
             vec4 texColor = texture(ourTexture, TexCoord);
             vec3 color = texColor.rgb;
 
             if (isHDR) {
+                const float gamma = 2.2;
                 color = vec3(1.0) - exp(-color);
                 color = pow(color, vec3(1.0 / gamma));
             }

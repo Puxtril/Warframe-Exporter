@@ -1,7 +1,7 @@
 #include "ui/preview/TextureRenderWidget.h"
 
 TextureRenderWidget::TextureRenderWidget(QWidget *parent)
-    : QtOpenGLViewer(parent), m_showAlpha(false)
+    : QtOpenGLViewer(parent), m_showAlpha(false), m_isHDR(false)
 {
     setIs3D(false);
 
@@ -36,6 +36,9 @@ void
 TextureRenderWidget::drawScene()
 {
     glUseProgram(m_shaderProgram);
+    GLint isHdrLoc = glGetUniformLocation(m_shaderProgram, "isHDR");
+    glUniform1i(isHdrLoc, m_isHDR);
+
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
@@ -44,6 +47,12 @@ TextureRenderWidget::drawScene()
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ZERO);
+        
     }
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -91,13 +100,13 @@ TextureRenderWidget::setTexture(WarframeExporter::Texture::TextureInternal& text
     else if (m_textureMapCompressed.count(texture.header.formatEnum) == 1)
     {
         int glFormat = m_textureMapCompressed[texture.header.formatEnum];
+        m_isHDR = glFormat == GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB;
         glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, m_texWidth, m_texHeight, 0, mip0Len, texture.body.data() + mip0Start);
     }
     else
     {
         throw std::runtime_error("Unable to preview texture compression format");
     }
-
     glGenerateMipmap(GL_TEXTURE_2D);
     
     resizeGL(width(), height());
@@ -160,14 +169,21 @@ TextureRenderWidget::loadShaders()
 {
     const char* shaderCode = R"""(#version 330 core
         out vec4 FragColor;
-
         in vec2 TexCoord;
-
         uniform sampler2D ourTexture;
+        uniform bool isHDR;
 
-        void main()
-        {
-            FragColor = texture(ourTexture, TexCoord);
+        void main() {
+            vec4 texColor = texture(ourTexture, TexCoord);
+            vec3 color = texColor.rgb;
+
+            if (isHDR) {
+                const float gamma = 2.2;
+                color = vec3(1.0) - exp(-color);
+                color = pow(color, vec3(1.0 / gamma));
+            }
+
+            FragColor = vec4(color, texColor.a);
         })""";
 
     unsigned int shader;
@@ -210,6 +226,11 @@ TextureRenderWidget::loadShaders()
 std::tuple<float, float>
 TextureRenderWidget::getMeshCoordsForTexture(int screenWidth, int screenHeight, int texWidth, int texHeight)
 {
+    if (texWidth <= screenWidth && texHeight <= screenHeight)
+    {
+        return { static_cast<float>(texWidth) / screenWidth,
+                 static_cast<float>(texHeight) / screenHeight };
+    }
     if (texWidth == texHeight)
     {
         if (screenHeight > screenWidth)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BinaryReaderBuffered.h"
-#include "EnumMapValue.h"
+#include "EnumMap.h"
 #include "CommonHeader.h"
 #include "ExporterLogger.h"
 #include "ExporterExceptions.h"

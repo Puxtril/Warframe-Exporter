@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EnumMapExtractorClass.h"
 #include "audio/AudioOpus/AudioOpusExtractor.h"
 #include "audio/AudioPCM/AudioPCMExtractor.h"
 

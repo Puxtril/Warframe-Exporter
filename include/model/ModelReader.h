@@ -3,12 +3,12 @@
 #include "BinaryReaderBuffered.h"
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
-#include "EnumMapValue.h"
+#include "EnumMapGame.h"
 #include "model/ModelTypes.h"
 
 namespace WarframeExporter::Model
 {
-	class ModelReader : public EnumMapValue
+	class ModelReader : public EnumMapGameValue
 	{
 	protected:
 		ModelReader() = default;

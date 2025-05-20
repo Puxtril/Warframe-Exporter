@@ -15,7 +15,28 @@ StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReade
     ShaderHeaderExternal shaderHeader;
 
     if (shaderTypeEnum == 23)
-        headerReader->seek(20, std::ios::cur);
+    {
+        headerReader->seek(8, std::ios::cur);
+
+        // Techrot Encore added another 8 bytes to this section
+        // Luckily all shaders have an int32 of value -1 that we can anchor with
+
+        // Pre-Techrot
+        if (headerReader->readInt32() == -1)
+        {
+            headerReader->seek(10, std::ios::cur);
+        }
+        // Post-Techrot
+        else
+        {
+            headerReader->seek(4, std::ios::cur);
+            if (headerReader->readInt32() == -1)
+                headerReader->seek(8, std::ios::cur);
+            else
+                throw unknown_format_error("Unknown shader header");
+        }
+        
+    }
     else
         headerReader->seek(8, std::ios::cur);
 
@@ -52,7 +73,7 @@ StandardShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader,
 
     ShaderEntry shader;
 
-    int bytecodeSize = shaderHeader.shaderLengths[index] - 18;
+    int bytecodeSize = shaderHeader.shaderLengths[index] - 20;
     shader.bytecode.resize(bytecodeSize);
     bodyReader->readUInt8Array((uint8_t*)shader.bytecode.data(), bytecodeSize);
 
@@ -75,7 +96,7 @@ StandardShaderReader::readAllShaders(BinaryReader::BinaryReaderBuffered* bodyRea
     {
         ShaderEntry& curShader = shaders[iShader];
 
-        int bytecodeSize = shaderHeader.shaderLengths[iShader] - 18;
+        int bytecodeSize = shaderHeader.shaderLengths[iShader] - 20;
         curShader.bytecode.resize(bytecodeSize);
         bodyReader->readUInt8Array((uint8_t*)curShader.bytecode.data(), bytecodeSize);
 
@@ -83,7 +104,7 @@ StandardShaderReader::readAllShaders(BinaryReader::BinaryReaderBuffered* bodyRea
         
         curShader.stage = bodyReader->readUInt16();
 
-        bodyReader->seek(14, std::ios::cur);
+        bodyReader->seek(16, std::ios::cur);
     }
 
     return shaders;

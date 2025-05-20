@@ -20,8 +20,6 @@ LevelExtractor::getLevelExternal(LotusLib::FileEntry& fileEntry)
 	levelReader->readBody(fileEntry.bData, external.header, external.body);
 
 	findLandscape(external);
-	LevelObjectHeaderExternal& landscape = external.header.levelObjs[external.landscapeIndex];
-
 	return external;
 }
 
@@ -35,12 +33,33 @@ LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal&
 }
 
 void
+LevelExtractor::findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal)
+{
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
+
+	for (size_t i = 0; i < levelExternal.header.levelObjs.size(); i++)
+	{
+		std::vector<char>& curAttributes = levelExternal.body.attributes[i];
+
+		LotusLib::FileEntry entry = pkg.getFile(levelExternal.header.levelObjs[i].objTypePath, LotusLib::READ_EXTRA_ATTRIBUTES);
+		if (entry.extra.attributes.size() > curAttributes.size())
+		{
+			size_t oldSize = curAttributes.size();
+			curAttributes.resize(oldSize + entry.extra.attributes.length());
+			memcpy(&curAttributes[oldSize-1], entry.extra.attributes.c_str(), entry.extra.attributes.length());
+		}
+	}
+}
+
+void
 LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
 {
 	LevelExternal levelExt = getLevelExternal(fileEntry);
+	pkgs.initilizePackagesBin();
+	findExtraAttributes(pkgs, levelExt);
 	LevelInternal levelInt = convertToInternal(fileEntry, levelExt);
 
-	m_logger.info("Level mesh count: " + std::to_string(levelInt.objs.size()));
+	m_logger.info("Level object count: " + std::to_string(levelInt.objs.size()));
 
 	Document gltfOut = createGltfCombined(pkgs, levelInt);
 
@@ -67,6 +86,9 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 	if (!bodyInt.landscape.landscapePath.empty())
 		addLandscapeToGltf(outGltf, bodyInt, pkgs);
 
+	// Deduplicate model data
+	std::unordered_map<std::string, std::vector<Mesh>> modelsAddedToGltf;
+
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
 		// >3GB
@@ -80,41 +102,49 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 
 		// HLOD variations of existing models
 		// No need for these in exports, they're annoying to delete manually
-		if (curLevelObj.objTypePath == "/EE/Types/Engine/HLODAggregateEntity")
+		if (curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0)
 			continue;
 
 		try
 		{
-			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curLevelObj.meshPath);
-
-			if (WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type] == nullptr)
+			// We have not extracted this model into the output gltf file
+			if (modelsAddedToGltf.count(curLevelObj.meshPath) == 0)
 			{
-				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curLevelObj.meshPath));
-				continue;
+				LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curLevelObj.meshPath);
+
+				if (curLevelObjFile.headerData.getLength() == 0)
+				{
+					m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curLevelObj.meshPath));
+					continue;
+				}
+
+				if (WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type) == nullptr)
+				{
+					m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curLevelObj.meshPath));
+					continue;
+				}
+
+				WarframeExporter::Model::ModelHeaderExternal headerExt;
+				WarframeExporter::Model::ModelBodyExternal bodyExt;
+				WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
+
+				if (headerExt.meshInfos.size() == 0)
+					continue;
+
+				// Gltf exporter doesn't like multiple rigged models
+				headerExt.boneTree.clear();
+
+				WarframeExporter::Model::ModelHeaderInternal headerInt;
+				WarframeExporter::Model::ModelBodyInternal bodyInt;
+				auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg);
+				WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale());
+
+				LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
+
+				modelsAddedToGltf[curLevelObj.meshPath] = LevelExporterGltf::addModel(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
 			}
 
-			WarframeExporter::Model::ModelHeaderExternal headerExt;
-			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, headerExt, bodyExt);
-
-			if (headerExt.meshInfos.size() == 0)
-			{
-				m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", curLevelObj.meshPath));
-				continue;
-			}
-
-			// Gltf exporter doesn't like multiple rigged models
-			headerExt.boneTree.clear();
-
-			WarframeExporter::Model::ModelHeaderInternal headerInt;
-			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg);
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[curLevelObjFile.commonHeader.type]->ensmalleningScale());
-
-			LevelConverter::applyTransformation(curLevelObj, bodyInt.positions);
-			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
-
-			LevelExporterGltf::addModelData(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
+			LevelExporterGltf::addModelInstance(outGltf, curLevelObj, modelsAddedToGltf[curLevelObj.meshPath]);
 		}
 		catch (std::exception& ex)
 		{

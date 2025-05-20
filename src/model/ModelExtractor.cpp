@@ -22,13 +22,13 @@ ModelExtractor::cancelVertexColorIndexing()
 }
 
 void
-ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
+ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, LotusLib::Game game, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
 {
 	if (fileEntry.bData.getLength() == 0)
 		throw unknown_format_error("Mesh has no body");
 
 	// Read body/header data
-	ModelReader* modelReader = g_enumMapModel[fileEntry.commonHeader.type];
+	ModelReader* modelReader = g_enumMapModel.at(game, fileEntry.commonHeader.type);
 
 	modelReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, outHeaderExt);
 	modelReader->readBody(outHeaderExt, &fileEntry.bData, outBodyExt);
@@ -48,7 +48,7 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 {
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
-	extractExternal(fileEntry, headerExt, bodyExt);
+	extractExternal(fileEntry, pkgs.getGame(), headerExt, bodyExt);
 
 	if (headerExt.meshInfos.size() == 0)
 		throw unknown_format_error("Mesh has zero MeshInfos");
@@ -59,7 +59,8 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
-	ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, g_enumMapModel[fileEntry.commonHeader.type]->ensmalleningScale());
+	ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, g_enumMapModel.at(pkgs.getGame(), fileEntry.commonHeader.type)->ensmalleningScale());
+	ModelConverter::mirrorX(headerInt, bodyInt);
 
 	m_logger.debug(spdlog::fmt_lib::format("Bones={} Verts={} Faces={} Morphs={} PhysXMeshes={} Colors={} Scale={},{},{}", headerExt.boneTree.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size(), vertexColors.size(), headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z, headerInt.modelScale.w));
 	

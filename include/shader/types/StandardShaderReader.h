@@ -2,6 +2,7 @@
 
 #include "shader/ShaderReader.h"
 #include "shader/ShaderTypes.h"
+#include "ExporterExceptions.h"
 
 namespace WarframeExporter::Shader
 {

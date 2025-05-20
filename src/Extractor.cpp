@@ -1,4 +1,4 @@
-#include "EnumMapExtractorClass.h"
+#include "EnumMapExtractor.h"
 
 using namespace WarframeExporter;
 

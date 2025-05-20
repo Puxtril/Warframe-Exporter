@@ -1,18 +1,24 @@
 #pragma once
 
-#include "EnumMapValue.h"
-
 #include <map>
 #include <stdexcept>
+#include <vector>
 
 namespace WarframeExporter
 {
-	// Map an enumeration (int) to a class
-	// 
-	// T must be a subclass of EnumMapValue.
-	//  EnumMapValue only requires 1 function - to return the Enum (int) keys.
-	// T should be a base class of your choosing.
-	//  Ex. for model formats, T should have methods like readModel, processModel, etc.
+	/* Map an enumeration (int) to a class
+	*  
+	*  T must be a subclass of EnumMapValue.
+	*   EnumMapValue only requires 1 function - to return the Enum (int) keys.
+	*  T should be a base class of your choosing.
+	*  Ex. for model formats, T should have methods like readModel, processModel, etc.
+	*/
+	class EnumMapValue
+	{
+	public:
+		virtual std::vector<int> getEnumMapKeys() const = 0;
+	};
+
 	template <class T>
 	class EnumMap
 	{

@@ -2,9 +2,9 @@ This guide is only for compiling on Linux. A pre-compiled version is already ava
 
 # Install Dependencies
 
-* Archlinux: `pacman -s git make cmake g++ zlib glu qt6-base`
+* Archlinux: `pacman -s git make cmake gcc zlib glu qt6-base`
 * Debian/Ubuntu/Mint: `apt install git make cmake g++ zlib1g-dev libglu1-mesa-dev qt6-base-dev`
-* Fedora: `yum install git make cmake g++ zlib-devel mesa-libGLU-devel qt6-qtbase-devel`
+* Fedora: `yum install git make cmake gcc zlib-devel mesa-libGLU-devel qt6-qtbase-devel`
 
 # Initilize the repository
 

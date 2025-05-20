@@ -2,14 +2,32 @@
 
 using namespace WarframeExporter::Landscape;
 
+std::tuple<int, int>
+LandscapeConverter::fixGridCount(const LandscapeHeaderExternal& externalHeader)
+{
+    if (externalHeader.rowCount + externalHeader.columnCount == externalHeader.chunks.size())
+        return {externalHeader.rowCount, externalHeader.columnCount};
+
+    if (externalHeader.rowCount != externalHeader.columnCount)
+    {
+        WarframeExporter::Logger::getInstance().warn(spdlog::fmt_lib::format("Invalid landscape grid {}x{} with {} chunks", externalHeader.rowCount, externalHeader.columnCount, externalHeader.chunks.size()));
+        return {externalHeader.rowCount, externalHeader.columnCount};
+    }
+
+    int sqroot = lround(sqrt(externalHeader.chunks.size()));
+    return {sqroot, sqroot};
+}
+
 void
 LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader, const std::vector<LandscapeBodyChunkExternal>& externalChunks, LandscapeInternal& internal)
 {
-    for (unsigned int iRow = 0; iRow < externalHeader.rowCount; iRow++)
+    std::tuple<int, int> grid = fixGridCount(externalHeader);
+
+    for (int iRow = 0; iRow < std::get<0>(grid); iRow++)
     {
-        for (unsigned int iColumn = 0; iColumn < externalHeader.columnCount; iColumn++)
+        for (int iColumn = 0; iColumn < std::get<1>(grid); iColumn++)
         {
-            unsigned int chunkIndex = iRow + iColumn;
+            int chunkIndex = iRow + iColumn;
             const glm::vec3& scale = externalHeader.chunks[chunkIndex].scale;
             internal.positions.push_back({iRow * scale.x, 0.0, iColumn * scale.z});
         }

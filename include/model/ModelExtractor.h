@@ -53,6 +53,7 @@ namespace WarframeExporter::Model
 			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_86 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_96 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_99 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_99 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_DCM_101 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_HLOD_OR_DCM_102 },
@@ -61,6 +62,7 @@ namespace WarframeExporter::Model
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_HLOD_OR_DCM_105 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_159 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_160 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_163 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_269 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_272 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_275 },
@@ -80,7 +82,7 @@ namespace WarframeExporter::Model
 		void indexVertexColors(LotusLib::PackageReader& pkgs);
 		void cancelVertexColorIndexing();
 
-		void extractExternal(LotusLib::FileEntry& fileEntry, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
+		void extractExternal(LotusLib::FileEntry& fileEntry, LotusLib::Game game, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
 		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;

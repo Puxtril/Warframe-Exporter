@@ -48,4 +48,7 @@ PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRe
 
     WarframeExporter::Texture::TextureInternal textureData = textureExtractor->getTexture(fileEntry, pkgs);
     m_textureWidget->setTexture(textureData);
+
+    bool hasAlpha = textureData.header.ddsFormat == ddspp::DXGIFormat::BC1_UNORM ? false : ddspp::hasAlpha(textureData.header.ddsFormat);
+    m_showAlphaCheckbox->setHidden(!hasAlpha);
 }

@@ -6,7 +6,6 @@
 
 namespace WarframeExporter::Audio
 {
-
 	class AudioExtractorProxy : public Extractor
 	{
 		AudioExtractorProxy() : Extractor() {}

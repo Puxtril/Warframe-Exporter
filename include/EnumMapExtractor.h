@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EnumMapExtractorClass.h"
+#include "EnumMapExtractor.h"
 #include "model/ModelExtractor.h"
 #include "texture/TextureExtractor.h"
 #include "material/MaterialExtractor.h"
@@ -8,6 +8,7 @@
 #include "audio/AudioExtractorProxy.h"
 #include "shader/ShaderExtractor.h"
 #include "landscape/LandscapeExtractor.h"
+#include "levelstatic/LevelStaticExtractor.h"
 
 namespace WarframeExporter
 {
@@ -20,5 +21,6 @@ namespace WarframeExporter
         .registerClass(Level::LevelExtractor::getInstance())
         .registerClass(Audio::AudioExtractorProxy::getInstance())
         .registerClass(Shader::ShaderExtractor::getInstance())
-        .registerClass(Landscape::LandscapeExtractor::getInstance());
+        .registerClass(Landscape::LandscapeExtractor::getInstance())
+        .registerClass(LevelStatic::LevelStaticExtractor::getInstance());
 };

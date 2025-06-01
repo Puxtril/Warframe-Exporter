@@ -66,8 +66,7 @@ LevelReader20x::readBody(BinaryReader::BinaryReaderBuffered& reader, const Level
 	for (size_t x = 0; x < extHeader.levelObjs.size(); x++)
 	{
 		uint32_t curAttrLen = attributeLens[x];
-		outBody.attributes[x].resize((curAttrLen));
-		reader.readUInt8Array((uint8_t*)outBody.attributes[x].data(), curAttrLen);
-		reader.seek(1, std::ios::cur);
+		outBody.attributes[x].resize((curAttrLen + 1));
+		reader.readUInt8Array((uint8_t*)outBody.attributes[x].data(), curAttrLen + 1);
 	}
 }

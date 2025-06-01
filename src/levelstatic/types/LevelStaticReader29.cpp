@@ -1,9 +1,9 @@
-#include "levelstatic/types/LevelStaticReader28.h"
+#include "levelstatic/types/LevelStaticReader29.h"
 
 using namespace WarframeExporter::LevelStatic;
 
 void
-LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, LevelStaticHeaderExternal& outHeader)
+LevelStaticReader29::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, LevelStaticHeaderExternal& outHeader)
 {
     uint32_t unkPaths = headerReader->readUInt32();
     while (unkPaths--)
@@ -68,6 +68,13 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
         outHeader.attributes[i] = headerReader->readAsciiString(curPathLen);
     }
 
+    uint32_t lightPaths = headerReader->readUInt32(0, 1000, "Light paths");
+    while (lightPaths--)
+    {
+        uint32_t curPathLen = headerReader->readUInt32();
+        headerReader->seek(curPathLen, std::ios::cur);
+    }
+
     uint32_t materialLen = headerReader->readUInt32(0, 1000, "Material Paths");
     outHeader.materialPaths.resize(materialLen);
     for (uint32_t i = 0; i < materialLen; i++)
@@ -89,7 +96,7 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
 }
 
 void
-LevelStaticReader28::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const LevelStaticHeaderExternal& extHeader, LevelStaticBodyExternal& outBody)
+LevelStaticReader29::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const LevelStaticHeaderExternal& extHeader, LevelStaticBodyExternal& outBody)
 {
     outBody.objects.resize(extHeader.vertexCount);
 

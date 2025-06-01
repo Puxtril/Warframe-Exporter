@@ -1,6 +1,7 @@
 #include "cli/CLI-Extract.h"
 
 CLIExtract::CLIExtract()
+	: m_dryRun(false)
 {
 	m_extTextCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-textures", "Extract all textures", false);
 	m_extModelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-models", "Extract all 3D models", false);

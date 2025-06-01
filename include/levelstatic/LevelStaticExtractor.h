@@ -48,6 +48,7 @@ namespace WarframeExporter::LevelStatic
 		{
 			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelStaticType::LEVELSTATIC_28 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelStaticType::LEVELSTATIC_29 },
 			};
 			return extTypes;
 		}

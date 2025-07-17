@@ -1,5 +1,8 @@
 #pragma once
 
+#include "EnumMapExtractor.h"
+#include "ExportSingleFile.h"
+
 #include "cli/CLI-Feature.h"
 #include "tclap/MultiArg.h"
 #include "tclap/ValueArg.h"
@@ -50,4 +53,5 @@ private:
 	void setTextureFormat(const std::string& commandValue);
 	void checkOutputDir(const std::string& outPath);
 	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game);
+	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game);
 };

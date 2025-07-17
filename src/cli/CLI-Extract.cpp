@@ -146,5 +146,36 @@ CLIExtract::extract(const std::filesystem::path& cacheDirPath, const LotusLib::L
 	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
 	LotusLib::PackagesReader pkgs(cacheDirPath, game);
 
+	if (tryExtractFile(pkgs, intPath, outPath, types, game))
+		return;
 	extractor.batchIterate(pkgs, outPath, intPath, types, game);
+}
+
+bool
+CLIExtract::tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game)
+{
+	LotusLib::PackageCategory pkgCategory = WarframeExporter::g_enumMapExtractor.getPkgCategories(game, types);
+	for (std::string& curPkgName : pkgs)
+	{
+		std::optional<LotusLib::PackageReader> curPkg = pkgs.getPackage(curPkgName);
+
+		if (((int)curPkg->getPkgCategory() & (int)pkgCategory) == 0)
+		{
+			// Package not needed by specified extractors
+			continue;
+		}
+
+		try
+		{
+			const LotusLib::FileEntries::FileNode* fileNode = (*curPkg).getFileNode(intPath);
+			WarframeExporter::extractFile(pkgs, curPkgName, fileNode, outPath, game);
+			return true;
+		}
+		catch (std::exception&)
+		{
+			continue;
+		}
+	}
+	
+	return false;
 }

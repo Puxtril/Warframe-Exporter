@@ -2,6 +2,7 @@
 
 #include "texture/TextureExtractor.h"
 #include "QtOpenGLViewer.h"
+#include "ExporterLogger.h"
 
 #include <map>
 
@@ -39,6 +40,8 @@ private:
     void loadTexture();
     void loadSquare();
     void loadShaders();
+
+    void logShaderErrors(unsigned int shader);
 
     static std::tuple<float, float> getMeshCoordsForTexture(int screenWidth, int screenHeight, int texWidth, int texHeight);
 

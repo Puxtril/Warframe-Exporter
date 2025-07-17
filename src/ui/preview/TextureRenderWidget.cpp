@@ -191,6 +191,7 @@ TextureRenderWidget::loadShaders()
     shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(shader, 1, &shaderCode, NULL);
     glCompileShader(shader);
+    logShaderErrors(shader);
 
     m_shaderProgram = glCreateProgram();
     glAttachShader(m_shaderProgram, shader);
@@ -215,11 +216,32 @@ TextureRenderWidget::loadShaders()
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
     glCompileShader(vertexShader);
+    logShaderErrors(shader);
 
     glAttachShader(m_shaderProgram, vertexShader);
     glLinkProgram(m_shaderProgram);
 
     glDeleteShader(vertexShader);
+}
+
+void
+TextureRenderWidget::logShaderErrors(unsigned int shader)
+{
+    GLint isCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+    if (isCompiled == GL_FALSE)
+    {
+        GLint maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // The maxLength includes the NULL character
+        std::vector<GLchar> errorLog(maxLength);
+        glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+    
+        char* errorPtr = (char*)&errorLog[0];
+        std::string errorMsg(errorPtr);
+        WarframeExporter::Logger::getInstance().error(errorMsg);
+    }
 }
 
 

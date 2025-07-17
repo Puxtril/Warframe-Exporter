@@ -26,5 +26,7 @@ private:
     void loadModel();
     void loadUniforms();
 
+    void logShaderErrors(unsigned int shader);
+
     void updateUniform();
 };

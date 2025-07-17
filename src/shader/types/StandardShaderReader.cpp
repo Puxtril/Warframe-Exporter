@@ -14,7 +14,7 @@ StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReade
 {
     ShaderHeaderExternal shaderHeader;
 
-    if (shaderTypeEnum == 23)
+    if (shaderTypeEnum >= 23)
     {
         headerReader->seek(8, std::ios::cur);
 

@@ -48,12 +48,13 @@ namespace WarframeExporter::Shader
         inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
 			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_18 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_21 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_21 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_18 },
+				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_21 },
+				//{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_21 },
 				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_22 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_23 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_26 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_23 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_24 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_26 },
 			};
 			return extTypes;
 		}

@@ -17,6 +17,7 @@ namespace WarframeExporter::Shader
                 (int)ShaderType::SHADER_18,
                 (int)ShaderType::SHADER_21,
                 (int)ShaderType::SHADER_23,
+                (int)ShaderType::SHADER_24,
                 (int)ShaderType::SHADER_26,
             };
 			return extTypes;

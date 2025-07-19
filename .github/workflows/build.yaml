@@ -3,8 +3,6 @@ name: Compile
 run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on:
   push:
-    tags:
-      - '**'
 
 defaults:
   run:
@@ -12,7 +10,7 @@ defaults:
 
 jobs:
   Compile-Windows:
-    runs-on: windows-2019
+    runs-on: windows-2025
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3

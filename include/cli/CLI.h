@@ -1,5 +1,12 @@
 #pragma once
 
+#if defined WIN32 || defined MINGW
+	// I hate Windows
+	#define WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#endif
+
 #include "Meta.h"
 #include "tclap/CmdLine.h"
 #include "tclap/ArgException.h"
@@ -18,13 +25,6 @@
 #include <string>
 #include <string_view>
 #include <sstream>
-
-#if defined WIN32 || defined MINGW
-	// I hate Windows
-	#define WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-#endif
 
 const static std::string_view g_description = "https://github.com/Puxtril/Warframe-Exporter";
 

@@ -10,7 +10,7 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
     ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
 
     getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
-    ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
+    ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, vertexColors, outHeader.modelScale);
 }
 
 void
@@ -107,7 +107,7 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
 }
 
 void
-ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec4& modelScale)
+ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors, const glm::vec4& modelScale)
 {
     outBody.indices = extBody.indices;
 
@@ -126,6 +126,8 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     outBody.boneWeights = extBody.boneWeights;
 
     outBody.colors = std::move(extBody.colors);
+    for (auto& col : vertexColors)
+        outBody.colors.push_back(col);
     outBody.AO = std::move(extBody.AO);
 
     // Convert local bone indices to global

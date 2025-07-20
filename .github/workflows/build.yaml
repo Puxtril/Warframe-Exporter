@@ -6,6 +6,8 @@ on:
 
 jobs:
   Compile-Windows:
+    CD:
+      if: false
     runs-on: windows-2025
     defaults:
       run:
@@ -123,17 +125,17 @@ jobs:
           cd build
           mkdir AppDir-ui
           cp ../assets/DesktopEntry.desktop AppDir-ui/DesktopEntry.desktop
-          cat "Name=Warframe Exporter" >> AppDir-ui/DesktopEntry.desktop
-          cat "Exec=Warframe-Exporter" >> AppDir-ui/DesktopEntry.desktop
+          echo "Name=Warframe Exporter" >> AppDir-ui/DesktopEntry.desktop
+          echo "Exec=Warframe-Exporter" >> AppDir-ui/DesktopEntry.desktop
           ./linuxdeploy-x86_64.AppImage --appdir AppDir-ui -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter --output appimage
       - name: Create CLI Appimage
         run: |
           cd build
           mkdir AppDir-cli
           cp ../assets/DesktopEntry.desktop AppDir-cli/DesktopEntry.desktop
-          cat "Name=Warframe Exporter CLI" >> AppDir-cli/DesktopEntry.desktop
-          cat "Exec=Warframe-Exporter-CLI-Advanced" >> AppDir-cli/DesktopEntry.desktop
-          cat "Terminal=true" >> AppDir-cli/DesktopEntry.desktop
+          echo "Name=Warframe Exporter CLI" >> AppDir-cli/DesktopEntry.desktop
+          echo "Exec=Warframe-Exporter-CLI-Advanced" >> AppDir-cli/DesktopEntry.desktop
+          echo "Terminal=true" >> AppDir-cli/DesktopEntry.desktop
           ./linuxdeploy-x86_64.AppImage --appdir AppDir-cli -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter --output appimage
       - name: Prepare artifact upload
         run: |

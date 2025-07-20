@@ -135,7 +135,7 @@ jobs:
           echo "Name=Warframe Exporter CLI" >> AppDir-cli/DesktopEntry.desktop
           echo "Exec=Warframe-Exporter-CLI-Advanced" >> AppDir-cli/DesktopEntry.desktop
           echo "Terminal=true" >> AppDir-cli/DesktopEntry.desktop
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir-cli -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter --output appimage
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir-cli -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter-CLI --output appimage
       - name: Prepare artifact upload
         run: |
           mkdir artifacts

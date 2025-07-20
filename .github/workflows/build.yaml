@@ -87,7 +87,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Install dependencies
-        run: apt update && apt install -y wget git make cmake g++ zlib1g-dev libglu1-mesa-dev qt6-base-dev
+        run: sudo apt update && sudo apt install -y wget git make cmake g++ zlib1g-dev libglu1-mesa-dev qt6-base-dev
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Init Extractor submodules

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "cli/CLI-Feature.h"
 #include "EnumMapExtractor.h"
 #include "ExportSingleFile.h"
 
-#include "cli/CLI-Feature.h"
 #include "tclap/MultiArg.h"
 #include "tclap/ValueArg.h"
 #include "tclap/CmdLine.h"

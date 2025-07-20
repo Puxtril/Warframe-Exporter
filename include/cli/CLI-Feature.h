@@ -1,5 +1,13 @@
 #pragma once
 
+#if defined WIN32 || defined MINGW
+	// I hate Windows
+	#define WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
+	#include <windows.h>
+#endif
+
 #include "tclap/CmdLine.h"
 #include "LotusLib.h"
 #include "LotusPath.h"

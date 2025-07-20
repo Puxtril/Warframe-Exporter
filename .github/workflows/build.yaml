@@ -101,7 +101,7 @@ jobs:
           git submodule update --init
       - name: Download Oodle binaries
         run: |
-          mkdir bin/Linux
+          mkdir -p bin/Linux
           cd bin/Linux
           wget https://github.com/WorkingRobot/OodleUE/raw/refs/heads/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Linux/liboo2corelinux64.a
       - name: Initilize CMake

@@ -4,13 +4,12 @@ run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on:
   push:
 
-defaults:
-  run:
-    shell: powershell
-
 jobs:
   Compile-Windows:
     runs-on: windows-2025
+    defaults:
+      run:
+        shell: powershell
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -81,6 +80,9 @@ jobs:
   
   Compile-Linux:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3

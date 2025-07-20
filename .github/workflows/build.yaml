@@ -6,8 +6,7 @@ on:
 
 jobs:
   Compile-Windows:
-    CD:
-      if: false
+    if: false
     runs-on: windows-2025
     defaults:
       run:

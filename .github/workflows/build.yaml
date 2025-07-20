@@ -122,7 +122,7 @@ jobs:
         run: |
           cd build
           mkdir AppDir-ui
-          cp ../DesktopEntry.desktop AppDir-ui/DesktopEntry.desktop
+          cp ../assets/DesktopEntry.desktop AppDir-ui/DesktopEntry.desktop
           cat "Name=Warframe Exporter" >> AppDir-ui/DesktopEntry.desktop
           cat "Exec=Warframe-Exporter" >> AppDir-ui/DesktopEntry.desktop
           ./linuxdeploy-x86_64.AppImage --appdir AppDir-ui -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter --output appimage
@@ -130,8 +130,17 @@ jobs:
         run: |
           cd build
           mkdir AppDir-cli
-          cp ../DesktopEntry.desktop AppDir-cli/DesktopEntry.desktop
+          cp ../assets/DesktopEntry.desktop AppDir-cli/DesktopEntry.desktop
           cat "Name=Warframe Exporter CLI" >> AppDir-cli/DesktopEntry.desktop
           cat "Exec=Warframe-Exporter-CLI-Advanced" >> AppDir-cli/DesktopEntry.desktop
           cat "Terminal=true" >> AppDir-cli/DesktopEntry.desktop
           ./linuxdeploy-x86_64.AppImage --appdir AppDir-cli -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter --output appimage
+      - name: Prepare artifact upload
+        run: |
+          mkdir artifacts
+          rm build/linuxdeploy-x86_64.AppImage
+          cp build/*.AppImage artifacts/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Warframe-Exporter-Linux
+          path: artifacts/

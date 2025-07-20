@@ -103,7 +103,7 @@ jobs:
         run: |
           mkdir bin\Linux
           cd bin\Linux
-          Invoke-WebRequest -Uri https://github.com/WorkingRobot/OodleUE/raw/refs/heads/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Linux/liboo2corelinux64.a -Outfile liboo2corelinux64.a
+          wget https://github.com/WorkingRobot/OodleUE/raw/refs/heads/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Linux/liboo2corelinux64.a
       - name: Initilize CMake
         run: |
           mkdir build

@@ -36,5 +36,7 @@ namespace WarframeExporter::Model
 		void skipMorphs(BinaryReader::BinaryReaderBuffered* reader);
 		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader);
 		void skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader);
+
+		bool canContinueReading(BinaryReader::BinaryReaderBuffered* reader, int vertexIndexCount);
 	};
 }

@@ -235,3 +235,12 @@ ModelReader::skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader)
     uint32_t pathLen = reader->readUInt32();
     reader->seek(pathLen, std::ios::cur);
 }
+
+bool
+ModelReader::canContinueReading(BinaryReader::BinaryReaderBuffered* reader, int vertexIndexCount)
+{
+    int remainingBytes = reader->getLength() - reader->tell();
+    if ((vertexIndexCount * 2) > remainingBytes)
+        return false;
+    return true;
+}

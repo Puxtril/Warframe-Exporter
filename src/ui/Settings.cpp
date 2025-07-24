@@ -95,6 +95,19 @@ UiSettings::getFilterFiles()
 }
 
 void
+UiSettings::setExtractVertexColors(bool filter)
+{
+    m_settings.setValue(m_extractVertexColors, filter);
+}
+
+bool
+UiSettings::getExtractVertexColors()
+{
+    bool value = m_settings.value(m_extractVertexColors, false).toBool();
+    return value;
+}
+
+void
 UiSettings::saveMainWindowData(QSize size)
 {
     m_settings.setValue(m_mainWindowSize, size);
@@ -132,6 +145,7 @@ UiSettings::setSettings(
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
+        bool indexVertexColors,
         LotusLib::Game game
     )
 {

@@ -156,6 +156,7 @@ UiExporter::setData(
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
+        bool indexVertexColors,
         LotusLib::Game game
 )
 {
@@ -167,7 +168,7 @@ UiExporter::setData(
     m_exporterFileThread.setData(&m_packages, exportPath);
     m_previewManager.setData(&m_packages);
 
-    WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = false;
+    WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = indexVertexColors;
     WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = shaderExportType;
     WarframeExporter::Texture::TextureExtractor::m_exportType = textureExportType;
 

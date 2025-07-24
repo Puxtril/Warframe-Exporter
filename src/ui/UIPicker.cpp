@@ -195,12 +195,14 @@ UiPicker::parsePickerOptions()
     int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
     WarframeExporter::Shader::ShaderExportType shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
 
+    bool indexVertexColors = UiSettings::getInstance().getExtractVertexColors();
+
     int selectedGame = this->GamePickerCombo->itemData(this->GamePickerCombo->currentIndex()).toInt();
     LotusLib::Game gameType = static_cast<LotusLib::Game>(selectedGame);
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
     LotusLib::Logger::setLogProperties(spdlog::level::info);
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType, gameType);
+    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType, indexVertexColors, gameType);
 }
 
 void
@@ -250,6 +252,9 @@ UiPicker::additionalSettingsClicked()
     Qt::CheckState isChecked = UiSettings::getInstance().getFilterFiles() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
     m_additionalSettings.FilterFilesCheckbox->setCheckState(isChecked);
 
+    isChecked = UiSettings::getInstance().getExtractVertexColors() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+    m_additionalSettings.ExtractVertexColorsCheckbox->setCheckState(isChecked);
+
     m_additionalSettingsDialog.setModal(Qt::ApplicationModal);
     m_additionalSettingsDialog.show();
 }
@@ -260,6 +265,7 @@ UiPicker::additionalSettingsClosed()
     m_additionalSettingsDialog.hide();
 
     UiSettings::getInstance().setFilterFiles(m_additionalSettings.FilterFilesCheckbox->isChecked());
+    UiSettings::getInstance().setExtractVertexColors(m_additionalSettings.ExtractVertexColorsCheckbox->isChecked());
 }
 
 void

@@ -36,6 +36,7 @@ class UiSettings : public QObject
     static const inline QString m_exporterSplitState = "splitter/state";
 
     static const inline QString m_filterExportTypes = "additionalsettings/filterfiles";
+    static const inline QString m_extractVertexColors = "additionalsettings/vertexcolors";
 
     UiSettings();
     UiSettings(const UiSettings&) = delete;
@@ -69,6 +70,9 @@ public:
     void setFilterFiles(bool filter);
     bool getFilterFiles();
 
+    void setExtractVertexColors(bool filter);
+    bool getExtractVertexColors();
+
 public slots:
     void setSettings(
         std::filesystem::path cachePath,
@@ -76,6 +80,7 @@ public slots:
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
+        bool indexVertexColors,
         LotusLib::Game game
     );
 };

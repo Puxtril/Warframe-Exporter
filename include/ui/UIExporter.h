@@ -78,6 +78,7 @@ public slots:
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
+        bool indexVertexColors,
         LotusLib::Game game
     );
     void loadTreeFinished();

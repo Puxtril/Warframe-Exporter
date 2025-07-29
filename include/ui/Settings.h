@@ -3,6 +3,7 @@
 #include "Extractor.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
+#include "ExtractOptions.h"
 
 #include <filesystem>
 #include <QtCore/qobject.h>
@@ -67,11 +68,7 @@ public:
 
     LotusLib::Game getGame() const;
 
-    void setFilterFiles(bool filter);
-    bool getFilterFiles();
-
-    void setExtractVertexColors(bool filter);
-    bool getExtractVertexColors();
+    WarframeExporter::ExtractOptions loadOptions();
 
 public slots:
     void setSettings(
@@ -80,7 +77,7 @@ public slots:
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
-        bool indexVertexColors,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     );
 };

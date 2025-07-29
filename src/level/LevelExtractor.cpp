@@ -52,7 +52,7 @@ LevelExtractor::findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExterna
 }
 
 void
-LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
+LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
 	LevelExternal levelExt = getLevelExternal(fileEntry);
 	pkgs.initilizePackagesBin();
@@ -61,7 +61,7 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 
 	m_logger.info("Level object count: " + std::to_string(levelInt.objs.size()));
 
-	Document gltfOut = createGltfCombined(pkgs, levelInt);
+	Document gltfOut = createGltfCombined(pkgs, levelInt, options);
 
 	if (gltfOut.buffers.size() > 1)
 	{
@@ -72,12 +72,12 @@ LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 		}
 	}
 
-	if (!dryRun)
+	if (!options.dryRun)
 		fx::gltf::Save(gltfOut, outputPath, gltfOut.buffers.size() > 1 ? false : true);
 }
 
 Document
-LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt)
+LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt, ExtractOptions options)
 {
 	Document outGltf;
 
@@ -136,7 +136,7 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 
 				WarframeExporter::Model::ModelHeaderInternal headerInt;
 				WarframeExporter::Model::ModelBodyInternal bodyInt;
-				auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg);
+				auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg, options.extractVertexColors);
 				WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale());
 
 				LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);

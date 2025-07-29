@@ -15,18 +15,16 @@ namespace WarframeExporter
 {
 	class BatchIteratorExport : public BatchIterator
 	{
-		bool m_dryRun;
-
 	public:
 		BatchIteratorExport();
-		BatchIteratorExport(bool dryRun);
 
 	protected:
 		void processKnownFile(
 			LotusLib::PackagesReader& pkgs,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
-			const std::filesystem::path& outputPath
+			const std::filesystem::path& outputPath,
+			ExtractOptions options
 		) override;
 		
 		void processUnknownFile(

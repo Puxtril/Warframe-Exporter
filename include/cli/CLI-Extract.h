@@ -52,6 +52,6 @@ private:
 	void setShaderFormat(const std::string& cmdValue);
 	void setTextureFormat(const std::string& commandValue);
 	void checkOutputDir(const std::string& outPath);
-	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game);
-	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game);
+	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
+	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
 };

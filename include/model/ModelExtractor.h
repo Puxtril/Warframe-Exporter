@@ -23,8 +23,6 @@ namespace WarframeExporter::Model
 		ModelExtractor(const ModelExtractor&) = delete;
 		ModelExtractor operator=(const ModelExtractor&) = delete;
 
-		bool m_indexVertexColors = true;
-
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
 		{
 			static std::string outFileExt = "glb";
@@ -83,8 +81,8 @@ namespace WarframeExporter::Model
 		void cancelVertexColorIndexing();
 
 		void extractExternal(LotusLib::FileEntry& fileEntry, LotusLib::Game game, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
-		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg);
+		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg, bool indexVertexColors);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

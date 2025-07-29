@@ -68,7 +68,11 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	if (!m_extLevelStatic->getValue() && !m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
-	WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = m_includeVertexColors->getValue();
+	
+	WarframeExporter::ExtractOptions options;
+
+	options.extractVertexColors = m_includeVertexColors->getValue();
+	options.dryRun = m_dryRun;
 	setShaderFormat(m_shaderExportType->getValue());
 	setTextureFormat(m_textureFormat->getValue());
 
@@ -94,7 +98,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	WarframeExporter::Logger::getInstance().debug("Type Flags: " + std::to_string(types));
 	std::stringstream pkgs;
 
-	extract(cacheDirPath, internalPath, outPath, (WarframeExporter::ExtractorType)types, game);
+	extract(cacheDirPath, internalPath, outPath, (WarframeExporter::ExtractorType)types, game, options);
 	WarframeExporter::Logger::getInstance().info("Extraction completed successfully");
 }
 
@@ -141,18 +145,18 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 }
 
 void
-CLIExtract::extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game)
+CLIExtract::extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options)
 {
-	WarframeExporter::BatchIteratorExport extractor(m_dryRun);
+	WarframeExporter::BatchIteratorExport extractor;
 	LotusLib::PackagesReader pkgs(cacheDirPath, game);
 
-	if (tryExtractFile(pkgs, intPath, outPath, types, game))
+	if (tryExtractFile(pkgs, intPath, outPath, types, game, options))
 		return;
-	extractor.batchIterate(pkgs, outPath, intPath, types, game);
+	extractor.batchIterate(pkgs, outPath, intPath, types, game, options);
 }
 
 bool
-CLIExtract::tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game)
+CLIExtract::tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options)
 {
 	LotusLib::PackageCategory pkgCategory = WarframeExporter::g_enumMapExtractor.getPkgCategories(game, types);
 	for (std::string& curPkgName : pkgs)
@@ -168,7 +172,7 @@ CLIExtract::tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::Lotus
 		try
 		{
 			const LotusLib::FileEntries::FileNode* fileNode = (*curPkg).getFileNode(intPath);
-			WarframeExporter::extractFile(pkgs, curPkgName, fileNode, outPath, game);
+			WarframeExporter::extractFile(pkgs, curPkgName, fileNode, outPath, game, options);
 			return true;
 		}
 		catch (std::exception&)

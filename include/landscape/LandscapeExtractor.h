@@ -60,6 +60,6 @@ namespace WarframeExporter::Landscape
 
 		void write(Document& gltf, const std::filesystem::path& outputPath);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

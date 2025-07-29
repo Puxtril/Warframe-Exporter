@@ -81,30 +81,13 @@ UiSettings::getGame() const
     return static_cast<LotusLib::Game>(value);
 }
 
-void
-UiSettings::setFilterFiles(bool filter)
+WarframeExporter::ExtractOptions
+UiSettings::loadOptions()
 {
-    m_settings.setValue(m_filterExportTypes, filter);
-}
-
-bool
-UiSettings::getFilterFiles()
-{
-    bool value = m_settings.value(m_filterExportTypes, true).toBool();
-    return value;
-}
-
-void
-UiSettings::setExtractVertexColors(bool filter)
-{
-    m_settings.setValue(m_extractVertexColors, filter);
-}
-
-bool
-UiSettings::getExtractVertexColors()
-{
-    bool value = m_settings.value(m_extractVertexColors, false).toBool();
-    return value;
+    WarframeExporter::ExtractOptions options;
+    options.filterUiFiles = m_settings.value(m_filterExportTypes, true).toBool();
+    options.extractVertexColors = m_settings.value(m_extractVertexColors, false).toBool();
+    return options;
 }
 
 void
@@ -145,8 +128,8 @@ UiSettings::setSettings(
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
-        bool indexVertexColors,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     )
 {
     QString qCachePath = QString(cachePath.string().c_str());
@@ -166,4 +149,7 @@ UiSettings::setSettings(
     m_settings.setValue(m_comboTextureFormat, (int)textureExportType);
 
     m_settings.setValue(m_comboGame, (int)game);
+
+    m_settings.setValue(m_filterExportTypes, options.filterUiFiles);
+    m_settings.setValue(m_extractVertexColors, options.extractVertexColors);
 }

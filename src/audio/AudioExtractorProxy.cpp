@@ -18,11 +18,11 @@ AudioExtractorProxy::getInstance()
 }
 
 void
-AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
+AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
 	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.headerData);
 	Extractor* extractor = g_enumMapAudioExtractor.at(LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)compressionEnum);
-	extractor->extract(fileEntry, pkgs, outputPath, dryRun);
+	extractor->extract(fileEntry, pkgs, outputPath, options);
 }
 
 AudioCompression

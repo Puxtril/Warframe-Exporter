@@ -8,6 +8,7 @@
 #include "Meta.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
+#include "ExtractOptions.h"
 
 #include <QtWidgets/qdialog.h>
 #include <QtWidgets/qmainwindow.h>
@@ -47,8 +48,8 @@ signals:
         WarframeExporter::ExtractorType extractTypes,
         WarframeExporter::Shader::ShaderExportType shaderExportType,
         WarframeExporter::Texture::TextureExportType textureExportType,
-        bool indexVertexColors,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     );
     void retryLoadPickerOptions();
 
@@ -57,7 +58,4 @@ public slots:
     void browseCacheWindows();
     void browseExportPath();
     void createExportFolderAndLoad(QAbstractButton *button);
-    void additionalSettingsClicked();
-    void additionalSettingsClosed();
-    void additionalSettingsCancelled();
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ExtractOptions.h"
 #include "fx/gltf.h"
 
 #include "Extractor.h"
@@ -57,8 +58,8 @@ namespace WarframeExporter::LevelStatic
 
 		LevelStaticExternal read(LotusLib::FileEntry& fileEntry);
 		// TODO: Make separate function for conversion
-		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf);
-		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf);
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, ExtractOptions options);
+		void addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf, ExtractOptions options);
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Extractor.h"
-#include "EnumMapExtractor.h"
 #include "FileNode.h"
 #include "LotusLib.h"
-#include "ExporterExceptions.h"
 #include "BatchIteratorExport.h"
 #include "LotusPath.h"
+#include "ExtractOptions.h"
 
 namespace WarframeExporter
 {
@@ -16,7 +15,8 @@ namespace WarframeExporter
         void extractFile(LotusLib::PackagesReader& pkgs,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
-			const std::filesystem::path& outputPath
+			const std::filesystem::path& outputPath,
+			ExtractOptions options
 		);
     };
 
@@ -25,7 +25,8 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			const LotusLib::FileEntries::FileNode* fileNode,
 			const std::filesystem::path& outputPath,
-			LotusLib::Game game
+			LotusLib::Game game,
+			ExtractOptions options
     );
 
     void
@@ -33,6 +34,7 @@ namespace WarframeExporter
 			const std::string& pkgName,
 			LotusLib::LotusPath& internalPath,
 			const std::filesystem::path& outputPath,
-			LotusLib::Game game
+			LotusLib::Game game,
+			ExtractOptions options
     );
 }

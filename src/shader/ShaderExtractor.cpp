@@ -77,7 +77,7 @@ ShaderExtractor::writeShader(const ShaderEntry& shader, const std::filesystem::p
 }
 
 void
-ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, bool dryRun)
+ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options)
 {
     ShaderHeaderExternal externalHeader = getHeader(fileEntry);
 
@@ -87,7 +87,7 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
     {
         if (m_shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
 		    decompileShader(bodyEntries[iShader]);
-		if (!dryRun)
+		if (!options.dryRun)
         	writeShader(bodyEntries[iShader], outputDir, iShader);
     }
 }

@@ -16,11 +16,12 @@ class ExporterFileThread : public QThread
     std::filesystem::path m_exportPath;
     std::string m_pkgName;
     LotusLib::LotusPath m_internalFilePath;
+    WarframeExporter::ExtractOptions m_options;
 
 public:
     ExporterFileThread();
 
-    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath);
+    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractOptions options);
     void setFileData(LotusLib::LotusPath internalFilePath, std::string pkgName);
     void extractCancelled();
     void run();

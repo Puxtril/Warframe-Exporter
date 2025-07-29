@@ -6,11 +6,12 @@ ExporterDirectoryThread::ExporterDirectoryThread()
 }
 
 void
-ExporterDirectoryThread::setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes)
+ExporterDirectoryThread::setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, WarframeExporter::ExtractOptions options)
 {
     m_pkgsReader = pkgsReader;
     m_exportPath = exportPath;
     m_extractTypes = extractTypes;
+    m_options = options;
 
     m_exporter = std::make_shared<BatchIteratorExportQt>();
 }
@@ -27,7 +28,7 @@ ExporterDirectoryThread::run()
     emit ExporterDirectoryThread::extractIndexingStarted();
 
     BatchIteratorCountQt totalItemsIter;
-    totalItemsIter.batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, m_pkgsReader->getGame());
+    totalItemsIter.batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, m_pkgsReader->getGame(), m_options);
     int totalItems = static_cast<int>(totalItemsIter.getFileCount());
 
     emit ExporterDirectoryThread::extractStart(totalItems);
@@ -37,7 +38,7 @@ ExporterDirectoryThread::run()
 
     try
     {
-        m_exporter->batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, m_pkgsReader->getGame());
+        m_exporter->batchIterate(*m_pkgsReader, m_exportPath, m_internalPath, m_extractTypes, m_pkgsReader->getGame(), m_options);
     }
     catch (ExtractionCancelled&)
     {

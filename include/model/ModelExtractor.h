@@ -23,7 +23,7 @@ namespace WarframeExporter::Model
 		ModelExtractor(const ModelExtractor&) = delete;
 		ModelExtractor operator=(const ModelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;

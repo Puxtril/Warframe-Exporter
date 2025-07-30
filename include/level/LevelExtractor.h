@@ -20,7 +20,7 @@ namespace WarframeExporter::Level
 		LevelExtractor(const LevelExtractor&) = delete;
 		LevelExtractor operator=(const LevelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;

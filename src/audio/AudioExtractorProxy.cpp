@@ -3,11 +3,11 @@
 using namespace WarframeExporter::Audio;
 
 const std::string&
-AudioExtractorProxy::getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const
+AudioExtractorProxy::getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const
 {
 	AudioCompression compressionEnum = peekCompressionFormat(hReader);
 	Extractor* extractor = g_enumMapAudioExtractor.at(LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)compressionEnum);
-	return extractor->getOutputExtension(commonHeader, hReader);
+	return extractor->getOutputExtension(commonHeader, hReader, options);
 }
 
 AudioExtractorProxy*

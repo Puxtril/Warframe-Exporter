@@ -68,13 +68,12 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	if (!m_extLevelStatic->getValue() && !m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
-	
 	WarframeExporter::ExtractOptions options;
 
 	options.extractVertexColors = m_includeVertexColors->getValue();
 	options.dryRun = m_dryRun;
-	setShaderFormat(m_shaderExportType->getValue());
-	setTextureFormat(m_textureFormat->getValue());
+	options.shaderExportType = getShaderFormat(m_shaderExportType->getValue());
+	options.textureExportType = getTextureFormat(m_textureFormat->getValue());
 
 	int types = 0;
 	if (m_extTextCmd->getValue() || m_extAllCmd->getValue())
@@ -102,36 +101,37 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	WarframeExporter::Logger::getInstance().info("Extraction completed successfully");
 }
 
-void
-CLIExtract::setShaderFormat(const std::string& cmdValue)
+WarframeExporter::Shader::ShaderExportType
+CLIExtract::getShaderFormat(const std::string& cmdValue)
 {
 	WarframeExporter::Shader::ShaderExportType requestedType = WarframeExporter::Shader::SHADER_EXPORT_BINARY;
 	if (cmdValue == "Decompiled" || cmdValue == "decompiled" || cmdValue == "decompile" || cmdValue == "Decompile")
 		requestedType = WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE;
 
 #ifdef Win32
-	WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = requestedType;
+	return requestedType;
 #else
 	if (requestedType == WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE)
 	{
 		WarframeExporter::Logger::getInstance().error("Cannot decompile shader on non-Windows OS");
 		exit(1);
 	}
-	WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = WarframeExporter::Shader::SHADER_EXPORT_BINARY;
+	return WarframeExporter::Shader::SHADER_EXPORT_BINARY;
 #endif
 }
 
-void
-CLIExtract::setTextureFormat(const std::string& commandValue)
+WarframeExporter::Texture::TextureExportType
+CLIExtract::getTextureFormat(const std::string& commandValue)
 {
 	if (commandValue == "DDS" || commandValue == "dds")
-		WarframeExporter::Texture::TextureExtractor::getInstance()->m_exportType = WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS;
+		return WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS;
 	else if (commandValue == "PNG" || commandValue == "png")
-		WarframeExporter::Texture::TextureExtractor::getInstance()->m_exportType = WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG;
+		return WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG;
 	else if (commandValue == "TGA" || commandValue == "tga")
-		WarframeExporter::Texture::TextureExtractor::getInstance()->m_exportType = WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA;
-	else
-		spdlog::get("Warframe-Exporter")->error("Texture format is not valid");
+		return WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA;
+	
+	WarframeExporter::Logger::getInstance().error("Texture format is not valid");
+	exit(1);
 }
 
 void
@@ -139,7 +139,7 @@ CLIExtract::checkOutputDir(const std::string& outPath)
 {
 	if (std::filesystem::exists(outPath) && !std::filesystem::is_directory(outPath))
 	{
-		spdlog::get("Warframe-Exporter")->error("Output directory is not valid");
+		WarframeExporter::Logger::getInstance().error("Output directory is not valid");
 		exit(1);
 	}
 }

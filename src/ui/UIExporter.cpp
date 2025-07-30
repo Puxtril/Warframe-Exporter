@@ -154,8 +154,6 @@ UiExporter::setData(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
         LotusLib::Game game,
         WarframeExporter::ExtractOptions options
 )
@@ -167,9 +165,6 @@ UiExporter::setData(
     m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, options);
     m_exporterFileThread.setData(&m_packages, exportPath, options);
     m_previewManager.setData(&m_packages);
-
-    WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = shaderExportType;
-    WarframeExporter::Texture::TextureExtractor::m_exportType = textureExportType;
 
     m_loading.initProgressBar(m_packages, extractTypes);
     m_loadingDialog.show();

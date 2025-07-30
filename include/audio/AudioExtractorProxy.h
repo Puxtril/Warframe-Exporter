@@ -42,7 +42,7 @@ namespace WarframeExporter::Audio
 			return extTypes;
 		}
 		
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override;
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override;
 
 		static AudioExtractorProxy* getInstance();
 

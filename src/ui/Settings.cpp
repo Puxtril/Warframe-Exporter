@@ -60,20 +60,6 @@ UiSettings::getExportShaders() const
     return m_settings.value(m_checkboxExportShaders).toBool();
 }
 
-WarframeExporter::Shader::ShaderExportType
-UiSettings::getShaderFormat() const
-{
-    int value = m_settings.value(m_comboShaderFormat).toInt();
-    return static_cast<WarframeExporter::Shader::ShaderExportType>(value);
-}
-
-WarframeExporter::Texture::TextureExportType
-UiSettings::getTextureFormat() const
-{
-    int value = m_settings.value(m_comboTextureFormat).toInt();
-    return static_cast<WarframeExporter::Texture::TextureExportType>(value);
-}
-
 LotusLib::Game
 UiSettings::getGame() const
 {
@@ -87,6 +73,13 @@ UiSettings::loadOptions()
     WarframeExporter::ExtractOptions options;
     options.filterUiFiles = m_settings.value(m_filterExportTypes, true).toBool();
     options.extractVertexColors = m_settings.value(m_extractVertexColors, false).toBool();
+
+    int value = m_settings.value(m_comboShaderFormat).toInt();
+    options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(value);
+
+    value = m_settings.value(m_comboTextureFormat).toInt();
+    options.textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(value);
+    
     return options;
 }
 
@@ -126,8 +119,6 @@ UiSettings::setSettings(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
         LotusLib::Game game,
         WarframeExporter::ExtractOptions options
     )
@@ -145,10 +136,10 @@ UiSettings::setSettings(
     m_settings.setValue(m_checkboxExportAudio, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0);
     m_settings.setValue(m_checkboxExportShaders, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0);
 
-    m_settings.setValue(m_comboShaderFormat, (int)shaderExportType);
-    m_settings.setValue(m_comboTextureFormat, (int)textureExportType);
-
     m_settings.setValue(m_comboGame, (int)game);
+
+    m_settings.setValue(m_comboShaderFormat, (int)options.shaderExportType);
+    m_settings.setValue(m_comboTextureFormat, (int)options.textureExportType);
 
     m_settings.setValue(m_filterExportTypes, options.filterUiFiles);
     m_settings.setValue(m_extractVertexColors, options.extractVertexColors);

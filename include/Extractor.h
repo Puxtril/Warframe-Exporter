@@ -43,7 +43,7 @@ namespace WarframeExporter
 	
 	public:
 		virtual const std::string& getFriendlyName() const = 0;
-		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const = 0;
+		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const = 0;
 		// If true, `outputPath` in `extract` will be a folder.
 		// Otherwise, will be a file with the correct extension
 		virtual bool isMultiExport() const = 0;

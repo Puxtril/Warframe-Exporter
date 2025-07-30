@@ -98,31 +98,6 @@ UiPicker::loadSettings()
     this->AudioCheckbox->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
     this->ShaderCheckbox->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
 
-    WarframeExporter::Texture::TextureExportType textureFormat = settings.getTextureFormat();
-    switch(textureFormat)
-    {
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS:
-            this->TextureFormatCombo->setCurrentIndex(0);
-            break;
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG:
-            this->TextureFormatCombo->setCurrentIndex(1);
-            break;
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA:
-            this->TextureFormatCombo->setCurrentIndex(2);
-            break;
-    }
-
-    WarframeExporter::Shader::ShaderExportType shaderFormat = settings.getShaderFormat();
-    switch(shaderFormat)
-    {
-        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY:
-            this->ShaderFormatCombo->setCurrentIndex(0);
-            break;
-        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_D3DDECOMPILE:
-            this->ShaderFormatCombo->setCurrentIndex(1);
-            break;
-    }
-
     LotusLib::Game game = settings.getGame();
     switch(game)
     {
@@ -139,6 +114,30 @@ UiPicker::loadSettings()
     }
 
     WarframeExporter::ExtractOptions options = settings.loadOptions();
+
+    switch(options.textureExportType)
+    {
+        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS:
+            this->TextureFormatCombo->setCurrentIndex(0);
+            break;
+        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG:
+            this->TextureFormatCombo->setCurrentIndex(1);
+            break;
+        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA:
+            this->TextureFormatCombo->setCurrentIndex(2);
+            break;
+    }
+
+    switch(options.shaderExportType)
+    {
+        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY:
+            this->ShaderFormatCombo->setCurrentIndex(0);
+            break;
+        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_D3DDECOMPILE:
+            this->ShaderFormatCombo->setCurrentIndex(1);
+            break;
+    }
+
     m_additionalSettings.FilterFilesCheckbox->setCheckState(options.filterUiFiles ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     m_additionalSettings.ExtractVertexColorsCheckbox->setCheckState(options.extractVertexColors ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
@@ -193,13 +192,14 @@ UiPicker::parsePickerOptions()
         return;
     }
 
+    WarframeExporter::ExtractOptions options;
+
     int selectedTextureFormat = this->TextureFormatCombo->itemData(this->TextureFormatCombo->currentIndex()).toInt();
-    WarframeExporter::Texture::TextureExportType textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(selectedTextureFormat);
+    options.textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(selectedTextureFormat);
 
     int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
-    WarframeExporter::Shader::ShaderExportType shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
+    options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
 
-    WarframeExporter::ExtractOptions options;
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
 
@@ -208,7 +208,7 @@ UiPicker::parsePickerOptions()
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
     LotusLib::Logger::setLogProperties(spdlog::level::info);
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType, gameType, options);
+    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, gameType, options);
 }
 
 void

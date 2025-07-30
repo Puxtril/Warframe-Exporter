@@ -63,9 +63,6 @@ public:
     QByteArray getSplitterGeometry();
     QByteArray getSplitterState();
 
-    WarframeExporter::Shader::ShaderExportType getShaderFormat() const;
-    WarframeExporter::Texture::TextureExportType getTextureFormat() const;
-
     LotusLib::Game getGame() const;
 
     WarframeExporter::ExtractOptions loadOptions();
@@ -75,8 +72,6 @@ public slots:
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
         LotusLib::Game game,
         WarframeExporter::ExtractOptions options
     );

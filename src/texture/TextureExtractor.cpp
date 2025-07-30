@@ -30,17 +30,17 @@ TextureExtractor::getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesR
 }
 
 void
-TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile)
+TextureExtractor::writeData(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile, TextureExportType exportType)
 {
 	if (texture.header.textureNames.size() > 0)
 	{
 		uint32_t mip0Start = (uint32_t)texture.body.size() - (texture.header.mip0Len * texture.header.textureNames.size());
-		writeArray(texture, commonHeader, texture.body.data() + mip0Start, texture.header.mip0Len, outputFile);
+		writeArray(texture, commonHeader, texture.body.data() + mip0Start, texture.header.mip0Len, outputFile, exportType);
 	}
 	else
 	{
 		uint32_t mip0Start = (uint32_t)texture.body.size() - texture.header.mip0Len;
-		writeTextureToFile(texture, commonHeader, texture.body.data() + mip0Start, texture.header.mip0Len, outputFile);
+		writeTextureToFile(texture, commonHeader, texture.body.data() + mip0Start, texture.header.mip0Len, outputFile, exportType);
 	}
 }
 
@@ -49,11 +49,11 @@ TextureExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRead
 {
 	TextureInternal intTexture = getTexture(fileEntry, pkgs);
 	if (!options.dryRun)
-		writeData(intTexture, fileEntry.commonHeader, outputPath);
+		writeData(intTexture, fileEntry.commonHeader, outputPath, options.textureExportType);
 }
 
 void
-TextureExtractor::writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile)
+TextureExtractor::writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType)
 {
 	std::filesystem::path baseOutputArray = std::filesystem::path(outputFile).replace_extension();
 	std::filesystem::create_directories(baseOutputArray);
@@ -62,15 +62,15 @@ TextureExtractor::writeArray(TextureInternal& texture, const LotusLib::CommonHea
 	for (int i = 0; i < texture.header.textureNames.size(); i++)
 	{
 		std::filesystem::path outPath = baseOutputArray / (outputFile.stem().string() + "_" + std::to_string(i) + outputFile.extension().string());		
-		TextureExtractor::writeTextureToFile(texture, commonHeader, dataStart, dataLen, outPath.string());
+		TextureExtractor::writeTextureToFile(texture, commonHeader, dataStart, dataLen, outPath.string(), exportType);
 		dataStart += dataLen;
 	}
 }
 
 void
-TextureExtractor::writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile)
+TextureExtractor::writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType)
 {
-	if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_DDS)
+	if (exportType == TextureExportType::TEXTURE_EXPORT_DDS)
 	{
 		std::ofstream out;
 		out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
@@ -85,9 +85,9 @@ TextureExtractor::writeTextureToFile(TextureInternal& texture, const LotusLib::C
 	else if (texture.header.formatEnum == TextureCompression::BC6)
 		TextureExporterConvert::convertAndWriteToHdr(data, dataLen, outputFile, texture.header.width, texture.header.height);
 
-	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_PNG)
+	else if (exportType == TextureExportType::TEXTURE_EXPORT_PNG)
 		TextureExporterConvert::convertAndWriteToPng(data, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 
-	else if (TextureExtractor::m_exportType == TextureExportType::TEXTURE_EXPORT_TGA)
+	else if (exportType == TextureExportType::TEXTURE_EXPORT_TGA)
 		TextureExporterConvert::convertAndWriteToTga(data, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 }

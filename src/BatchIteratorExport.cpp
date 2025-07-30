@@ -23,7 +23,7 @@ BatchIteratorExport::processKnownFile(LotusLib::PackagesReader& pkgs, LotusLib::
 	else
 	{
 		savePath = outputPath / fileEntry.internalPath.relative_path();
-		savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData));
+		savePath.replace_extension(extractor->getOutputExtension(fileEntry.commonHeader, &fileEntry.headerData, options));
 
 	if (existingFileIdentical(fileEntry.metadata->getTimeStamp(), savePath))
 	{

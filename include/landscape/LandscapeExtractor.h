@@ -18,7 +18,7 @@ namespace WarframeExporter::Landscape
 		LandscapeExtractor(const LandscapeExtractor&) = delete;
 		LandscapeExtractor operator=(const LandscapeExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			const static std::string outFileExt = "glb";
 			return outFileExt;

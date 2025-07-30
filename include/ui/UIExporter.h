@@ -75,8 +75,6 @@ public slots:
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
         LotusLib::Game game,
         WarframeExporter::ExtractOptions options
     );

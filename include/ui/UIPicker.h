@@ -35,9 +35,7 @@ public:
 
 private:
     void setupMessageBoxes();
-    void addShaderFormatOptions();
-    void addTextureFormatOptions();
-    void addGameOptions();
+    void addComboBoxOptions();
     void loadSettings();
     void loadVersion();
 

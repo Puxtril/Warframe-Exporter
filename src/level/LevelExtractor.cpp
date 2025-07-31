@@ -100,10 +100,11 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 		if (curLevelObj.meshPath == "")
 			continue;
 
-		// HLOD variations of existing models
-		// No need for these in exports, they're annoying to delete manually
-		if (curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0)
-			continue;
+		bool isHlod = curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0;
+		if (
+			(isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::IGNORE) ||
+			(!isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::ONLY)
+		) { continue; }
 
 		try
 		{

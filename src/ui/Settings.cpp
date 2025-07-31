@@ -71,14 +71,18 @@ WarframeExporter::ExtractOptions
 UiSettings::loadOptions()
 {
     WarframeExporter::ExtractOptions options;
-    options.filterUiFiles = m_settings.value(m_filterExportTypes, true).toBool();
-    options.extractVertexColors = m_settings.value(m_extractVertexColors, false).toBool();
 
-    int value = m_settings.value(m_comboShaderFormat).toInt();
+    options.filterUiFiles = m_settings.value(m_filterExportTypes).isValid() ? m_settings.value(m_filterExportTypes).toBool() : options.filterUiFiles;
+    options.extractVertexColors = m_settings.value(m_extractVertexColors).isValid() ? m_settings.value(m_extractVertexColors).toBool() : options.extractVertexColors;
+
+    int value = m_settings.value(m_comboShaderFormat).isValid() ? m_settings.value(m_comboShaderFormat).toInt() : options.shaderExportType;
     options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(value);
 
-    value = m_settings.value(m_comboTextureFormat).toInt();
+    value = m_settings.value(m_comboTextureFormat).isValid() ? m_settings.value(m_comboTextureFormat).toInt() : options.textureExportType;
     options.textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(value);
+
+    value = m_settings.value(m_levelHlodExportType).isValid() ? m_settings.value(m_levelHlodExportType).toInt() : options.levelHlodExtractMode;
+    options.levelHlodExtractMode = static_cast<WarframeExporter::Level::LevelHlodExtractMode>(value);
     
     return options;
 }
@@ -143,4 +147,5 @@ UiSettings::setSettings(
 
     m_settings.setValue(m_filterExportTypes, options.filterUiFiles);
     m_settings.setValue(m_extractVertexColors, options.extractVertexColors);
+    m_settings.setValue(m_levelHlodExportType, options.levelHlodExtractMode);
 }

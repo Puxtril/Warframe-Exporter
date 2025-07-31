@@ -13,9 +13,7 @@ UiPicker::setupUi(QDialog *WindowPicker)
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
     setupMessageBoxes();
-    addShaderFormatOptions();
-    addTextureFormatOptions();
-    addGameOptions();
+    addComboBoxOptions();
     loadSettings();
     loadVersion();
 }
@@ -60,27 +58,23 @@ UiPicker::setupMessageBoxes()
 }
 
 void
-UiPicker::addShaderFormatOptions()
+UiPicker::addComboBoxOptions()
 {
     this->ShaderFormatCombo->addItem("Binary", WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY);
 #ifdef WIN32
     this->ShaderFormatCombo->addItem("Decompiled", WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE);
 #endif
-}
 
-void
-UiPicker::addTextureFormatOptions()
-{
     this->TextureFormatCombo->addItem("DDS", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS);
     this->TextureFormatCombo->addItem("PNG",WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG);
     this->TextureFormatCombo->addItem("TGA", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA);
-}
 
-void
-UiPicker::addGameOptions()
-{
     this->GamePickerCombo->addItem("Warframe", (int)LotusLib::Game::WARFRAME);
     this->GamePickerCombo->addItem("Soulframe", (int)LotusLib::Game::SOULFRAME);
+
+    m_additionalSettings.LevelHlodExportCombo->addItem("Ignore", WarframeExporter::Level::LevelHlodExtractMode::IGNORE);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Include", WarframeExporter::Level::LevelHlodExtractMode::INCLUDE);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Only", WarframeExporter::Level::LevelHlodExtractMode::ONLY);
 }
 
 void
@@ -99,44 +93,13 @@ UiPicker::loadSettings()
     this->ShaderCheckbox->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
 
     LotusLib::Game game = settings.getGame();
-    switch(game)
-    {
-        case LotusLib::Game::UNKNOWN:
-        case LotusLib::Game::WARFRAME:
-            this->GamePickerCombo->setCurrentIndex(0);
-            break;
-        case LotusLib::Game::SOULFRAME:
-            this->GamePickerCombo->setCurrentIndex(1);
-            break;
-        case LotusLib::Game::WARFRAME_PE:
-            this->GamePickerCombo->setCurrentIndex(2);
-            break;
-    }
+    game = game == LotusLib::Game::UNKNOWN ? LotusLib::Game::WARFRAME : game;
+    this->GamePickerCombo->setCurrentIndex(this->GamePickerCombo->findData((int)game));
 
     WarframeExporter::ExtractOptions options = settings.loadOptions();
-
-    switch(options.textureExportType)
-    {
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS:
-            this->TextureFormatCombo->setCurrentIndex(0);
-            break;
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG:
-            this->TextureFormatCombo->setCurrentIndex(1);
-            break;
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA:
-            this->TextureFormatCombo->setCurrentIndex(2);
-            break;
-    }
-
-    switch(options.shaderExportType)
-    {
-        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY:
-            this->ShaderFormatCombo->setCurrentIndex(0);
-            break;
-        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_D3DDECOMPILE:
-            this->ShaderFormatCombo->setCurrentIndex(1);
-            break;
-    }
+    this->TextureFormatCombo->setCurrentIndex(this->TextureFormatCombo->findData(options.textureExportType));
+    this->ShaderFormatCombo->setCurrentIndex(this->ShaderFormatCombo->findData(options.shaderExportType));
+    m_additionalSettings.LevelHlodExportCombo->setCurrentIndex(m_additionalSettings.LevelHlodExportCombo->findData(options.levelHlodExtractMode));
 
     m_additionalSettings.FilterFilesCheckbox->setCheckState(options.filterUiFiles ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     m_additionalSettings.ExtractVertexColorsCheckbox->setCheckState(options.extractVertexColors ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
@@ -199,6 +162,9 @@ UiPicker::parsePickerOptions()
 
     int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
     options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
+
+    int levelHlodExtractMode = m_additionalSettings.LevelHlodExportCombo->itemData(m_additionalSettings.LevelHlodExportCombo->currentIndex()).toInt();
+    options.levelHlodExtractMode = static_cast<WarframeExporter::Level::LevelHlodExtractMode>(levelHlodExtractMode);
 
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();

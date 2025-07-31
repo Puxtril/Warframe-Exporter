@@ -16,6 +16,7 @@ CLIExtract::CLIExtract()
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
 	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format", false, "Binary", "Binary | Decompiled");
 	m_textureFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "texture-format", "Texture output format", false, "DDS", "DDS | PNG | TGA");
+	m_levelHlodExport = std::make_shared<TCLAP::ValueArg<std::string>>("", "level-hlod", "Extract HLOD files in levels", false, "Ignore", "Ignore | Include | Only");
 }
 
 CLIExtract*
@@ -59,7 +60,8 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 	cmdLine
 	.add(m_includeVertexColors.get())
 	.add(m_shaderExportType.get())
-	.add(m_textureFormat.get());
+	.add(m_textureFormat.get())
+	.add(m_levelHlodExport.get());
 }
  
 void
@@ -74,6 +76,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	options.dryRun = m_dryRun;
 	options.shaderExportType = getShaderFormat(m_shaderExportType->getValue());
 	options.textureExportType = getTextureFormat(m_textureFormat->getValue());
+	options.levelHlodExtractMode = getLevelHlodMode(m_levelHlodExport->getValue());
 
 	int types = 0;
 	if (m_extTextCmd->getValue() || m_extAllCmd->getValue())
@@ -131,6 +134,20 @@ CLIExtract::getTextureFormat(const std::string& commandValue)
 		return WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA;
 	
 	WarframeExporter::Logger::getInstance().error("Texture format is not valid");
+	exit(1);
+}
+
+WarframeExporter::Level::LevelHlodExtractMode
+CLIExtract::getLevelHlodMode(const std::string commandValue)
+{
+	if (commandValue == "Ignore" || commandValue == "ignore" || commandValue == "IGNORE")
+		return WarframeExporter::Level::LevelHlodExtractMode::IGNORE;
+	if (commandValue == "Include" || commandValue == "include" || commandValue == "INCLUDE")
+		return WarframeExporter::Level::LevelHlodExtractMode::INCLUDE;
+	if (commandValue == "Only" || commandValue == "only" || commandValue == "ONLY")
+		return WarframeExporter::Level::LevelHlodExtractMode::ONLY;
+
+	WarframeExporter::Logger::getInstance().error("Level HLOD export format isn't valid");
 	exit(1);
 }
 

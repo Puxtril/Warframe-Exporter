@@ -20,7 +20,6 @@
 #include "cli/CLI-Extract.h"
 #include "cli/CLI-Debug.h"
 #include "cli/CLI-Main.h"
-#include "cli/CLI-Output.h"
 
 #include <filesystem>
 #include <string>

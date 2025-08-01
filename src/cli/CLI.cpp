@@ -12,10 +12,6 @@ main(int argc, char** argv)
 	TCLAP::CmdLine cmd(g_description.data(), ' ', displayVersion);
 	TCLAP::OneOf cmds;
 
-	// Set custom output
-	ExporterStdOutput StdOutput;
-	cmd.setOutput(&StdOutput);
-
 	for (CLIFeature* feat : g_features)
 		feat->addMainCmds(cmds);
 
@@ -25,7 +21,7 @@ main(int argc, char** argv)
 	TCLAP::ValueArg<std::string> outPathCmd("", "output-path", "Destination of extracted assets. Ex: C:\\Users\\Puxtril\\Downloads\\Extracted (Default: Current directory)", false, "Extracted", "Output path");
 	TCLAP::ValueArg<std::string> intPathCmd("", "internal-path", "Internal path base. Ex: /Lotus/Characters/Tenno/Excalibur", false, "/", "Internal Path");
 	TCLAP::ValueArg<std::string> pkgCmd("", "package", "Warframe package. Ex: \"Misc\" or \"Texture\"", false, "", "Package name");
-	TCLAP::ValueArg<std::string> gameCmd("", "game", "Target game (Warframe)", false, "Warframe", "Game name");
+	TCLAP::ValueArg<std::string> gameCmd("", "game", "Target game", false, "Warframe", "Warframe | Soulframe");
 	TCLAP::ValueArg<std::string> cacheDirCmd("", "cache-dir", "Cache directory. Ex: C:\\Program Files\\Steam\\steamapps\\common\\Warframe\\Cache.Windows", true, "", "Cache.Windows path");
 	cmd.add(intPathCmd).add(pkgCmd).add(cacheDirCmd).add(outPathCmd).add(gameCmd);
 

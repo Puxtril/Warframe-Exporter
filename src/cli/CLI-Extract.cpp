@@ -3,17 +3,17 @@
 CLIExtract::CLIExtract()
 	: m_dryRun(false)
 {
-	m_extTextCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-textures", "Extract all textures", false);
-	m_extModelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-models", "Extract all 3D models", false);
+	m_extTextCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-textures", "Extract 2D textures", false);
+	m_extModelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-models", "Extract 3D models", false);
 	m_extMatCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-materials", "Extract material metadata", false);
 	m_extAudioCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-audio", "Extract audio clips", false);
-	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resources", false);
-	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract all levels", false);
-	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract all shaders", false);
-	m_extLandscape = std::make_shared<TCLAP::SwitchArg>("", "extract-landscapes", "Extract all Landscapes", false);
-	m_extLevelStatic = std::make_shared<TCLAP::SwitchArg>("", "extract-levelstatic", "Extract all Static Levels", false);
+	m_extAllCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-all", "Extract all resource types", false);
+	m_extLevelCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-levels", "Extract levels", false);
+	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract shaders", false);
+	m_extLandscape = std::make_shared<TCLAP::SwitchArg>("", "extract-landscapes", "Extract landscapes", false);
+	m_extLevelStatic = std::make_shared<TCLAP::SwitchArg>("", "extract-levelstatic", "Extract static levels", false);
 
-	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include extraction of Vertex Colors", false);
+	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include Vertex Colors on 3D models", false);
 	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format", false, "Binary", "Binary | Decompiled");
 	m_textureFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "texture-format", "Texture output format", false, "DDS", "DDS | PNG | TGA");
 	m_levelHlodExport = std::make_shared<TCLAP::ValueArg<std::string>>("", "level-hlod", "Extract HLOD files in levels", false, "Ignore", "Ignore | Include | Only");

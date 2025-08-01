@@ -11,7 +11,6 @@ A cross-platform program/library for exporting files from Warframe. Provides a C
 Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/releases/latest).
 - `Warframe-Exporter` is the easy-to-use program with a Graphical User Interface.
 - `Warframe-Exporter-CLI` is a Command-Line interface. This is useful for writing scripts to export files.
-- `Warframe-Exporter-CLI-Advanced` is a Command-Line interface with extra features. You probably don't need this unless you're familiar with the inner workings of Warframe.
 
 # External Libraries
 
@@ -35,8 +34,8 @@ Inside the `utils` folder, you'll find a collection of `.hexpat` files. These ar
 1. Download and install ImHex
 1. Copy all `.hexpat` files into `C:\Users\<Username>\AppData\Local\imhex\patterns` or `~/.local/share/imhex/patterns`
 1. Load a raw file into Imhex for analysis
-    1. Using the advanced tool, find specific formats using the `--print-enums` flag
-    1. Write raw files from the advanced tool using the `--write-raw` flag
+    1. Using the CLI, find specific formats using the `--print-enums` flag
+    1. Write raw files using the `--write-raw` flag
 1. Within ImHex, go to *File -> Import -> Pattern File* and select the appropriate pattern
 
 # Building

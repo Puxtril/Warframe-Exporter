@@ -141,11 +141,11 @@ WarframeExporter::Level::LevelHlodExtractMode
 CLIExtract::getLevelHlodMode(const std::string commandValue)
 {
 	if (commandValue == "Ignore" || commandValue == "ignore" || commandValue == "IGNORE")
-		return WarframeExporter::Level::LevelHlodExtractMode::IGNORE;
+		return WarframeExporter::Level::LevelHlodExtractMode::IGNORE_HLOD;
 	if (commandValue == "Include" || commandValue == "include" || commandValue == "INCLUDE")
-		return WarframeExporter::Level::LevelHlodExtractMode::INCLUDE;
+		return WarframeExporter::Level::LevelHlodExtractMode::INCLUDE_HLOD;
 	if (commandValue == "Only" || commandValue == "only" || commandValue == "ONLY")
-		return WarframeExporter::Level::LevelHlodExtractMode::ONLY;
+		return WarframeExporter::Level::LevelHlodExtractMode::ONLY_HLOD;
 
 	WarframeExporter::Logger::getInstance().error("Level HLOD export format isn't valid");
 	exit(1);

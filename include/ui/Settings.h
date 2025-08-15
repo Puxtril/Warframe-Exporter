@@ -3,6 +3,7 @@
 #include "Extractor.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
+#include "ExtractOptions.h"
 
 #include <filesystem>
 #include <QtCore/qobject.h>
@@ -36,6 +37,8 @@ class UiSettings : public QObject
     static const inline QString m_exporterSplitState = "splitter/state";
 
     static const inline QString m_filterExportTypes = "additionalsettings/filterfiles";
+    static const inline QString m_extractVertexColors = "additionalsettings/vertexcolors";
+    static const inline QString m_levelHlodExportType = "additionalsettings/levelhlod";
 
     UiSettings();
     UiSettings(const UiSettings&) = delete;
@@ -61,21 +64,16 @@ public:
     QByteArray getSplitterGeometry();
     QByteArray getSplitterState();
 
-    WarframeExporter::Shader::ShaderExportType getShaderFormat() const;
-    WarframeExporter::Texture::TextureExportType getTextureFormat() const;
-
     LotusLib::Game getGame() const;
 
-    void setFilterFiles(bool filter);
-    bool getFilterFiles();
+    WarframeExporter::ExtractOptions loadOptions();
 
 public slots:
     void setSettings(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     );
 };

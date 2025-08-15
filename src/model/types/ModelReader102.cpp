@@ -93,6 +93,9 @@ ModelReader102::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
         bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
     }
 
+    if (!canContinueReading(bodyReader, extHeader.faceCount))
+        throw unknown_format_error("Incorrect index count");
+
     outBody.indices.resize(extHeader.faceCount);
     bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 

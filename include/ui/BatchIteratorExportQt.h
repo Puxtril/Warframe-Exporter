@@ -22,7 +22,8 @@ public:
         LotusLib::PackagesReader& pkgs,
         LotusLib::FileEntry& fileEntry,
         WarframeExporter::Extractor* extractor,
-        const std::filesystem::path& outputPath
+        const std::filesystem::path& outputPath,
+        WarframeExporter::ExtractOptions options
     ) override;
 
     void cancelExtraction();
@@ -45,7 +46,8 @@ public:
         LotusLib::PackagesReader& pkgs,
         LotusLib::FileEntry& fileEntry,
         WarframeExporter::Extractor* extractor,
-        const std::filesystem::path& outputPath
+        const std::filesystem::path& outputPath,
+        WarframeExporter::ExtractOptions options
     ) override;
 		
     void processUnknownFile(

@@ -31,7 +31,7 @@ namespace WarframeExporter::Audio {
 			return false;
 		}
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			const static std::string outFileExt = "wav";
 			return outFileExt;
@@ -48,6 +48,6 @@ namespace WarframeExporter::Audio {
 
 		static AudioPCMExtractor* getInstance();
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

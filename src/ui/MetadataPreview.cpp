@@ -16,8 +16,15 @@ MetdataPreview::setupUis(QPlainTextEdit* textWidget, QLabel* compressed, QLabel*
 void
 MetdataPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
 {
+    pkgs->initilizePackagesBin();
     LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER);
-    setupCommonHeader(pkgs->getGame(), fileEntry);
+
+    std::stringstream outStr;
+    setupCommonHeader(outStr, pkgs->getGame(), fileEntry);
+    addPackagesBinHeirarchy(outStr, pkgs->getPackage(pkgName).value(), internalPath);
+    std::string outStrTmp = outStr.str();
+    m_textWidget->setPlainText(QString(outStrTmp.c_str()));
+
     auto pkg = pkgs->getPackage(pkgName).value();
     setFiledata(pkg, fileEntry);
 }
@@ -32,10 +39,8 @@ MetdataPreview::clearPreview()
 }
 
 void
-MetdataPreview::setupCommonHeader(LotusLib::Game game, LotusLib::FileEntry& fileEntry)
+MetdataPreview::setupCommonHeader(std::stringstream& outStr, LotusLib::Game game, LotusLib::FileEntry& fileEntry)
 {
-    std::stringstream outStr;
-
     outStr << "Type Enum: ";
     outStr << fileEntry.commonHeader.type << " ";
     auto extractor = WarframeExporter::g_enumMapExtractor.at(game, LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
@@ -54,10 +59,6 @@ MetdataPreview::setupCommonHeader(LotusLib::Game game, LotusLib::FileEntry& file
     outStr << "----------" << std::endl;
     for (const std::string& curPath : fileEntry.commonHeader.paths)
         outStr << " " << curPath << std::endl;
-
-
-    std::string outStrTmp = outStr.str();
-    m_textWidget->setPlainText(QString(outStrTmp.c_str()));
 }
 
 void
@@ -120,4 +121,33 @@ MetdataPreview::filesizeToQString(int input)
 
     std::string sizeStr = std::to_string((int)sizedDown) + " " + prefixes[prefixIndex];
     return QString(sizeStr.c_str());
+}
+
+void
+MetdataPreview::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath)
+{
+    std::stack<std::string> heirarchy;
+
+    std::string curFile = filePath;
+    while (curFile != "")
+    {
+        heirarchy.push(curFile);
+        LotusLib::FileEntry nextEntry = pkg.getFile(curFile, LotusLib::READ_EXTRA_ATTRIBUTES);
+        curFile = nextEntry.extra.parent;
+    }
+
+    if (heirarchy.size() == 1)
+        return;
+
+    outStr << std::endl << std::endl;
+
+    outStr << "Hierarchy" << std::endl;
+    outStr << "----------" << std::endl;
+
+    int curLevel = 1;
+    while (!heirarchy.empty())
+    {
+        outStr << "[" << curLevel++ << "]  " << heirarchy.top() << std::endl;
+        heirarchy.pop();
+    }
 }

@@ -3,6 +3,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QLabel>
+#include <stack>
 
 #include "LotusLib.h"
 #include "EnumMapExtractor.h"
@@ -25,8 +26,9 @@ public:
     void clearPreview();
 
 private:
-    void setupCommonHeader(LotusLib::Game game, LotusLib::FileEntry& fileEntry);
+    void setupCommonHeader(std::stringstream& outStr, LotusLib::Game game, LotusLib::FileEntry& fileEntry);
     void setFiledata(LotusLib::PackageReader& pkgs, LotusLib::FileEntry& fileEntry);
     static QString timestampToQString(int64_t input);
     static QString filesizeToQString(int input);
+    static void addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath);
 };

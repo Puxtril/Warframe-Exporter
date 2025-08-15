@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <set>
 
 #include <QtWidgets/QTreeWidget>
 #include <QtGui/QBrush>
@@ -14,9 +13,9 @@
 #include "LotusLib.h"
 #include "Extractor.h"
 #include "LotusPath.h"
+#include "ExtractOptions.h"
 
 #include "ui/UIMainWindow.h"
-#include "ui/Settings.h"
 #include "ui/ui_Exporter.h"
 #include "ui/TreeItemSubtypes.h"
 #include "ui/preview/PreviewManager.h"
@@ -76,9 +75,8 @@ public slots:
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     );
     void loadTreeFinished();
     void extractButtonClicked();

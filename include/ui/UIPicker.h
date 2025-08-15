@@ -8,6 +8,7 @@
 #include "Meta.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
+#include "ExtractOptions.h"
 
 #include <QtWidgets/qdialog.h>
 #include <QtWidgets/qmainwindow.h>
@@ -34,9 +35,7 @@ public:
 
 private:
     void setupMessageBoxes();
-    void addShaderFormatOptions();
-    void addTextureFormatOptions();
-    void addGameOptions();
+    void addComboBoxOptions();
     void loadSettings();
     void loadVersion();
 
@@ -45,9 +44,8 @@ signals:
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     );
     void retryLoadPickerOptions();
 
@@ -56,7 +54,4 @@ public slots:
     void browseCacheWindows();
     void browseExportPath();
     void createExportFolderAndLoad(QAbstractButton *button);
-    void additionalSettingsClicked();
-    void additionalSettingsClosed();
-    void additionalSettingsCancelled();
 };

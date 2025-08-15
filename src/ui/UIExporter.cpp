@@ -154,27 +154,22 @@ UiExporter::setData(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
 )
 {
     m_packages.setData(cachePath, game);
     m_cacheDirPath = cachePath;
     m_exportPath = exportPath / "Extracted";
     m_extractTypes = extractTypes;
-    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes);
-    m_exporterFileThread.setData(&m_packages, exportPath);
+    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, options);
+    m_exporterFileThread.setData(&m_packages, exportPath, options);
     m_previewManager.setData(&m_packages);
-
-    WarframeExporter::Model::ModelExtractor::getInstance()->m_indexVertexColors = false;
-    WarframeExporter::Shader::ShaderExtractor::m_shaderExportType = shaderExportType;
-    WarframeExporter::Texture::TextureExtractor::m_exportType = textureExportType;
 
     m_loading.initProgressBar(m_packages, extractTypes);
     m_loadingDialog.show();
 
-    m_loadTreeThread.setData(m_extractTypes, m_packages, this->treeWidget, UiSettings::getInstance().getFilterFiles());
+    m_loadTreeThread.setData(m_extractTypes, m_packages, this->treeWidget, options.filterUiFiles);
     m_loadTreeThread.start();
 }
 

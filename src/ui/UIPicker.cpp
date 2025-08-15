@@ -13,9 +13,7 @@ UiPicker::setupUi(QDialog *WindowPicker)
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
     setupMessageBoxes();
-    addShaderFormatOptions();
-    addTextureFormatOptions();
-    addGameOptions();
+    addComboBoxOptions();
     loadSettings();
     loadVersion();
 }
@@ -23,9 +21,9 @@ UiPicker::setupUi(QDialog *WindowPicker)
 void
 UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* exporter)
 {
-    QObject::connect(this->AdditionalSettingsButton, &QPushButton::clicked, this, &UiPicker::additionalSettingsClicked);
-    QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::accepted, this, &UiPicker::additionalSettingsClosed);
-    QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::rejected, this, &UiPicker::additionalSettingsCancelled);
+    QObject::connect(this->AdditionalSettingsButton, &QPushButton::clicked, &m_additionalSettingsDialog, &QDialog::show);
+    QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::accepted, &m_additionalSettingsDialog, &QDialog::hide);
+    QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::rejected, &m_additionalSettingsDialog, &QDialog::hide);
 
     QObject::connect(this->LoadButton, &QPushButton::clicked, this, &UiPicker::parsePickerOptions);
     QObject::connect(this, &UiPicker::pickerDone, WindowPicker, &QDialog::hide);
@@ -60,27 +58,23 @@ UiPicker::setupMessageBoxes()
 }
 
 void
-UiPicker::addShaderFormatOptions()
+UiPicker::addComboBoxOptions()
 {
     this->ShaderFormatCombo->addItem("Binary", WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY);
 #ifdef WIN32
     this->ShaderFormatCombo->addItem("Decompiled", WarframeExporter::Shader::SHADER_EXPORT_D3DDECOMPILE);
 #endif
-}
 
-void
-UiPicker::addTextureFormatOptions()
-{
     this->TextureFormatCombo->addItem("DDS", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS);
     this->TextureFormatCombo->addItem("PNG",WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG);
     this->TextureFormatCombo->addItem("TGA", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA);
-}
 
-void
-UiPicker::addGameOptions()
-{
     this->GamePickerCombo->addItem("Warframe", (int)LotusLib::Game::WARFRAME);
     this->GamePickerCombo->addItem("Soulframe", (int)LotusLib::Game::SOULFRAME);
+
+    m_additionalSettings.LevelHlodExportCombo->addItem("Ignore", WarframeExporter::Level::LevelHlodExtractMode::IGNORE);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Include", WarframeExporter::Level::LevelHlodExtractMode::INCLUDE);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Only", WarframeExporter::Level::LevelHlodExtractMode::ONLY);
 }
 
 void
@@ -98,45 +92,17 @@ UiPicker::loadSettings()
     this->AudioCheckbox->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
     this->ShaderCheckbox->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
 
-    WarframeExporter::Texture::TextureExportType textureFormat = settings.getTextureFormat();
-    switch(textureFormat)
-    {
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_DDS:
-            this->TextureFormatCombo->setCurrentIndex(0);
-            break;
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG:
-            this->TextureFormatCombo->setCurrentIndex(1);
-            break;
-        case WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA:
-            this->TextureFormatCombo->setCurrentIndex(2);
-            break;
-    }
-
-    WarframeExporter::Shader::ShaderExportType shaderFormat = settings.getShaderFormat();
-    switch(shaderFormat)
-    {
-        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_BINARY:
-            this->ShaderFormatCombo->setCurrentIndex(0);
-            break;
-        case WarframeExporter::Shader::ShaderExportType::SHADER_EXPORT_D3DDECOMPILE:
-            this->ShaderFormatCombo->setCurrentIndex(1);
-            break;
-    }
-
     LotusLib::Game game = settings.getGame();
-    switch(game)
-    {
-        case LotusLib::Game::UNKNOWN:
-        case LotusLib::Game::WARFRAME:
-            this->GamePickerCombo->setCurrentIndex(0);
-            break;
-        case LotusLib::Game::SOULFRAME:
-            this->GamePickerCombo->setCurrentIndex(1);
-            break;
-        case LotusLib::Game::WARFRAME_PE:
-            this->GamePickerCombo->setCurrentIndex(2);
-            break;
-    }
+    game = game == LotusLib::Game::UNKNOWN ? LotusLib::Game::WARFRAME : game;
+    this->GamePickerCombo->setCurrentIndex(this->GamePickerCombo->findData((int)game));
+
+    WarframeExporter::ExtractOptions options = settings.loadOptions();
+    this->TextureFormatCombo->setCurrentIndex(this->TextureFormatCombo->findData(options.textureExportType));
+    this->ShaderFormatCombo->setCurrentIndex(this->ShaderFormatCombo->findData(options.shaderExportType));
+    m_additionalSettings.LevelHlodExportCombo->setCurrentIndex(m_additionalSettings.LevelHlodExportCombo->findData(options.levelHlodExtractMode));
+
+    m_additionalSettings.FilterFilesCheckbox->setCheckState(options.filterUiFiles ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    m_additionalSettings.ExtractVertexColorsCheckbox->setCheckState(options.extractVertexColors ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
 void
@@ -189,18 +155,26 @@ UiPicker::parsePickerOptions()
         return;
     }
 
+    WarframeExporter::ExtractOptions options;
+
     int selectedTextureFormat = this->TextureFormatCombo->itemData(this->TextureFormatCombo->currentIndex()).toInt();
-    WarframeExporter::Texture::TextureExportType textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(selectedTextureFormat);
+    options.textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(selectedTextureFormat);
 
     int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
-    WarframeExporter::Shader::ShaderExportType shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
+    options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
+
+    int levelHlodExtractMode = m_additionalSettings.LevelHlodExportCombo->itemData(m_additionalSettings.LevelHlodExportCombo->currentIndex()).toInt();
+    options.levelHlodExtractMode = static_cast<WarframeExporter::Level::LevelHlodExtractMode>(levelHlodExtractMode);
+
+    options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
+    options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
 
     int selectedGame = this->GamePickerCombo->itemData(this->GamePickerCombo->currentIndex()).toInt();
     LotusLib::Game gameType = static_cast<LotusLib::Game>(selectedGame);
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
     LotusLib::Logger::setLogProperties(spdlog::level::info);
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, shaderExportType, textureExportType, gameType);
+    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, gameType, options);
 }
 
 void
@@ -242,28 +216,4 @@ UiPicker::createExportFolderAndLoad(QAbstractButton *button)
     }
 
     emit retryLoadPickerOptions();
-}
-
-void
-UiPicker::additionalSettingsClicked()
-{
-    Qt::CheckState isChecked = UiSettings::getInstance().getFilterFiles() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
-    m_additionalSettings.FilterFilesCheckbox->setCheckState(isChecked);
-
-    m_additionalSettingsDialog.setModal(Qt::ApplicationModal);
-    m_additionalSettingsDialog.show();
-}
-
-void
-UiPicker::additionalSettingsClosed()
-{
-    m_additionalSettingsDialog.hide();
-
-    UiSettings::getInstance().setFilterFiles(m_additionalSettings.FilterFilesCheckbox->isChecked());
-}
-
-void
-UiPicker::additionalSettingsCancelled()
-{
-    m_additionalSettingsDialog.hide();
 }

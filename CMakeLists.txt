@@ -3,7 +3,6 @@
 
 option(COMPILE_WF_UI_EXE "Compile the standard UI executable" ON)
 option(COMPILE_WF_CLI_EXE "Compile the standard CLI executable" ON)
-option(COMPILE_WF_CLI_EXE_ADVANCED "Compile the standard CLI executable with more advanced options" ON)
 
 ##################################################
 # Project stuff
@@ -143,7 +142,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/PhysxParser")
 add_library(Warframe-Exporter-Lib STATIC ${WARFRAME_EXPORTER_SOURCES})
 target_link_libraries(Warframe-Exporter-Lib spdlog glm::glm nlohmann_json::nlohmann_json spng_static PhysxParser)
 
-if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
+if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE)
 
 	# zlib is used by libPNG
 	# Both dynamic and static libraries will be built by zlib,
@@ -225,13 +224,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE OR COMPILE_WF_CLI_EXE_ADVANCED)
 	if(COMPILE_WF_CLI_EXE)
 		add_executable(Warframe-Exporter-CLI ${WARFRAME_EXPORTER_CLI_SOURCES})
 		target_link_libraries(Warframe-Exporter-CLI Warframe-Exporter-Lib spdlog LotusLib libzstd_static ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY} lzf PhysxParser)
-		target_compile_definitions(Warframe-Exporter-CLI PUBLIC WF_EXTRACT)
-	endif()
-		
-	if(COMPILE_WF_CLI_EXE_ADVANCED)
-		add_executable(Warframe-Exporter-CLI-Advanced ${WARFRAME_EXPORTER_CLI_SOURCES})
-		target_link_libraries(Warframe-Exporter-CLI-Advanced Warframe-Exporter-Lib spdlog LotusLib libzstd_static ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY} lzf PhysxParser)
-		target_compile_definitions(Warframe-Exporter-CLI-Advanced PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
+		target_compile_definitions(Warframe-Exporter-CLI PUBLIC WF_EXTRACT WF_DEBUG WF_ADVANCED)
 	endif()
 
 endif()

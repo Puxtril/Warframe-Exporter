@@ -4,13 +4,7 @@ using namespace WarframeExporter::Shader;
 
 ShaderExtractor::ShaderExtractor()
     : Extractor(), m_hasWarnedCompileNonWindows(false)
-{
-#ifdef WIN32
-    m_shaderExportType = SHADER_EXPORT_D3DDECOMPILE;
-#else
-    m_shaderExportType = SHADER_EXPORT_BINARY;
-#endif
-}
+{ }
 
 ShaderExtractor*
 ShaderExtractor::getInstance()
@@ -77,7 +71,7 @@ ShaderExtractor::writeShader(const ShaderEntry& shader, const std::filesystem::p
 }
 
 void
-ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, bool dryRun)
+ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options)
 {
     ShaderHeaderExternal externalHeader = getHeader(fileEntry);
 
@@ -85,9 +79,9 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
 
     for (int iShader = 0; iShader < bodyEntries.size(); iShader++)
     {
-        if (m_shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
+        if (options.shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
 		    decompileShader(bodyEntries[iShader]);
-		if (!dryRun)
+		if (!options.dryRun)
         	writeShader(bodyEntries[iShader], outputDir, iShader);
     }
 }
@@ -95,24 +89,29 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
 void
 ShaderExtractor::_decompileShader(ShaderEntry& shaderEntry, int index)
 {
+	shaderEntry.decompiled = "";
+
 #ifdef WIN32
-	ShaderConverterD3D* decompiler = ShaderConverterD3D::getInstance();
-#else
-	if (!m_hasWarnedCompileNonWindows)
-	{
-		m_logger.warn("Unable to decompile shaders on non-Windows platform");
-		m_hasWarnedCompileNonWindows = true;
-	}
-	ShaderConverter* decompiler = ShaderConverter::getInstance();
-#endif
-	
-	bool success = decompiler->decompileShader(shaderEntry);
-	
-	if (!success)
+	ID3DBlob* disassembly;
+
+	HRESULT result = D3DDisassemble(
+		(LPCVOID)shaderEntry.bytecode.data(),
+		shaderEntry.bytecode.size(),
+		D3D_DISASM_ENABLE_DEFAULT_VALUE_PRINTS,
+		NULL,
+		&disassembly
+	);
+
+	if (FAILED(result))
 	{
 		if (index == -1)
 			m_logger.error("Shader decompilation failed");
 		else
 			m_logger.error("Shader decompilation failed (Index " + std::to_string(index) + ")");
+
+		return;
 	}
+	
+	shaderEntry.decompiled = std::string(static_cast<char*>(disassembly->GetBufferPointer()));
+#endif
 }

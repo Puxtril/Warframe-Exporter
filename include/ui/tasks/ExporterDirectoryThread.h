@@ -2,6 +2,7 @@
 
 #include "Extractor.h"
 #include "LotusPath.h"
+#include "ExtractOptions.h"
 #include "ui/BatchIteratorExportQt.h"
 
 #include <QtCore/QThread>
@@ -16,12 +17,13 @@ class ExporterDirectoryThread : public QThread
     std::filesystem::path m_exportPath;
     WarframeExporter::ExtractorType m_extractTypes;
     LotusLib::LotusPath m_internalPath;
+    WarframeExporter::ExtractOptions m_options;
     std::shared_ptr<BatchIteratorExportQt> m_exporter;
 
 public:
     ExporterDirectoryThread();
 
-    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes);
+    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, WarframeExporter::ExtractOptions options);
     void setInternalPath(LotusLib::LotusPath internalPath);
     void extractCancelled();
     void run();

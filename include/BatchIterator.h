@@ -25,8 +25,8 @@ namespace WarframeExporter
 		BatchIterator();
 
 		// Derrives which packages to read based on `types`
-		void batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, ExtractorType types, LotusLib::Game game);
-		void batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, LotusLib::PackageCategory pkgCategory, ExtractorType types, LotusLib::Game game);
+		void batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, ExtractorType types, LotusLib::Game game, ExtractOptions options);
+		void batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, LotusLib::PackageCategory pkgCategory, ExtractorType types, LotusLib::Game game, ExtractOptions options);
 
 	protected:
 		// fileEntry will only contain the Common Header and H package header
@@ -34,7 +34,8 @@ namespace WarframeExporter
 			LotusLib::PackagesReader& pkg,
 			LotusLib::FileEntry& fileEntry,
 			Extractor* extractor,
-			const std::filesystem::path& outputPath
+			const std::filesystem::path& outputPath,
+			ExtractOptions options
 		) = 0;
 		
 		virtual void processUnknownFile(

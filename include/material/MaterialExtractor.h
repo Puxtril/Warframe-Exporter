@@ -17,7 +17,7 @@ namespace WarframeExporter::Material
 		MaterialExtractor(const MaterialExtractor&) = delete;
 		MaterialExtractor operator=(const MaterialExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			const static std::string outFileExt = "txt";
 			return outFileExt;
@@ -64,6 +64,6 @@ namespace WarframeExporter::Material
 		void addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, LotusLib::LotusPath internalPath, MaterialExternal& materialExternal);
 		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

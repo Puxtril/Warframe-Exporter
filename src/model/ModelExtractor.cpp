@@ -35,16 +35,16 @@ ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, LotusLib::Game g
 }
 
 std::vector<std::vector<glm::u8vec4>>
-ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg)
+ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg, bool indexVertexColors)
 {
 	std::vector<std::vector<glm::u8vec4>> vertexColors;
-	if (m_indexVertexColors)
+	if (indexVertexColors)
 		m_vertexColorIndexer.getModelColors(modelPath, vertexColors, pkg);
 	return vertexColors;
 }
 
 void
-ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
+ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
@@ -54,7 +54,7 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 		throw unknown_format_error("Mesh has zero MeshInfos");
 
 	auto pkg = pkgs.getPackage("Misc");
-	auto vertexColors = getVertexColors(fileEntry.internalPath, pkg.value());
+	auto vertexColors = getVertexColors(fileEntry.internalPath, pkg.value(), options.extractVertexColors);
 
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;
@@ -67,6 +67,6 @@ ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader
 	// Convert body/header into exportable format
 	Document gltfDocument;
 	ModelExporterGltf::addModelData(gltfDocument, headerInt, bodyInt, bodyExt);
-	if (!dryRun)
+	if (!options.dryRun)
 		ModelExporterGltf::save(gltfDocument, outputPath);
 }

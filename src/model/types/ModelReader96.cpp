@@ -84,6 +84,9 @@ ModelReader96::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bina
         outBody.UV2[x][1] = bodyReader->readHalf();
     }
 
+    if (!canContinueReading(bodyReader, extHeader.faceCount))
+        throw unknown_format_error("Incorrect index count");
+
     outBody.indices.resize(extHeader.faceCount);
     bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 

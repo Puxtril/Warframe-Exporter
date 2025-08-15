@@ -22,14 +22,14 @@ LevelStaticExtractor::read(LotusLib::FileEntry& fileEntry)
 }
 
 void
-LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf)
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, ExtractOptions options)
 {
 	std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf;
-	addModelsToGltf(external, pkgs, gltf, modelPathsInGltf);
+	addModelsToGltf(external, pkgs, gltf, modelPathsInGltf, options);
 }
 
 void
-LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf)
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf, ExtractOptions options)
 {
 	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
 	
@@ -74,7 +74,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg);
+			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg, options.extractVertexColors);
 			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale());
 				
 			modelPathsInGltf[curMeshPath] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
@@ -85,11 +85,11 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 }
 
 void
-LevelStaticExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
+LevelStaticExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
 	LevelStaticExternal external = read(fileEntry);
 	fx::gltf::Document gltf;
-	addModelsToGltf(external, pkgs, gltf);
-	if (!dryRun)
+	addModelsToGltf(external, pkgs, gltf, options);
+	if (!options.dryRun)
 		fx::gltf::Save(gltf, outputPath, gltf.buffers.size() > 1 ? false : true);
 }

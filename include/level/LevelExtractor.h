@@ -20,7 +20,7 @@ namespace WarframeExporter::Level
 		LevelExtractor(const LevelExtractor&) = delete;
 		LevelExtractor operator=(const LevelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;
@@ -56,9 +56,9 @@ namespace WarframeExporter::Level
 
 		LevelExternal getLevelExternal(LotusLib::FileEntry& fileEntry);
 		LevelInternal convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal);
-		Document createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt);
+		Document createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt, ExtractOptions options);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 		
 		// More attribute may exist in Packages.bin
 		void findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ExtractOptions.h"
 #include "Extractor.h"
 #include "texture/TextureStructs.hpp"
 #include "BinaryReaderBuffered.h"
@@ -21,19 +22,17 @@ namespace WarframeExporter::Texture
 		TextureExtractor(const TextureExtractor&) = delete;
 		TextureExtractor operator=(const TextureExtractor&) = delete;
 
-		static inline TextureExportType m_exportType = TextureExportType::TEXTURE_EXPORT_DDS;
-
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			size_t curOffset = hReader->tell();
 			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, commonHeader);
 			hReader->seek(curOffset, std::ios::beg);
 
 			static const std::string hdr = "hdr";
-			if (extHeader.format == (uint8_t)TextureCompression::BC6 && m_exportType != TextureExportType::TEXTURE_EXPORT_DDS)
+			if (extHeader.format == (uint8_t)TextureCompression::BC6 && options.textureExportType != TextureExportType::TEXTURE_EXPORT_DDS)
 				return hdr;
 
-			switch (m_exportType)
+			switch (options.textureExportType)
 			{
 			case TextureExportType::TEXTURE_EXPORT_DDS:
 			{
@@ -111,12 +110,12 @@ namespace WarframeExporter::Texture
 		static TextureExtractor* getInstance();
 
 		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs);
-		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile);
+		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile, TextureExportType exportType);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 
 	private:
-		static void writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile);
-		static void writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile);
+		static void writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType);
+		static void writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType);
 	};
 }

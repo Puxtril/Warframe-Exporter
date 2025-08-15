@@ -60,20 +60,6 @@ UiSettings::getExportShaders() const
     return m_settings.value(m_checkboxExportShaders).toBool();
 }
 
-WarframeExporter::Shader::ShaderExportType
-UiSettings::getShaderFormat() const
-{
-    int value = m_settings.value(m_comboShaderFormat).toInt();
-    return static_cast<WarframeExporter::Shader::ShaderExportType>(value);
-}
-
-WarframeExporter::Texture::TextureExportType
-UiSettings::getTextureFormat() const
-{
-    int value = m_settings.value(m_comboTextureFormat).toInt();
-    return static_cast<WarframeExporter::Texture::TextureExportType>(value);
-}
-
 LotusLib::Game
 UiSettings::getGame() const
 {
@@ -81,17 +67,24 @@ UiSettings::getGame() const
     return static_cast<LotusLib::Game>(value);
 }
 
-void
-UiSettings::setFilterFiles(bool filter)
+WarframeExporter::ExtractOptions
+UiSettings::loadOptions()
 {
-    m_settings.setValue(m_filterExportTypes, filter);
-}
+    WarframeExporter::ExtractOptions options;
 
-bool
-UiSettings::getFilterFiles()
-{
-    bool value = m_settings.value(m_filterExportTypes, true).toBool();
-    return value;
+    options.filterUiFiles = m_settings.value(m_filterExportTypes).isValid() ? m_settings.value(m_filterExportTypes).toBool() : options.filterUiFiles;
+    options.extractVertexColors = m_settings.value(m_extractVertexColors).isValid() ? m_settings.value(m_extractVertexColors).toBool() : options.extractVertexColors;
+
+    int value = m_settings.value(m_comboShaderFormat).isValid() ? m_settings.value(m_comboShaderFormat).toInt() : options.shaderExportType;
+    options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(value);
+
+    value = m_settings.value(m_comboTextureFormat).isValid() ? m_settings.value(m_comboTextureFormat).toInt() : options.textureExportType;
+    options.textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(value);
+
+    value = m_settings.value(m_levelHlodExportType).isValid() ? m_settings.value(m_levelHlodExportType).toInt() : options.levelHlodExtractMode;
+    options.levelHlodExtractMode = static_cast<WarframeExporter::Level::LevelHlodExtractMode>(value);
+    
+    return options;
 }
 
 void
@@ -130,9 +123,8 @@ UiSettings::setSettings(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,
         WarframeExporter::ExtractorType extractTypes,
-        WarframeExporter::Shader::ShaderExportType shaderExportType,
-        WarframeExporter::Texture::TextureExportType textureExportType,
-        LotusLib::Game game
+        LotusLib::Game game,
+        WarframeExporter::ExtractOptions options
     )
 {
     QString qCachePath = QString(cachePath.string().c_str());
@@ -148,8 +140,12 @@ UiSettings::setSettings(
     m_settings.setValue(m_checkboxExportAudio, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0);
     m_settings.setValue(m_checkboxExportShaders, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0);
 
-    m_settings.setValue(m_comboShaderFormat, (int)shaderExportType);
-    m_settings.setValue(m_comboTextureFormat, (int)textureExportType);
-
     m_settings.setValue(m_comboGame, (int)game);
+
+    m_settings.setValue(m_comboShaderFormat, (int)options.shaderExportType);
+    m_settings.setValue(m_comboTextureFormat, (int)options.textureExportType);
+
+    m_settings.setValue(m_filterExportTypes, options.filterUiFiles);
+    m_settings.setValue(m_extractVertexColors, options.extractVertexColors);
+    m_settings.setValue(m_levelHlodExportType, options.levelHlodExtractMode);
 }

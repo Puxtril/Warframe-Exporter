@@ -6,10 +6,11 @@ ExporterFileThread::ExporterFileThread()
 }
 
 void
-ExporterFileThread::setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath)
+ExporterFileThread::setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractOptions options)
 {
     m_pkgsReader = pkgsReader;
     m_exportPath = exportPath;
+    m_options = options;
 }
 
 void
@@ -26,7 +27,7 @@ ExporterFileThread::run()
 
     try
     {
-        WarframeExporter::extractFile(*m_pkgsReader, m_pkgName, m_internalFilePath, m_exportPath, m_pkgsReader->getGame());
+        WarframeExporter::extractFile(*m_pkgsReader, m_pkgName, m_internalFilePath, m_exportPath, m_pkgsReader->getGame(), m_options);
     }
     catch (std::exception& ex)
     {

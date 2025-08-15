@@ -10,7 +10,7 @@ AudioPCMExtractor::getInstance()
 }
 
 void
-AudioPCMExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, bool dryRun)
+AudioPCMExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
 	AudioReader* reader = g_enumMapAudioPCMReader[fileEntry.commonHeader.type];
 	
@@ -20,6 +20,6 @@ AudioPCMExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRea
 	AudioBody audioBody;
 	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
 
-	if (!dryRun)
+	if (!options.dryRun)
 		AudioPCMExporterWAV::writeData(audioHeader, audioBody, outputPath);
 }

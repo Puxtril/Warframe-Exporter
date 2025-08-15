@@ -4,8 +4,6 @@
 #include "shader/ShaderStructs.h"
 #include "shader/ShaderTypes.h"
 #include "shader/ShaderEnumMap.h"
-#include "shader/ShaderConverter.h"
-#include "shader/ShaderConverterD3D.h"
 #include "shader/ShaderExportType.h"
 
 namespace WarframeExporter::Shader
@@ -20,15 +18,13 @@ namespace WarframeExporter::Shader
         ShaderExtractor(const ShaderExtractor&) = delete;
 		ShaderExtractor operator=(const ShaderExtractor&) = delete;
 
-		static inline ShaderExportType m_shaderExportType;
-
         inline const std::string& getFriendlyName() const override
         {
             const static std::string friendlyName = "Shader";
 			return friendlyName;
         }
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
         {
             const static std::string ext = "hlsl";
 			return ext;
@@ -71,7 +67,7 @@ namespace WarframeExporter::Shader
 
         void writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex = 0);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, bool dryRun = false) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options) override;
 		
 	private:
 		void _decompileShader(ShaderEntry& shaderEntry, int index = -1);

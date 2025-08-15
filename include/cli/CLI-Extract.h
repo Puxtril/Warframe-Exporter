@@ -9,8 +9,6 @@
 #include "tclap/CmdLine.h"
 #include "BatchIteratorExport.h"
 #include "model/ModelExtractor.h"
-#include "shader/ShaderExtractor.h"
-#include "texture/TextureExtractor.h"
 
 #include <memory>
 #include <filesystem>
@@ -31,6 +29,7 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_includeVertexColors;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_shaderExportType;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_textureFormat;
+	std::shared_ptr<TCLAP::ValueArg<std::string>> m_levelHlodExport;
 
 	bool m_dryRun;
 
@@ -49,9 +48,11 @@ public:
 	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
 
 private:
-	void setShaderFormat(const std::string& cmdValue);
-	void setTextureFormat(const std::string& commandValue);
+	WarframeExporter::Shader::ShaderExportType getShaderFormat(const std::string& cmdValue);
+	WarframeExporter::Texture::TextureExportType getTextureFormat(const std::string& commandValue);
+	WarframeExporter::Level::LevelHlodExtractMode getLevelHlodMode(const std::string commandValue);
+
 	void checkOutputDir(const std::string& outPath);
-	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game);
-	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game);
+	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
+	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
 };

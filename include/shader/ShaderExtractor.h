@@ -1,5 +1,15 @@
 #pragma once
 
+#if defined WIN32 || defined MINGW
+	// I hate Windows
+	#define WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
+	#include <windows.h>
+	#include <D3Dcommon.h>
+	#include <d3dcompiler.h>
+#endif
+
 #include "Extractor.h"
 #include "shader/ShaderStructs.h"
 #include "shader/ShaderTypes.h"

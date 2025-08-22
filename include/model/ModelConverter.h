@@ -32,5 +32,6 @@ namespace WarframeExporter::Model
 
 		static std::vector<std::string> extractMaterialNames(const std::string& attributes);
 		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec4& outScale);
+		static void getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec4 ensmall1, glm::vec4 ensmall2,  ScaleType scaleType, glm::vec4& outScale);
 	};
 }

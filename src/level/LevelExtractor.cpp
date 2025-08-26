@@ -86,9 +86,6 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 	if (!bodyInt.landscape.landscapePath.empty())
 		addLandscapeToGltf(outGltf, bodyInt, pkgs);
 
-	// Deduplicate model data
-	std::unordered_map<std::string, std::vector<Mesh>> modelsAddedToGltf;
-
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
 		// >3GB
@@ -108,44 +105,38 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 
 		try
 		{
-			// We have not extracted this model into the output gltf file
-			if (modelsAddedToGltf.count(curLevelObj.meshPath) == 0)
+			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curLevelObj.meshPath);
+
+			if (curLevelObjFile.headerData.getLength() == 0)
 			{
-				LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curLevelObj.meshPath);
-
-				if (curLevelObjFile.headerData.getLength() == 0)
-				{
-					m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curLevelObj.meshPath));
-					continue;
-				}
-
-				if (WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type) == nullptr)
-				{
-					m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curLevelObj.meshPath));
-					continue;
-				}
-
-				WarframeExporter::Model::ModelHeaderExternal headerExt;
-				WarframeExporter::Model::ModelBodyExternal bodyExt;
-				WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
-
-				if (headerExt.meshInfos.size() == 0)
-					continue;
-
-				// Gltf exporter doesn't like multiple rigged models
-				headerExt.boneTree.clear();
-
-				WarframeExporter::Model::ModelHeaderInternal headerInt;
-				WarframeExporter::Model::ModelBodyInternal bodyInt;
-				auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg, options.extractVertexColors);
-				WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale(), curLevelObj.meshPath);
-
-				LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
-
-				modelsAddedToGltf[curLevelObj.meshPath] = LevelExporterGltf::addModel(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
+				m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curLevelObj.meshPath));
+				continue;
 			}
 
-			LevelExporterGltf::addModelInstance(outGltf, curLevelObj, modelsAddedToGltf[curLevelObj.meshPath]);
+			if (WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type) == nullptr)
+			{
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curLevelObj.meshPath));
+				continue;
+			}
+
+			WarframeExporter::Model::ModelHeaderExternal headerExt;
+			WarframeExporter::Model::ModelBodyExternal bodyExt;
+			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
+
+			if (headerExt.meshInfos.size() == 0)
+				continue;
+
+			// Gltf exporter doesn't like multiple rigged models
+			headerExt.boneTree.clear();
+
+			WarframeExporter::Model::ModelHeaderInternal headerInt;
+			WarframeExporter::Model::ModelBodyInternal bodyInt;
+			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg, options.extractVertexColors);
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale(), curLevelObj.meshPath);
+
+			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
+
+			LevelExporterGltf::addModel(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
 		}
 		catch (std::exception& ex)
 		{

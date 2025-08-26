@@ -3,11 +3,12 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType)
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType, const std::string& internalPath)
+
 {
     if (extHeader.boneTree.size() > 1)
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
-    ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
+    ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader, internalPath);
 
     getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, vertexColors, outHeader.modelScale);
@@ -77,7 +78,7 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
 }
 
 void
-ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader)
+ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader, const std::string& internalPath)
 {
     outHeader.vertexCount = extHeader.vertexCount;
     outHeader.boneCount = extHeader.boneCount;
@@ -97,7 +98,10 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
         memcpy(newMeshInfo.faceLODCounts.data(), extMeshInfo.faceLODCounts.data(), 5 * 4);
 
         std::string matName = x < materialNames.size() ? materialNames[x] : "None";
-        newMeshInfo.matName = matName;
+        if (matName[0] != '/' && matName != "None")
+            newMeshInfo.matName = (std::filesystem::path(internalPath).parent_path() / matName).string();
+        else
+            newMeshInfo.matName = matName;
 
         intMeshInfos.push_back(newMeshInfo);
     }

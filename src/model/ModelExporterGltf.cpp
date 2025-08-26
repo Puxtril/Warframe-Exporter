@@ -225,7 +225,7 @@ ModelExporterGltf::_findOrCreateMaterial(Document& gltfDoc, const std::string& m
 
 	for (int32_t x = 0; x < (int32_t)gltfDoc.materials.size(); x++)
 	{
-		if (gltfDoc.materials[x].name.compare(materialName) == 0)
+		if (gltfDoc.materials[x].extensionsAndExtras["extras"]["FullPath"] == materialPath)
 			return x;
 	}
 	

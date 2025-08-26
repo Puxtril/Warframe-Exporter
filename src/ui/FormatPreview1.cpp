@@ -85,7 +85,7 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
         // Convert body/header data into internal format
         WarframeExporter::Model::ModelHeaderInternal headerInt;
         WarframeExporter::Model::ModelBodyInternal bodyInt;
-        WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs->getGame(), fileEntry.commonHeader.type)->ensmalleningScale());
+        WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs->getGame(), fileEntry.commonHeader.type)->ensmalleningScale(), fileEntry.internalPath);
     
         outStr << "Vertices: " << headerInt.vertexCount << std::endl;
         outStr << "Total faces: " << headerInt.faceCount / 3 << std::endl;

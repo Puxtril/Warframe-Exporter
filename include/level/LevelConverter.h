@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 #include "LotusNotationParser.h"
 
@@ -8,6 +9,7 @@
 #include "level/LevelStructs.h"
 #include "model/ModelStructs.hpp"
 #include "ExporterLogger.h"
+#include "ExporterExceptions.h"
 
 namespace WarframeExporter::Level
 {
@@ -29,5 +31,6 @@ namespace WarframeExporter::Level
 		// AnimRetarget: /Lotus/Levels/Railjack/GrineerHangerShip/HangarPrisionInterior.level
 		// Misc: /Lotus/Levels/Railjack/GrineerHangerShip/HangarPrisionInterior/
 		static void fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string& outPath);
+		static std::vector<std::string> getPrettyMaterialParams(nlohmann::json inputJson);
 	};
 };

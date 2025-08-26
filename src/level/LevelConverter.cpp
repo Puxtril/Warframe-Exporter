@@ -47,6 +47,8 @@ LevelConverter::splitAttributes(nlohmann::json& json, LevelObjectInternal& intOb
 			intObj.materials = element.value().get<std::vector<std::string>>();
 		else if (element.key() == "MeshScale")
 			intObj.scale = element.value().get<float>();
+		else if (element.key() == "MaterialParams")
+			json["MaterialParamsPretty"] = getPrettyMaterialParams(element.value());
 	}
 }
 
@@ -84,4 +86,38 @@ LevelConverter::convertLandscapeToInternal(const LevelExternal& levelExternal, L
 		levelInternal.landscape.attributes["MaterialLOD"] = attrs["MaterialLOD"].get<std::string>();
 	if (attrs.contains("OverrideMaterial"))
 		levelInternal.landscape.attributes["OverrideMaterial"] = attrs["OverrideMaterial"].get<std::vector<std::string>>();
+}
+
+std::vector<std::string>
+LevelConverter::getPrettyMaterialParams(nlohmann::json inputJson)
+{
+	std::vector<std::string> params;
+
+	auto materialParamsRaw = inputJson.get<std::vector<std::unordered_map<std::string, nlohmann::json>>>();
+	for (size_t i = 0; i < materialParamsRaw.size(); i++)
+	{
+		std::string name = materialParamsRaw[i]["name"].get<std::string>();
+		std::string valueType = materialParamsRaw[i]["type"].get<std::string>();
+		nlohmann::json valueRaw = materialParamsRaw[i]["value"];
+
+		if (valueType == "Float")
+		{
+			params.push_back(name + "=" + std::to_string(valueRaw.get<float>()));
+		}
+		else if (valueType == "Color")
+		{
+			std::array<float, 4> col = valueRaw.get<std::array<float, 4>>();
+			params.push_back(name + "=[" + std::to_string(col[0]) + "," + std::to_string(col[1]) + "," + std::to_string(col[2]) + "," + std::to_string(col[3]) + "]");
+		}
+		else if (valueType == "Float4")
+		{
+			params.push_back(name + "=[" + std::to_string(materialParamsRaw[i]["value"].get<float>()) + "," + std::to_string(materialParamsRaw[i]["value1"].get<float>()) + "," + std::to_string(materialParamsRaw[i]["value2"].get<float>()) + "," + std::to_string(materialParamsRaw[i]["value3"].get<float>()) + "]");
+		}
+		else
+		{
+			throw unknown_format_error("Unknown MaterialParam Type: " + valueType);
+		}
+	}
+
+	return params;
 }

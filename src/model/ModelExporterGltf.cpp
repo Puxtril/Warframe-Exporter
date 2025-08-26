@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt)
+ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, const std::string& internalPath)
 {
 	_modifyAsset(gltfDoc);
 
@@ -14,7 +14,7 @@ ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& he
 	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
 	{
 		meshes[meshIndex] = _createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
-		_addModelExtraInformation(gltfDoc, meshes[meshIndex], header);
+		_addModelExtraInformation(gltfDoc, meshes[meshIndex], header, internalPath);
 	}
 
 	if (header.boneTree.size() > 0)
@@ -60,9 +60,11 @@ ModelExporterGltf::_print_exception(const std::exception& e, int level)
 }
 
 void
-ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header)
+ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header, const std::string& internalPath)
 {
 	mesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
+	if (internalPath != "")
+		mesh.extensionsAndExtras["extras"]["MeshPath"] = internalPath;
 }
 
 void

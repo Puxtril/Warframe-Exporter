@@ -11,7 +11,8 @@ ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     uint32_t strLen2 = headerReader->readUInt32(0, 200, "Second strLen");
     headerReader->seek(strLen2, std::ios::cur);
 
-    headerReader->seek(0x20, std::ios::cur);
+    headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
+    headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
     outHeader.faceCount = (uint32_t)headerReader->readUInt64();
 

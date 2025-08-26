@@ -13,7 +13,8 @@ ModelReader96::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 
     skipUnknownVector(headerReader);
 
-    headerReader->seek(0x20, std::ios_base::cur);
+    headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
+    headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
     // Main model data
     outHeader.vertexCount = headerReader->readUInt32();

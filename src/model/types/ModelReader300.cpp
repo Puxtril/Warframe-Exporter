@@ -9,7 +9,9 @@ ModelReader300::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     skipPhysicsStruct(headerReader);
 
-    headerReader->seek(0x4C, std::ios_base::cur);
+    headerReader->seek(0x2C, std::ios_base::cur);
+    headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
+    headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
     readWeightedBones(headerReader, outHeader.weightedBoneNames);
 

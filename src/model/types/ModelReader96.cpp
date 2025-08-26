@@ -13,8 +13,6 @@ ModelReader96::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 
     skipUnknownVector(headerReader);
 
-    //headerReader->seek(0x20, std::ios_base::cur);
-    //std::cout << "New Ensmallening: " << headerReader->readFloat() << ", " << headerReader->readFloat() << ", " << headerReader->readFloat() << std::endl;
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 

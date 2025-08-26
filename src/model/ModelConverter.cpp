@@ -9,13 +9,7 @@ ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExter
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
     ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
 
-    getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
-    // outHeader.modelScale = glm::vec4(
-    //     std::max(std::abs(extHeader.ensmallening1[0]), std::abs(extHeader.ensmallening2[0])),
-    //     std::max(std::abs(extHeader.ensmallening1[1]), std::abs(extHeader.ensmallening2[1])),
-    //     std::max(std::abs(extHeader.ensmallening1[2]), std::abs(extHeader.ensmallening2[2])),
-    //     std::max(std::abs(extHeader.ensmallening1[3]), std::abs(extHeader.ensmallening2[3]))
-    // );
+    getModelScale(extHeader.meshInfos, extHeader.ensmallening1, extHeader.ensmallening2, scaleType, outHeader.modelScale);
     ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, vertexColors, outHeader.modelScale);
 }
 
@@ -206,7 +200,7 @@ ModelConverter::extractMaterialNames(const std::string& attributes)
 }
 
 void
-ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec4& outScale)
+ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec4 ensmall1, glm::vec4 ensmall2, ScaleType scaleType, glm::vec4& outScale)
 {
     outScale.x = 0.0;
     outScale.y = 0.0;
@@ -219,7 +213,7 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, Sc
         {
             if (scaleType == ScaleType::XYZ)
             {
-                float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
+                float largerOf2 = std::max(std::abs(ensmall1[i]), std::abs(ensmall2[i]));
                 outScale[i] = std::max(outScale[i], largerOf2);
             }
             else if (scaleType == ScaleType::XZ)
@@ -234,57 +228,6 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, Sc
                 float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
                 outScale[i] = largerOf2 * 2;
             }
-        }
-    }
-	
-	// Because the scale might be 0...
-	outScale.x = (outScale.x == 0.0f) ? 1.0f : outScale.x;
-	outScale.y = (outScale.y == 0.0f) ? 1.0f : outScale.y;
-	outScale.z = (outScale.z == 0.0f) ? 1.0f : outScale.z;
-    // Intentionally commented out
-    //outScale.w = (outScale.w == 0.0f) ? 1.0f : outScale.w;
-}
-
-void
-ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec4 ensmall1, glm::vec4 ensmall2, ScaleType scaleType, glm::vec4& outScale)
-{
-    outScale.x = 0.0;
-    outScale.y = 0.0;
-    outScale.z = 0.0;
-    outScale.w = 0.0;
-
-    std::vector<glm::vec4> vectors;
-    vectors.push_back(ensmall1);
-    vectors.push_back(ensmall2);
-
-    for (MeshInfoExternal curMeshInfo : meshInfos)
-    {
-        vectors.push_back(curMeshInfo.vector1);
-        vectors.push_back(curMeshInfo.vector2);
-    }
-
-    for (int i = 0; i < 4; i++)
-    {
-        for (const glm::vec4& curVec : vectors)
-        {
-            if (scaleType == ScaleType::XYZ)
-            {
-                outScale[i] = std::max(outScale[i], curVec[i]);
-            }
-            /*
-            else if (scaleType == ScaleType::XZ)
-            {
-                // Skip Y axis
-                if (i == 1)
-                {
-                    outScale[i] = 1.0;
-                    continue;
-                }
-
-                float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
-                outScale[i] = largerOf2 * 2;
-            }
-            */
         }
     }
 	

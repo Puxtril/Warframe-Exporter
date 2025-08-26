@@ -9,7 +9,6 @@ ModelReader99::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 
     skipPhysicsStruct(headerReader);
 
-    //headerReader->seek(0x4E, std::ios_base::cur);
     headerReader->seek(0x2E, std::ios_base::cur);
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);

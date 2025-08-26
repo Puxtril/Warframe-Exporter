@@ -21,7 +21,7 @@ MetdataPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgNa
 
     std::stringstream outStr;
     setupCommonHeader(outStr, pkgs->getGame(), fileEntry);
-    addPackagesBinHeirarchy(outStr, pkgs->getPackage(pkgName).value(), internalPath);
+    addPackagesBinHeirarchy(outStr, pkgs->getPackage(pkgName).value(), internalPath.string());
     std::string outStrTmp = outStr.str();
     m_textWidget->setPlainText(QString(outStrTmp.c_str()));
 
@@ -133,7 +133,7 @@ MetdataPreview::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::Pac
     {
         heirarchy.push(curFile);
         LotusLib::FileEntry nextEntry = pkg.getFile(curFile, LotusLib::READ_EXTRA_ATTRIBUTES);
-        curFile = nextEntry.extra.parent;
+        curFile = nextEntry.extra.parent.string();
     }
 
     if (heirarchy.size() == 1)

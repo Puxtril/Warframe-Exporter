@@ -99,8 +99,8 @@ LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal
 
 		bool isHlod = curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0;
 		if (
-			(isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::IGNORE) ||
-			(!isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::ONLY)
+			(isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::IGNORE_HLOD) ||
+			(!isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::ONLY_HLOD)
 		) { continue; }
 
 		try

@@ -74,6 +74,7 @@ void
 ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options)
 {
     ShaderHeaderExternal externalHeader = getHeader(fileEntry);
+	ZstdShaderReader::getInstance()->initilizeDecompressor(pkgs);
 
     std::vector<ShaderEntry> bodyEntries = readAllEntries(fileEntry, externalHeader);
 

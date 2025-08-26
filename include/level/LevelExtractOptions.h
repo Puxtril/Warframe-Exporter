@@ -4,8 +4,8 @@ namespace WarframeExporter::Level
 {
     enum LevelHlodExtractMode
     {
-        IGNORE = 1,
-        INCLUDE = 2,
-        ONLY = 3
+        IGNORE_HLOD = 1,
+        INCLUDE_HLOD = 2,
+        ONLY_HLOD = 3
     };
 }

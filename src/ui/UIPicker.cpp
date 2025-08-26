@@ -72,9 +72,9 @@ UiPicker::addComboBoxOptions()
     this->GamePickerCombo->addItem("Warframe", (int)LotusLib::Game::WARFRAME);
     this->GamePickerCombo->addItem("Soulframe", (int)LotusLib::Game::SOULFRAME);
 
-    m_additionalSettings.LevelHlodExportCombo->addItem("Ignore", WarframeExporter::Level::LevelHlodExtractMode::IGNORE);
-    m_additionalSettings.LevelHlodExportCombo->addItem("Include", WarframeExporter::Level::LevelHlodExtractMode::INCLUDE);
-    m_additionalSettings.LevelHlodExportCombo->addItem("Only", WarframeExporter::Level::LevelHlodExtractMode::ONLY);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Ignore", WarframeExporter::Level::LevelHlodExtractMode::IGNORE_HLOD);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Include", WarframeExporter::Level::LevelHlodExtractMode::INCLUDE_HLOD);
+    m_additionalSettings.LevelHlodExportCombo->addItem("Only", WarframeExporter::Level::LevelHlodExtractMode::ONLY_HLOD);
 }
 
 void

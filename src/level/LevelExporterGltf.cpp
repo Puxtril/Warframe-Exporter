@@ -2,7 +2,7 @@
 
 using namespace WarframeExporter::Level;
 
-std::vector<Mesh>
+void
 LevelExporterGltf::addModel(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj)
 {
 	WarframeExporter::Model::ModelExporterGltf::_modifyAsset(gltfDoc);
@@ -10,19 +10,16 @@ LevelExporterGltf::addModel(Document& gltfDoc, const WarframeExporter::Model::Mo
 	Attributes vertsAttrs = WarframeExporter::Model::ModelExporterGltf::_addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
 	std::vector<int32_t> indicesAccessors = WarframeExporter::Model::ModelExporterGltf::_addIndexData(gltfDoc, bodyInt.indices, header.meshInfos);
 
-	std::vector<Mesh> meshes(indicesAccessors.size());
 	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
 	{
-		meshes[meshIndex] = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
-		WarframeExporter::Model::ModelExporterGltf::_addModelExtraInformation(gltfDoc, meshes[meshIndex], header);
-		addModelToScene(gltfDoc, levelObj, meshes[meshIndex]);
+		Mesh createdMesh = WarframeExporter::Model::ModelExporterGltf::_createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
+		WarframeExporter::Model::ModelExporterGltf::_addModelExtraInformation(gltfDoc, createdMesh, header);
+		_addModelToScene(gltfDoc, levelObj, createdMesh);
 	}
-
-	return meshes;
 }
 
 void
-LevelExporterGltf::addModelToScene(Document& gltfDoc, const LevelObjectInternal& levelObj, const Mesh& curMesh)
+LevelExporterGltf::_addModelToScene(Document& gltfDoc, const LevelObjectInternal& levelObj, Mesh& mesh)
 {
 	if (gltfDoc.scenes.size() == 0)
 	{
@@ -47,7 +44,7 @@ LevelExporterGltf::addModelToScene(Document& gltfDoc, const LevelObjectInternal&
 	};
 
 	int curMeshIndex = static_cast<int>(gltfDoc.meshes.size());
-	gltfDoc.meshes.push_back(curMesh);
+	gltfDoc.meshes.push_back(mesh);
 	node.mesh = curMeshIndex;
 	int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
 	gltfDoc.nodes.push_back(node);
@@ -59,8 +56,22 @@ LevelExporterGltf::addModelToScene(Document& gltfDoc, const LevelObjectInternal&
 
 	insertedMesh.extensionsAndExtras["extras"]["MeshPath"] = levelObj.meshPath;
 	insertedMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
+
+	// Before adding the remaining JSON values, we need to check for valid ASCII
 	for (const auto& x : levelObj.attributes.items())
-		insertedMesh.extensionsAndExtras["extras"][x.key()] = x.value();
+	{
+		bool canAdd = true;
+		for (const char& curChar : x.key())
+		{
+			if (curChar < 0 || curChar > 126)
+			{
+				canAdd = false;
+				break;
+			}
+		}
+		if (canAdd)
+			insertedMesh.extensionsAndExtras["extras"][x.key()] = x.value();
+	}
 }
 
 std::vector<int32_t>

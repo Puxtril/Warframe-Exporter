@@ -3,6 +3,7 @@
 #include "landscape/LandscapeStructs.h"
 #include "glm/gtx/quaternion.hpp"
 #include "ExporterLogger.h"
+#include "ExporterExceptions.h"
 
 #include <cmath>
 #include <tuple>

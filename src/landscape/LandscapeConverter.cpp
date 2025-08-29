@@ -10,7 +10,9 @@ LandscapeConverter::fixGridCount(const LandscapeHeaderExternal& externalHeader)
 
     if (externalHeader.rowCount != externalHeader.columnCount)
     {
-        WarframeExporter::Logger::getInstance().warn(spdlog::fmt_lib::format("Invalid landscape grid {}x{} with {} chunks", externalHeader.rowCount, externalHeader.columnCount, externalHeader.chunks.size()));
+        if (externalHeader.rowCount * externalHeader.columnCount != externalHeader.chunks.size())
+            throw unknown_format_error("Non-square grid with invalid chunk size: (" + std::to_string(externalHeader.rowCount) + "," + std::to_string(externalHeader.columnCount) + "): " + std::to_string(externalHeader.chunks.size()));
+        
         return {externalHeader.rowCount, externalHeader.columnCount};
     }
 

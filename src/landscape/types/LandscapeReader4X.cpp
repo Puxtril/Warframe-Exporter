@@ -18,8 +18,8 @@ LandscapeReader4X::readHeader(BinaryReader::BinaryReaderBuffered* reader)
     
     reader->seek((4 * 2), std::ios::cur);
 
-    outHeader.rowCount = reader->readUInt32(1, 1000, "Landscape row count");
-    outHeader.columnCount = reader->readUInt32();
+    outHeader.columnCount = reader->readUInt32(1, 1000, "Landscape column count");
+    outHeader.rowCount = reader->readUInt32();
 
     reader->seek(2, std::ios::cur);
 
@@ -53,16 +53,12 @@ LandscapeReader4X::readHeader(BinaryReader::BinaryReaderBuffered* reader)
     {
         LandscapeHeaderChunkExternal& curChunk = outHeader.chunks[i];
 
-        //reader->seek(0x8C, std::ios::cur);
-        reader->seek(0x3C, std::ios::cur);
+        reader->seek(0x8, std::ios::cur);
 
-        curChunk.scale = {
-            reader->readFloat(),
-            reader->readFloat(),
-            reader->readFloat()
-        };
+        float scale = reader->readFloat();
+        curChunk.scale = { scale, scale, scale };
 
-        reader->seek(0x44, std::ios::cur);
+        reader->seek(0x80, std::ios::cur);
 
         curChunk.bodyLen = reader->readUInt32();
         reader->seek(8, std::ios::cur);

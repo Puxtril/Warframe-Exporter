@@ -35,134 +35,87 @@ MaterialConverter::replaceCurlyBracketsWithSquare(MaterialInternal& internalMate
     }
 }
 
-std::string
-MaterialConverter::combineMaterial(const MaterialInternal& internalMaterial)
+void
+MaterialConverter::combineMaterial(std::stringstream& outStream, const MaterialInternal& internalMaterial)
 {
-    std::stringstream formatted;
-
-    formatted << "##################" << std::endl;
-    formatted << "#   Attributes   #" << std::endl;
-    formatted << "##################" << std::endl;
-    formatted << std::endl;
+    outStream << "##################" << std::endl;
+    outStream << "#   Attributes   #" << std::endl;
+    outStream << "##################" << std::endl;
+    outStream << std::endl;
 
     for (const auto& curAttribute : internalMaterial.miscAttributes)
         if (std::get<0>(curAttribute).size() > 1)
-            formatted << std::get<0>(curAttribute) << " = " << std::get<1>(curAttribute) << std::endl;
+            outStream << std::get<0>(curAttribute) << " = " << std::get<1>(curAttribute) << std::endl;
 
     for (const auto& curAttribute : internalMaterial.shaderAttributes)
         if (std::get<0>(curAttribute).size() > 1)
-            formatted << std::get<0>(curAttribute) << " = " << std::get<1>(curAttribute) << std::endl;
+            outStream << std::get<0>(curAttribute) << " = " << std::get<1>(curAttribute) << std::endl;
 
     if (internalMaterial.hlm3Textures.size() > 0)
     {
-        formatted << std::endl;
-        formatted << "####################" << std::endl;
-        formatted << "#   HLM3 Textures  #" << std::endl;
-        formatted << "####################" << std::endl;
-        formatted << std::endl;
+        outStream << std::endl;
+        outStream << "####################" << std::endl;
+        outStream << "#   HLM3 Textures  #" << std::endl;
+        outStream << "####################" << std::endl;
+        outStream << std::endl;
 
         for (const std::string& curTexture : internalMaterial.hlm3Textures)
         {
-            formatted << curTexture << std::endl;
+            outStream << curTexture << std::endl;
         }
     }
 
-    formatted << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << "#   Shader Set 1   #" << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << std::endl;
+    outStream << std::endl;
+    outStream << "####################" << std::endl;
+    outStream << "#   Shader Set 1   #" << std::endl;
+    outStream << "####################" << std::endl;
+    outStream << std::endl;
 
     for (size_t i = 0; i < internalMaterial.shaderSet1.size(); i++)
     {
-        formatted << i << ": " << internalMaterial.shaderSet1[i] << std::endl;
+        outStream << i << ": " << internalMaterial.shaderSet1[i] << std::endl;
     }
 
-    formatted << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << "#   Shader Set 2   #" << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << std::endl;
+    outStream << std::endl;
+    outStream << "####################" << std::endl;
+    outStream << "#   Shader Set 2   #" << std::endl;
+    outStream << "####################" << std::endl;
+    outStream << std::endl;
 
     for (size_t i = 0; i < internalMaterial.shaderSet2.size(); i++)
     {
-        formatted << i << ": " << internalMaterial.shaderSet2[i] << std::endl;
+        outStream << i << ": " << internalMaterial.shaderSet2[i] << std::endl;
     }
-
-    return formatted.str();;
 }
 
-/*
-std::string
-MaterialConverter::combineMaterial(const MaterialInternal& internalMaterial)
+void
+MaterialConverter::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath)
 {
-    std::stringstream formatted;
+    std::stack<std::string> heirarchy;
 
-    formatted << "################################" << std::endl;
-    formatted << "#   Material File Attributes   #" << std::endl;
-    formatted << "################################" << std::endl;
-    formatted << std::endl;
-
-    for (const std::string& curAttribute : externalMaterial.attributes)
+    std::string curFile = filePath;
+    while (curFile != "")
     {
-        formatted << curAttribute << std::endl;
+        heirarchy.push(curFile);
+        LotusLib::FileEntry nextEntry = pkg.getFile(curFile, LotusLib::READ_EXTRA_ATTRIBUTES);
+        curFile = nextEntry.extra.parent.string();
     }
 
-    for (size_t i = 0; i < externalMaterial.attributeChain.size(); i++)
+    if (heirarchy.size() == 1)
+        return;
+
+    outStr << std::endl << std::endl;
+
+    outStr << "Hierarchy" << std::endl;
+    outStr << "----------" << std::endl;
+
+    int curLevel = 1;
+    while (!heirarchy.empty())
     {
-        const MaterialAttributes& curAttributes = externalMaterial.attributeChain[i];
-
-        formatted << std::endl;
-        formatted << "############################" << std::endl;
-        formatted << "#   Heirarchy Attributes   #" << std::endl;
-        formatted << "#        (Parent " << i << ")        #" << std::endl;
-        formatted << "#############################" << std::endl;
-        formatted << "Path: " << curAttributes.filePath << std::endl;
-        formatted << std::endl;
-        formatted << curAttributes.attributes << std::endl;
+        outStr << "[" << curLevel++ << "]  " << heirarchy.top() << std::endl;
+        heirarchy.pop();
     }
-
-    if (externalMaterial.hlm3Textures.size() > 0)
-    {
-        formatted << std::endl;
-        formatted << "####################" << std::endl;
-        formatted << "#   HLM3 Textures  #" << std::endl;
-        formatted << "####################" << std::endl;
-        formatted << std::endl;
-
-        for (const std::string& curTexture : externalMaterial.hlm3Textures)
-        {
-            formatted << curTexture << std::endl;
-        }
-    }
-
-    formatted << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << "#   Shader Set 1   #" << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << std::endl;
-
-    for (size_t i = 0; i < externalMaterial.shaderSet1.size(); i++)
-    {
-        formatted << i << ": " << externalMaterial.shaderSet1[i] << std::endl;
-    }
-
-    formatted << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << "#   Shader Set 2   #" << std::endl;
-    formatted << "####################" << std::endl;
-    formatted << std::endl;
-
-    for (size_t i = 0; i < externalMaterial.shaderSet2.size(); i++)
-    {
-        formatted << i << ": " << externalMaterial.shaderSet2[i] << std::endl;
-    }
-
-    MaterialInternal internalMaterial;
-    internalMaterial.formatted = formatted.str();
-    return internalMaterial;
 }
-*/
 
 void
 MaterialConverter::splitAndCombineAttributes(

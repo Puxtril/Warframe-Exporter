@@ -48,11 +48,27 @@ MaterialExtractor::addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, Lotus
 void
 MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath)
 {
-	std::string output = MaterialConverter::combineMaterial(materialInternal);
+	std::stringstream ss;
+	MaterialConverter::combineMaterial(ss, materialInternal);
 
 	std::ofstream out;
 	out.open(outputPath, std::ios::out | std::ofstream::trunc);
-	out.write(output.c_str(), output.size());
+	std::string writeData = ss.str();
+	out.write(writeData.c_str(), writeData.length());
+	out.close();
+}
+
+void
+MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const std::string& filePath)
+{
+	std::stringstream ss;
+	MaterialConverter::combineMaterial(ss, materialInternal);
+	MaterialConverter::addPackagesBinHeirarchy(ss, pkgsReader.getPackage("Misc").value(), filePath);
+
+	std::ofstream out;
+	out.open(outputPath, std::ios::out | std::ofstream::trunc);
+	std::string writeData = ss.str();
+	out.write(writeData.c_str(), writeData.length());
 	out.close();
 }
 
@@ -63,5 +79,5 @@ MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRea
 	addPackgesBinAttributes(pkgs, fileEntry.internalPath, external);
 	MaterialInternal internal = formatMaterial(external);
 	if (!options.dryRun)
-		writeOut(internal, outputPath);
+		writeOut(internal, outputPath, pkgs, fileEntry.internalPath);
 }

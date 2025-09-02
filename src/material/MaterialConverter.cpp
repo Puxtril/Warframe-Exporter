@@ -172,6 +172,9 @@ MaterialConverter::splitAndCombineAttribute(
         key = std::string(curAttribute);
     }
 
+    if (value == "\"\"")
+        return;
+
     std::vector<std::pair<std::string, std::string>>* insertInto = &miscAttributes;
     if (key.find(':') != std::string::npos)
         insertInto = &shaderAttributes;

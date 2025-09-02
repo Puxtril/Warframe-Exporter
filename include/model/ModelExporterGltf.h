@@ -2,6 +2,7 @@
 
 #include "ExporterLogger.h"
 #include "ModelStructs.hpp"
+#include "LotusLib.h"
 #include "fx/gltf.h"
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
@@ -17,12 +18,12 @@ namespace WarframeExporter::Model::ModelExporterGltf
 	static const std::string m_generatorName = "Puxtrils Warframe Model Exporter";
 	static const std::string m_copyright = "DIGITAL EXTREMES Ltd.";
 
-	void addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, const std::string& internalPath);
+	void addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, const LotusLib::LotusPath& internalPath);
 	void save(Document& gltfDoc, const std::filesystem::path& outPath);
 
 	void _print_exception(const std::exception& e, int level = 0);
 
-	void _addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header, const std::string& internalPath = "");
+	void _addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header, const LotusLib::LotusPath& internalPath = "");
 
 	void _addModelsToScene(Document& gltfDoc, const std::vector<Mesh>& meshes, int32_t skinIndex = -1);
 

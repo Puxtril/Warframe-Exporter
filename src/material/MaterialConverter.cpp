@@ -89,11 +89,11 @@ MaterialConverter::combineMaterial(std::stringstream& outStream, const MaterialI
 }
 
 void
-MaterialConverter::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath)
+MaterialConverter::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const LotusLib::LotusPath& filePath)
 {
     std::stack<std::string> heirarchy;
 
-    std::string curFile = filePath;
+    std::string curFile = filePath.string();
     while (curFile != "")
     {
         heirarchy.push(curFile);

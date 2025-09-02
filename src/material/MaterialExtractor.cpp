@@ -59,7 +59,7 @@ MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std:
 }
 
 void
-MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const std::string& filePath)
+MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const LotusLib::LotusPath& filePath)
 {
 	std::stringstream ss;
 	MaterialConverter::combineMaterial(ss, materialInternal);

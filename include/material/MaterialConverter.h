@@ -15,7 +15,7 @@ namespace WarframeExporter::Material
         static MaterialInternal convertMaterial(const MaterialExternal& externalMaterial);
         static void combineMaterial(std::stringstream& outStream, const MaterialInternal& internalMaterial);
         static void replaceCurlyBracketsWithSquare(MaterialInternal& internalMaterial);
-        static void addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath);
+        static void addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const LotusLib::LotusPath& filePath);
 
     private:
         static void splitAndCombineAttributes(

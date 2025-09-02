@@ -63,7 +63,7 @@ namespace WarframeExporter::Material
 		MaterialInternal formatMaterial(const MaterialExternal& materialExternal);
 		void addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, LotusLib::LotusPath internalPath, MaterialExternal& materialExternal);
 		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath);
-		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const std::string& filePath);
+		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const LotusLib::LotusPath& filePath);
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};

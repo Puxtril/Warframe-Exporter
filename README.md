@@ -38,26 +38,6 @@ Inside the `utils` folder, you'll find a collection of `.hexpat` files. These ar
     1. Write raw files using the `--write-raw` flag
 1. Within ImHex, go to *File -> Import -> Pattern File* and select the appropriate pattern
 
-# Building
-
-CMake is very nice and I love it. ~~See how easy this is to compile?~~ I hate GUIs and Windows.
-
-## Requirements
-
-- Packages 
-    - Windows: CMake, git, Visual Studio 2022
-    - Other OSs: CMake, git, any C++ compiler
-- A copy of the Oodle SDK (Provided by Unreal Engine)
-    - Download the files.
-        - Easy: Download [from here.](https://github.com/WorkingRobot/OodleUE/tree/main/Engine/Source/Runtime/OodleDataCompression/Sdks)
-        - Hard: Download from the engine
-            - Download Unreal Engine from the official website (You will need an account and the Epic launcher)
-            - Once downloaded find the SDK folder `Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.5/lib`
-    - Create a folder in the root of this repository named `bin`
-    - Copy folders `Linux` and `Win64` into `bin`. We want the *static* libraries here.
-    
-Rather than duplicate build commands here, please refer to the runners inside `.github/workflows`.
-
 # Overview of this library
 
 For more information on the cache file structure, read the [LotusLib documentation](https://github.com/Puxtril/LotusLib#documentation).

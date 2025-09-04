@@ -33,35 +33,6 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial, Lot
 }
 
 void
-MaterialConverter::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath)
-{
-    std::stack<std::string> heirarchy;
-
-    std::string curFile = filePath;
-    while (curFile != "")
-    {
-        heirarchy.push(curFile);
-        LotusLib::FileEntry nextEntry = pkg.getFile(curFile, LotusLib::READ_EXTRA_ATTRIBUTES);
-        curFile = nextEntry.extra.parent.string();
-    }
-
-    if (heirarchy.size() == 1)
-        return;
-
-    outStr << std::endl << std::endl;
-
-    outStr << "Hierarchy" << std::endl;
-    outStr << "----------" << std::endl;
-
-    int curLevel = 1;
-    while (!heirarchy.empty())
-    {
-        outStr << "[" << curLevel++ << "]  " << heirarchy.top() << std::endl;
-        heirarchy.pop();
-    }
-}
-
-void
 MaterialConverter::combineAttributes(nlohmann::json& currentAttrs, const nlohmann::json& parentAttrs, const LotusLib::LotusPath& parentPath)
 {
     for (const auto& curJson : parentAttrs.items())
@@ -74,7 +45,7 @@ MaterialConverter::combineAttributes(nlohmann::json& currentAttrs, const nlohman
                 std::string value = curJson.value().get<std::string>();
                 if (value[0] != '/')
                 {
-                    currentAttrs[curJson.key()] = parentPath.string() + "/" + value;
+                    currentAttrs[curJson.key()] = parentPath.parent_path().string() + "/" + value;
                     continue;
                 }
             }

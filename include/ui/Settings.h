@@ -28,6 +28,7 @@ class UiSettings : public QObject
 
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
+    static const inline QString m_comboMaterialFormat = "load/export/materialformat";
 
     static const inline QString m_comboGame = "load/export/game";
 

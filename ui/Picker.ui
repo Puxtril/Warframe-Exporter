@@ -376,17 +376,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="MaterialFormatLabel">
-           <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Regular text data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Txt</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
+          <widget class="QComboBox" name="MaterialFormatCombo"/>
          </item>
         </layout>
        </item>

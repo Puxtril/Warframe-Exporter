@@ -32,9 +32,11 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial, Lot
     return internal;
 }
 
-void
-MaterialConverter::combineMaterial(std::stringstream& outStream, const MaterialInternal& internalMaterial)
+std::string
+MaterialConverter::combineMaterialToTxt(const MaterialInternal& internalMaterial)
 {
+    std::stringstream outStream;
+
     outStream << "##################" << std::endl;
     outStream << "#   Attributes   #" << std::endl;
     outStream << "##################" << std::endl;
@@ -97,6 +99,29 @@ MaterialConverter::combineMaterial(std::stringstream& outStream, const MaterialI
     {
         outStream << i << ": " << internalMaterial.shaderSet2[i] << std::endl;
     }
+
+    return outStream.str();
+}
+
+std::string
+MaterialConverter::combineMaterialToJson(const MaterialInternal& internalMaterial)
+{
+    nlohmann::json outputJson = nlohmann::json::object();
+    outputJson["attributes"] = internalMaterial.shaderAttributes;
+
+    outputJson["hlm3"] = nlohmann::json::array();
+    for (const std::string& curTexture : internalMaterial.hlm3Textures)
+        outputJson["hlm3"].push_back(curTexture);
+
+    outputJson["shaders1"] = nlohmann::json::array();
+    for (const std::string& curShader : internalMaterial.shaderSet1)
+        outputJson["shaders1"].push_back(curShader);
+
+    outputJson["shaders2"] = nlohmann::json::array();
+    for (const std::string& curShader : internalMaterial.shaderSet2)
+        outputJson["shaders2"].push_back(curShader);
+
+    return outputJson.dump(4);
 }
 
 void

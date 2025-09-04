@@ -18,29 +18,17 @@ MaterialExtractor::getExternalMaterial(BinaryReader::BinaryReaderBuffered* heade
 }
 
 void
-MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath)
+MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, ExtractOptions options)
 {
-	std::stringstream ss;
-	MaterialConverter::combineMaterial(ss, materialInternal);
+	std::string outTxt;
+	if (options.materialExtractMode == MaterialExtractType::TXT)
+		outTxt = MaterialConverter::combineMaterialToTxt(materialInternal);
+	else if (options.materialExtractMode == MaterialExtractType::JSON)
+		outTxt = MaterialConverter::combineMaterialToJson(materialInternal);
 
 	std::ofstream out;
 	out.open(outputPath, std::ios::out | std::ofstream::trunc);
-	std::string writeData = ss.str();
-	out.write(writeData.c_str(), writeData.length());
-	out.close();
-}
-
-void
-MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const std::string& filePath)
-{
-	std::stringstream ss;
-	MaterialConverter::combineMaterial(ss, materialInternal);
-	MaterialConverter::addPackagesBinHeirarchy(ss, pkgsReader.getPackage("Misc").value(), filePath);
-
-	std::ofstream out;
-	out.open(outputPath, std::ios::out | std::ofstream::trunc);
-	std::string writeData = ss.str();
-	out.write(writeData.c_str(), writeData.length());
+	out.write(outTxt.c_str(), outTxt.length());
 	out.close();
 }
 
@@ -51,5 +39,5 @@ MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRea
 	MaterialInternal internal = MaterialConverter::convertMaterial(external, fileEntry.internalPath, pkgs);
 
 	if (!options.dryRun)
-		writeOut(internal, outputPath, pkgs, fileEntry.internalPath);
+		writeOut(internal, outputPath, options);
 }

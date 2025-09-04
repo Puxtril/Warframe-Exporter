@@ -81,6 +81,9 @@ UiSettings::loadOptions()
     value = m_settings.value(m_comboTextureFormat).isValid() ? m_settings.value(m_comboTextureFormat).toInt() : options.textureExportType;
     options.textureExportType = static_cast<WarframeExporter::Texture::TextureExportType>(value);
 
+    value = m_settings.value(m_comboMaterialFormat).isValid() ? m_settings.value(m_comboMaterialFormat).toInt() : options.materialExtractMode;
+    options.materialExtractMode = static_cast<WarframeExporter::Material::MaterialExtractType>(value);
+
     value = m_settings.value(m_levelHlodExportType).isValid() ? m_settings.value(m_levelHlodExportType).toInt() : options.levelHlodExtractMode;
     options.levelHlodExtractMode = static_cast<WarframeExporter::Level::LevelHlodExtractMode>(value);
     
@@ -147,5 +150,6 @@ UiSettings::setSettings(
 
     m_settings.setValue(m_filterExportTypes, options.filterUiFiles);
     m_settings.setValue(m_extractVertexColors, options.extractVertexColors);
+    m_settings.setValue(m_comboMaterialFormat, options.materialExtractMode);
     m_settings.setValue(m_levelHlodExportType, options.levelHlodExtractMode);
 }

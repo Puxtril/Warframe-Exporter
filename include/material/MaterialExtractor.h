@@ -7,6 +7,7 @@
 #include "material/MaterialEnumMap.h"
 #include "material/MaterialConverter.h"
 #include "material/MaterialExtractOptions.h"
+#include "material/MaterialExporter.h"
 
 namespace WarframeExporter::Material
 {

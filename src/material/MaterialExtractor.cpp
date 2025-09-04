@@ -22,9 +22,9 @@ MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std:
 {
 	std::string outTxt;
 	if (options.materialExtractMode == MaterialExtractType::TXT)
-		outTxt = MaterialConverter::combineMaterialToTxt(materialInternal);
+		outTxt = MaterialExporter::combineMaterialToTxt(materialInternal);
 	else if (options.materialExtractMode == MaterialExtractType::JSON)
-		outTxt = MaterialConverter::combineMaterialToJson(materialInternal);
+		outTxt = MaterialExporter::combineMaterialToJson(materialInternal);
 
 	std::ofstream out;
 	out.open(outputPath, std::ios::out | std::ofstream::trunc);

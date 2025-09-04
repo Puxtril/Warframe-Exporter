@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Material;
 
 MaterialInternal
-MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial)
+MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial, LotusLib::LotusPath& internalPath, LotusLib::PackagesReader& pkgs)
 {
     MaterialInternal internal;
 
@@ -11,28 +11,25 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial)
     internal.shaderSet1 = std::move(externalMaterial.shaderSet1);
     internal.shaderSet2 = std::move(externalMaterial.shaderSet2);
 
-    std::set<std::string> seenAttributes;
-
-    splitAndCombineAttributes(externalMaterial.attributes, internal.shaderAttributes, internal.miscAttributes, seenAttributes);
-    for (const auto& x : externalMaterial.attributeChain)
-        splitAndCombineAttributes(x.attributes, internal.shaderAttributes, internal.miscAttributes, seenAttributes);
+    // Essentially, this is setting `internal.shaderAttributes` to `currentJson`.
+    // But, we still want to fix relative file paths.
+    nlohmann::json currentJson = LotusLib::LotusNotationParser::parse(externalMaterial.attributes.c_str(), externalMaterial.attributes.length());
+    internal.shaderAttributes = nlohmann::json::object();
+    combineAttributes(internal.shaderAttributes, currentJson, internalPath);
+    
+    // Go through Packages.bin to add material heirarchy
+    pkgs.initilizePackagesBin();
+    LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
+    LotusLib::LotusPath currentPath = internalPath;
+    while (currentPath != "")
+    {
+        LotusLib::FileEntry entry = pkg.getFile(currentPath, LotusLib::READ_EXTRA_ATTRIBUTES);
+        nlohmann::json parentAttrs = LotusLib::LotusNotationParser::parse(entry.extra.attributes.c_str(), entry.extra.attributes.size());
+        combineAttributes(internal.shaderAttributes, parentAttrs, currentPath);
+        currentPath = entry.extra.parent;
+    }
 
     return internal;
-}
-
-void
-MaterialConverter::replaceCurlyBracketsWithSquare(MaterialInternal& internalMaterial)
-{
-    for (auto& curPair : internalMaterial.shaderAttributes)
-    {
-        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '{', '[');
-        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '}', ']');
-    }
-    for (auto& curPair : internalMaterial.miscAttributes)
-    {
-        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '{', '[');
-        std::replace(std::get<1>(curPair).begin(), std::get<1>(curPair).end(), '}', ']');
-    }
 }
 
 void
@@ -43,13 +40,27 @@ MaterialConverter::combineMaterial(std::stringstream& outStream, const MaterialI
     outStream << "##################" << std::endl;
     outStream << std::endl;
 
-    for (const auto& curAttribute : internalMaterial.miscAttributes)
-        if (std::get<0>(curAttribute).size() > 1)
-            outStream << std::get<0>(curAttribute) << " = " << std::get<1>(curAttribute) << std::endl;
+    for (const auto& curAttribute : internalMaterial.shaderAttributes.items())
+    {
+        if (curAttribute.key()[2] != ':')
+        {
+            if (curAttribute.value().is_string())
+                outStream << curAttribute.key() << " = " << curAttribute.value().get<std::string>() << std::endl;
+            else
+                outStream << curAttribute.key() << " = " << curAttribute.value() << std::endl;
+        }
+    }
 
-    for (const auto& curAttribute : internalMaterial.shaderAttributes)
-        if (std::get<0>(curAttribute).size() > 1)
-            outStream << std::get<0>(curAttribute) << " = " << std::get<1>(curAttribute) << std::endl;
+    for (const auto& curAttribute : internalMaterial.shaderAttributes.items())
+    {
+        if (curAttribute.key()[2] == ':')
+        {
+            if (curAttribute.value().is_string())
+                outStream << curAttribute.key() << " = " << curAttribute.value().get<std::string>() << std::endl;
+            else
+                outStream << curAttribute.key() << " = " << curAttribute.value() << std::endl;
+        }
+    }
 
     if (internalMaterial.hlm3Textures.size() > 0)
     {
@@ -118,70 +129,23 @@ MaterialConverter::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::
 }
 
 void
-MaterialConverter::splitAndCombineAttributes(
-    const std::vector<std::string>& rawAttributes,
-    std::vector<std::pair<std::string, std::string>>& shaderAttributes,
-    std::vector<std::pair<std::string, std::string>>& miscAttributes,
-    std::set<std::string>& seenAttributes
-)
+MaterialConverter::combineAttributes(nlohmann::json& currentAttrs, const nlohmann::json& parentAttrs, const LotusLib::LotusPath& parentPath)
 {
-    for (const std::string& curStr : rawAttributes)
+    for (const auto& curJson : parentAttrs.items())
     {
-        std::string_view cur(curStr);
-        splitAndCombineAttribute(cur, shaderAttributes, miscAttributes, seenAttributes);
-    }
-}
-
-void
-MaterialConverter::splitAndCombineAttributes(
-    const std::string& rawAttributes,
-    std::vector<std::pair<std::string, std::string>>& shaderAttributes,
-    std::vector<std::pair<std::string, std::string>>& miscAttributes,
-    std::set<std::string>& seenAttributes
-)
-{
-    size_t last = 0;
-    size_t next = 0;
-    while ((next = rawAttributes.find('\n', last)) != std::string::npos)
-    {
-        std::string_view cur = std::string_view(rawAttributes).substr(last, next-last);
-        splitAndCombineAttribute(cur, shaderAttributes, miscAttributes, seenAttributes);
-        last = next + 1;
-    }
-}
-
-void
-MaterialConverter::splitAndCombineAttribute(
-    std::string_view& curAttribute,
-    std::vector<std::pair<std::string, std::string>>& shaderAttributes,
-    std::vector<std::pair<std::string, std::string>>& miscAttributes,
-    std::set<std::string>& seenAttributes
-)
-{
-    size_t mid = curAttribute.find('=');
-
-    std::string key;
-    std::string value;
-    if (mid != std::string_view::npos)
-    {
-        key = std::string(curAttribute.substr(0, mid));
-        value = std::string(curAttribute.substr(mid + 1, curAttribute.length() - mid));
-    }
-    else
-    {
-        key = std::string(curAttribute);
-    }
-
-    if (value == "\"\"")
-        return;
-
-    std::vector<std::pair<std::string, std::string>>* insertInto = &miscAttributes;
-    if (key.find(':') != std::string::npos)
-        insertInto = &shaderAttributes;
-
-    if (seenAttributes.count(key) == 0)
-    {
-        insertInto->push_back({key, value});
-        seenAttributes.insert(key);
+        if (!currentAttrs.contains(curJson.key()))
+        {
+            if (curJson.key()[0] == 'T' && curJson.key()[1] == 'X' && curJson.key()[2] == ':')
+            {
+                // Must cast `curJson.value()` to `std::string` to use `operator[]`
+                std::string value = curJson.value().get<std::string>();
+                if (value[0] != '/')
+                {
+                    currentAttrs[curJson.key()] = parentPath.string() + "/" + value;
+                    continue;
+                }
+            }
+            currentAttrs[curJson.key()] = curJson.value();
+        }
     }
 }

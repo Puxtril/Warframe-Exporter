@@ -7,7 +7,7 @@ MaterialReaderHlm3::readData(BinaryReader::BinaryReaderBuffered* headerReader, c
 {
     MaterialExternal extMaterial;
 
-    extMaterial.attributes = splitAttributes(commonHeader.attributes);
+    extMaterial.attributes = commonHeader.attributes;
     extMaterial.hlm3Textures = getHlm3Textures(headerReader);
     extMaterial.keywords = getExtraNames(headerReader);
     extMaterial.shaderSet1 = getShaderSet1(headerReader, 15);

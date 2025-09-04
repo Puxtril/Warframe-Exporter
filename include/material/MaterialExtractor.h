@@ -60,8 +60,6 @@ namespace WarframeExporter::Material
 		static MaterialExtractor* getInstance();
 
 		MaterialExternal getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
-		MaterialInternal formatMaterial(const MaterialExternal& materialExternal);
-		void addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, LotusLib::LotusPath internalPath, MaterialExternal& materialExternal);
 		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath);
 		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const std::string& filePath);
 

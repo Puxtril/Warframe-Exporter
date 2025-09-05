@@ -13,7 +13,7 @@ AudioPCMExporterWAV::writeData(const AudioHeader& header, const AudioBody& body,
 	else if (header.compression == AudioCompression::ADPCM)
 		writeADPCMHeader(header, out);
 	
-	writeBody(body, out);
+	writeBody(body, header, out);
 
 	out.close();
 }
@@ -32,7 +32,7 @@ AudioPCMExporterWAV::writePCMHeader(const AudioHeader& header, std::ofstream& ou
 	const static uint32_t data = 0x61746164;
 
 	outFile.write((char*)&RIFF, 4);
-	uint32_t writeSize = header.size + 32; // Where does 32 come from?
+	uint32_t writeSize = header.size + 32;
 	outFile.write((char*)&writeSize, 4);
 	outFile.write((char*)&WAVE, 4);
 	outFile.write((char*)&fmt, 4);
@@ -69,7 +69,7 @@ AudioPCMExporterWAV::writeADPCMHeader(const AudioHeader& header, std::ofstream& 
 	};
 
 	outFile.write((char*)&RIFF, 4);
-	uint32_t writeSize = header.size + 66; // Where does 66 come from?
+	uint32_t writeSize = header.size + 66;
 	outFile.write((char*)&writeSize, 4);
 	outFile.write((char*)&WAVE, 4);
 	outFile.write((char*)&fmt, 4);
@@ -93,7 +93,10 @@ AudioPCMExporterWAV::writeADPCMHeader(const AudioHeader& header, std::ofstream& 
 }
 
 void
-AudioPCMExporterWAV::writeBody(const AudioBody& body, std::ofstream& outFile)
+AudioPCMExporterWAV::writeBody(const AudioBody& body, const AudioHeader& header, std::ofstream& outFile)
 {
-	outFile.write(body.data.data(), body.data.size());
+	if (header.size > body.data.size())
+		throw unknown_format_error("Header size > body: " + std::to_string(header.size) + " > " + std::to_string(body.data.size()));
+	size_t start = body.data.size() - header.size;
+	outFile.write(body.data.data() + start, body.data.size());
 }

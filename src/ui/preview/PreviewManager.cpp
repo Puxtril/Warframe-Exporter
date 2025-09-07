@@ -5,7 +5,8 @@ PreviewManager::PreviewManager()
     m_previewWidgets = {
         {WarframeExporter::ExtractorType::Material, PreviewMaterial::getInstance()},
         {WarframeExporter::ExtractorType::Texture, PreviewTexture::getInstance()},
-        {WarframeExporter::ExtractorType::Model, PreviewModel::getInstance()}
+        {WarframeExporter::ExtractorType::Model, PreviewModel::getInstance()},
+        {WarframeExporter::ExtractorType::Audio, PreviewAudio::getInstance()}
     };
 }
 

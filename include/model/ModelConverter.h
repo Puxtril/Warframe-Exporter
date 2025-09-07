@@ -1,5 +1,6 @@
 #pragma once
 
+#include "LotusPath.h"
 #include "ModelStructs.hpp"
 #include "ModelReader.h"
 #include "glm/vec3.hpp"
@@ -21,12 +22,12 @@ namespace WarframeExporter::Model
 	class ModelConverter
 	{
 	public:
-		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType, const std::string& internalPath);
+		static void convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType, const LotusLib::LotusPath& internalPath);
 		static void mirrorX(ModelHeaderInternal& intHeader, ModelBodyInternal& intBody);
 
 	private:	
 		static void convertInternalHeaderRigged(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelHeaderInternal& outHeader);
-		static void convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader, const std::string& internalPath);
+		static void convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader, const LotusLib::LotusPath& internalPath);
 		static void convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors, const glm::vec4& modelScale);
 		static void addVertexColors(ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors);
 

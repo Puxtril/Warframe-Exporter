@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, const std::string& internalPath)
+ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, const LotusLib::LotusPath& internalPath)
 {
 	_modifyAsset(gltfDoc);
 
@@ -60,7 +60,7 @@ ModelExporterGltf::_print_exception(const std::exception& e, int level)
 }
 
 void
-ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header, const std::string& internalPath)
+ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header, const LotusLib::LotusPath& internalPath)
 {
 	mesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
 	if (internalPath != "")

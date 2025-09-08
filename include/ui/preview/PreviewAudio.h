@@ -1,16 +1,15 @@
 #pragma once
 
 #include "ui/preview/Preview.h"
-#include "audio/AudioExtractorProxy.h"
-#include "audio/AudioPCM/AudioPCMExtractor.h"
-#include "ExporterExceptions.h"
-#include "membuf.hpp"
+#include "ui/preview/AudioPlaybackWidget.h"
 
-#include <QtMultimedia/QMediaPlayer>
-#include <QtMultimedia/QAudioOutput>
-#include <QtCore/QBuffer>
-#include <QtCore/QByteArray>
-#include <memory>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <qlabel.h>
 
 class PreviewAudio : public Preview
 {
@@ -18,10 +17,15 @@ class PreviewAudio : public Preview
     PreviewAudio(const PreviewAudio&) = delete;
     const PreviewAudio& operator=(const PreviewAudio&) = delete;
 
-    std::unique_ptr<QByteArray> m_audioData;
-    std::unique_ptr<QBuffer> m_audioDataBuffer;
-    QMediaPlayer m_mediaPlayer;
-    QAudioOutput m_audioOutput;
+    QSlider* m_timelineSlider;
+    QLabel* m_timelineText;
+    QPushButton* m_playButton;
+    QPushButton* m_pauseButton;
+    QPushButton* m_replayButton;
+    QSlider* m_volumeSlider;
+    QLabel* m_speakerLabel;
+
+    AudioPlaybackWidget m_audioPlaybackWidget;
 
 public:
     static PreviewAudio* getInstance(); 
@@ -31,4 +35,7 @@ public:
     void hide() override;
     void show() override;
     void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;
+
+private:
+    void createUi(QWidget* parentWidget, QVBoxLayout* parentLayout);
 };

@@ -88,6 +88,7 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/LoadTreeThread.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/ExporterDirectoryThread.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/ExporterFileThread.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/preview/AudioPlaybackWidget.h
 )
 
 ##################################################

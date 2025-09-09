@@ -30,6 +30,8 @@ class AudioPlaybackWidget : public QObject
     QMediaPlayer m_mediaPlayer;
     QAudioOutput m_audioOutput;
 
+    bool m_mediaWasPlayingBeforeSliderDragEvent;
+
 public:
     void setup();
     void connectToWidgets(QSlider* timelineSlider, QLabel* timelineText, QSlider* volumeSlider, QPushButton* playButton, QPushButton* pauseButton, QPushButton* replayButton);
@@ -39,6 +41,8 @@ public:
     void mediaStateChanged(QMediaPlayer::MediaStatus status);
     void playbackPositionChanged(qint64 milliseconds);
     void buttonClickedReplay();
+    void timelineSliderPressed();
+    void timelineSliderReleased();
     // `value` is 0-100
     void timelinePositionDragged(int value);
     void setVolume(int value);

@@ -20,6 +20,8 @@ AudioPlaybackWidget::connectToWidgets(QSlider* timelineSlider, QLabel* timelineT
     connect(replayButton, &QPushButton::clicked, this, &AudioPlaybackWidget::buttonClickedReplay);
     connect(volumeSlider, &QSlider::valueChanged, this, &AudioPlaybackWidget::setVolume);
     connect(&m_mediaPlayer, &QMediaPlayer::positionChanged, this, &AudioPlaybackWidget::playbackPositionChanged);
+    connect(m_timelineSlider, &QSlider::sliderPressed, this, &AudioPlaybackWidget::timelineSliderPressed);
+    connect(m_timelineSlider, &QSlider::sliderReleased, this, &AudioPlaybackWidget::timelineSliderReleased);
     connect(m_timelineSlider, &QSlider::sliderMoved, this, &AudioPlaybackWidget::timelinePositionDragged);
     connect(&m_mediaPlayer, &QMediaPlayer::mediaStatusChanged, this, &AudioPlaybackWidget::mediaStateChanged);
 }
@@ -89,7 +91,27 @@ void
 AudioPlaybackWidget::buttonClickedReplay()
 {
     m_mediaPlayer.setPosition(0);
-    m_mediaPlayer.play();
+}
+
+void
+AudioPlaybackWidget::timelineSliderPressed()
+{
+    if (m_mediaPlayer.isPlaying())
+    {
+        m_mediaWasPlayingBeforeSliderDragEvent = true;
+        m_mediaPlayer.pause();
+    }
+    else
+    {
+        m_mediaWasPlayingBeforeSliderDragEvent = false;
+    }
+}
+
+void
+AudioPlaybackWidget::timelineSliderReleased()
+{
+    if (m_mediaWasPlayingBeforeSliderDragEvent)
+        m_mediaPlayer.play();
 }
 
 void

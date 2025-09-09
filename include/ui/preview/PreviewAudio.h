@@ -9,13 +9,15 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
-#include <qlabel.h>
 
 class PreviewAudio : public Preview
 {
     PreviewAudio() = default;
     PreviewAudio(const PreviewAudio&) = delete;
     const PreviewAudio& operator=(const PreviewAudio&) = delete;
+
+    QVBoxLayout* m_parentLayout;
+    QVBoxLayout* m_rootLayout;
 
     QSlider* m_timelineSlider;
     QLabel* m_timelineText;
@@ -37,5 +39,5 @@ public:
     void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;
 
 private:
-    void createUi(QWidget* parentWidget, QVBoxLayout* parentLayout);
+    void createUi(QWidget* parentWidget);
 };

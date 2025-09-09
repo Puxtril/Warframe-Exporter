@@ -11,7 +11,8 @@ void
 PreviewAudio::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonsArea, QHBoxLayout* layout)
 {
     m_audioPlaybackWidget.setup();
-    createUi(parentWidget, parentLayout);
+    m_parentLayout = parentLayout;
+    createUi(parentWidget);
     m_audioPlaybackWidget.connectToWidgets(m_timelineSlider, m_timelineText, m_volumeSlider, m_playButton, m_pauseButton, m_replayButton);
     hide();
 }
@@ -32,6 +33,7 @@ PreviewAudio::hide()
     m_replayButton->hide();
     m_speakerLabel->hide();
     m_volumeSlider->hide();
+    m_parentLayout->removeItem(m_rootLayout);
 }
 
 void
@@ -44,6 +46,7 @@ PreviewAudio::show()
     m_replayButton->show();
     m_speakerLabel->show();
     m_volumeSlider->show();
+    m_parentLayout->addItem(m_rootLayout);
 }
 
 void
@@ -53,18 +56,20 @@ PreviewAudio::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRead
 }
 
 void
-PreviewAudio::createUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
+PreviewAudio::createUi(QWidget* parentWidget)
 {
+    m_rootLayout = new QVBoxLayout();
+
     // Top spacer
     QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-    parentLayout->addItem(verticalSpacer);
+    m_rootLayout->addItem(verticalSpacer);
 
     // Timeline slider
     m_timelineSlider = new QSlider(parentWidget);
     m_timelineSlider->setOrientation(Qt::Orientation::Horizontal);
     m_timelineSlider->setMinimum(0);
     m_timelineSlider->setMaximum(100);
-    parentLayout->addWidget(m_timelineSlider);
+    m_rootLayout->addWidget(m_timelineSlider);
 
     // Timeline text
     QHBoxLayout* horizontalLayout_2 = new QHBoxLayout();
@@ -75,11 +80,11 @@ PreviewAudio::createUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
     font.setPointSize(13);
     m_timelineText->setFont(font);
     horizontalLayout_2->addWidget(m_timelineText);
-    parentLayout->addLayout(horizontalLayout_2);
+    m_rootLayout->addLayout(horizontalLayout_2);
 
     // Middle spacer
     QSpacerItem* verticalSpacer_3 = new QSpacerItem(20, 5, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
-    parentLayout->addItem(verticalSpacer_3);
+    m_rootLayout->addItem(verticalSpacer_3);
 
     // Buttons
     QHBoxLayout* horizontalLayout = new QHBoxLayout();
@@ -114,9 +119,9 @@ PreviewAudio::createUi(QWidget* parentWidget, QVBoxLayout* parentLayout)
     m_volumeSlider->setMaximum(100);
     horizontalLayout->addWidget(m_volumeSlider);
 
-    parentLayout->addLayout(horizontalLayout);
+    m_rootLayout->addLayout(horizontalLayout);
 
     // Bottom spacer
     QSpacerItem* verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-    parentLayout->addItem(verticalSpacer_2);
+    m_rootLayout->addItem(verticalSpacer_2);
 }

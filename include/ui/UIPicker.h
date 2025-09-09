@@ -24,6 +24,7 @@ class UiPicker : public QObject, private Ui_WindowPicker
     QDialog m_additionalSettingsDialog;
     Ui_AdditionalSettings m_additionalSettings;
 
+    QMessageBox m_chosenGameMessage;
     QMessageBox m_invalidCacheFolderBox;
     QMessageBox m_invalidExportFolderBox;
 
@@ -33,12 +34,13 @@ public:
 
     void setupUi(QDialog *WindowPicker);
     void connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* exporter);
+    void loadSettings();
 
 private:
     void setupMessageBoxes();
     void addComboBoxOptions();
-    void loadSettings();
     void loadVersion();
+    void cachePathUpdated(const QString& newPath);
 
 signals:
     void pickerDone(

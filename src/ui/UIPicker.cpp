@@ -14,8 +14,10 @@ UiPicker::setupUi(QDialog *WindowPicker)
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
     setupMessageBoxes();
     addComboBoxOptions();
-    loadSettings();
     loadVersion();
+
+    // When `CacheWindowsInput` is updated, this will show
+    this->GameInfoButton->hide();
 }
 
 void
@@ -24,6 +26,9 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
     QObject::connect(this->AdditionalSettingsButton, &QPushButton::clicked, &m_additionalSettingsDialog, &QDialog::show);
     QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::accepted, &m_additionalSettingsDialog, &QDialog::hide);
     QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::rejected, &m_additionalSettingsDialog, &QDialog::hide);
+
+    QObject::connect(this->CacheWindowsInput, &QLineEdit::textChanged, this, &UiPicker::cachePathUpdated);
+    QObject::connect(this->GameInfoButton, &QPushButton::clicked, &this->m_chosenGameMessage, &QMessageBox::show);
 
     QObject::connect(this->LoadButton, &QPushButton::clicked, this, &UiPicker::parsePickerOptions);
     QObject::connect(this, &UiPicker::pickerDone, WindowPicker, &QDialog::hide);
@@ -40,6 +45,10 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
 void
 UiPicker::setupMessageBoxes()
 {
+    m_chosenGameMessage.setFixedSize(500, 200);
+    m_chosenGameMessage.setModal(true);
+    m_chosenGameMessage.setVisible(false);
+
     m_invalidCacheFolderBox.setWindowTitle("Error");
     m_invalidCacheFolderBox.setText("Cache.Windows folder is invalid");
     m_invalidCacheFolderBox.setIcon(QMessageBox::Critical);
@@ -103,6 +112,78 @@ UiPicker::loadVersion()
 {
     QString version = std::string(g_version).c_str();
     this->VersionLabel->setText(version);
+}
+
+void
+UiPicker::cachePathUpdated(const QString& newPath)
+{
+    LotusLib::Game newGame = LotusLib::guessGame(newPath.toStdString());
+
+    bool disableLoadButton = true;
+    QIcon::ThemeIcon buttonIcon;
+    QMessageBox::Icon msgBoxIcon;
+    QString msgBoxMsg;
+
+    switch (newGame)
+    {
+        case LotusLib::Game::UNKNOWN:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogQuestion;
+            msgBoxIcon = QMessageBox::Icon::Question;
+            msgBoxMsg = "Unknown game.";
+            disableLoadButton = true;
+            break;
+        }
+        case LotusLib::Game::STARTREK:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogError;
+            msgBoxIcon = QMessageBox::Icon::Critical;
+            msgBoxMsg = "Star Trek is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged.";
+            disableLoadButton = true;
+            break;
+        }
+        case LotusLib::Game::DARKNESSII:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogError;
+            msgBoxIcon = QMessageBox::Icon::Critical;
+            msgBoxMsg = "Darkness II is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged.";
+            disableLoadButton = true;
+            break;
+        }
+        case LotusLib::Game::WARFRAME_PE:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogWarning;
+            msgBoxIcon = QMessageBox::Icon::Warning;
+            msgBoxMsg = "Warframe pre-Ensmallening (anything before 2022) is not well supported. Expect crashes and lots of missing functionality.";
+            disableLoadButton = false;
+            break;
+        }
+        case LotusLib::Game::WARFRAME:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogInformation;
+            msgBoxIcon = QMessageBox::Icon::Information;
+            msgBoxMsg = "Warframe is typically well-supported on the latest version. However, new updates are likely to break existing functionality.";
+            disableLoadButton = false;
+            break;
+        }
+        case LotusLib::Game::SOULFRAME:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogWarning;
+            msgBoxIcon = QMessageBox::Icon::Warning;
+            msgBoxMsg = "Soulframe Preludes 8 is the only version currently supported. Newer versions may load without error, but files will display as Unsupported.";
+            disableLoadButton = false;
+            break;
+        }
+    }
+
+    this->LoadButton->setDisabled(disableLoadButton);
+    this->GameInfoButton->show();
+    this->GameInfoButton->setIcon(QIcon::fromTheme(buttonIcon).pixmap(100, 100));
+    m_chosenGameMessage.setIcon(msgBoxIcon);
+    m_chosenGameMessage.setText(msgBoxMsg);
+
+    std::string newTitle = LotusLib::gameToString(newGame) + " Information";
+    m_chosenGameMessage.setWindowTitle(newTitle.c_str());
 }
 
 void

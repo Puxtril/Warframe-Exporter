@@ -22,6 +22,7 @@ int main(int argc, char** argv)
     UiPicker picker;
     picker.setupUi(&dialog);
     picker.connect(&dialog, &mainWindow, &window);
+    picker.loadSettings();
     dialog.show();
     
     return app.exec();

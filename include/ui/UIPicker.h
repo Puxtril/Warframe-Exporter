@@ -9,6 +9,7 @@
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
 #include "ExtractOptions.h"
+#include "LotusUtils.h"
 
 #include <QtWidgets/qdialog.h>
 #include <QtWidgets/qmainwindow.h>

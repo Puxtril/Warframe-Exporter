@@ -69,9 +69,6 @@ UiPicker::addComboBoxOptions()
     this->TextureFormatCombo->addItem("PNG",WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG);
     this->TextureFormatCombo->addItem("TGA", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA);
 
-    this->GamePickerCombo->addItem("Warframe", (int)LotusLib::Game::WARFRAME);
-    this->GamePickerCombo->addItem("Soulframe", (int)LotusLib::Game::SOULFRAME);
-
     m_additionalSettings.LevelHlodExportCombo->addItem("Ignore", WarframeExporter::Level::LevelHlodExtractMode::IGNORE_HLOD);
     m_additionalSettings.LevelHlodExportCombo->addItem("Include", WarframeExporter::Level::LevelHlodExtractMode::INCLUDE_HLOD);
     m_additionalSettings.LevelHlodExportCombo->addItem("Only", WarframeExporter::Level::LevelHlodExtractMode::ONLY_HLOD);
@@ -91,10 +88,6 @@ UiPicker::loadSettings()
     this->MaterialCheckbox->setCheckState(settings.getExportMaterials() ? Qt::Checked : Qt::Unchecked);
     this->AudioCheckbox->setCheckState(settings.getExportAudio() ? Qt::Checked : Qt::Unchecked);
     this->ShaderCheckbox->setCheckState(settings.getExportShaders() ? Qt::Checked : Qt::Unchecked);
-
-    LotusLib::Game game = settings.getGame();
-    game = game == LotusLib::Game::UNKNOWN ? LotusLib::Game::WARFRAME : game;
-    this->GamePickerCombo->setCurrentIndex(this->GamePickerCombo->findData((int)game));
 
     WarframeExporter::ExtractOptions options = settings.loadOptions();
     this->TextureFormatCombo->setCurrentIndex(this->TextureFormatCombo->findData(options.textureExportType));
@@ -169,12 +162,12 @@ UiPicker::parsePickerOptions()
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
 
-    int selectedGame = this->GamePickerCombo->itemData(this->GamePickerCombo->currentIndex()).toInt();
-    LotusLib::Game gameType = static_cast<LotusLib::Game>(selectedGame);
+    LotusLib::Game game = LotusLib::guessGame(cachePath);
+    WarframeExporter::Logger::getInstance().info("Setting game to " + LotusLib::gameToString(game));
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
     LotusLib::Logger::setLogProperties(spdlog::level::info);
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, gameType, options);
+    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, game, options);
 }
 
 void

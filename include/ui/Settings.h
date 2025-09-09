@@ -29,8 +29,6 @@ class UiSettings : public QObject
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
 
-    static const inline QString m_comboGame = "load/export/game";
-
     static const inline QString m_mainWindowSize = "mainwindow/size";
 
     static const inline QString m_exporterSplitGeometry = "splitter/geometry";
@@ -63,8 +61,6 @@ public:
     void saveSplitterData(QByteArray geometry, QByteArray state);
     QByteArray getSplitterGeometry();
     QByteArray getSplitterState();
-
-    LotusLib::Game getGame() const;
 
     WarframeExporter::ExtractOptions loadOptions();
 

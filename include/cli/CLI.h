@@ -42,5 +42,5 @@ int main(int argc, char** argv);
 
 void checkDirs(const std::filesystem::path& cacheDir);
 LotusLib::LotusPath forgiveLotusPath(LotusLib::LotusPath inPath);
-LotusLib::Game getGame(const std::string& gameStr);
+LotusLib::Game getGame(const std::string& gameStr, const std::filesystem::path& cacheDir);
 void createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath);

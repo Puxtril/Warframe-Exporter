@@ -655,19 +655,6 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QComboBox" name="GamePickerCombo">
-          <property name="font">
-           <font>
-            <italic>true</italic>
-            <kerning>true</kerning>
-           </font>
-          </property>
-          <property name="frame">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>

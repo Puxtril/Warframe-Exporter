@@ -60,13 +60,6 @@ UiSettings::getExportShaders() const
     return m_settings.value(m_checkboxExportShaders).toBool();
 }
 
-LotusLib::Game
-UiSettings::getGame() const
-{
-    int value = m_settings.value(m_comboGame).toInt();
-    return static_cast<LotusLib::Game>(value);
-}
-
 WarframeExporter::ExtractOptions
 UiSettings::loadOptions()
 {
@@ -139,8 +132,6 @@ UiSettings::setSettings(
     m_settings.setValue(m_checkboxExportMaterials, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Material) > 0);
     m_settings.setValue(m_checkboxExportAudio, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Audio) > 0);
     m_settings.setValue(m_checkboxExportShaders, ((int)extractTypes & (int)WarframeExporter::ExtractorType::Shader) > 0);
-
-    m_settings.setValue(m_comboGame, (int)game);
 
     m_settings.setValue(m_comboShaderFormat, (int)options.shaderExportType);
     m_settings.setValue(m_comboTextureFormat, (int)options.textureExportType);

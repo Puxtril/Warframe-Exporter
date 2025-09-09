@@ -6,6 +6,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
@@ -19,6 +20,7 @@ class PreviewAudio : public Preview
     QVBoxLayout* m_parentLayout;
     QVBoxLayout* m_rootLayout;
 
+    QGroupBox* m_groupBox;
     QSlider* m_timelineSlider;
     QLabel* m_timelineText;
     QPushButton* m_playButton;

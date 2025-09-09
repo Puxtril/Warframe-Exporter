@@ -126,14 +126,6 @@ UiPicker::cachePathUpdated(const QString& newPath)
 
     switch (newGame)
     {
-        case LotusLib::Game::UNKNOWN:
-        {
-            buttonIcon = QIcon::ThemeIcon::DialogQuestion;
-            msgBoxIcon = QMessageBox::Icon::Question;
-            msgBoxMsg = "Unknown game.";
-            disableLoadButton = true;
-            break;
-        }
         case LotusLib::Game::STARTREK:
         {
             buttonIcon = QIcon::ThemeIcon::DialogError;
@@ -172,6 +164,15 @@ UiPicker::cachePathUpdated(const QString& newPath)
             msgBoxIcon = QMessageBox::Icon::Warning;
             msgBoxMsg = "Soulframe Preludes 8 is the only version currently supported. Newer versions may load without error, but files will display as Unsupported.";
             disableLoadButton = false;
+            break;
+        }
+        case LotusLib::Game::UNKNOWN:
+        default:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogQuestion;
+            msgBoxIcon = QMessageBox::Icon::Question;
+            msgBoxMsg = "Unknown game.";
+            disableLoadButton = true;
             break;
         }
     }

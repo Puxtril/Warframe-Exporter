@@ -130,7 +130,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogError;
             msgBoxIcon = QMessageBox::Icon::Critical;
-            msgBoxMsg = "Star Trek is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged.";
+            msgBoxMsg = "Star Trek is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged. Why do you have these files? This isn't a good game.";
             disableLoadButton = true;
             break;
         }
@@ -138,7 +138,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogError;
             msgBoxIcon = QMessageBox::Icon::Critical;
-            msgBoxMsg = "Darkness II is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged.";
+            msgBoxMsg = "Darkness II is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged. I'd be surprised if anyone actually sees this message.";
             disableLoadButton = true;
             break;
         }
@@ -146,7 +146,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogWarning;
             msgBoxIcon = QMessageBox::Icon::Warning;
-            msgBoxMsg = "Warframe pre-Ensmallening (anything before 2022) is not well supported. Expect crashes and lots of missing functionality.";
+            msgBoxMsg = "Warframe pre-Ensmallening (anything before 2022) is not well supported. Expect crashes and lots of missing functionality. There's lots of development work needed here.";
             disableLoadButton = false;
             break;
         }
@@ -154,7 +154,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogInformation;
             msgBoxIcon = QMessageBox::Icon::Information;
-            msgBoxMsg = "Warframe is typically well-supported on the latest version. However, new updates are likely to break existing functionality.";
+            msgBoxMsg = "Warframe is typically well-supported on the latest version. However, game updates are likely to break extractor functionality.";
             disableLoadButton = false;
             break;
         }
@@ -162,7 +162,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogWarning;
             msgBoxIcon = QMessageBox::Icon::Warning;
-            msgBoxMsg = "Soulframe Preludes 8 is the only version currently supported. Newer versions may load without error, but files will display as Unsupported.";
+            msgBoxMsg = "Soulframe Preludes 8 is the only supported version (currently). Newer versions may successfully load, but many files will be unsupported.";
             disableLoadButton = false;
             break;
         }
@@ -171,7 +171,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogQuestion;
             msgBoxIcon = QMessageBox::Icon::Question;
-            msgBoxMsg = "Unknown game.";
+            msgBoxMsg = "Unknown game. Try selecting another Cache.Windows folder!";
             disableLoadButton = true;
             break;
         }

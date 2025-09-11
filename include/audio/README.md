@@ -1,0 +1,3 @@
+I couldn't find a good place to put this, so I'm making a separate README.
+
+Audio extraction was researched and first implemented by [sehnryr](https://github.com/sehnryr/lotus-lib). The implementation here is simply a one-for-one copy of his. Syhnryr gets all credit for Reverse Engineering the Opus/WAV internal formats used in Warframe. At the time of writing, the formats haven't changed and are even used in Soulframe.

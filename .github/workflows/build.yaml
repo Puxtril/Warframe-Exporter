@@ -22,9 +22,9 @@ jobs:
       - name: Install qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: 6.7.1
+          version: 6.8.3
           host: 'windows'
-          arch: 'win64_msvc2019_64'
+          arch: 'win64_msvc2022_64'
           install-deps: 'true'
           setup-python: 'true'
           cache: 'true'

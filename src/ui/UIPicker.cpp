@@ -244,7 +244,7 @@ UiPicker::parsePickerOptions()
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
 
-    LotusLib::Game game = LotusLib::guessGame(cachePath);
+    LotusLib::Game game = LotusLib::guessGame(cachePath.string());
     WarframeExporter::Logger::getInstance().info("Setting game to " + LotusLib::gameToString(game));
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);

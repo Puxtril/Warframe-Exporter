@@ -183,7 +183,7 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE)
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_UI_SOURCES})
 
 		find_package(OpenGL REQUIRED)
-		find_package(Qt6 COMPONENTS Widgets Core Gui OpenGLWidgets Multimedia)
+		find_package(Qt6 QUIET COMPONENTS Widgets Core Gui OpenGLWidgets Multimedia)
 
 		# Qt6 is installed on the system (Probably using a *nix package manager)
 		if (Qt6_FOUND)

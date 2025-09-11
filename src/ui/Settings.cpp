@@ -122,6 +122,18 @@ UiSettings::getSplitterState()
 }
 
 void
+UiSettings::setAudioVolume(int volume)
+{
+    m_settings.setValue(m_audioVolume, volume);
+}
+
+int
+UiSettings::getAudioVolume(int defaultValue)
+{
+    return m_settings.value(m_audioVolume, defaultValue).toInt();
+}
+
+void
 UiSettings::setSettings(
         std::filesystem::path cachePath,
         std::filesystem::path exportPath,

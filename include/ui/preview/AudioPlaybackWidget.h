@@ -5,6 +5,7 @@
 #include "audio/AudioPCM/AudioPCMExtractor.h"
 #include "ExporterExceptions.h"
 #include "membuf.hpp"
+#include "ui/Settings.h"
 
 #include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QAudioOutput>
@@ -22,6 +23,7 @@ class AudioPlaybackWidget : public QObject
 {
     Q_OBJECT
 
+    QSlider* m_volumeSlider;
     QSlider* m_timelineSlider;
     QLabel* m_timelineText;
 
@@ -43,6 +45,7 @@ public:
     void buttonClickedReplay();
     void timelineSliderPressed();
     void timelineSliderReleased();
+    void volumeSliderReleased();
     // `value` is 0-100
     void timelinePositionDragged(int value);
     void setVolume(int value);

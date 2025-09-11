@@ -41,6 +41,8 @@ class UiSettings : public QObject
     static const inline QString m_extractVertexColors = "additionalsettings/vertexcolors";
     static const inline QString m_levelHlodExportType = "additionalsettings/levelhlod";
 
+    static const inline QString m_audioVolume = "preview/audiovolume";
+
     UiSettings();
     UiSettings(const UiSettings&) = delete;
     const UiSettings& operator=(const UiSettings&) = delete;
@@ -64,6 +66,9 @@ public:
     void saveSplitterData(QByteArray geometry, QByteArray state);
     QByteArray getSplitterGeometry();
     QByteArray getSplitterState();
+
+    void setAudioVolume(int volume);
+    int getAudioVolume(int defaultValue);
 
     LotusLib::Game getGame() const;
 

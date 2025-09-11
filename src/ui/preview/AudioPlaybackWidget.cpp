@@ -9,16 +9,19 @@ AudioPlaybackWidget::setup()
 void
 AudioPlaybackWidget::connectToWidgets(QSlider* timelineSlider, QLabel* timelineText, QSlider* volumeSlider, QPushButton* playButton, QPushButton* pauseButton, QPushButton* replayButton)
 {
+    m_volumeSlider = volumeSlider;
     m_timelineSlider = timelineSlider;
     m_timelineText = timelineText;
-
-    m_audioOutput.setVolume(1);
-    volumeSlider->setSliderPosition(100);
+    
+    int savedVolume = UiSettings::getInstance().getAudioVolume(50);
+    m_volumeSlider->setValue(savedVolume);
+    setVolume(savedVolume);
 
     connect(playButton, &QPushButton::clicked, &m_mediaPlayer, &QMediaPlayer::play);
     connect(pauseButton, &QPushButton::clicked, &m_mediaPlayer, &QMediaPlayer::pause);
     connect(replayButton, &QPushButton::clicked, this, &AudioPlaybackWidget::buttonClickedReplay);
     connect(volumeSlider, &QSlider::valueChanged, this, &AudioPlaybackWidget::setVolume);
+    connect(volumeSlider, &QSlider::sliderReleased, this, &AudioPlaybackWidget::volumeSliderReleased);
     connect(&m_mediaPlayer, &QMediaPlayer::positionChanged, this, &AudioPlaybackWidget::playbackPositionChanged);
     connect(m_timelineSlider, &QSlider::sliderPressed, this, &AudioPlaybackWidget::timelineSliderPressed);
     connect(m_timelineSlider, &QSlider::sliderReleased, this, &AudioPlaybackWidget::timelineSliderReleased);
@@ -115,6 +118,12 @@ AudioPlaybackWidget::timelineSliderReleased()
 }
 
 void
+AudioPlaybackWidget::volumeSliderReleased()
+{
+    UiSettings::getInstance().setAudioVolume(m_volumeSlider->value());
+}
+
+void
 AudioPlaybackWidget::timelinePositionDragged(int value)
 {
     qint64 ms = (value / 100.0) * m_mediaPlayer.duration();
@@ -124,5 +133,5 @@ AudioPlaybackWidget::timelinePositionDragged(int value)
 void
 AudioPlaybackWidget::setVolume(int value)
 {
-    m_audioOutput.setVolume(std::log10(value) * 0.5);
+    m_audioOutput.setVolume(std::pow((value / 100.0), 3));
 }

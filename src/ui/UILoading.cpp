@@ -26,8 +26,7 @@ UILoading::getTotalFileCount(LotusLib::PackagesReader& pkgs, WarframeExporter::E
         std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(curPkgName);
         if (!pkg || ((int)pkg->getPkgCategory() & (int)pkgCategories) == 0)
             continue;
-        auto iter = pkg.value().begin();
-        while (iter++ != pkg.value().end())
+        for (auto& i : pkg.value())
             fileCount++;
     }
 

@@ -28,6 +28,7 @@ class UiSettings : public QObject
 
     static const inline QString m_comboTextureFormat = "load/export/textureformat";
     static const inline QString m_comboShaderFormat = "load/export/shaderformat";
+    static const inline QString m_comboMaterialFormat = "load/export/materialformat";
 
     static const inline QString m_mainWindowSize = "mainwindow/size";
 
@@ -37,6 +38,8 @@ class UiSettings : public QObject
     static const inline QString m_filterExportTypes = "additionalsettings/filterfiles";
     static const inline QString m_extractVertexColors = "additionalsettings/vertexcolors";
     static const inline QString m_levelHlodExportType = "additionalsettings/levelhlod";
+
+    static const inline QString m_audioVolume = "preview/audiovolume";
 
     UiSettings();
     UiSettings(const UiSettings&) = delete;
@@ -61,6 +64,9 @@ public:
     void saveSplitterData(QByteArray geometry, QByteArray state);
     QByteArray getSplitterGeometry();
     QByteArray getSplitterState();
+
+    void setAudioVolume(int volume);
+    int getAudioVolume(int defaultValue);
 
     WarframeExporter::ExtractOptions loadOptions();
 

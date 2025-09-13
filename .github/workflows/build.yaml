@@ -22,9 +22,10 @@ jobs:
       - name: Install qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: 6.7.1
+          version: 6.8.3
+          modules: qtmultimedia
           host: 'windows'
-          arch: 'win64_msvc2019_64'
+          arch: 'win64_msvc2022_64'
           install-deps: 'true'
           setup-python: 'true'
           cache: 'true'
@@ -72,7 +73,7 @@ jobs:
         run: |
           mkdir artifacts
           cd build\Release
-          Compress-Archive -DestinationPath ..\..\artifacts\Warframe-Exporter.zip -Path "Warframe-Exporter.exe", "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll", "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "d3dcompiler_47.dll", "platforms"
+          Compress-Archive -DestinationPath ..\..\artifacts\Warframe-Exporter.zip -Path "Warframe-Exporter.exe", "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll", "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "Qt6Multimedia.dll", "Qt6Network.dll", "d3dcompiler_47.dll", "platforms", "multimedia", "avcodec-61.dll", "avformat-61.dll", "avutil-59.dll", "swresample-5.dll", "swscale-8.dll"
       - name: Copy CLI executables to Artifacts folder
         run: |
           cp build\Release\Warframe-Exporter-CLI.exe artifacts

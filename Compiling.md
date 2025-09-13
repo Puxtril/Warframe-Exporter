@@ -19,7 +19,7 @@
     1. `git clone https://github.com/microsoft/vcpkg.git` and `cd vcpkg`
     1. Initilize vcpkg with `.\bootstrap-vcpkg.bat`
     1. Install `zlib` with `.\vcpkg.exe install zlib:x64-windows-static`
-    1. Install Qt with `.\vcpkg.exe install qtbase` (This takes a **while**)
+    1. Install Qt with `.\vcpkg.exe install qtbase qtmultimedia` (This takes a **while**)
 1. [Initilize the repository](#initilize-the-repository)
 1. [Install oodle](#obtain-a-copy-of-oodle)
 1. Compile

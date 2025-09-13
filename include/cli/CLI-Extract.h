@@ -29,6 +29,7 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_includeVertexColors;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_shaderExportType;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_textureFormat;
+	std::shared_ptr<TCLAP::ValueArg<std::string>> m_materialFormat;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_levelHlodExport;
 
 	bool m_dryRun;
@@ -50,6 +51,7 @@ public:
 private:
 	WarframeExporter::Shader::ShaderExportType getShaderFormat(const std::string& cmdValue);
 	WarframeExporter::Texture::TextureExportType getTextureFormat(const std::string& commandValue);
+	WarframeExporter::Material::MaterialExtractType getMaterialFormat(const std::string& commandValue);
 	WarframeExporter::Level::LevelHlodExtractMode getLevelHlodMode(const std::string commandValue);
 
 	void checkOutputDir(const std::string& outPath);

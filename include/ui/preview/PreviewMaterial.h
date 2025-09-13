@@ -2,6 +2,7 @@
 
 #include "ui/preview/Preview.h"
 #include "material/MaterialExtractor.h"
+#include "material/MaterialExporter.h"
 
 #include <QtWidgets/QPlainTextEdit>
 

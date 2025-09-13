@@ -48,5 +48,6 @@ namespace WarframeExporter::Audio {
 		static AudioOpusExtractor* getInstance();
 
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, std::ostream& outStream, ExtractOptions options);
 	};
 }

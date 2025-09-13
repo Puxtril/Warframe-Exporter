@@ -88,6 +88,7 @@ file(GLOB WARFRAME_EXPORTER_UI_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/LoadTreeThread.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/ExporterDirectoryThread.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/tasks/ExporterFileThread.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/ui/preview/AudioPlaybackWidget.h
 )
 
 ##################################################
@@ -118,6 +119,7 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/QtOpenGLViewer"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/bcdec"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/PhysxParser/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/membuf"
 )
 
 ##################################################
@@ -181,13 +183,13 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE)
 		add_executable(Warframe-Exporter ${WARFRAME_EXPORTER_UI_SOURCES})
 
 		find_package(OpenGL REQUIRED)
-		find_package(Qt6 QUIET COMPONENTS Widgets Core Gui OpenGLWidgets)
+		find_package(Qt6 QUIET COMPONENTS Widgets Core Gui OpenGLWidgets Multimedia)
 
 		# Qt6 is installed on the system (Probably using a *nix package manager)
 		if (Qt6_FOUND)
 
 			# ezpz
-			target_link_libraries(Warframe-Exporter Warframe-Exporter-Lib spdlog Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets OpenGL::GL ${D3D_COMPILER} LotusLib libzstd_static ${OODLE_CORE} spng_static ${ZLIB_LIBRARY} lzf PhysxParser)
+			target_link_libraries(Warframe-Exporter Warframe-Exporter-Lib spdlog Qt6::Widgets Qt6::Core Qt6::Gui Qt6::OpenGLWidgets Qt6::Multimedia OpenGL::GL ${D3D_COMPILER} LotusLib libzstd_static ${OODLE_CORE} spng_static ${ZLIB_LIBRARY} lzf PhysxParser)
 			message(STATUS "Linked to Qt6 libraries installed on the system")
 
 		# Not found. Probably Windows. Requires building from source.
@@ -209,8 +211,9 @@ if(COMPILE_WF_UI_EXE OR COMPILE_WF_CLI_EXE)
 			find_library(Qt6Gui NAMES Qt6Gui PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6OpenGL NAMES Qt6OpenGL PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 			find_library(Qt6OpenGLWidgets NAMES Qt6OpenGLWidgets PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
+			find_library(Qt6Multimedia NAMES Multimedia PATHS "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-install/lib" REQUIRED)
 
-			target_link_libraries(Warframe-Exporter Warframe-Exporter-Lib spdlog LotusLib libzstd_static ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} OpenGL::GL ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY} lzf PhysxParser)
+			target_link_libraries(Warframe-Exporter Warframe-Exporter-Lib spdlog LotusLib libzstd_static ${Qt6Widgets} ${Qt6Core} ${Qt6Gui} ${Qt6OpenGL} ${Qt6OpenGLWidgets} ${Qt6Multimedia} OpenGL::GL ${OODLE_CORE} ${D3D_COMPILER} spng_static ${ZLIB_LIBRARY} lzf PhysxParser)
 			message(STATUS "Linked to Qt6 libraries built locally")
 
 		endif()

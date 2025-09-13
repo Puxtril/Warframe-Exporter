@@ -78,6 +78,9 @@ UiPicker::addComboBoxOptions()
     this->TextureFormatCombo->addItem("PNG",WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_PNG);
     this->TextureFormatCombo->addItem("TGA", WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA);
 
+    this->MaterialFormatCombo->addItem("TXT", WarframeExporter::Material::MaterialExtractType::TXT);
+    this->MaterialFormatCombo->addItem("JSON", WarframeExporter::Material::MaterialExtractType::JSON);
+
     m_additionalSettings.LevelHlodExportCombo->addItem("Ignore", WarframeExporter::Level::LevelHlodExtractMode::IGNORE_HLOD);
     m_additionalSettings.LevelHlodExportCombo->addItem("Include", WarframeExporter::Level::LevelHlodExtractMode::INCLUDE_HLOD);
     m_additionalSettings.LevelHlodExportCombo->addItem("Only", WarframeExporter::Level::LevelHlodExtractMode::ONLY_HLOD);
@@ -101,6 +104,7 @@ UiPicker::loadSettings()
     WarframeExporter::ExtractOptions options = settings.loadOptions();
     this->TextureFormatCombo->setCurrentIndex(this->TextureFormatCombo->findData(options.textureExportType));
     this->ShaderFormatCombo->setCurrentIndex(this->ShaderFormatCombo->findData(options.shaderExportType));
+    this->MaterialFormatCombo->setCurrentIndex(this->MaterialFormatCombo->findData(options.materialExtractMode));
     m_additionalSettings.LevelHlodExportCombo->setCurrentIndex(m_additionalSettings.LevelHlodExportCombo->findData(options.levelHlodExtractMode));
 
     m_additionalSettings.FilterFilesCheckbox->setCheckState(options.filterUiFiles ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
@@ -237,6 +241,9 @@ UiPicker::parsePickerOptions()
 
     int selectedShaderFormat = this->ShaderFormatCombo->itemData(this->ShaderFormatCombo->currentIndex()).toInt();
     options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(selectedShaderFormat);
+
+    int selectedMaterialFormat = this->MaterialFormatCombo->itemData(this->MaterialFormatCombo->currentIndex()).toInt();
+    options.materialExtractMode = static_cast<WarframeExporter::Material::MaterialExtractType>(selectedMaterialFormat);
 
     int levelHlodExtractMode = m_additionalSettings.LevelHlodExportCombo->itemData(m_additionalSettings.LevelHlodExportCombo->currentIndex()).toInt();
     options.levelHlodExtractMode = static_cast<WarframeExporter::Level::LevelHlodExtractMode>(levelHlodExtractMode);

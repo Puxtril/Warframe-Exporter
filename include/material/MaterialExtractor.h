@@ -6,6 +6,8 @@
 #include "material/MaterialStructs.h"
 #include "material/MaterialEnumMap.h"
 #include "material/MaterialConverter.h"
+#include "material/MaterialExtractOptions.h"
+#include "material/MaterialExporter.h"
 
 namespace WarframeExporter::Material
 {
@@ -19,8 +21,13 @@ namespace WarframeExporter::Material
 
 		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
-			const static std::string outFileExt = "txt";
-			return outFileExt;
+			const static std::string& jsonExt = "json";
+			if (options.materialExtractMode == MaterialExtractType::JSON)
+				return jsonExt;
+
+			const static std::string& txtExt = "txt";
+			return txtExt;
+
 		}
 		
 		inline bool isMultiExport() const override
@@ -60,11 +67,7 @@ namespace WarframeExporter::Material
 		static MaterialExtractor* getInstance();
 
 		MaterialExternal getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
-		MaterialInternal formatMaterial(const MaterialExternal& materialExternal);
-		void addPackgesBinAttributes(LotusLib::PackagesReader& pkgs, LotusLib::LotusPath internalPath, MaterialExternal& materialExternal);
-		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath);
-		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, LotusLib::PackagesReader& pkgsReader, const LotusLib::LotusPath& filePath);
-
+		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, ExtractOptions options);
 		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

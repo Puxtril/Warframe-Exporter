@@ -16,6 +16,7 @@ CLIExtract::CLIExtract()
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include Vertex Colors on 3D models", false);
 	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format", false, "Binary", "Binary | Decompiled");
 	m_textureFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "texture-format", "Texture output format", false, "DDS", "DDS | PNG | TGA");
+	m_materialFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "material-format", "Material output format", false, "TXT", "TXT | JSON");
 	m_levelHlodExport = std::make_shared<TCLAP::ValueArg<std::string>>("", "level-hlod", "Extract HLOD files in levels", false, "Ignore", "Ignore | Include | Only");
 }
 
@@ -61,6 +62,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 	.add(m_includeVertexColors.get())
 	.add(m_shaderExportType.get())
 	.add(m_textureFormat.get())
+	.add(m_materialFormat.get())
 	.add(m_levelHlodExport.get());
 }
  
@@ -76,6 +78,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::Lot
 	options.dryRun = m_dryRun;
 	options.shaderExportType = getShaderFormat(m_shaderExportType->getValue());
 	options.textureExportType = getTextureFormat(m_textureFormat->getValue());
+	options.materialExtractMode = getMaterialFormat(m_materialFormat->getValue());
 	options.levelHlodExtractMode = getLevelHlodMode(m_levelHlodExport->getValue());
 
 	int types = 0;
@@ -134,6 +137,18 @@ CLIExtract::getTextureFormat(const std::string& commandValue)
 		return WarframeExporter::Texture::TextureExportType::TEXTURE_EXPORT_TGA;
 	
 	WarframeExporter::Logger::getInstance().error("Texture format is not valid");
+	exit(1);
+}
+
+WarframeExporter::Material::MaterialExtractType
+CLIExtract::getMaterialFormat(const std::string& commandValue)
+{
+	if (commandValue == "TXT" || commandValue == "txt" || commandValue == "Txt")
+		return WarframeExporter::Material::MaterialExtractType::TXT;
+	else if (commandValue == "JSON" || commandValue == "json" || commandValue == "Json")
+		return WarframeExporter::Material::MaterialExtractType::JSON;
+	
+	WarframeExporter::Logger::getInstance().error("Material format is not valid");
 	exit(1);
 }
 

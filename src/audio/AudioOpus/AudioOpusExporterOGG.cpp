@@ -3,20 +3,15 @@
 using namespace WarframeExporter::Audio;
 
 void
-AudioOpusExporterOGG::writeData(const AudioHeader& header, const AudioBody& body, const std::filesystem::path& outPath)
+AudioOpusExporterOGG::writeData(const AudioHeader& header, const AudioBody& body, std::ostream& outFile)
 {
-	std::ofstream out;
-	out.open(outPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-
-	writeOpusPage(header, 0, out);
-	writeTagPage(header, 1, out);
-	writeBodyPages(header, 2, body.data.data(), body.data.size(), out);
-
-	out.close();
+	writeOpusPage(header, 0, outFile);
+	writeTagPage(header, 1, outFile);
+	writeBodyPages(header, 2, body.data.data(), body.data.size(), outFile);
 }
 		
 void
-AudioOpusExporterOGG::writeOpusPage(const AudioHeader& header, int pageIndex, std::ofstream& outFile)
+AudioOpusExporterOGG::writeOpusPage(const AudioHeader& header, int pageIndex, std::ostream& outFile)
 {
 	OpusHeader opusHeader;
 	opusHeader.version = 1;
@@ -42,7 +37,7 @@ AudioOpusExporterOGG::writeOpusPage(const AudioHeader& header, int pageIndex, st
 }
 
 void
-AudioOpusExporterOGG::writeTagPage(const AudioHeader& header, int pageIndex, std::ofstream& outFile)
+AudioOpusExporterOGG::writeTagPage(const AudioHeader& header, int pageIndex, std::ostream& outFile)
 {
 	OpusTags infoTag;
 	infoTag.vendor = "Warframe";
@@ -64,7 +59,7 @@ AudioOpusExporterOGG::writeTagPage(const AudioHeader& header, int pageIndex, std
 }
 
 void
-AudioOpusExporterOGG::writeBodyPages(const AudioHeader& header, int pageIndex, const char* data, size_t dataLen, std::ofstream& outFile)
+AudioOpusExporterOGG::writeBodyPages(const AudioHeader& header, int pageIndex, const char* data, size_t dataLen, std::ostream& outFile)
 {
 	size_t chunkSize = header.blockAllign * 50;
 	uint64_t granulePosition = header.samplesPerSec;
@@ -78,7 +73,7 @@ AudioOpusExporterOGG::writeBodyPages(const AudioHeader& header, int pageIndex, c
 }
 
 void
-AudioOpusExporterOGG::writeBodyPage(const AudioHeader& header, const char* data, size_t dataLen, uint64_t granPos, int pageIndex, bool isLast, std::ofstream& outFile)
+AudioOpusExporterOGG::writeBodyPage(const AudioHeader& header, const char* data, size_t dataLen, uint64_t granPos, int pageIndex, bool isLast, std::ostream& outFile)
 {
 	OggHeader bodyHeader;
 	bodyHeader.version = 0;
@@ -93,7 +88,7 @@ AudioOpusExporterOGG::writeBodyPage(const AudioHeader& header, const char* data,
 }
 
 void
-AudioOpusExporterOGG::addChecksumAndWrite(OggHeader& oggHeader, const char* data, size_t dataLen, std::ofstream& outFile)
+AudioOpusExporterOGG::addChecksumAndWrite(OggHeader& oggHeader, const char* data, size_t dataLen, std::ostream& outFile)
 {
 	oggHeader.checksum = 0;
 

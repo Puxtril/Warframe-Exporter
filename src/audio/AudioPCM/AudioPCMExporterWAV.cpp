@@ -3,23 +3,18 @@
 using namespace WarframeExporter::Audio;
 
 void
-AudioPCMExporterWAV::writeData(const AudioHeader& header, const AudioBody& body, const std::filesystem::path& outPath)
+AudioPCMExporterWAV::writeData(const AudioHeader& header, const AudioBody& body, std::ostream& outFile)
 {
-	std::ofstream out;
-	out.open(outPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-	
 	if (header.compression == AudioCompression::PCM)
-		writePCMHeader(header, out);
+		writePCMHeader(header, outFile);
 	else if (header.compression == AudioCompression::ADPCM)
-		writeADPCMHeader(header, out);
+		writeADPCMHeader(header, outFile);
 	
-	writeBody(body, out);
-
-	out.close();
+	writeBody(body, header, outFile);
 }
 
 void
-AudioPCMExporterWAV::writePCMHeader(const AudioHeader& header, std::ofstream& outFile)
+AudioPCMExporterWAV::writePCMHeader(const AudioHeader& header, std::ostream& outFile)
 {
 	int blockAllign = ((uint16_t)(header.channelCount * header.bitsPerSample)) >> 3;
 	int bytesPerSec = header.samplesPerSec * blockAllign;
@@ -32,7 +27,7 @@ AudioPCMExporterWAV::writePCMHeader(const AudioHeader& header, std::ofstream& ou
 	const static uint32_t data = 0x61746164;
 
 	outFile.write((char*)&RIFF, 4);
-	uint32_t writeSize = header.size + 32; // Where does 32 come from?
+	uint32_t writeSize = header.size + 32;
 	outFile.write((char*)&writeSize, 4);
 	outFile.write((char*)&WAVE, 4);
 	outFile.write((char*)&fmt, 4);
@@ -48,7 +43,7 @@ AudioPCMExporterWAV::writePCMHeader(const AudioHeader& header, std::ofstream& ou
 }
 
 void
-AudioPCMExporterWAV::writeADPCMHeader(const AudioHeader& header, std::ofstream& outFile)
+AudioPCMExporterWAV::writeADPCMHeader(const AudioHeader& header, std::ostream& outFile)
 {
 	const static uint32_t RIFF = 0x46464952;
 	const static uint32_t WAVE = 0x45564157;
@@ -69,7 +64,7 @@ AudioPCMExporterWAV::writeADPCMHeader(const AudioHeader& header, std::ofstream& 
 	};
 
 	outFile.write((char*)&RIFF, 4);
-	uint32_t writeSize = header.size + 66; // Where does 66 come from?
+	uint32_t writeSize = header.size + 66;
 	outFile.write((char*)&writeSize, 4);
 	outFile.write((char*)&WAVE, 4);
 	outFile.write((char*)&fmt, 4);
@@ -93,7 +88,10 @@ AudioPCMExporterWAV::writeADPCMHeader(const AudioHeader& header, std::ofstream& 
 }
 
 void
-AudioPCMExporterWAV::writeBody(const AudioBody& body, std::ofstream& outFile)
+AudioPCMExporterWAV::writeBody(const AudioBody& body, const AudioHeader& header, std::ostream& outFile)
 {
-	outFile.write(body.data.data(), body.data.size());
+	if (header.size > body.data.size())
+		throw unknown_format_error("Header size > body: " + std::to_string(header.size) + " > " + std::to_string(body.data.size()));
+	size_t start = body.data.size() - header.size;
+	outFile.write(body.data.data() + start, body.data.size());
 }

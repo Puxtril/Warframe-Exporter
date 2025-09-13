@@ -7,7 +7,7 @@ MaterialReaderBasic::readData(BinaryReader::BinaryReaderBuffered* headerReader, 
 {
     MaterialExternal extMaterial;
 
-    extMaterial.attributes = splitAttributes(commonHeader.attributes);
+    extMaterial.attributes = commonHeader.attributes;
     extMaterial.keywords = getExtraNames(headerReader);
     extMaterial.shaderSet1 = getShaderSet1(headerReader, 15);
     extMaterial.shaderSet2 = getShaderSet2(headerReader, 30);

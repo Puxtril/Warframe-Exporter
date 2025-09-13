@@ -12,6 +12,7 @@
 #include "ui/preview/PreviewMaterial.h"
 #include "ui/preview/PreviewTexture.h"
 #include "ui/preview/PreviewModel.h"
+#include "ui/preview/PreviewAudio.h"
 
 class PreviewManager
 {

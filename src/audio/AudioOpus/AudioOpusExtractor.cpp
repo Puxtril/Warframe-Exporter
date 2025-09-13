@@ -21,5 +21,25 @@ AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRe
 	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
 
 	if (!options.dryRun)
-		AudioOpusExporterOGG::writeData(audioHeader, audioBody, outputPath);
+	{
+		std::ofstream out;
+		out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		AudioOpusExporterOGG::writeData(audioHeader, audioBody, out);
+		out.close();
+	}
+}
+
+void
+AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, std::ostream& outStream, ExtractOptions options)
+{
+	AudioReader* reader = g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
+	
+	AudioHeader audioHeader;
+	reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
+
+	AudioBody audioBody;
+	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
+
+	if (!options.dryRun)
+		AudioOpusExporterOGG::writeData(audioHeader, audioBody, outStream);
 }

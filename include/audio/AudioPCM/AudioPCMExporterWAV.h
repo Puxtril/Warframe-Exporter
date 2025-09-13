@@ -1,9 +1,9 @@
 #pragma once
 
 #include "audio/AudioStructs.h"
+#include "ExporterExceptions.h"
 
 #include <fstream>
-#include <istream>
 #include <filesystem>
 
 namespace WarframeExporter::Audio
@@ -11,11 +11,11 @@ namespace WarframeExporter::Audio
 	class AudioPCMExporterWAV
 	{
 	public:
-		static void writeData(const AudioHeader& header, const AudioBody& body, const std::filesystem::path& outPath);
+		static void writeData(const AudioHeader& header, const AudioBody& body, std::ostream& outFile);
 
 	private:
-		static void writePCMHeader(const AudioHeader& header, std::ofstream& outFile);
-		static void writeADPCMHeader(const AudioHeader& header, std::ofstream& outFile);
-		static void writeBody(const AudioBody& body, std::ofstream& outFile);
+		static void writePCMHeader(const AudioHeader& header, std::ostream& outFile);
+		static void writeADPCMHeader(const AudioHeader& header, std::ostream& outFile);
+		static void writeBody(const AudioBody& body, const AudioHeader& header, std::ostream& outFile);
 	};
 }

@@ -2,27 +2,6 @@
 
 using namespace WarframeExporter::Material;
 
-// Taken from
-// https://www.martinbroadhurst.com/how-to-split-a-string-in-c
-std::vector<std::string>
-MaterialReader::splitAttributes(const std::string& attributes)
-{
-    std::size_t current, previous = 0;
-    char delim = '\n';
-    std::vector<std::string> attributesSplit;
-
-    current = attributes.find(delim);
-    while (current != std::string::npos)
-    {
-        attributesSplit.push_back(attributes.substr(previous, current - previous));
-        previous = current + 1;
-        current = attributes.find(delim, previous);
-    }
-    attributesSplit.push_back(attributes.substr(previous, current - previous));
-
-    return attributesSplit;
-}
-
 std::vector<std::string>
 MaterialReader::getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader)
 {

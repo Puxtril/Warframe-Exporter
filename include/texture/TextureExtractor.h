@@ -80,8 +80,8 @@ namespace WarframeExporter::Texture
 				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DIFFUSE_EMISSION_TINT },
 				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL },
 				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL },
-				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_COMPOSITE },
-				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_COMPOSITE },
+				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ARRAY },
+				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ARRAY },
 				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ROUGHNESS },
 				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ROUGHNESS },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_SKYBOX },
@@ -93,8 +93,6 @@ namespace WarframeExporter::Texture
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_176 },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_CUBEMAP },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_CUBEMAP },
-				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_HDR },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_HDR },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_NORMAL_MAP },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_NORMAL_MAP },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_PACKMAP },
@@ -102,7 +100,22 @@ namespace WarframeExporter::Texture
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_194 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_194 },
 				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DETAILSPACK },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DETAILSPACK }
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DETAILSPACK },
+
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_163 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_163 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_164 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_164 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_166 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_166 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_175 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_175 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_176 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_176 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_177 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_177 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HDR },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HDR },
 			};
 			return extTypes;
 		};

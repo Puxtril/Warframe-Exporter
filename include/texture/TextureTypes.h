@@ -2,23 +2,35 @@
 
 namespace WarframeExporter::Texture
 {
+	// Types used in the Texture package
     enum class TextureType
     {
 		TEXTURE_DIFFUSE_EMISSION_TINT = 163,
 		TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE = 164,
 		TEXTURE_BILLBOARD_SPRITEMAP_NORMAL = 165,
-		TEXTURE_COMPOSITE = 166,
+		TEXTURE_ARRAY = 166,
 		TEXTURE_ROUGHNESS = 167,
 		TEXTURE_SKYBOX = 171,
 		TEXTURE_174 = 174,
 		TEXTURE_RAW_175 = 175,
 		TEXTURE_176 = 176,
 		TEXTURE_CUBEMAP = 177,
-		TEXTURE_HDR = 181,
 		TEXTURE_NORMAL_MAP = 184,
 		TEXTURE_PACKMAP = 188,
 		TEXTURE_194 = 194,
 		TEXTURE_DETAILSPACK = 195
+	};
+
+	// Types used in the Lightmap package
+	enum class LightmapType
+    {
+		LIGHTMAP_163 = 163,
+		LIGHTMAP_164 = 164,
+		LIGHTMAP_166 = 166,
+		LIGHTMAP_175 = 175,
+		LIGHTMAP_176 = 176,
+		LIGHTMAP_177 = 177,
+		LIGHTMAP_HDR = 181,
 	};
 
     enum class TextureCompression

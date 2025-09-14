@@ -48,7 +48,11 @@ MetdataPreview::setupCommonHeader(std::stringstream& outStr, LotusLib::Game game
         outStr << "(" << extractor->getFriendlyName() << ")";
     else
         outStr << "(Unknown)";
-    outStr << std::endl << std::endl;
+    
+    outStr << std::endl;
+    outStr << "Package: " << fileEntry.srcPkgName << std::endl;
+    
+    outStr << std::endl;
 
     outStr << "Attributes" << std::endl;
     outStr << "----------" << std::endl;

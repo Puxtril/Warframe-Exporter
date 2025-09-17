@@ -2,7 +2,7 @@
 
 #include "BinaryReaderBuffered.h"
 #include "model/vertexcolor/VertexColorStructs.h"
-#include "EnumMapValue.h"
+#include "EnumMap.h"
 #include "glm/vec4.hpp"
 
 namespace WarframeExporter::Model::VertexColor
@@ -18,8 +18,8 @@ namespace WarframeExporter::Model::VertexColor
 		VertexColorReader() = default;
 
 	public:
-		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader) = 0;
-		virtual void readHeader(BinaryReaderBuffered* headerReader, VertexColorHeader& outHeader) = 0;
-		virtual void readBody(BinaryReaderBuffered* bodyReader, std::vector<glm::u8vec4>& outData) = 0;
+		virtual void readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader) = 0;
+		virtual void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, VertexColorHeader& outHeader) = 0;
+		virtual void readBody(BinaryReader::BinaryReaderBuffered* bodyReader, std::vector<glm::u8vec4>& outData) = 0;
 	};
 }

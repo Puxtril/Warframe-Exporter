@@ -1,0 +1,83 @@
+name: Compile
+
+run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '**'
+
+defaults:
+  run:
+    shell: powershell
+
+jobs:
+  Compile-Windows:
+    runs-on: windows-2025
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Install qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.8.3
+          modules: qtmultimedia
+          host: 'windows'
+          arch: 'win64_msvc2022_64'
+          install-deps: 'true'
+          setup-python: 'true'
+          cache: 'true'
+      - name: Download and compile Zlib
+        run: |
+          mkdir zlib
+          cd zlib
+          Invoke-WebRequest -Uri https://zlib.net/zlib-1.3.1.tar.gz -OutFile zlib.tar.gz
+          tar -xzf .\zlib.tar.gz
+          mkdir build
+          cd build
+          cmake ..\zlib-1.3.1 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\zlib\install
+          cmake --build . --config Release
+          cmake --install .
+          cd ..\install\lib
+          mv zlib.lib zlib-dynamic.lib
+          mv zlibstatic.lib zlib.lib
+      - name: Init Extractor submodules
+        run: |
+          cd lib
+          git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
+          git submodule update --init tclap-code
+      - name: Init LotusLib submodule
+        run: |
+          cd lib/LotusLib/lib
+          git submodule update --init
+      - name: Download Oodle binaries
+        run: |
+          mkdir bin\Win64
+          cd bin\Win64
+          Invoke-WebRequest -Uri https://github.com/WorkingRobot/OodleUE/raw/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Win64/oo2core_win64.lib -Outfile oo2core_win64.lib
+      - name: Initilize CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DZLIB_ROOT=${{ github.workspace }}\zlib\install
+      - name: Compile project
+        run: |
+          cd build
+          cmake --build . --config Release -j8
+      - name: Link Qt Requirements
+        run: |
+          & "windeployqt.exe" build\Release\Warframe-Exporter.exe
+      - name: Zip Exporter GUI and Qt Dependencies to Artifacts folder
+        run: |
+          mkdir artifacts
+          cd build\Release
+          Compress-Archive -DestinationPath ..\..\artifacts\Warframe-Exporter.zip -Path "Warframe-Exporter.exe", "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll", "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "Qt6Multimedia.dll", "Qt6Network.dll", "d3dcompiler_47.dll", "platforms", "multimedia", "avcodec-61.dll", "avformat-61.dll", "avutil-59.dll", "swresample-5.dll", "swscale-8.dll"
+      - name: Copy CLI executables to Artifacts folder
+        run: |
+          cp build\Release\Warframe-Exporter-CLI.exe artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Warframe-Exporter-Windows
+          path: artifacts/

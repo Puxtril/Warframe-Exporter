@@ -9,41 +9,35 @@ MaterialExtractor::getInstance()
 	return instance;
 }
 
-void
-MaterialExtractor::getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths)
+MaterialExternal
+MaterialExtractor::getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
-	uint32_t pathCount = headerReader->readUInt32();
-	for (uint32_t x = 0; x < pathCount; x++)
-	{
-		uint32_t nameLen = headerReader->readUInt32();
-		std::string name = headerReader->readAsciiString(nameLen);
-		outPaths.push_back(name);
-	}
+	MaterialReader* reader = g_enumMapMaterial[commonHeader.type];
+	MaterialExternal external = reader->readData(headerReader, commonHeader);
+	return external;
 }
 
 void
-MaterialExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, ExtractOptions options)
 {
+	std::string outTxt;
+	if (options.materialExtractMode == MaterialExtractType::TXT)
+		outTxt = MaterialExporter::combineMaterialToTxt(materialInternal);
+	else if (options.materialExtractMode == MaterialExtractType::JSON)
+		outTxt = MaterialExporter::combineMaterialToJson(materialInternal);
+
 	std::ofstream out;
-	out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
-	
-	out.write(header.attributes.c_str(), header.attributes.length());
-	
-	std::vector<std::string> extraNames;
-	getExtraNames(hReader, extraNames);
-
-	out.write("\n", 1);
-	for (const auto& name : extraNames)
-	{
-		out.write(name.c_str(), name.length());
-		out.write("\n", 1);
-	}
-
+	out.open(outputPath, std::ios::out | std::ofstream::trunc);
+	out.write(outTxt.c_str(), outTxt.length());
 	out.close();
 }
 
 void
-MaterialExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData)
+MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
+	MaterialExternal external = getExternalMaterial(&fileEntry.headerData, fileEntry.commonHeader);
+	MaterialInternal internal = MaterialConverter::convertMaterial(external, fileEntry.internalPath, pkgs);
 
+	if (!options.dryRun)
+		writeOut(internal, outputPath, options);
 }

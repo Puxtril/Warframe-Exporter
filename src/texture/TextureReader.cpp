@@ -2,14 +2,14 @@
 
 using namespace WarframeExporter::Texture;
 
-BinaryReaderBuffered*
-TextureReader::getCorrectBodyReader(BinaryReaderBuffered* FfileReader, BinaryReaderBuffered* BfileReader)
+BinaryReader::BinaryReaderBuffered*
+TextureReader::getCorrectBodyReader(BinaryReader::BinaryReaderBuffered* FfileReader, BinaryReader::BinaryReaderBuffered* BfileReader)
 {
 	return FfileReader->getLength() > BfileReader->getLength() ? FfileReader : BfileReader;
 }
 
 TextureHeaderExternal
-TextureReader::readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData)
+TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
 	uint8_t enum1 = headerReader->readUInt8();
 	uint8_t enum2 = headerReader->readUInt8();
@@ -19,30 +19,29 @@ TextureReader::readHeader(BinaryReaderBuffered* headerReader, const Ensmallening
 	uint32_t unkArrCount = headerReader->readUInt32();
 	headerReader->seek(4U * unkArrCount, std::ios_base::cur);
 
-	if (!ensmalleningData.isPostPart1())
-		headerReader->seek(9, std::ios_base::cur);
+	//if (!ensmalleningData.isPostPart1())
+	//	headerReader->seek(9, std::ios_base::cur);
 
 	int16_t width = headerReader->readInt16();
 	int16_t height = headerReader->readInt16();
 
-	return TextureHeaderExternal{ enum1, enum2, enum3, enum4, width, height };
+	std::string texPaths = "";
+
+	if (commonHeader.type == (uint32_t)TextureType::TEXTURE_ARRAY)
+	{
+		headerReader->seek(0x2F, std::ios::cur);
+
+		uint32_t pathLen = headerReader->readUInt32();
+		texPaths = headerReader->readAsciiString(pathLen);
+	}
+
+	return TextureHeaderExternal{ enum1, enum2, enum3, enum4, width, height, std::move(texPaths) };
 }
 
-TextureBodyInternal
-TextureReader::readBody(BinaryReaderBuffered* bodyReader, const TextureHeaderInternal& headerInternal, const Ensmallening& postEnsmallening)
+std::vector<char>
+TextureReader::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderExternal& headerExternal)
 {
-	if (postEnsmallening.isPostPart1())
-	{
-		std::unique_ptr<char[]> data = std::make_unique<char[]>(bodyReader->getLength());
-		std::memcpy(data.get(), bodyReader->getPtr(), bodyReader->getLength());
-		return TextureBodyInternal{ std::move(data), bodyReader->getLength() };
-	}
-	else
-	{
-		char* rawData = (char*)bodyReader->readUInt8Array(bodyReader->getLength());
-		std::unique_ptr<char[]> unSwizzled = std::make_unique<char[]>(bodyReader->getLength());
-		headerInternal.formatClass->unSwizzle(rawData, (int)bodyReader->getLength(), unSwizzled.get());
-		delete[] rawData;
-		return TextureBodyInternal{std::move(unSwizzled), bodyReader->getLength()};
-	}
+	std::vector<char> data(bodyReader->getLength());
+	std::memcpy(data.data(), bodyReader->getPtr().data(), bodyReader->getLength());
+	return data;
 }

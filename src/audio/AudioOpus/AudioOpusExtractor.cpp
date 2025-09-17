@@ -1,8 +1,4 @@
 #include "audio/AudioOpus/AudioOpusExtractor.h"
-#include "FileNode.h"
-#include "Package.h"
-#include "audio/AudioOpus/AudioOpusExporterOGG.h"
-#include "audio/AudioOpus/EnumMapAudioOpusReader.h"
 
 using namespace WarframeExporter::Audio;
 
@@ -14,38 +10,36 @@ AudioOpusExtractor::getInstance()
 }
 
 void
-AudioOpusExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
-	AudioReader* reader = g_enumMapAudioOpusReader[header.type];
+	AudioReader* reader = g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
 	
 	AudioHeader audioHeader;
-	reader->readHeader(hReader, ensmalleningData, header, audioHeader);
-
-	BinaryReaderBuffered* fReader = nullptr;
-	try
-	{
-		const LotusLib::FileEntries::FileNode* entry = pkgDir[package][LotusLib::PackageTrioType::F]->getFileEntry(internalpath);
-		std::unique_ptr<char[]> rawData = pkgDir[package][LotusLib::PackageTrioType::F]->getDataAndDecompress(entry);
-		fReader = new BinaryReaderBuffered((uint8_t*)rawData.release(), entry->getLen());
-	} catch (std::exception&) { }
-	
-	BinaryReaderBuffered* bReader = nullptr;
-	try
-	{
-		const LotusLib::FileEntries::FileNode* entry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalpath);
-		std::unique_ptr<char[]> rawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(entry);
-		bReader = new BinaryReaderBuffered((uint8_t*)rawData.release(), entry->getLen());
-	} catch (std::exception&) { }
+	reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
 
 	AudioBody audioBody;
-	reader->readBody(audioHeader, fReader, bReader, audioBody);
+	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
 
-	AudioOpusExporterOGG::writeData(audioHeader, audioBody, outputPath);
+	if (!options.dryRun)
+	{
+		std::ofstream out;
+		out.open(outputPath, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		AudioOpusExporterOGG::writeData(audioHeader, audioBody, out);
+		out.close();
+	}
 }
 
 void
-AudioOpusExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData)
+AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, std::ostream& outStream, ExtractOptions options)
 {
-	AudioReader* reader = g_enumMapAudioOpusReader[header.type];
-	reader->readHeaderDebug(hReader, ensmalleningData, header);
+	AudioReader* reader = g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
+	
+	AudioHeader audioHeader;
+	reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
+
+	AudioBody audioBody;
+	reader->readBody(audioHeader, &fileEntry.fData, &fileEntry.bData, audioBody);
+
+	if (!options.dryRun)
+		AudioOpusExporterOGG::writeData(audioHeader, audioBody, outStream);
 }

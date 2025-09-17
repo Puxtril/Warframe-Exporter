@@ -50,6 +50,8 @@ namespace WarframeExporter::Model
 		uint32_t boneCount;
 		uint32_t faceCount;
 		uint32_t morphCount;
+		glm::vec4 ensmallening1;
+		glm::vec4 ensmallening2;
 		// 2 "free use" variables for skipping data
 		uint32_t bodySkipLen1;
 		uint32_t bodySkipLen2;
@@ -87,7 +89,7 @@ namespace WarframeExporter::Model
 		int morphCount;
 		std::vector<MeshInfoInternal> meshInfos;
 		std::vector<std::string> errorMsgs;
-		glm::vec3 modelScale;
+		glm::vec4 modelScale;
 	};
 
 	struct ModelBodyExternal
@@ -96,9 +98,12 @@ namespace WarframeExporter::Model
 		std::vector<glm::quat> boneRotations;
 		std::vector<glm::vec3> bonePositions;
 		std::vector<uint16_t> indices;
-		std::vector<glm::vec3> positions;
+		std::vector<glm::vec4> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> AO;
+		std::vector<glm::u8vec4> normals;
+		std::vector<glm::u8vec3> tangents;
 		std::vector<std::vector<glm::u8vec4>> colors;
 		std::vector<glm::u8vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
@@ -110,24 +115,26 @@ namespace WarframeExporter::Model
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> UV1;
 		std::vector<glm::vec2> UV2;
+		std::vector<uint8_t> AO;
 		std::vector<std::vector<glm::u8vec4>> colors;
 		std::vector<glm::u16vec4> boneIndices;
 		std::vector<glm::vec4> boneWeights;
-			
-		static const int positionLen = 12;
-		static const int colorLen = 4;
-		static const int UVLen = 8;
-		static const int boneIndexLen = 8;
-		static const int boneWeightLen = 16;
+
+		constexpr int32_t positionTypeSize() const { return sizeof(positions[0]); }
+		constexpr int32_t UVTypeSize() const { return sizeof(UV1[0]); }
+		constexpr int32_t colorTypeSize() const { return sizeof(colors[0][0]); }
+		constexpr int32_t AOTypeSize() const { return sizeof(AO[0]); }
+		constexpr int32_t boneIndexTypeSize() const { return sizeof(boneIndices[0]); }
+		constexpr int32_t boneWeightTypeSize() const { return sizeof(boneWeights[0]); }
 
 		int32_t vertexSizeRigged() const
 		{
-			return positionLen + (UVLen * 2) + (colorLen * colors.size()) + boneIndexLen + boneWeightLen;
+			return static_cast<int32_t>(positionTypeSize() + (UVTypeSize() * 2) + (colorTypeSize() * colors.size()) + boneIndexTypeSize() + boneWeightTypeSize());
 		}
 
 		int32_t vertexSizeStatic() const
 		{
-			return positionLen + (UVLen * 2) + (colorLen * colors.size());
+			return static_cast<int32_t>(positionTypeSize() + (UVTypeSize() * 2) + (colorTypeSize() * colors.size()));
 		}
 	};
 }

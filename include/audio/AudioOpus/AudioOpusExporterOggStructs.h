@@ -31,7 +31,7 @@ namespace WarframeExporter::Audio
 		uint32_t pageSequenceNumber;
 		uint32_t checksum;
 		uint8_t pageSegments;
-		std::vector<char> segmentTable;
+		std::vector<uint8_t> segmentTable;
 
 		size_t serialize(char* dest) const;
 		size_t getByteSize() const;

@@ -1,22 +1,17 @@
 #include "model/ModelConverter.h"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/vector_uint4_sized.hpp"
-#include <iterator>
 
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType)
-{
-    ModelConverter::flipXAxis(extBody);
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType, const LotusLib::LotusPath& internalPath)
 
+{
     if (extHeader.boneTree.size() > 1)
         ModelConverter::convertInternalHeaderRigged(extHeader, extBody, outHeader);
-    ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader);
+    ModelConverter::convertInternalHeaderStaticOrRigged(extHeader, attributes, outHeader, internalPath);
 
-    getModelScale(extHeader.meshInfos, scaleType, outHeader.modelScale);
-    ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, outHeader.modelScale);
-    ModelConverter::addVertexColors(outBody, vertexColors);
+    getModelScale(extHeader.meshInfos, extHeader.ensmallening1, extHeader.ensmallening2, scaleType, outHeader.modelScale);
+    ModelConverter::convertInternalBodyStaticOrRigged(extHeader, extBody, outBody, vertexColors, outHeader.modelScale);
 }
 
 void
@@ -83,7 +78,7 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
 }
 
 void
-ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader)
+ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader, const LotusLib::LotusPath& internalPath)
 {
     outHeader.vertexCount = extHeader.vertexCount;
     outHeader.boneCount = extHeader.boneCount;
@@ -103,7 +98,10 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
         memcpy(newMeshInfo.faceLODCounts.data(), extMeshInfo.faceLODCounts.data(), 5 * 4);
 
         std::string matName = x < materialNames.size() ? materialNames[x] : "None";
-        newMeshInfo.matName = matName;
+        if (matName[0] != '/' && matName != "None")
+            newMeshInfo.matName = (internalPath.parent_path() / matName).string();
+        else
+            newMeshInfo.matName = matName;
 
         intMeshInfos.push_back(newMeshInfo);
     }
@@ -113,7 +111,7 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
 }
 
 void
-ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, const glm::vec3& modelScale)
+ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors, const glm::vec4& modelScale)
 {
     outBody.indices = extBody.indices;
 
@@ -122,32 +120,19 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
     newPositions.resize(extBody.positions.size());
     for (size_t x = 0; x < extBody.positions.size(); x++)
     {
-        newPositions[x] = extBody.positions[x] * modelScale;
+        newPositions[x][0] = extBody.positions[x][0] * modelScale[0];
+        newPositions[x][1] = extBody.positions[x][1] * modelScale[1];
+        newPositions[x][2] = extBody.positions[x][2] * modelScale[2];
     }
-    outBody.positions = newPositions;
-    outBody.UV1 = extBody.UV1;
-    outBody.UV2 = extBody.UV2;
-    outBody.boneWeights = extBody.boneWeights;
+    outBody.positions = std::move(newPositions);
+    outBody.UV1 = std::move(extBody.UV1);
+    outBody.UV2 = std::move(extBody.UV2);
+    outBody.boneWeights = std::move(extBody.boneWeights);
 
-    // Split RGBA Vertex colors into 2 separate color maps
-    // One is RGB from original
-    // Next is the Alpha channel copied onto RGB channels
-    std::vector<std::vector<glm::u8vec4>> newColors;
-    for (size_t x = 0; x < extBody.colors.size(); x++)
-    {
-        std::vector<glm::u8vec4> alphaColor(extHeader.vertexCount);
-        for (size_t y = 0; y < extHeader.vertexCount; y++)
-        {
-            alphaColor[y][0] = extBody.colors[x][y][3];
-            alphaColor[y][1] = extBody.colors[x][y][3];
-            alphaColor[y][2] = extBody.colors[x][y][3];
-            extBody.colors[x][y][3] = 0.0f;
-        }
-
-        newColors.push_back(std::move(extBody.colors[x]));
-        newColors.push_back(std::move(alphaColor));
-    }
-    outBody.colors = std::move(newColors);
+    outBody.colors = std::move(extBody.colors);
+    for (auto& col : vertexColors)
+        outBody.colors.push_back(col);
+    outBody.AO = std::move(extBody.AO);
 
     // Convert local bone indices to global
     std::vector<glm::u16vec4>& newIndices = outBody.boneIndices;
@@ -176,43 +161,21 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
 }
 
 void
-ModelConverter::addVertexColors(ModelBodyInternal& outBody, std::vector<std::vector<glm::u8vec4>> vertexColors)
+ModelConverter::mirrorX(ModelHeaderInternal& intHeader, ModelBodyInternal& intBody)
 {
-    // Unfortunately, Blender doesn't like RGBA vertex colors
-    // So we split into RGB and A.
-    for (auto& curVColors : vertexColors)
+    // Rigged models
+    for (auto& curBone : intHeader.boneTree)
     {
-        std::vector<glm::u8vec4> newA;
-        for (glm::u8vec4& curColor : curVColors)
-            newA.push_back(glm::u8vec4(curColor.a, curColor.a, curColor.a, curColor.a));
-
-        outBody.colors.push_back(std::move(curVColors));
-        outBody.colors.push_back(std::move(newA));
-    }
-}
-
-void
-ModelConverter::flipXAxis(ModelBodyExternal& extBody)
-{
-    // For rigged models
-    for (auto& x : extBody.reverseBinds)
-    {
-        x = glm::transpose(glm::scale(glm::transpose(x), { -1, 1, 1 }));
-    }
-    for (auto& x : extBody.boneRotations)
-    {
-        x.x *= -1;
-        x.y *= -1;
-    }
-    for (auto& x : extBody.bonePositions)
-    {
-        x.x *= -1;
+        curBone.reverseBind = glm::transpose(glm::scale(glm::transpose(curBone.reverseBind), { -1, 1, 1 }));
+        curBone.rotation.x *= -1;
+        curBone.rotation.y *= -1;
+        curBone.position.x *= -1;
     }
     
-    // For static models
-    if (extBody.bonePositions.empty())
+    // Static models
+    if (intHeader.boneTree.empty())
     {
-        for (glm::vec3& curPos : extBody.positions)
+        for (glm::vec3& curPos : intBody.positions)
         {
             curPos.z *= -1.0f;
         }
@@ -241,19 +204,20 @@ ModelConverter::extractMaterialNames(const std::string& attributes)
 }
 
 void
-ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, ScaleType scaleType, glm::vec3& outScale)
+ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, glm::vec4 ensmall1, glm::vec4 ensmall2, ScaleType scaleType, glm::vec4& outScale)
 {
     outScale.x = 0.0;
     outScale.y = 0.0;
     outScale.z = 0.0;
+    outScale.w = 0.0;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         for (MeshInfoExternal curMeshInfo : meshInfos)
         {
             if (scaleType == ScaleType::XYZ)
             {
-                float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
+                float largerOf2 = std::max(std::abs(ensmall1[i]), std::abs(ensmall2[i]));
                 outScale[i] = std::max(outScale[i], largerOf2);
             }
             else if (scaleType == ScaleType::XZ)
@@ -270,4 +234,11 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, Sc
             }
         }
     }
+	
+	// Because the scale might be 0...
+	outScale.x = (outScale.x == 0.0f) ? 1.0f : outScale.x;
+	outScale.y = (outScale.y == 0.0f) ? 1.0f : outScale.y;
+	outScale.z = (outScale.z == 0.0f) ? 1.0f : outScale.z;
+    // Intentionally commented out
+    //outScale.w = (outScale.w == 0.0f) ? 1.0f : outScale.w;
 }

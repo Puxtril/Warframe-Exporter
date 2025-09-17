@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model::VertexColor;
 
 void
-VertexColorReader110::readHeaderDebug(BinaryReaderBuffered* headerReader)
+VertexColorReader110::readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader)
 {
 	const static std::string colorCountMsg = "Vertex color count";
 	headerReader->readUInt32(0, 50000, colorCountMsg);
@@ -13,7 +13,7 @@ VertexColorReader110::readHeaderDebug(BinaryReaderBuffered* headerReader)
 }
 
 void
-VertexColorReader110::readHeader(BinaryReaderBuffered* headerReader, VertexColorHeader& outHeader)
+VertexColorReader110::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, VertexColorHeader& outHeader)
 {
 	outHeader.colorCount = headerReader->readUInt32();
 
@@ -22,12 +22,12 @@ VertexColorReader110::readHeader(BinaryReaderBuffered* headerReader, VertexColor
 }
 
 void
-VertexColorReader110::readBody(BinaryReaderBuffered* bodyReader, std::vector<glm::u8vec4>& outData)
+VertexColorReader110::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, std::vector<glm::u8vec4>& outData)
 {
 	size_t colorCount = bodyReader->getLength() / 4;
 
 	outData.resize(colorCount);
-	for (int x = 0; x < colorCount; x++)
+	for (size_t x = 0; x < colorCount; x++)
 	{
 		bodyReader->readUInt8Array(&outData[x][0], 4);
 	}

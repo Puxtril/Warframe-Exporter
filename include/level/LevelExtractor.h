@@ -5,12 +5,10 @@
 #include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 #include "level/LevelConverter.h"
-
 #include "level/LevelExporterGltf.h"
 #include "model/ModelExtractor.h"
+#include "landscape/LandscapeExtractor.h"
 #include "CommonHeader.h"
-
-#include <iostream>
 
 namespace WarframeExporter::Level
 {
@@ -22,10 +20,15 @@ namespace WarframeExporter::Level
 		LevelExtractor(const LevelExtractor&) = delete;
 		LevelExtractor operator=(const LevelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;
+		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
 		}
 
 		inline const std::string& getFriendlyName() const override
@@ -40,20 +43,29 @@ namespace WarframeExporter::Level
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = {
-				(int)LevelType::LEVEL_201,
+			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_201 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_202 }
 			};
 			return extTypes;
 		}
 
 		static LevelExtractor* getInstance();
 
-		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData) override;
+		LevelExternal getLevelExternal(LotusLib::FileEntry& fileEntry);
+		LevelInternal convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal);
+		Document createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt, ExtractOptions options);
+
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		
+		// More attribute may exist in Packages.bin
+		void findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal);
 	
 	private:
-		void createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf);
+		void writeAndAdvanceBuffer(Document& gltfDoc, const std::filesystem::path& outputPath);
+		void findLandscape(LevelExternal& levelExternal);
+		void addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, LotusLib::PackagesReader& pkgs);
 	};
 }

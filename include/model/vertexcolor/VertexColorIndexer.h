@@ -3,6 +3,7 @@
 #include "ExporterLogger.h"
 #include "BinaryReaderBuffered.h"
 #include "FileNode.h"
+#include "LotusLib.h"
 #include "Package.h"
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
@@ -29,21 +30,24 @@ namespace WarframeExporter::Model::VertexColor
 
 		using vertexColorData = std::vector<glm::u8vec4>;
 
+		bool m_cancelIndexing;
 		packageColors m_vertexColorMap;
 		Logger& m_logger;
 		
 	public:
 		VertexColorIndexer();
 
-		void getModelColors(const LotusLib::LotusPath& modelPath, std::vector<vertexColorData>& outColors, LotusLib::Package<LotusLib::CachePairReader>& pkg);
+		void getModelColors(const LotusLib::LotusPath& modelPath, std::vector<vertexColorData>& outColors, LotusLib::PackageReader& pkg);
+		void indexVertexColors(LotusLib::PackageReader& pkg);
+		void cancelIndexing();
 
 	private:
-		int indexColors(LotusLib::Package<LotusLib::CachePairReader>& pkg);
-		void readColor(LotusLib::Package<LotusLib::CachePairReader>& pkg, LotusLib::LotusPath vertexColorPath, vertexColorData& outData);
+		int indexColors(LotusLib::PackageReader& pkg);
+		void readColor(LotusLib::PackageReader& pkg, LotusLib::LotusPath vertexColorPath, vertexColorData& outData);
 
-		bool isIndexed(LotusLib::Package<LotusLib::CachePairReader>& pkg);
+		bool isIndexed(LotusLib::PackageReader& pkg);
 
 		// Will create if doesn't exist
-		modelToColorList& getColorList(LotusLib::Package<LotusLib::CachePairReader>& pkg);
+		modelToColorList& getColorList(LotusLib::PackageReader& pkg);
 	};
 }

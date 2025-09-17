@@ -2,96 +2,88 @@
 
 using namespace WarframeExporter;
 
-BatchIterator::BatchIterator(LotusLib::PackageCollection<LotusLib::CachePairReader>* package, const Ensmallening& ensmallData, std::filesystem::path baseOutputPath)
-	: m_package(package),
-	m_ensmalleningData(ensmallData),
-	m_baseOutPath(baseOutputPath),
-	m_logger(Logger::getInstance())
+BatchIterator::BatchIterator()
+	: m_logger(Logger::getInstance())
 {
 }
 
 void
-BatchIterator::batchIterate(const LotusLib::LotusPath& basePath, const std::vector<std::string>& packages, ExtractorType types)
+BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, ExtractorType types, LotusLib::Game game, ExtractOptions options)
 {
-	this->validatePackages(packages);
-
-	for (const std::string& curPackageName : packages)
-	{
-		auto curPair = (*m_package)[curPackageName][LotusLib::PackageTrioType::H];
-		curPair->readToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::B])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->readToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::F])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->readToc();
-
-		for (auto iter = curPair->getIter(basePath); iter != curPair->getIter(); iter++)
-		{
-			const LotusLib::FileEntries::FileNode* curFile = *iter;
-
-			std::unique_ptr<char[]> rawData = curPair->getDataAndDecompress(curFile);
-			BinaryReaderBuffered rawDataReader((uint8_t*)rawData.release (), curFile->getLen());
-			std::string curFilePath = curFile->getFullPath();
-
-			LotusLib::CommonHeader header;
-			if (!tryReadHeader(rawDataReader, header))
-			{
-				m_logger.debug("Common header error: " + curFilePath);
-				continue;
-			}
-
-			Extractor* extractor = g_enumMapExtractor[header.type];
-
-			if (extractor == nullptr)
-			{
-				processUnknownFile(curFilePath, header, curFile);
-				continue;
-			}
-
-			if (((int)extractor->getExtractorType() & (int)types) == 0)
-			{
-				processSkipFile(curFilePath, header, curFile, extractor);
-				continue;
-			}
-
-			processKnownFile(curPackageName, curFilePath, &rawDataReader, header, extractor);
-		}
-
-		curPair->unReadToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::B])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::B]->unReadToc();
-		if ((*m_package)[curPackageName][LotusLib::PackageTrioType::F])
-			(*m_package)[curPackageName][LotusLib::PackageTrioType::F]->unReadToc();
-	}
+	LotusLib::PackageCategory targetPkgCategories = g_enumMapExtractor.getPkgCategories(game, types);
+	batchIterate(pkgsDir, outputPath, basePath, targetPkgCategories, types, game, options);
 }
 
 void
-BatchIterator::validatePackages(const std::vector<std::string>& packages) const
+BatchIterator::batchIterate(LotusLib::PackagesReader& pkgsDir, const std::filesystem::path& outputPath, const LotusLib::LotusPath& basePath, LotusLib::PackageCategory pkgCategory, ExtractorType types, LotusLib::Game game, ExtractOptions options)
 {
-	for (auto& curPkgStr : packages)
+	for (std::string& curPkgName : pkgsDir)
 	{
-		try
+		std::optional<LotusLib::PackageReader> curPkg = pkgsDir.getPackage(curPkgName);
+
+		if (!curPkg)
 		{
-			(*m_package)[curPkgStr][LotusLib::PackageTrioType::H];
+			m_logger.warn("Package doesn't exist: " + curPkgName);
+			continue;
 		}
-		catch (std::exception&)
+
+		if (((int)curPkg->getPkgCategory() & (int)pkgCategory) == 0)
 		{
-			m_logger.error("Package does not exist: " + curPkgStr);
-			throw std::runtime_error("Package does not exist: " + curPkgStr);
+			// Package not needed by specified extractors
+			continue;
+		}
+		
+		if (!pkgHasDir(*curPkg, basePath))
+		{
+			m_logger.warn("Folder doesn't exist inside " + curPkgName + ": " + basePath.string());
+			continue;
+		}
+
+		for (auto iter = curPkg->getIter(basePath); iter != curPkg->getIter(); iter++)
+		{
+			try
+			{
+				LotusLib::FileEntry curEntry = curPkg->getFile((*iter), LotusLib::FileEntryReaderFlags::READ_COMMON_HEADER | LotusLib::FileEntryReaderFlags::READ_H_CACHE);
+
+				Extractor* extractor = g_enumMapExtractor.at(game, curPkg->getPkgCategory(), curEntry.commonHeader.type);
+
+				if (extractor == nullptr)
+				{
+					processUnknownFile(pkgsDir, curEntry, outputPath);
+					continue;
+				}
+
+				if (((int)extractor->getExtractorType() & (int)types) == 0)
+				{
+					processSkipFile(pkgsDir, curEntry, extractor);
+					continue;
+				}
+
+				processKnownFile(pkgsDir, curEntry, extractor, outputPath, options);
+			}
+			catch (LotusLib::DecompressionException&)
+			{
+				m_logger.error("Decompression error, skipping");
+				continue;
+			}
+			catch (LotusLib::LotusException&)
+			{
+				continue;
+			}
 		}
 	}
 }
 
 bool
-BatchIterator::tryReadHeader(BinaryReaderBuffered& rawData, LotusLib::CommonHeader& outHeader) const
+BatchIterator::pkgHasDir(LotusLib::PackageReader& pkg, const LotusLib::LotusPath& path)
 {
 	try
 	{
-		int headerLen = LotusLib::CommonHeaderReader::readHeader(rawData.getPtr(), outHeader);
-		rawData.seek(headerLen, std::ios::beg);
+		pkg.getDirNode(path);
+		return true;
 	}
-	catch (LotusLib::LotusException&)
+	catch (std::exception&)
 	{
 		return false;
 	}
-	return true;
 }

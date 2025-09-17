@@ -10,7 +10,7 @@ AudioOpusReader139::getInstance()
 }
 
 void
-AudioOpusReader139::readBody(const AudioHeader& extHeader, BinaryReaderBuffered* fReader, BinaryReaderBuffered* bReader, AudioBody& outBody)
+AudioOpusReader139::readBody(const AudioHeader& extHeader, BinaryReader::BinaryReaderBuffered* fReader, BinaryReader::BinaryReaderBuffered* bReader, AudioBody& outBody)
 {
 	std::vector<char>& data = outBody.data;
 
@@ -19,7 +19,7 @@ AudioOpusReader139::readBody(const AudioHeader& extHeader, BinaryReaderBuffered*
 		data.resize(fReader->getLength());
 		fReader->readUInt8Array((uint8_t*)data.data(), fReader->getLength());
 	}
-	if (bReader != nullptr && (fReader == nullptr || fReader->getLength() != extHeader.size))
+	if (bReader != nullptr && (fReader == nullptr || static_cast<int>(fReader->getLength()) != extHeader.size))
 	{
 		size_t curSize = data.size();
 		data.resize(curSize + bReader->getLength());

@@ -10,76 +10,63 @@ ModelExtractor::getInstance()
 }
 
 void
-ModelExtractor::extractExternal(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
+ModelExtractor::indexVertexColors(LotusLib::PackageReader& pkgs)
 {
-	const LotusLib::FileEntries::FileNode* bEntry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
-	std::unique_ptr<char[]> bRawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(bEntry);
-	BinaryReaderBuffered bReader = BinaryReaderBuffered((uint8_t*)bRawData.release(), bEntry->getLen());
+	m_vertexColorIndexer.indexVertexColors(pkgs);
+}
 
-	if (bEntry == nullptr)
+void
+ModelExtractor::cancelVertexColorIndexing()
+{
+	m_vertexColorIndexer.cancelIndexing();
+}
+
+void
+ModelExtractor::extractExternal(LotusLib::FileEntry& fileEntry, LotusLib::Game game, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt)
+{
+	if (fileEntry.bData.getLength() == 0)
 		throw unknown_format_error("Mesh has no body");
 
 	// Read body/header data
-	ModelReader* modelReader = g_enumMapModel[header.type];
+	ModelReader* modelReader = g_enumMapModel.at(game, fileEntry.commonHeader.type);
 
-	modelReader->readHeader(hReader, ensmalleningData, header, outHeaderExt);
-	modelReader->readBody(outHeaderExt, &bReader, outBodyExt);
-
-	m_logger.debug(spdlog::fmt_lib::format("Raw model data: Bones={} WeightedBones={} Submeshes={} Vertices={} Faces={} Morphs={} PhysXMeshes={}", outHeaderExt.boneTree.size(), outHeaderExt.weightedBoneNames.size(), outHeaderExt.meshInfos.size(), outHeaderExt.vertexCount, outHeaderExt.faceCount, outHeaderExt.morphCount, outHeaderExt.physXMeshes.size()));
-
-	// Error checking. Properly extracted models will never trigger this.
-	if (outHeaderExt.meshInfos.size() == 0)
-		throw unknown_format_error("Mesh has zero MeshInfos");
+	modelReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, outHeaderExt);
+	modelReader->readBody(outHeaderExt, &fileEntry.bData, outBodyExt);
 }
 
 std::vector<std::vector<glm::u8vec4>>
-ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::Package<LotusLib::CachePairReader>& pkg)
+ModelExtractor::getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg, bool indexVertexColors)
 {
 	std::vector<std::vector<glm::u8vec4>> vertexColors;
-	if (m_indexVertexColors)
+	if (indexVertexColors)
 		m_vertexColorIndexer.getModelColors(modelPath, vertexColors, pkg);
-	if (vertexColors.size() > 0)
-		m_logger.debug("Found " + std::to_string(vertexColors.size()) + "vertex colors");
 	return vertexColors;
 }
 
 void
-ModelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+ModelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
 	ModelHeaderExternal headerExt;
 	ModelBodyExternal bodyExt;
-	extractExternal(header, hReader, pkgDir, package, internalPath, ensmalleningData, headerExt, bodyExt);
+	extractExternal(fileEntry, pkgs.getGame(), headerExt, bodyExt);
 
-	auto vertexColors = getVertexColors(internalPath, pkgDir["Misc"]);
+	if (headerExt.meshInfos.size() == 0)
+		throw unknown_format_error("Mesh has zero MeshInfos");
+
+	auto pkg = pkgs.getPackage("Misc");
+	auto vertexColors = getVertexColors(fileEntry.internalPath, pkg.value(), options.extractVertexColors);
 
 	// Convert body/header data into internal format
 	ModelHeaderInternal headerInt;
 	ModelBodyInternal bodyInt;
-	ModelConverter::convertToInternal(headerExt, bodyExt, header.attributes, vertexColors, headerInt, bodyInt, g_enumMapModel[header.type]->ensmalleningScale());
+	ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, g_enumMapModel.at(pkgs.getGame(), fileEntry.commonHeader.type)->ensmalleningScale(), fileEntry.internalPath);
+	ModelConverter::mirrorX(headerInt, bodyInt);
 
-	m_logger.debug(spdlog::fmt_lib::format("Converted model data: Scale={},{},{}", headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z));
+	m_logger.debug(spdlog::fmt_lib::format("Bones={} Verts={} Faces={} Morphs={} PhysXMeshes={} Colors={} Scale={},{},{}", headerExt.boneTree.size(), headerExt.vertexCount, headerExt.faceCount, headerExt.morphCount, headerExt.physXMeshes.size(), vertexColors.size(), headerInt.modelScale.x, headerInt.modelScale.y, headerInt.modelScale.z, headerInt.modelScale.w));
 	
 	// Convert body/header into exportable format
-	ModelExporterGltf outModel;
-	outModel.addModelData(headerInt, bodyInt);
-	outModel.save(outputPath);
-}
-
-void
-ModelExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData)
-{
-	const LotusLib::FileEntries::FileNode* bEntry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalPath);
-	std::unique_ptr<char[]> bRawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(bEntry);
-	BinaryReaderBuffered bReader = BinaryReaderBuffered((uint8_t*)bRawData.release(), bEntry->getLen());
-
-	ModelHeaderExternal headerExt;
-
-	size_t pos = hReader->tell();
-	ModelReader* modelReader = g_enumMapModel[header.type];
-
-	modelReader->readHeaderDebug(hReader, ensmalleningData, header);
-	hReader->seek(pos, std::ios_base::beg);
-	modelReader->readHeader(hReader, ensmalleningData, header, headerExt);
-	if (headerExt.vertexCount > 0)
-		modelReader->readBodyDebug(headerExt, &bReader);
+	Document gltfDocument;
+	ModelExporterGltf::addModelData(gltfDocument, headerInt, bodyInt, bodyExt, fileEntry.internalPath);
+	if (!options.dryRun)
+		ModelExporterGltf::save(gltfDocument, outputPath);
 }

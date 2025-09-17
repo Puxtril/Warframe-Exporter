@@ -3,6 +3,7 @@
 #include "Extractor.h"
 #include "audio/AudioStructs.h"
 #include "audio/AudioPCM/EnumMapAudioPCMReader.h"
+#include "audio/AudioPCM/AudioPCMExporterWAV.h"
 
 namespace WarframeExporter::Audio {
 	class AudioPCMExtractor : public Extractor
@@ -24,25 +25,30 @@ namespace WarframeExporter::Audio {
 			static ExtractorType type = ExtractorType::Audio;
 			return type;
 		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			const static std::string outFileExt = "wav";
 			return outFileExt;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
-				(int)AudioCompression::PCM,
-				(int)AudioCompression::ADPCM
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioCompression::PCM },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioCompression::ADPCM }
 			};
 			return extTypes;
 		}
 
 		static AudioPCMExtractor* getInstance();
 
-		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, std::ostream& outStream, ExtractOptions options);
 	};
 }

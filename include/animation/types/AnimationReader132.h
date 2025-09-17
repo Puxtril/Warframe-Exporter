@@ -1,7 +1,6 @@
 #pragma once
 
 #include "animation/AnimationReader.h"
-#include "animation/AnimationRotationDebugger.h"
 
 #include <bitset>
 
@@ -16,9 +15,11 @@ namespace WarframeExporter::Animation
 			return instance;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
-			std::vector<int> extTypes = { (int)AnimationType::ANIMATION_132 };
+			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, (int)AnimationType::ANIMATION_132 },
+			};
 			return extTypes;
 		}
 		
@@ -26,10 +27,8 @@ namespace WarframeExporter::Animation
 		// When researching channel types, it's helpful to know what animations have many of 1 type
 		void isPureChannelType(uint16_t* channelTypes, int channelCount);
 
-		void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override;
-		void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, AnimationHeaderExternal& outHeader) override;
-		void readBodyDebug(BinaryReaderBuffered* bodyReader, const AnimationHeaderExternal& extHeader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) override;
-		void readBody(BinaryReaderBuffered* bodyReader, const AnimationHeaderExternal& extHeader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, AnimationBodyExternal& outBody) override;
+		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, AnimationHeaderExternal& outHeader) override;
+		void readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const AnimationHeaderExternal& extHeader, const LotusLib::CommonHeader& header, AnimationBodyExternal& outBody) override;
 
 	protected:
 		/*

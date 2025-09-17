@@ -1,21 +1,14 @@
 #pragma once
 
-#include "TextureInfo.h"
+#include "TextureTypes.h"
+#include "ddspp.h"
 
+#include <string>
 #include <cstdint>
-#include <memory>
+#include <vector>
 
 namespace WarframeExporter::Texture
 {
-	struct TextureHeaderInternal
-	{
-		TextureCompression formatEnum;
-		TextureInfo* formatClass;
-		int32_t mip0Len;
-		int16_t width;
-		int16_t height;
-	};
-
 	struct TextureHeaderExternal
 	{
 		uint8_t unkEnum1;
@@ -24,11 +17,22 @@ namespace WarframeExporter::Texture
 		uint8_t format;
 		int16_t widthBase;
 		int16_t heightBase;
+		std::string textureNames;
 	};
 
-	struct TextureBodyInternal
+	struct TextureHeaderInternal
 	{
-		std::unique_ptr<char[]> data;
-		size_t dataLen;
+		TextureCompression formatEnum;
+		ddspp::DXGIFormat ddsFormat;
+		int32_t mip0Len;
+		int16_t width;
+		int16_t height;
+		std::vector<std::string> textureNames;
+	};
+
+	struct TextureInternal
+	{
+		TextureHeaderInternal header;
+		std::vector<char> body;
 	};
 }

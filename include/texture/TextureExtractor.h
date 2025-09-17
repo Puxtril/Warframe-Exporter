@@ -1,34 +1,19 @@
 #pragma once
 
+#include "ExtractOptions.h"
 #include "Extractor.h"
-#include "../Ensmallening.hpp"
-#include "TextureStructs.hpp"
-#include "BinaryReaderBase.h"
+#include "texture/TextureStructs.hpp"
 #include "BinaryReaderBuffered.h"
-#include "TextureReader.h"
-#include "TextureConverter.h"
-#include "TextureEnumMap.h"
-#include "TextureExporterDDS.h"
+#include "texture/TextureReader.h"
+#include "texture/TextureConverter.h"
+#include "texture/TextureExporterDDS.h"
+#include "texture/TextureExportTypes.h"
+#include "texture/TextureTypes.h"
+#include "texture/TextureExporterConvert.h"
 
-#include <iostream>
 
 namespace WarframeExporter::Texture
-{
-	enum class TextureType {
-		TEXTURE_DIFFUSE_EMISSION_TINT = 163,
-		TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE = 164,
-		TEXTURE_BILLBOARD_SPRITEMAP_NORMAL = 165,
-		TEXTURE_ROUGHNESS = 167,
-		TEXTURE_SKYBOX = 171,
-		TEXTURE_174 = 174,
-		TEXTURE_176 = 176,
-		TEXTURE_CUBEMAP = 177,
-		TEXTURE_NORMAL_MAP = 184,
-		TEXTURE_PACKMAP = 188,
-		TEXTURE_194 = 194,
-		TEXTURE_DETAILSPACK = 195
-	};
-	
+{	
 	class TextureExtractor : public Extractor
 	{
 		TextureExtractor() : Extractor() {}
@@ -37,10 +22,41 @@ namespace WarframeExporter::Texture
 		TextureExtractor(const TextureExtractor&) = delete;
 		TextureExtractor operator=(const TextureExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
-			static std::string outFileExt = "dds";
-			return outFileExt;
+			size_t curOffset = hReader->tell();
+			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, commonHeader);
+			hReader->seek(curOffset, std::ios::beg);
+
+			static const std::string hdr = "hdr";
+			if (extHeader.format == (uint8_t)TextureCompression::BC6 && options.textureExportType != TextureExportType::TEXTURE_EXPORT_DDS)
+				return hdr;
+
+			switch (options.textureExportType)
+			{
+			case TextureExportType::TEXTURE_EXPORT_DDS:
+			{
+				static const std::string dds = "dds";
+				return dds;
+			}
+			case TextureExportType::TEXTURE_EXPORT_PNG:
+			{
+				static const std::string png = "png";
+				return png;
+			}
+			case TextureExportType::TEXTURE_EXPORT_TGA:
+			{
+				static const std::string tga = "tga";
+				return tga;
+			}
+			default:
+				throw std::runtime_error("Unexpected export format");
+			}
+		}	
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
 		}
 
 		inline const std::string& getFriendlyName() const override
@@ -55,29 +71,64 @@ namespace WarframeExporter::Texture
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			static std::vector<int> extTypes = {
-				(int)TextureType::TEXTURE_DIFFUSE_EMISSION_TINT,
-				(int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE,
-				(int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL,
-				(int)TextureType::TEXTURE_ROUGHNESS,
-				(int)TextureType::TEXTURE_SKYBOX,
-				(int)TextureType::TEXTURE_174,
-				(int)TextureType::TEXTURE_176,
-				(int)TextureType::TEXTURE_CUBEMAP,
-				(int)TextureType::TEXTURE_NORMAL_MAP,
-				(int)TextureType::TEXTURE_PACKMAP,
-				(int)TextureType::TEXTURE_194,
-				(int)TextureType::TEXTURE_DETAILSPACK
+			static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE },
+				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_DIFFUSE },
+				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DIFFUSE_EMISSION_TINT },
+				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DIFFUSE_EMISSION_TINT },
+				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL },
+				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_BILLBOARD_SPRITEMAP_NORMAL },
+				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ARRAY },
+				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ARRAY },
+				{  LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ROUGHNESS },
+				{  LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_ROUGHNESS },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_SKYBOX },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_SKYBOX },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_POSTPROCESS },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_POSTPROCESS },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_RAW_175 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_176 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_176 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_CUBEMAP },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_CUBEMAP },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_NORMAL_MAP },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_NORMAL_MAP },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_PACKMAP },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_PACKMAP },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_LANDSCAPE },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_LANDSCAPE },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DETAILSPACK },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::TEXTURE, (int)TextureType::TEXTURE_DETAILSPACK },
+
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HLOD_DIFFUSE },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HLOD_DIFFUSE },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HLOD_PACKMAP },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HLOD_PACKMAP },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_LANDSCAPE },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_LANDSCAPE },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_175 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_175 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_176 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_176 },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_XYZ },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_XYZ },
+				{ LotusLib::Game::WARFRAME,  LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HDR },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::LIGHT_MAP, (int)LightmapType::LIGHTMAP_HDR },
 			};
 			return extTypes;
 		};
 
 		static TextureExtractor* getInstance();
-		static void writeData (const std::filesystem::path& outputFile, const TextureHeaderInternal& header, const TextureBodyInternal& body, const LotusLib::CommonHeader& comHeader);
 
-		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalPath, const Ensmallening& ensmalleningData) override;
+		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs);
+		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile, TextureExportType exportType);
+
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+
+	private:
+		static void writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType);
+		static void writeTextureToFile(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType);
 	};
 }

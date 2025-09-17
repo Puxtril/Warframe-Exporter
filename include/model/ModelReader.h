@@ -1,35 +1,14 @@
 #pragma once
 
 #include "BinaryReaderBuffered.h"
-#include "Ensmallening.hpp"
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
-#include "EnumMapValue.h"
+#include "EnumMapGame.h"
+#include "model/ModelTypes.h"
 
 namespace WarframeExporter::Model
 {
-	enum class ModelType
-	{
-		MODEL_STATIC_86 = 86,
-		MODEL_STATIC_96 = 96,
-		MODEL_LEVEL_99 = 99,
-		MODEL_DCM_101 = 101,
-		MODEL_HLOD_102 = 102,
-		MODEL_LEVEL_103 = 103,
-		MODEL_TERRAIN_159 = 159,
-		MODEL_RIGGED_269 = 269,
-		MODEL_RIGGED_272 = 272,
-		MODEL_PACKED_289 = 289
-	};
-
-	enum class ScaleType
-	{
-		XYZ,
-		XZ,
-		NONE
-	};
-
-	class ModelReader : public EnumMapValue
+	class ModelReader : public EnumMapGameValue
 	{
 	protected:
 		ModelReader() = default;
@@ -37,9 +16,27 @@ namespace WarframeExporter::Model
 	public:
 		virtual ScaleType ensmalleningScale() const = 0;
 
-		virtual void readHeaderDebug(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header) = 0;
-		virtual void readHeader(BinaryReaderBuffered* headerReader, const Ensmallening& ensmalleningData, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
-		virtual void readBodyDebug(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader) = 0;
-		virtual void readBody(const ModelHeaderExternal& extHeader, BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) = 0;
+		virtual void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
+		virtual void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) = 0;
+
+	protected:
+		void readWeightedBones(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outWeightedBones);
+		void readBoneTree(BinaryReader::BinaryReaderBuffered* reader, std::vector<BoneTreeNodeExternal>& outBoneTree);
+		void readBoneMaps(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::vector<uint32_t>>& outBoneMaps);
+		void readMeshInfos(BinaryReader::BinaryReaderBuffered* reader, std::vector<MeshInfoExternal>& outMeshInfos);
+		void readMaterialPaths(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outMaterialpaths);
+		void readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::vector<PhysXMesh>& outPhysxMeshes);
+		void readErrors(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outErrors);
+
+		void skipUnk16Array(BinaryReader::BinaryReaderBuffered* reader);
+		void skipUnk64Array(BinaryReader::BinaryReaderBuffered* reader);
+
+		void skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader);
+		uint32_t skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader);
+		void skipMorphs(BinaryReader::BinaryReaderBuffered* reader);
+		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader);
+		void skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader);
+
+		bool canContinueReading(BinaryReader::BinaryReaderBuffered* reader, int vertexIndexCount);
 	};
 }

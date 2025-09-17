@@ -7,9 +7,6 @@
 [submodule "lib/lib/json"]
 	path = lib/json
 	url = https://github.com/nlohmann/json.git
-[submodule "lib/Binary-Reader"]
-	path = lib/Binary-Reader
-	url = https://github.com/Protinon/Binary-Reader.git
 [submodule "lib/spdlog"]
 	path = lib/spdlog
 	url = https://github.com/gabime/spdlog.git
@@ -22,3 +19,21 @@
 [submodule "lib/ddspp"]
 	path = lib/ddspp
 	url = https://github.com/Puxtril/ddspp.git
+[submodule "Binary-reader"]
+	path = lib/Binary-Reader
+	url = https://github.com/Puxtril/Binary-Reader.git
+[submodule "lib/qt5"]
+	path = lib/qt5
+	url = https://code.qt.io/qt/qt5.git
+[submodule "lib/QtOpenGLViewer"]
+	path = lib/QtOpenGLViewer
+	url = https://github.com/Puxtril/QtOpenGLViewer.git
+[submodule "lib/bcdec"]
+	path = lib/bcdec
+	url = https://github.com/iOrange/bcdec.git
+[submodule "lib/libspng"]
+	path = lib/libspng
+	url = https://github.com/randy408/libspng.git
+[submodule "lib/PhysxParser"]
+	path = lib/PhysxParser
+	url = https://github.com/Puxtril/PhysxParser.git

@@ -10,6 +10,6 @@ namespace WarframeExporter::Audio
 
 	public:
 		static AudioPCMReader139* getInstance();
-		void readBody(const AudioHeader& extHeader, BinaryReaderBuffered* fReader, BinaryReaderBuffered* bReader, AudioBody& outBody) override;
+		void readBody(const AudioHeader& extHeader, BinaryReader::BinaryReaderBuffered* fReader, BinaryReader::BinaryReaderBuffered* bReader, AudioBody& outBody) override;
 	};
 }

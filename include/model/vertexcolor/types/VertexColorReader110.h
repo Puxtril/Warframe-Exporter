@@ -2,7 +2,7 @@
 
 #include "model/vertexcolor/VertexColorStructs.h"
 #include "model/vertexcolor/VertexColorReader.h"
-#include "BinaryReaderBase.h"
+#include "BinaryReaderBuffered.h"
 #include "ExporterExceptions.h"
 
 #include <string>
@@ -28,8 +28,8 @@ namespace WarframeExporter::Model::VertexColor
 			return extTypes;
 		}
 	
-		void readHeaderDebug(BinaryReaderBuffered* headerReader) override;
-		void readHeader(BinaryReaderBuffered* headerReader, VertexColorHeader& outHeader) override;
-		void readBody(BinaryReaderBuffered* bodyReader, std::vector<glm::u8vec4>& outData) override;
+		void readHeaderDebug(BinaryReader::BinaryReaderBuffered* headerReader) override;
+		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, VertexColorHeader& outHeader) override;
+		void readBody(BinaryReader::BinaryReaderBuffered* bodyReader, std::vector<glm::u8vec4>& outData) override;
 	};
 };

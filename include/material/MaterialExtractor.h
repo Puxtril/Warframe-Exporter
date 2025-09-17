@@ -2,17 +2,15 @@
 
 #include "Extractor.h"
 #include "BinaryReaderBuffered.h"
+#include "material/MaterialTypes.h"
+#include "material/MaterialStructs.h"
+#include "material/MaterialEnumMap.h"
+#include "material/MaterialConverter.h"
+#include "material/MaterialExtractOptions.h"
+#include "material/MaterialExporter.h"
 
 namespace WarframeExporter::Material
 {
-	enum class MaterialType
-	{
-		MATERIAL_203 = 203,
-		MATERIAL_204 = 204,
-		MATERIAL_205 = 205,
-		MATERIAL_206 = 206
-	};
-
 	class MaterialExtractor : public Extractor
 	{
 		MaterialExtractor() : Extractor() {}
@@ -21,10 +19,20 @@ namespace WarframeExporter::Material
 		MaterialExtractor(const MaterialExtractor&) = delete;
 		MaterialExtractor operator=(const MaterialExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
-			const static std::string outFileExt = "txt";
-			return outFileExt;
+			const static std::string& jsonExt = "json";
+			if (options.materialExtractMode == MaterialExtractType::JSON)
+				return jsonExt;
+
+			const static std::string& txtExt = "txt";
+			return txtExt;
+
+		}
+		
+		inline bool isMultiExport() const override
+		{
+			return false;
 		}
 
 		inline const std::string& getFriendlyName() const override
@@ -39,21 +47,27 @@ namespace WarframeExporter::Material
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
-			const static std::vector<int> extTypes = {
-				(int)MaterialType::MATERIAL_203,
-				(int)MaterialType::MATERIAL_204,
-				(int)MaterialType::MATERIAL_205,
-				(int)MaterialType::MATERIAL_206
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_203 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_204 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_205 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_206 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_208 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_208 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_210 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_214 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_216 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_216 }
 			};
 			return extTypes;
 		}
 
 		static MaterialExtractor* getInstance();
 
-		void getExtraNames(BinaryReaderBuffered* headerReader, std::vector<std::string>& outPaths);
-		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData) override;
+		MaterialExternal getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
+		void writeOut(const MaterialInternal& materialInternal, const std::filesystem::path& outputPath, ExtractOptions options);
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

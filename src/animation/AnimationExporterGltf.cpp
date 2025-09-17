@@ -1,4 +1,4 @@
-#include "animation/AnimationExporterGLTF.h"
+#include "animation/AnimationExporterGltf.h"
 
 using namespace WarframeExporter::Animation;
 

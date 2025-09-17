@@ -1,0 +1,85 @@
+#pragma once
+
+#if defined WIN32 || defined MINGW
+	// I hate Windows
+	#define WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
+	#include <windows.h>
+	#include <D3Dcommon.h>
+	#include <d3dcompiler.h>
+#endif
+
+#include "Extractor.h"
+#include "shader/ShaderStructs.h"
+#include "shader/ShaderTypes.h"
+#include "shader/ShaderEnumMap.h"
+#include "shader/ShaderExportType.h"
+
+namespace WarframeExporter::Shader
+{
+    class ShaderExtractor : public Extractor
+    {
+		bool m_hasWarnedCompileNonWindows;
+		
+        ShaderExtractor();
+
+    public:
+        ShaderExtractor(const ShaderExtractor&) = delete;
+		ShaderExtractor operator=(const ShaderExtractor&) = delete;
+
+        inline const std::string& getFriendlyName() const override
+        {
+            const static std::string friendlyName = "Shader";
+			return friendlyName;
+        }
+
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
+        {
+            const static std::string ext = "hlsl";
+			return ext;
+        }
+		
+		inline bool isMultiExport() const override
+		{
+			return true;
+		}
+
+		inline ExtractorType getExtractorType() const override
+        {
+            static ExtractorType type = ExtractorType::Shader;
+			return type;
+        }
+
+        inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
+		{
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_18 },
+				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_21 },
+				//{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_21 },
+				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_22 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_23 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_24 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_26 },
+			};
+			return extTypes;
+		}
+
+        static ShaderExtractor* getInstance();
+
+        ShaderHeaderExternal getHeader(LotusLib::FileEntry& fileEntry);
+
+        ShaderEntry readEntry(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header, int index);
+        std::vector<ShaderEntry> readAllEntries(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header);
+		
+		void decompileShader(ShaderEntry& shaderEntry);
+		void decompileShaders(std::vector<ShaderEntry>& shaderEntries);
+
+        void writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex = 0);
+
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options) override;
+		
+	private:
+		void _decompileShader(ShaderEntry& shaderEntry, int index = -1);
+    };
+}

@@ -1,0 +1,118 @@
+#include "shader/ShaderExtractor.h"
+
+using namespace WarframeExporter::Shader;
+
+ShaderExtractor::ShaderExtractor()
+    : Extractor(), m_hasWarnedCompileNonWindows(false)
+{ }
+
+ShaderExtractor*
+ShaderExtractor::getInstance()
+{
+    static ShaderExtractor instance;
+    return &instance;
+}
+
+ShaderHeaderExternal
+ShaderExtractor::getHeader(LotusLib::FileEntry& fileEntry)
+{
+	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
+	return shaderReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader.type);
+}
+
+ShaderEntry
+ShaderExtractor::readEntry(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header, int index)
+{
+	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
+	return shaderReader->readShader(&fileEntry.bData, header, index);
+}
+
+std::vector<ShaderEntry>
+ShaderExtractor::readAllEntries(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header)
+{
+	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
+	return shaderReader->readAllShaders(&fileEntry.bData, header);
+}
+
+void
+ShaderExtractor::decompileShader(ShaderEntry& shaderEntry)
+{
+	_decompileShader(shaderEntry);
+}
+
+void
+ShaderExtractor::decompileShaders(std::vector<ShaderEntry>& shaderEntries)
+{
+	for (int i = 0; i < shaderEntries.size(); i++)
+	{
+		_decompileShader(shaderEntries[i], i);
+	}
+}
+
+void
+ShaderExtractor::writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex)
+{
+    std::filesystem::path outputFile = outputDir / std::to_string(shaderIndex);
+	
+    std::ofstream out;
+	if (shader.decompiled == "")
+	{
+		outputFile.replace_extension("bin");
+		out.open(outputFile, std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write(shader.bytecode.data(), shader.bytecode.size());
+	}
+	else
+	{
+		outputFile.replace_extension("hlsl");
+		out.open(outputFile, std::ios::out | std::ofstream::trunc);
+		out.write(shader.decompiled.c_str(), shader.decompiled.length());
+	}
+	out.close();
+}
+
+void
+ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options)
+{
+    ShaderHeaderExternal externalHeader = getHeader(fileEntry);
+	ZstdShaderReader::getInstance()->initilizeDecompressor(pkgs);
+
+    std::vector<ShaderEntry> bodyEntries = readAllEntries(fileEntry, externalHeader);
+
+    for (int iShader = 0; iShader < bodyEntries.size(); iShader++)
+    {
+        if (options.shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
+		    decompileShader(bodyEntries[iShader]);
+		if (!options.dryRun)
+        	writeShader(bodyEntries[iShader], outputDir, iShader);
+    }
+}
+
+void
+ShaderExtractor::_decompileShader(ShaderEntry& shaderEntry, int index)
+{
+	shaderEntry.decompiled = "";
+
+#ifdef WIN32
+	ID3DBlob* disassembly;
+
+	HRESULT result = D3DDisassemble(
+		(LPCVOID)shaderEntry.bytecode.data(),
+		shaderEntry.bytecode.size(),
+		D3D_DISASM_ENABLE_DEFAULT_VALUE_PRINTS,
+		NULL,
+		&disassembly
+	);
+
+	if (FAILED(result))
+	{
+		if (index == -1)
+			m_logger.error("Shader decompilation failed");
+		else
+			m_logger.error("Shader decompilation failed (Index " + std::to_string(index) + ")");
+
+		return;
+	}
+	
+	shaderEntry.decompiled = std::string(static_cast<char*>(disassembly->GetBufferPointer()));
+#endif
+}

@@ -6,7 +6,6 @@
 
 namespace WarframeExporter::Audio
 {
-
 	class AudioExtractorProxy : public Extractor
 	{
 		AudioExtractorProxy() : Extractor() {}
@@ -27,24 +26,28 @@ namespace WarframeExporter::Audio
 			return type;
 		}
 
-		inline std::vector<int> getEnumMapKeys() const override
+		inline bool isMultiExport() const override
 		{
-			const static std::vector<int> extTypes = {
+			return false;
+		}
+
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
+		{
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				//(int)AudioType::AUDIO_6,
 				//(int)AudioType::AUDIO_23,
-				(int)AudioType::AUDIO_139	
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioType::AUDIO_139 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)AudioType::AUDIO_139 }
 			};
 			return extTypes;
 		}
 		
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReaderBuffered* hReader) const override;
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override;
 
 		static AudioExtractorProxy* getInstance();
 
-		void extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath) override;
-		void extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData) override;
+		AudioCompression peekCompressionFormat(BinaryReader::BinaryReaderBuffered* headerReader) const;
 
-	private:
-		AudioCompression peekCompressionFormat(BinaryReaderBuffered* headerReader) const;
+		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
 	};
 }

@@ -7,15 +7,11 @@
 
 using namespace fx::gltf;
 
-namespace WarframeExporter::Level
+namespace WarframeExporter::Level::LevelExporterGltf
 {
-	class LevelExporterGltf : public WarframeExporter::Model::ModelExporterGltf
-	{
-	public:
-		void addModelData(const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& body, const LevelObjectInternal& levelObj);
+	void addModel(Document& gltfDoc, const WarframeExporter::Model::ModelHeaderInternal& header, const WarframeExporter::Model::ModelBodyInternal& bodyInt, const WarframeExporter::Model::ModelBodyExternal& bodyExt, const LevelObjectInternal& levelObj);
 
-	private:
-		void addLevelInformation(const LevelObjectInternal& levelObj, std::vector<int32_t> meshIndices);
-		std::vector<int32_t> getMeshNodeIndices(int32_t startIndex, int32_t endIndex);
-	};
+	void _addModelToScene(Document& gltfDoc, const LevelObjectInternal& levelObj, Mesh& mesh);
+	void _applyTransforms();
+	std::vector<int32_t> _getMeshNodeIndices(Document& gltfDoc, int32_t startIndex, int32_t endIndex);
 }

@@ -3,16 +3,32 @@
 using namespace WarframeExporter::Texture;
 
 TextureHeaderInternal
-TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize)
+TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize, uint32_t fileFormat)
 {
-	TextureInfo* formatClass = g_enumMapTexture[(int)headerExternal.format];
+	TextureCompression compressionFormat = static_cast<TextureCompression>(headerExternal.format);
+	ddspp::DXGIFormat ddsFormat = internalFormatToDdsFormat.at(compressionFormat);
 
-	bool isCompressed = ddspp::is_compressed(formatClass->getFormat());
-	int squareSize = ddspp::get_bits_per_pixel_or_block(formatClass->getFormat()) / 8;
-	auto dimensions = getCorrectResolution(headerExternal.widthBase, headerExternal.heightBase, isCompressed, fileSize, squareSize);
+	std::vector<std::string> subtextureNames;
+	if (fileFormat == (uint32_t)TextureType::TEXTURE_CUBEMAP)
+	{
+		// Cubemaps will have exactly 6 sub-textures
+		subtextureNames = {"1", "2", "3", "4", "5", "6"};
+	}
+	else
+	{
+		// Textures of type TEXTURE_ARRAY will have X sub-textures
+		// But that is read by the external reader. This will just parse this field
+		subtextureNames = parseSubtextureString(headerExternal.textureNames);
+	}
+	size_t filesizeMinusTextureCount = subtextureNames.size() > 0 ? fileSize / subtextureNames.size() : fileSize;
+
+	bool isCompressed = ddspp::is_compressed(ddsFormat);
+	int squareSize = ddspp::get_bits_per_pixel_or_block(ddsFormat) / 8;
+	int32_t singleEntryFileSize = std::ceil(filesizeMinusTextureCount);
+	auto dimensions = getCorrectResolution(headerExternal.widthBase, headerExternal.heightBase, isCompressed, singleEntryFileSize, squareSize);
 	int32_t mip0Len = getMip0Len(std::get<0>(dimensions), std::get<1>(dimensions), isCompressed, squareSize);
 
-	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), formatClass, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions) };
+	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), ddsFormat, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions), subtextureNames };
 }
 
 std::pair<int16_t, int16_t>
@@ -30,6 +46,26 @@ int32_t
 TextureConverter::getMip0Len(int16_t width, int16_t height, bool isCompressed, int blockSize)
 {
 	if (!isCompressed)
-		return width * height * 4;
+		return width * height * blockSize;
 	return std::max(1, ((width + 3) / 4)) * std::max(1, ((height + 3) / 4)) * blockSize;
+}
+
+std::vector<std::string>
+TextureConverter::parseSubtextureString(const std::string& subtextureString)
+{
+	std::vector<std::string> subtexturePaths;
+
+	size_t cursor1 = 0;
+	size_t cursor2 = subtextureString.find('.', cursor1);
+
+	while(cursor2 < subtextureString.length())
+	{
+		size_t startOfNext = subtextureString.find('/', cursor2 + 1);
+		subtexturePaths.push_back(subtextureString.substr(cursor1, startOfNext - cursor1));
+
+		cursor1 = startOfNext;
+		cursor2 = subtextureString.find('.', cursor1);
+	}
+
+	return subtexturePaths;
 }

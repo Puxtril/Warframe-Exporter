@@ -3,8 +3,8 @@
 #include <filesystem>
 #include <cstdint>
 
-#define WINDOWS_TICK 10000000
-#define SEC_TO_UNIX_EPOCH 11644473600LL
+#define WINDOWS_TIME_TICK 10000000
+#define WINDOWS_TIME_MAGIC 116444736000000000LL
 
 #if defined WIN32 || defined MINGW
 	#define WINDOWS
@@ -16,21 +16,37 @@
 	#include <sys/time.h>
 #endif
 
-class FileProperties
+namespace WarframeExporter
 {
-public:
-	static int64_t wintimeToEpoch(uint64_t winTime);
+	// Windows tracks time in 100ns units since January 1, 1601.
+	// Unix tracks time in 1s units since January 1, 1970.
+	class FileProperties
+	{
+	public:
+		typedef int64_t TimeEpoch;
+		typedef int64_t TimeDos;
 
-	static void writeWinTime(std::filesystem::path filePath, uint64_t createTime, uint64_t writeTime, uint64_t accessTime);
-	//static void writeEpochTime(std::filesystem::path filePath, int64_t createTime, int64_t writeTime, int64_t accessTime);
-	static int64_t readWinTimeMod(std::filesystem::path filePath);
-	//static int64_t readEpochTime(std::filesystem::path);
-private:
-#ifdef WINDOWS
-	static void writeFileTime(std::filesystem::path filePath, FILETIME createTime, FILETIME writeTime, FILETIME accessTime);
-	static std::tuple<FILETIME, FILETIME, FILETIME> readFileTime(std::filesystem::path filePath);
-#else
-	static void writeFileTime(std::filesystem::path filePath, const struct utimbuf& time);
-	static time_t readFileTime(std::filesystem::path filePath);
-#endif
-};
+		static TimeEpoch dosToEpoch(TimeDos dosTime);
+		static TimeDos epochToDos(TimeEpoch epochTime);
+		static TimeDos wipeNanoseconds(TimeDos dosTime);
+
+		// Implemention is determined at compile-time
+		// "Cross platform interface"
+		static void writeEpoch(std::filesystem::path filePath, TimeEpoch createTime, TimeEpoch writeTime, TimeEpoch accessTime);
+		static void writeDos(std::filesystem::path filePath, TimeDos createTime, TimeDos writeTime, TimeDos accessTime, bool ignoreNano = false);
+		static TimeEpoch readEpoch(std::filesystem::path filePath);
+		static TimeDos readDos(std::filesystem::path filePath, bool ignoreNano = false);
+
+	// Platform-specific
+	private:
+	#ifdef WINDOWS
+		static TimeDos filetimeStructToUint64(const FILETIME& dosTime);
+		static FILETIME uint64ToFiletimeStruct(const TimeDos& dosTime);
+		static void writeFileTime(std::filesystem::path filePath, TimeDos createTime, TimeDos writeTime, TimeDos accessTime);
+		static std::tuple<FILETIME, FILETIME, FILETIME> readFileTime(std::filesystem::path filePath);
+	#else
+		static void writeFileTime(std::filesystem::path filePath, const struct utimbuf& time);
+		static TimeEpoch readFileTime(std::filesystem::path filePath);
+	#endif
+	};
+}

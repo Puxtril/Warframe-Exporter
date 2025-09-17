@@ -9,88 +9,189 @@ LevelExtractor::getInstance()
 	return instance;
 }
 
-void
-LevelExtractor::extract(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData, const std::filesystem::path& outputPath)
+LevelExternal
+LevelExtractor::getLevelExternal(LotusLib::FileEntry& fileEntry)
 {
-	const LotusLib::FileEntries::FileNode* bEntry = pkgDir[package][LotusLib::PackageTrioType::B]->getFileEntry(internalpath);
-	std::unique_ptr<char[]> bRawData = pkgDir[package][LotusLib::PackageTrioType::B]->getDataAndDecompress(bEntry);
-	BinaryReaderBuffered bReader = BinaryReaderBuffered((uint8_t*)bRawData.release(), bEntry->getLen());
-
-	LevelReader* levelReader = g_enumMapLevel[header.type];
+	LevelReader* levelReader = g_enumMapLevel[fileEntry.commonHeader.type];
 	
-	LevelHeaderExternal headerExt;
-	LevelBodyExternal bodyExt;
-	levelReader->readHeader(*hReader, headerExt);
-	levelReader->readBody(bReader, headerExt, bodyExt);
+	LevelExternal external;
+	external.landscapeIndex = -1;
+	levelReader->readHeader(fileEntry.headerData, external.header);
+	levelReader->readBody(fileEntry.bData, external.header, external.body);
 
+	findLandscape(external);
+	return external;
+}
+
+LevelInternal
+LevelExtractor::convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal)
+{
 	LevelInternal bodyInt;
-	LevelConverter::convertToInternal(headerExt, bodyExt, internalpath, bodyInt);
-	m_logger.info("Level mesh count: " + std::to_string(bodyInt.objs.size()));
-
-	LevelExporterGltf gltfOut;
-
-	pkgDir["Misc"][LotusLib::PackageTrioType::H]->readToc();
-	pkgDir["Misc"][LotusLib::PackageTrioType::B]->readToc();
-	createGltfCombined(pkgDir, ensmalleningData, bodyInt, gltfOut);
-
-	gltfOut.save(outputPath);
+	LevelConverter::convertToInternal(levelExternal.header, levelExternal.body, fileEntry.internalPath, bodyInt);
+	LevelConverter::convertLandscapeToInternal(levelExternal, bodyInt);
+	return bodyInt;
 }
 
 void
-LevelExtractor::extractDebug(const LotusLib::CommonHeader& header, BinaryReaderBuffered* hReader, LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const std::string& package, const LotusLib::LotusPath& internalpath, const Ensmallening& ensmalleningData)
+LevelExtractor::findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal)
 {
-	LevelReader* levelReader = g_enumMapLevel[header.type];
-	levelReader->readHeaderDebug(*hReader);
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
+
+	for (size_t i = 0; i < levelExternal.header.levelObjs.size(); i++)
+	{
+		std::vector<char>& curAttributes = levelExternal.body.attributes[i];
+
+		LotusLib::FileEntry entry = pkg.getFile(levelExternal.header.levelObjs[i].objTypePath, LotusLib::READ_EXTRA_ATTRIBUTES);
+		if (entry.extra.attributes.size() > curAttributes.size())
+		{
+			size_t oldSize = curAttributes.size();
+			curAttributes.resize(oldSize + entry.extra.attributes.length());
+			memcpy(&curAttributes[oldSize-1], entry.extra.attributes.c_str(), entry.extra.attributes.length());
+		}
+	}
 }
 
 void
-LevelExtractor::createGltfCombined(LotusLib::PackageCollection<LotusLib::CachePairReader>& pkgDir, const Ensmallening& ensmalleningData, LevelInternal& bodyInt, LevelExporterGltf& outGltf)
+LevelExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
 {
+	LevelExternal levelExt = getLevelExternal(fileEntry);
+	pkgs.initilizePackagesBin();
+	findExtraAttributes(pkgs, levelExt);
+	LevelInternal levelInt = convertToInternal(fileEntry, levelExt);
+
+	m_logger.info("Level object count: " + std::to_string(levelInt.objs.size()));
+
+	Document gltfOut = createGltfCombined(pkgs, levelInt, options);
+
+	if (gltfOut.buffers.size() > 1)
+	{
+		for (size_t i = 0; i < gltfOut.buffers.size(); i++)
+		{
+			Buffer& currentBuf = gltfOut.buffers[i];
+			currentBuf.uri = outputPath.stem().string() + std::to_string(i) + ".bin";
+		}
+	}
+
+	if (!options.dryRun)
+		fx::gltf::Save(gltfOut, outputPath, gltfOut.buffers.size() > 1 ? false : true);
+}
+
+Document
+LevelExtractor::createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt, ExtractOptions options)
+{
+	Document outGltf;
+
+	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
+
+	if (!bodyInt.landscape.landscapePath.empty())
+		addLandscapeToGltf(outGltf, bodyInt, pkgs);
+
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
+		// >3GB
+		if (outGltf.buffers.size() > 0 && outGltf.buffers.back().data.size() > 3221225472)
+			outGltf.buffers.resize(outGltf.buffers.size() + 1);
+
 		LevelObjectInternal& curLevelObj = bodyInt.objs[x];
 
 		if (curLevelObj.meshPath == "")
 			continue;
 
-		try {
-			const LotusLib::FileEntries::FileNode* hEntry = pkgDir["Misc"][LotusLib::PackageTrioType::H]->getFileEntry(curLevelObj.meshPath);
-			std::unique_ptr<char[]> hRawData = pkgDir["Misc"][LotusLib::PackageTrioType::H]->getDataAndDecompress(hEntry);
-			BinaryReaderBuffered hReader = BinaryReaderBuffered((uint8_t*)hRawData.release(), hEntry->getLen());
+		bool isHlod = curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0;
+		if (
+			(isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::IGNORE_HLOD) ||
+			(!isHlod && options.levelHlodExtractMode == LevelHlodExtractMode::ONLY_HLOD)
+		) { continue; }
 
-			LotusLib::CommonHeader commonHeader;
-			int headerLen = LotusLib::CommonHeaderReader::readHeader(hReader.getPtr(), commonHeader);
-			hReader.seek(headerLen, std::ios::beg);
+		try
+		{
+			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curLevelObj.meshPath);
 
-			if (WarframeExporter::Model::g_enumMapModel[commonHeader.type] == nullptr)
+			if (curLevelObjFile.headerData.getLength() == 0)
 			{
-				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported mesh: {}", curLevelObj.meshPath));
+				m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curLevelObj.meshPath));
+				continue;
+			}
+
+			if (WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type) == nullptr)
+			{
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curLevelObj.meshPath));
 				continue;
 			}
 
 			WarframeExporter::Model::ModelHeaderExternal headerExt;
 			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(commonHeader, &hReader, pkgDir, "Misc", curLevelObj.meshPath, ensmalleningData, headerExt, bodyExt);
+			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
 
-			// My Gltf exporter doesn't like multiple rigged models
-			// These are levels anyway, so no big deal right?
-			// ...
-			// Right?
+			if (headerExt.meshInfos.size() == 0)
+				continue;
+
+			// Gltf exporter doesn't like multiple rigged models
 			headerExt.boneTree.clear();
 
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, pkgDir["Misc"]);
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel[commonHeader.type]->ensmalleningScale());
+			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg, options.extractVertexColors);
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale(), curLevelObj.meshPath);
 
-			LevelConverter::applyTransformation(curLevelObj, bodyInt.positions);
 			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
 
-			outGltf.addModelData(headerInt, bodyInt, curLevelObj);
-		} catch (std::exception& ex) {
+			LevelExporterGltf::addModel(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
+		}
+		catch (std::exception& ex)
+		{
 			if (curLevelObj.meshPath.length() > 5)
-				m_logger.error(spdlog::fmt_lib::format("{}::{}: {}", curLevelObj.meshPath, curLevelObj.objName, ex.what()));
+				m_logger.error(spdlog::fmt_lib::format("{}: {}", ex.what(), curLevelObj.meshPath));
 			continue;
+		}
+	}
+
+	return outGltf;
+}
+
+void
+LevelExtractor::findLandscape(LevelExternal& levelExternal)
+{
+	for (size_t i = 0; i < levelExternal.header.levelObjs.size(); i++)
+	{
+		if (levelExternal.header.levelObjs[i].objTypePath == "/EE/Types/Effects/Landscape")
+		{
+			levelExternal.landscapeIndex = i;
+			break;
+		}
+	}
+}
+
+void
+LevelExtractor::addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, LotusLib::PackagesReader& pkgs)
+{
+	auto landscapeExtractor = Landscape::LandscapeExtractor::getInstance();
+
+	LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
+	LotusLib::FileEntry landscapeEntry;
+	try
+	{
+		landscapeEntry = pkg.getFile(bodyInt.landscape.landscapePath);
+	}
+	catch (std::exception& ex)
+	{
+		WarframeExporter::Logger::getInstance().error("Unable to find landscape " + bodyInt.landscape.landscapePath);
+		return;
+	}
+
+	auto extHeader = landscapeExtractor->readHeader(&landscapeEntry.headerData, landscapeEntry.commonHeader);
+    auto chunks = landscapeExtractor->readLandscapeChunks(&landscapeEntry.bData, extHeader, landscapeEntry.commonHeader);
+    auto intLandscape = landscapeExtractor->formatLandscape(extHeader, chunks);
+
+	size_t modelCountPre = gltfDoc.meshes.size();
+	Landscape::LandscapeExporterGltf::addLandscapeChunks(gltfDoc, intLandscape);
+	
+	// Add level-specific attributes to each landscape chunk
+	for (size_t modelIndex = modelCountPre; modelIndex < gltfDoc.meshes.size(); modelIndex++)
+	{
+		for (auto& attribute : bodyInt.landscape.attributes)
+		{
+			gltfDoc.meshes[modelIndex].extensionsAndExtras["extras"][attribute.first] = attribute.second;
 		}
 	}
 }

@@ -2,122 +2,120 @@
 
 using namespace WarframeExporter::Model;
 
-ModelExporterGltf::ModelExporterGltf()
-	: m_logger(Logger::getInstance()), m_document()
-{
-}
-
 void
-ModelExporterGltf::addModelData(const ModelHeaderInternal& header, const ModelBodyInternal& body)
+ModelExporterGltf::addModelData(Document& gltfDoc, const ModelHeaderInternal& header, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, const LotusLib::LotusPath& internalPath)
 {
+	_modifyAsset(gltfDoc);
+
+	Attributes vertsAttrs = _addVertexData(gltfDoc, bodyInt, bodyExt, header.vertexCount);
+	std::vector<int32_t> indicesAccessors = _addIndexData(gltfDoc, bodyInt.indices, header.meshInfos);
+
+	std::vector<Mesh> meshes(indicesAccessors.size());
+	for (size_t meshIndex = 0; meshIndex < indicesAccessors.size(); meshIndex++)
+	{
+		meshes[meshIndex] = _createMesh(gltfDoc, vertsAttrs, indicesAccessors[meshIndex], header.meshInfos[meshIndex].matName, header.meshInfos[meshIndex].name);
+		_addModelExtraInformation(gltfDoc, meshes[meshIndex], header, internalPath);
+	}
+
 	if (header.boneTree.size() > 0)
-		addModelDataRigged(header, body);
+	{
+		int32_t rootBoneNodeIndex = _createBones(gltfDoc, header.boneTree);
+		int32_t inverseMatricesIndex = _addInverseBindMatrices(gltfDoc, header.boneTree, header.weightedBones);
+		int32_t skinIndex = _createSkin(gltfDoc, header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
+
+		_addModelsToScene(gltfDoc, meshes, skinIndex);
+		
+		gltfDoc.scenes[0].nodes.push_back(rootBoneNodeIndex);
+	}
 	else
-		addModelDataStatic(header, body);
+	{
+		_addModelsToScene(gltfDoc, meshes);
+	}
 }
 
 void
-ModelExporterGltf::addModelDataRigged(const ModelHeaderInternal& header, const ModelBodyInternal& body)
-{
-	modifyAsset();
-
-	Attributes vertsAttrs = addVertexDataRigged(body, header.vertexCount);
-	unsigned int indicesBufViewIndex = addIndexData(body.indices);
-	std::vector<int32_t> meshIndices = createMeshes(header.meshInfos, vertsAttrs, indicesBufViewIndex);
-
-	int32_t rootBoneNodeIndex = createBones(header.boneTree);
-	int32_t inverseMatricesIndex = addInverseBindMatrices(header.boneTree, header.weightedBones);
-	int32_t skinIndex = createSkin(header.weightedBones, (int)header.boneTree.size(), "Skeleton", rootBoneNodeIndex, inverseMatricesIndex);
-
-	createSceneWithModelNodes(meshIndices, skinIndex);
-	m_document.scenes[0].nodes.push_back(rootBoneNodeIndex);
-}
-
-void
-ModelExporterGltf::addModelDataStatic(const ModelHeaderInternal& header, const ModelBodyInternal& body)
-{
-	modifyAsset();
-
-	Attributes vertsAttrs = addVertexDataStatic(body, header.vertexCount);
-	int32_t indicesBufViewIndex = addIndexData(body.indices);
-	std::vector<int32_t> meshIndices = createMeshes(header.meshInfos, vertsAttrs, indicesBufViewIndex);
-
-	createSceneWithModelNodes(meshIndices, -1);
-}
-
-void
-ModelExporterGltf::save(const std::filesystem::path& outPath)
+ModelExporterGltf::save(Document& gltfDoc, const std::filesystem::path& outPath)
 {
 	try
 	{
-		Save(m_document, outPath, true);
+		Save(gltfDoc, outPath, true);
 	}
 	catch (std::exception& ex)
 	{
-		print_exception(ex);
+		_print_exception(ex);
 	}
 }
 
 void
-ModelExporterGltf::print_exception(const std::exception& e, int level)
+ModelExporterGltf::_print_exception(const std::exception& e, int level)
 {
-	m_logger.error(std::string(level, ' ') + e.what());
+	WarframeExporter::Logger::getInstance().error(std::string(level, ' ') + e.what());
 	try {
 		std::rethrow_if_nested(e);
 	}
 	catch (const std::exception& nestedException) {
-		print_exception(nestedException, level + 1);
+		_print_exception(nestedException, level + 1);
 	}
 	catch (...) {}
 }
 
 void
-ModelExporterGltf::createSceneWithModelNodes(const std::vector<int32_t>& meshes, int32_t skinIndex)
+ModelExporterGltf::_addModelExtraInformation(Document& gltfDoc, Mesh& mesh, const ModelHeaderInternal& header, const LotusLib::LotusPath& internalPath)
 {
-	if (m_document.scenes.size() == 0)
+	mesh.extensionsAndExtras["extras"]["EnsmalleningScale"] = std::array<float, 4>{header.modelScale.x,header.modelScale.y, header.modelScale.z, header.modelScale.w};
+	if (internalPath != "")
+		mesh.extensionsAndExtras["extras"]["MeshPath"] = internalPath;
+}
+
+void
+ModelExporterGltf::_addModelsToScene(Document& gltfDoc, const std::vector<Mesh>& meshes, int32_t skinIndex)
+{
+	if (gltfDoc.scenes.size() == 0)
 	{
 		Scene scene;
-		m_document.scenes.resize(1);
-		m_document.scene = 0;
+		gltfDoc.scenes.resize(1);
+		gltfDoc.scene = 0;
 	}
-	Scene& scene = m_document.scenes[0];
+	Scene& scene = gltfDoc.scenes[0];
 
 	for (size_t x = 0; x < meshes.size(); x++)
 	{
 		Node curNode;
-		curNode.mesh = meshes[x];
+		int curMeshIndex = static_cast<int>(gltfDoc.meshes.size());
+		gltfDoc.meshes.push_back(meshes[x]);
+		curNode.mesh = curMeshIndex;
 		curNode.skin = skinIndex;
-		int curNodeIndex = static_cast<int>(m_document.nodes.size());
-		m_document.nodes.push_back(curNode);
+		int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
+		gltfDoc.nodes.push_back(curNode);
 		scene.nodes.push_back(curNodeIndex);
 	}
 }
 
 int32_t
-ModelExporterGltf::createBones(const std::vector<BoneTreeNodeInternal>& boneTree)
+ModelExporterGltf::_createBones(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree)
 {
 	int32_t rootIndex = -1;
 	if (boneTree.size() > 0)
-		rootIndex = static_cast<int32_t>(m_document.nodes.size());
+		rootIndex = static_cast<int32_t>(gltfDoc.nodes.size());
 	for (uint16_t x = 0; x < static_cast<uint16_t>(boneTree.size()); x++)
 	{
 		Node boneNode;
 		boneNode.name = boneTree[x].name;
-		findChildrenOfBone(boneTree, x, boneNode.children);
+		_findChildrenOfBone(boneTree, x, boneNode.children);
 
 		std::memcpy(&boneNode.rotation[0], &boneTree[x].rotation[0], sizeof(float) * 4);
 		std::memcpy(&boneNode.translation[0], &boneTree[x].position[0], sizeof(float) * 3);
 
-		m_document.nodes.push_back(boneNode);
+		gltfDoc.nodes.push_back(boneNode);
 	}
 	return rootIndex;
 }
 
 int32_t
-ModelExporterGltf::createSkin(const std::vector<int32_t>& weightedIndices, int totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
+ModelExporterGltf::_createSkin(Document& gltfDoc, const std::vector<int32_t>& weightedIndices, int totalBoneCount, const std::string& skinName, int32_t rootBoneIndex, int32_t inverseBindMatricesIndex)
 {
 	Skin skin;
-	int32_t skinIndex = static_cast<int32_t>(m_document.skins.size());
+	int32_t skinIndex = static_cast<int32_t>(gltfDoc.skins.size());
 	skin.name = skinName;
 	skin.skeleton = rootBoneIndex;
 	std::vector<bool> addedBones(totalBoneCount, false);
@@ -133,20 +131,17 @@ ModelExporterGltf::createSkin(const std::vector<int32_t>& weightedIndices, int t
 	}
 
 	skin.inverseBindMatrices = inverseBindMatricesIndex;
-	m_document.skins.push_back(skin);
+	gltfDoc.skins.push_back(skin);
 	return skinIndex;
 }
 
 int32_t
-ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices)
+ModelExporterGltf::_addInverseBindMatrices(Document& gltfDoc, const std::vector<BoneTreeNodeInternal>& boneTree, const std::vector<int32_t>& weightedIndices)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-	checkAndFixBufferAllignment();
-
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 	uint32_t matSize = static_cast<uint32_t>(sizeof(boneTree[0].reverseBind));
 	uint32_t byteLen = static_cast<uint32_t>(boneTree.size()) * matSize;
+	byteLen += (byteLen % 4);
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
@@ -171,367 +166,404 @@ ModelExporterGltf::addInverseBindMatrices(const std::vector<BoneTreeNodeInternal
 	}
 
 	BufferView bufView;
-	int32_t bufViewIndex = static_cast<int32_t>(m_document.bufferViews.size());
-	bufView.buffer = 0;
+	int32_t bufViewIndex = static_cast<int32_t>(gltfDoc.bufferViews.size());
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.byteStride = 0;
-	m_document.bufferViews.push_back(bufView);
+	gltfDoc.bufferViews.push_back(bufView);
 
 	Accessor matAcc;
-	int32_t matAccIndex = static_cast<int32_t>(m_document.accessors.size());
+	int32_t matAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
 	matAcc.bufferView = bufViewIndex;
 	matAcc.byteOffset = 0;
 	matAcc.count = (uint32_t)boneTree.size();
 	matAcc.type = Accessor::Type::Mat4;
 	matAcc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(matAcc);
+	gltfDoc.accessors.push_back(matAcc);
 
 	return matAccIndex;
 }
 
-std::vector<int32_t>
-ModelExporterGltf::createMeshes(const std::vector<MeshInfoInternal>& meshInfos, Attributes attrs, int32_t indicesBuffViewIndex)
+Mesh
+ModelExporterGltf::_createMesh(Document& gltfDoc, Attributes attrs, int32_t indicies, const std::string& materialName, const std::string& modelName)
 {
-	Mesh mesh;
-	std::vector<int32_t> meshIndices;
+	Primitive curPrim;
+	curPrim.indices = indicies;
+	curPrim.material = _findOrCreateMaterial(gltfDoc, materialName);
+	curPrim.mode = Primitive::Mode::Triangles;
+	curPrim.attributes = attrs;
 
-	for (size_t x = 0; x < meshInfos.size(); x++)
-	{
-		Accessor curAcc;
-		int32_t curAccIndex = static_cast<int32_t>(m_document.accessors.size());
-		curAcc.bufferView = indicesBuffViewIndex;
-		curAcc.byteOffset = meshInfos[x].faceLODOffsets[0] * 2;
-		curAcc.count = meshInfos[x].faceLODCounts[0];
-		curAcc.type = Accessor::Type::Scalar;
-		curAcc.componentType = Accessor::ComponentType::UnsignedShort;
-		m_document.accessors.push_back(curAcc);
+	Mesh curMesh;
+	curMesh.name = modelName;
+	curMesh.primitives.push_back(curPrim);
 
-		Primitive curPrim;
-		curPrim.indices = curAccIndex;
-		curPrim.material = findOrCreateMaterial(meshInfos[x].matName);
-		curPrim.mode = Primitive::Mode::Triangles;
-		curPrim.attributes = attrs;
+	return curMesh;
+}
 
-		Mesh curMesh;
-		int32_t curMeshIndex = static_cast<int32_t>(m_document.meshes.size());
-		curMesh.name = meshInfos[x].name;
-		curMesh.primitives.push_back(curPrim);
-		m_document.meshes.push_back(curMesh);
-		
-		meshIndices.push_back(curMeshIndex);
-	}
+Mesh
+ModelExporterGltf::_createMesh(Document& gltfDoc, Attributes attrs, int32_t indicies)
+{
+	Primitive curPrim;
+	curPrim.indices = indicies;
+	curPrim.mode = Primitive::Mode::Triangles;
+	curPrim.attributes = attrs;
 
-	return meshIndices;
+	Mesh curMesh;
+	curMesh.primitives.push_back(curPrim);
+
+	return curMesh;
 }
 
 int32_t
-ModelExporterGltf::findOrCreateMaterial(const std::string& materialPath)
+ModelExporterGltf::_findOrCreateMaterial(Document& gltfDoc, const std::string& materialPath)
 {
 	std::string materialName = materialPath;
 	size_t lastSlashOffset = materialPath.find_last_of("/");
 	if (lastSlashOffset != std::string::npos)
 		materialName = materialPath.substr(lastSlashOffset + 1);
 
-	for (int32_t x = 0; x < (int32_t)m_document.materials.size(); x++)
+	for (int32_t x = 0; x < (int32_t)gltfDoc.materials.size(); x++)
 	{
-		if (m_document.materials[x].name.compare(materialName) == 0)
+		if (gltfDoc.materials[x].extensionsAndExtras["extras"]["FullPath"] == materialPath)
 			return x;
 	}
 	
-	int32_t matIndex = static_cast<int32_t>(m_document.materials.size());
+	int32_t matIndex = static_cast<int32_t>(gltfDoc.materials.size());
 	Material mat;
 	mat.name = materialName;
 	mat.doubleSided = true;
 	mat.extensionsAndExtras["extras"]["FullPath"] = materialPath;
-	m_document.materials.push_back(mat);
+	gltfDoc.materials.push_back(mat);
 
 	return matIndex;
 }
 
-// Color must be in the format VEC4
-// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
 Attributes
-ModelExporterGltf::addVertexDataRigged(const ModelBodyInternal& body, int vertCount)
+ModelExporterGltf::_addVertexData(Document& gltfDoc, const ModelBodyInternal& bodyInt, const ModelBodyExternal& bodyExt, int vertCount)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
+	Buffer& buf = _getBuffer(gltfDoc);
 
-	Buffer& buf = m_document.buffers[0];
-	// 1 colorLen is already factored into this vertex size
-	// Add the other 2
-	uint32_t byteLen = vertCount * body.vertexSizeRigged();
+	bool 
+		addPosition = true,
+		addUV1 = bodyInt.UV1.size() > 0 ? true : false,
+		addUV2 = bodyInt.UV2.size() > 0 ? true : false,
+		addAO = bodyInt.AO.size() > 0 ? true : false,
+		addBoneIndex = bodyInt.boneIndices.size() > 0 ? true : false,
+		addBoneWeight = bodyInt.boneWeights.size() > 0 ? true : false,
+		addRawPosition = bodyExt.positions.size() > 0 ? true : false,
+		addRawNormal = bodyExt.normals.size() > 0 ? true : false,
+		addRawTangent = bodyExt.tangents.size() > 0 ? true : false;
+
+	// Custom attributes/colors as Uint8 must be exported as Vec4
+	uint32_t modelTotalByteLen = (
+		(addPosition ? bodyInt.positionTypeSize() : 0) +
+		(addUV1 ? bodyInt.UVTypeSize() : 0) +
+		(addUV2 ? bodyInt.UVTypeSize() : 0) +
+		(addAO ? bodyInt.AOTypeSize() * 4 : 0) + // 1 -> 4
+		(bodyInt.colorTypeSize() * bodyInt.colors.size()) +
+		(addBoneIndex ? bodyInt.boneIndexTypeSize() : 0) +
+		(addBoneWeight ? bodyInt.boneWeightTypeSize() : 0) + 
+		(addRawPosition ? sizeof(bodyExt.positions[0]) : 0) +
+		(addRawNormal ? sizeof(bodyExt.normals[0]) : 0) +
+		(addRawTangent ? 4 : 0) // 3 -> 4
+	) * vertCount;
+
+	// Assert 32-bit allignment
+	modelTotalByteLen += (modelTotalByteLen % 4);
+
+	// Resize buffer
 	uint32_t startOffset = buf.byteLength;
+	buf.data.resize(startOffset + modelTotalByteLen);
+	buf.byteLength += modelTotalByteLen;
 
-	buf.data.resize(startOffset + byteLen);
-	buf.byteLength += byteLen;
-	uint8_t* curPos = buf.data.data() + startOffset;
+	// Cursors for inserting into Buffer (and thus, BufferView)
+	uint8_t* bufferCursor = buf.data.data() + startOffset;
+	uint32_t bufferViewCursor = 0;
 
-	for (int iVert = 0; iVert < vertCount; iVert++)
-	{
-		memcpy(curPos, &body.positions[iVert].x, ModelBodyInternal::positionLen);
-		curPos += ModelBodyInternal::positionLen;
-		memcpy(curPos, &body.UV1[iVert].x, ModelBodyInternal::UVLen);
-		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
-		curPos += ModelBodyInternal::UVLen;
-		for (int x = 0; x < body.colors.size(); x++)
-		{
-			memcpy(curPos, &body.colors[x][iVert], ModelBodyInternal::colorLen);
-			curPos += ModelBodyInternal::colorLen;
-		}
-		memcpy(curPos, &body.boneIndices[iVert].x, ModelBodyInternal::boneIndexLen);
-		curPos += ModelBodyInternal::boneIndexLen;
-		memcpy(curPos, &body.boneWeights[iVert].x, ModelBodyInternal::boneWeightLen);
-		curPos += ModelBodyInternal::boneWeightLen;
-	}
-	
+	// Create glTF BufferView
+	// Resize to current model byte length, then don't touch again
 	BufferView bufView;
-	int32_t bufViewIndex = static_cast<int32_t>(m_document.bufferViews.size());
-	bufView.buffer = 0;
+	int32_t bufViewIndex = static_cast<int32_t>(gltfDoc.bufferViews.size());
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
-	bufView.byteLength = byteLen;
-	bufView.byteStride = body.vertexSizeRigged();
+	bufView.byteLength = modelTotalByteLen;
 	bufView.target = BufferView::TargetType::ArrayBuffer;
-	m_document.bufferViews.push_back(bufView);
-	
-	uint32_t curByteOffset = 0;
+	gltfDoc.bufferViews.push_back(bufView);
 
-	Accessor posAcc;
-	int32_t posAccIndex = static_cast<int32_t>(m_document.accessors.size());
-	posAcc.bufferView = bufViewIndex;
-	posAcc.byteOffset = curByteOffset;
-	posAcc.count = vertCount;
-	posAcc.type = Accessor::Type::Vec3;
-	posAcc.componentType = Accessor::ComponentType::Float;
-	posAcc.max = findMaxVec3(body.positions);
-	posAcc.min = findMinVec3(body.positions);
-	m_document.accessors.push_back(posAcc);
-	curByteOffset += ModelBodyInternal::positionLen;
-	
-	Accessor uv1Acc;
-	int32_t uv1AccIndex = (int32_t)m_document.accessors.size();
-	uv1Acc.bufferView = bufViewIndex;
-	uv1Acc.byteOffset = curByteOffset;
-	uv1Acc.count = vertCount;
-	uv1Acc.type = Accessor::Type::Vec2;
-	uv1Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv1Acc);
-	curByteOffset += ModelBodyInternal::UVLen;
+	Attributes attrs;
 
-	Accessor uv2Acc;
-	int32_t uv2AccIndex = (int32_t)m_document.accessors.size();
-	uv2Acc.bufferView = bufViewIndex;
-	uv2Acc.byteOffset = curByteOffset;
-	uv2Acc.count = vertCount;
-	uv2Acc.type = Accessor::Type::Vec2;
-	uv2Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv2Acc);
-	curByteOffset += ModelBodyInternal::UVLen;
-
-	std::vector<int32_t> vertexColAccIndices;
-	for (int x = 0; x < body.colors.size(); x++)
+	if (addPosition)
 	{
+		uint32_t byteSize = bodyInt.positionTypeSize() * bodyInt.positions.size();
+		memcpy(bufferCursor, &bodyInt.positions[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor posAcc;
+		int32_t posAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		posAcc.bufferView = bufViewIndex;
+		posAcc.byteOffset = bufferViewCursor;
+		posAcc.count = vertCount;
+		posAcc.type = Accessor::Type::Vec3;
+		posAcc.componentType = Accessor::ComponentType::Float;
+		posAcc.max = _findMaxVec3(bodyInt.positions);
+		posAcc.min = _findMinVec3(bodyInt.positions);
+		gltfDoc.accessors.push_back(posAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["POSITION"] = posAccIndex;
+	}
+
+	if (addUV1)
+	{
+		uint32_t byteSize = bodyInt.UVTypeSize() * bodyInt.UV1.size();
+		memcpy(bufferCursor, &bodyInt.UV1[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor uv1Acc;
+		int32_t uv1AccIndex = (int32_t)gltfDoc.accessors.size();
+		uv1Acc.bufferView = bufViewIndex;
+		uv1Acc.byteOffset = bufferViewCursor;
+		uv1Acc.count = vertCount;
+		uv1Acc.type = Accessor::Type::Vec2;
+		uv1Acc.componentType = Accessor::ComponentType::Float;
+		gltfDoc.accessors.push_back(uv1Acc);
+		bufferViewCursor += byteSize;
+
+		attrs["TEXCOORD_0"] = uv1AccIndex;
+	}
+
+	if (addUV2)
+	{
+		uint32_t byteSize = bodyInt.UVTypeSize() * bodyInt.UV2.size();
+		memcpy(bufferCursor, &bodyInt.UV2[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor uv2Acc;
+		int32_t uv2AccIndex = (int32_t)gltfDoc.accessors.size();
+		uv2Acc.bufferView = bufViewIndex;
+		uv2Acc.byteOffset = bufferViewCursor;
+		uv2Acc.count = vertCount;
+		uv2Acc.type = Accessor::Type::Vec2;
+		uv2Acc.componentType = Accessor::ComponentType::Float;
+		gltfDoc.accessors.push_back(uv2Acc);
+		bufferViewCursor += byteSize;
+
+		attrs["TEXCOORD_1"] = uv2AccIndex;
+	}
+
+	if (addAO)
+	{
+		uint32_t byteSize = bodyInt.AOTypeSize() * bodyInt.AO.size();
+		for (const uint8_t& curAO : bodyInt.AO)
+		{
+			memcpy(bufferCursor++, &curAO, 1);
+			memcpy(bufferCursor++, &curAO, 1);
+			memcpy(bufferCursor++, &curAO, 1);
+			memcpy(bufferCursor++, &curAO, 1);
+		}
+
+		Accessor aoAcc;
+		int32_t aoAccIndex = (int32_t)gltfDoc.accessors.size();
+		aoAcc.bufferView = bufViewIndex;
+		aoAcc.byteOffset = bufferViewCursor;
+		aoAcc.count = vertCount;
+		aoAcc.type = Accessor::Type::Vec4;
+		aoAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		aoAcc.normalized = true;
+		gltfDoc.accessors.push_back(aoAcc);
+		bufferViewCursor += (byteSize * 4);
+
+		attrs["_AmbientOcclusion"] = aoAccIndex;
+	}
+
+	for (size_t x = 0; x < bodyInt.colors.size(); x++)
+	{
+		uint32_t byteSize = bodyInt.colorTypeSize() * bodyInt.colors[x].size();
+		memcpy(bufferCursor, &bodyInt.colors[x][0], byteSize);
+		bufferCursor += byteSize;
+
 		Accessor colAcc;
-		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
+		int32_t vertColAcc = (int32_t)gltfDoc.accessors.size();
 		colAcc.bufferView = bufViewIndex;
-		colAcc.byteOffset = curByteOffset;
+		colAcc.byteOffset = bufferViewCursor;
 		colAcc.count = vertCount;
 		colAcc.type = Accessor::Type::Vec4;
 		colAcc.componentType = Accessor::ComponentType::UnsignedByte;
 		colAcc.normalized = true;
-		m_document.accessors.push_back(colAcc);
-		curByteOffset += ModelBodyInternal::colorLen;
+		gltfDoc.accessors.push_back(colAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["COLOR_" + std::to_string(x)] = vertColAcc;
 	}
 
-	Accessor boneIndexAcc;
-	int32_t boneIndexAccIndex = (int32_t)m_document.accessors.size();
-	boneIndexAcc.bufferView = bufViewIndex;
-	boneIndexAcc.byteOffset = curByteOffset;
-	boneIndexAcc.count = vertCount;
-	boneIndexAcc.type = Accessor::Type::Vec4;
-	boneIndexAcc.componentType = Accessor::ComponentType::UnsignedShort;
-	m_document.accessors.push_back(boneIndexAcc);
-	curByteOffset += ModelBodyInternal::boneIndexLen;
-
-	Accessor boneWeightAcc;
-	int32_t boneWeightAccIndex = (int32_t)m_document.accessors.size();
-	boneWeightAcc.bufferView = bufViewIndex;
-	boneWeightAcc.byteOffset = curByteOffset;
-	boneWeightAcc.count = vertCount;
-	boneWeightAcc.type = Accessor::Type::Vec4;
-	boneWeightAcc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(boneWeightAcc);
-
-	Attributes attrs;
-	attrs["POSITION"] = posAccIndex;
-	attrs["TEXCOORD_0"] = uv1AccIndex;
-	attrs["TEXCOORD_1"] = uv2AccIndex;
-	for (int x = 0; x < vertexColAccIndices.size(); x++)
-		attrs["COLOR_" + std::to_string(x)] = vertexColAccIndices[x];
-	attrs["JOINTS_0"] = boneIndexAccIndex;
-	attrs["WEIGHTS_0"] = boneWeightAccIndex;
-
-	return attrs;
-}
-
-// Color must be in the format VEC4
-// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
-Attributes
-ModelExporterGltf::addVertexDataStatic(const ModelBodyInternal& body, int vertCount)
-{
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-
-	Buffer& buf = m_document.buffers[0];
-	uint32_t byteLen = vertCount * body.vertexSizeStatic();
-	uint32_t startOffset = buf.byteLength;
-
-	buf.data.resize(startOffset + byteLen);
-	buf.byteLength += byteLen;
-	uint8_t* curPos = buf.data.data() + startOffset;
-
-	for (int iVert = 0; iVert < vertCount; iVert++)
+	if (addBoneIndex)
 	{
-		memcpy(curPos, &body.positions[iVert].x, ModelBodyInternal::positionLen);
-		curPos += ModelBodyInternal::positionLen;
-		memcpy(curPos, &body.UV1[iVert].x, ModelBodyInternal::UVLen);
-		curPos += ModelBodyInternal::UVLen;
-		memcpy(curPos, &body.UV2[iVert].x, ModelBodyInternal::UVLen);
-		curPos += ModelBodyInternal::UVLen;
-		for (int x = 0; x < body.colors.size(); x++)
+		uint32_t byteSize = bodyInt.boneIndexTypeSize() * bodyInt.boneIndices.size();
+		memcpy(bufferCursor, &bodyInt.boneIndices[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor boneIndexAcc;
+		int32_t boneIndexAccIndex = (int32_t)gltfDoc.accessors.size();
+		boneIndexAcc.bufferView = bufViewIndex;
+		boneIndexAcc.byteOffset = bufferViewCursor;
+		boneIndexAcc.count = vertCount;
+		boneIndexAcc.type = Accessor::Type::Vec4;
+		boneIndexAcc.componentType = Accessor::ComponentType::UnsignedShort;
+		gltfDoc.accessors.push_back(boneIndexAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["JOINTS_0"] = boneIndexAccIndex;
+	}
+
+	if (addBoneWeight)
+	{
+		uint32_t byteSize = bodyInt.boneWeightTypeSize() * bodyInt.boneWeights.size();
+		memcpy(bufferCursor, &bodyInt.boneWeights[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor boneWeightAcc;
+		int32_t boneWeightAccIndex = (int32_t)gltfDoc.accessors.size();
+		boneWeightAcc.bufferView = bufViewIndex;
+		boneWeightAcc.byteOffset = bufferViewCursor;
+		boneWeightAcc.count = vertCount;
+		boneWeightAcc.type = Accessor::Type::Vec4;
+		boneWeightAcc.componentType = Accessor::ComponentType::Float;
+		gltfDoc.accessors.push_back(boneWeightAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["WEIGHTS_0"] = boneWeightAccIndex;
+	}
+
+	if (addRawPosition)
+	{
+		uint32_t byteSize = sizeof(bodyExt.positions[0]) * bodyExt.positions.size();
+		memcpy(bufferCursor, &bodyExt.positions[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor posAcc;
+		int32_t posAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		posAcc.bufferView = bufViewIndex;
+		posAcc.byteOffset = bufferViewCursor;
+		posAcc.count = vertCount;
+		posAcc.type = Accessor::Type::Vec4;
+		posAcc.componentType = Accessor::ComponentType::Float;
+		posAcc.normalized = true;
+		gltfDoc.accessors.push_back(posAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["_RawPosition"] = posAccIndex;
+	}
+
+	if (addRawNormal)
+	{
+		uint32_t byteSize = sizeof(bodyExt.normals[0]) * bodyExt.normals.size();
+		memcpy(bufferCursor, &bodyExt.normals[0], byteSize);
+		bufferCursor += byteSize;
+
+		Accessor normalAcc;
+		int32_t normalAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		normalAcc.bufferView = bufViewIndex;
+		normalAcc.byteOffset = bufferViewCursor;
+		normalAcc.count = vertCount;
+		normalAcc.type = Accessor::Type::Vec4;
+		normalAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		normalAcc.normalized = true;
+		gltfDoc.accessors.push_back(normalAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["_RawNormal"] = normalAccIndex;
+	}
+
+	if (addRawTangent)
+	{
+		uint32_t byteSize = 4 * bodyExt.tangents.size();
+		for (size_t i = 0; i < bodyExt.tangents.size(); i++)
 		{
-			memcpy(curPos, &body.colors[x][iVert], ModelBodyInternal::colorLen);
-			curPos += ModelBodyInternal::colorLen;
+			memcpy(bufferCursor, &bodyExt.tangents[i][0], 3);
+			memcpy(bufferCursor + 3, &bodyInt.AO[i], 1);
+			bufferCursor += 4;
 		}
+
+		Accessor tangentAcc;
+		int32_t tangentAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		tangentAcc.bufferView = bufViewIndex;
+		tangentAcc.byteOffset = bufferViewCursor;
+		tangentAcc.count = vertCount;
+		tangentAcc.type = Accessor::Type::Vec4;
+		tangentAcc.componentType = Accessor::ComponentType::UnsignedByte;
+		tangentAcc.normalized = true;
+		gltfDoc.accessors.push_back(tangentAcc);
+		bufferViewCursor += byteSize;
+
+		attrs["_RawTangent"] = tangentAccIndex;
 	}
-
-	BufferView bufView;
-	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
-	bufView.buffer = 0;
-	bufView.byteOffset = startOffset;
-	bufView.byteLength = byteLen;
-	bufView.byteStride = body.vertexSizeStatic();
-	bufView.target = BufferView::TargetType::ArrayBuffer;
-	m_document.bufferViews.push_back(bufView);
-
-	uint32_t curByteOffset = 0;
-
-	Accessor posAcc;
-	int32_t posAccIndex = (int32_t)m_document.accessors.size();
-	posAcc.bufferView = bufViewIndex;
-	posAcc.byteOffset = curByteOffset;
-	posAcc.count = vertCount;
-	posAcc.type = Accessor::Type::Vec3;
-	posAcc.componentType = Accessor::ComponentType::Float;
-	posAcc.max = findMaxVec3(body.positions);
-	posAcc.min = findMinVec3(body.positions);
-	m_document.accessors.push_back(posAcc);
-	curByteOffset += ModelBodyInternal::positionLen;
-	
-	Accessor uv1Acc;
-	int32_t uv1AccIndex = (int32_t)m_document.accessors.size();
-	uv1Acc.bufferView = bufViewIndex;
-	uv1Acc.byteOffset = curByteOffset;
-	uv1Acc.count = vertCount;
-	uv1Acc.type = Accessor::Type::Vec2;
-	uv1Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv1Acc);
-	curByteOffset += ModelBodyInternal::UVLen;
-
-	Accessor uv2Acc;
-	int32_t uv2AccIndex = (int32_t)m_document.accessors.size();
-	uv2Acc.bufferView = bufViewIndex;
-	uv2Acc.byteOffset = curByteOffset;
-	uv2Acc.count = vertCount;
-	uv2Acc.type = Accessor::Type::Vec2;
-	uv2Acc.componentType = Accessor::ComponentType::Float;
-	m_document.accessors.push_back(uv2Acc);
-	curByteOffset += ModelBodyInternal::UVLen;
-
-	std::vector<int32_t> vertexColAccIndices;
-	for (int x = 0; x < body.colors.size(); x++)
-	{
-		Accessor colAcc;
-		vertexColAccIndices.push_back((int32_t)m_document.accessors.size());
-		colAcc.bufferView = bufViewIndex;
-		colAcc.byteOffset = curByteOffset;
-		colAcc.count = vertCount;
-		colAcc.type = Accessor::Type::Vec4;
-		colAcc.componentType = Accessor::ComponentType::UnsignedByte;
-		colAcc.normalized = true;
-		m_document.accessors.push_back(colAcc);
-		curByteOffset += ModelBodyInternal::colorLen;
-	}
-
-	Attributes attrs;
-	attrs["POSITION"] = posAccIndex;
-	attrs["TEXCOORD_0"] = uv1AccIndex;
-	attrs["TEXCOORD_1"] = uv2AccIndex;
-	for (int x = 0; x < vertexColAccIndices.size(); x++)
-		attrs["COLOR_" + std::to_string(x)] = vertexColAccIndices[x];
 
 	return attrs;
 }
 
-int32_t
-ModelExporterGltf::addIndexData(const std::vector<uint16_t>& body)
+std::vector<int32_t>
+ModelExporterGltf::_addIndexData(Document& gltfDoc, const std::vector<uint16_t>& body, const std::vector<MeshInfoInternal>& meshInfos)
 {
-	if (m_document.buffers.size() == 0)
-		createBuffer();
-	
-	Buffer& buf = m_document.buffers[0];
+	Buffer& buf = _getBuffer(gltfDoc);
 
-	uint32_t byteLen = (uint32_t)body.size() * (uint32_t)sizeof(body[0]);
+	uint32_t indexSize = (uint32_t)body.size() * (uint32_t)sizeof(body[0]);
+	uint32_t byteLen = indexSize + (indexSize % 4);
 	uint32_t startOffset = buf.byteLength;
 
 	buf.data.resize(startOffset + byteLen);
-	std::memcpy(&buf.data[startOffset], body.data(), byteLen);
+	std::memcpy(&buf.data[startOffset], body.data(), indexSize);
 	buf.byteLength += byteLen;
 
 	BufferView bufView;
-	int32_t bufViewIndex = (int32_t)m_document.bufferViews.size();
-	bufView.buffer = 0;
+	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
+	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = startOffset;
 	bufView.byteLength = byteLen;
 	bufView.target = BufferView::TargetType::ElementArrayBuffer;
-	m_document.bufferViews.push_back(bufView);
+	gltfDoc.bufferViews.push_back(bufView);
 
-	return bufViewIndex;
-}
-
-void
-ModelExporterGltf::modifyAsset()
-{
-	m_document.asset.generator = m_generatorName;
-	m_document.asset.copyright = m_copyright;
-}
-
-void
-ModelExporterGltf::createBuffer()
-{
-	assert(m_document.buffers.size() == 0);
-
-	Buffer newBuf;
-	newBuf.name = "Model Data";
-	newBuf.byteLength = 0;
-	m_document.buffers.push_back(newBuf);
-}
-
-void
-ModelExporterGltf::checkAndFixBufferAllignment()
-{
-	Buffer& buf = m_document.buffers[0];
-	int mod = buf.byteLength % 4;
-	if (mod != 0)
+	std::vector<int32_t> accessorIndicies;
+	for (size_t x = 0; x < meshInfos.size(); x++)
 	{
-		buf.data.resize(buf.data.size() + mod);
-		buf.byteLength += mod;
+		Accessor curAcc;
+		int32_t curAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+		curAcc.bufferView = bufViewIndex;
+		curAcc.byteOffset = meshInfos[x].faceLODOffsets[0] * 2;
+		curAcc.count = meshInfos[x].faceLODCounts[0];
+		curAcc.type = Accessor::Type::Scalar;
+		curAcc.componentType = Accessor::ComponentType::UnsignedShort;
+		gltfDoc.accessors.push_back(curAcc);
+		
+		accessorIndicies.push_back(curAccIndex);
 	}
+
+	return accessorIndicies;
+}
+
+void
+ModelExporterGltf::_modifyAsset(Document& gltfDoc)
+{
+	gltfDoc.asset.generator = m_generatorName;
+	gltfDoc.asset.copyright = m_copyright;
+}
+
+Buffer&
+ModelExporterGltf::_getBuffer(Document& gltfDoc)
+{
+	if (gltfDoc.buffers.size() == 0)
+	{
+		Buffer newBuf;
+		newBuf.name = "Model Data 1";
+		newBuf.byteLength = 0;
+		gltfDoc.buffers.push_back(newBuf);
+	}
+
+	return gltfDoc.buffers.back();
 }
 
 std::vector<float>
-ModelExporterGltf::findMaxVec3(const std::vector<glm::vec3>& body)
+ModelExporterGltf::_findMaxVec3(const std::vector<glm::vec3>& body)
 {
 	std::vector<float> max = { -100.0F, -100.0F, -100.0F };
 	for (size_t x = 0; x < body.size(); x++)
@@ -547,7 +579,7 @@ ModelExporterGltf::findMaxVec3(const std::vector<glm::vec3>& body)
 }
 
 std::vector<float>
-ModelExporterGltf::findMinVec3(const std::vector<glm::vec3>& body)
+ModelExporterGltf::_findMinVec3(const std::vector<glm::vec3>& body)
 {
 	std::vector<float> min = { 100.0F, 100.0F, 100.0F };
 	for (size_t x = 0; x < body.size(); x++)
@@ -563,7 +595,7 @@ ModelExporterGltf::findMinVec3(const std::vector<glm::vec3>& body)
 }
 
 void
-ModelExporterGltf::findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree, uint16_t boneIndex, std::vector<int32_t>& out)
+ModelExporterGltf::_findChildrenOfBone(const std::vector<BoneTreeNodeInternal>& boneTree, uint16_t boneIndex, std::vector<int32_t>& out)
 {
 	for (uint16_t x = 0; x < boneTree.size(); x++)
 	{

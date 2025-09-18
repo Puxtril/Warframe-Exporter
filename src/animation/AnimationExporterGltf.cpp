@@ -42,6 +42,7 @@ gltfAnimation::addSkeletonToScene(int32_t rootBoneIndex, int32_t boneCount)
 	int32_t curNodeIndex = m_document.nodes.size();
 	m_document.nodes.push_back(curNode);
 	m_document.scenes[0].nodes.push_back(curNodeIndex);
+	m_document.scenes[0].nodes.push_back(rootBoneIndex);
 }
 
 int32_t

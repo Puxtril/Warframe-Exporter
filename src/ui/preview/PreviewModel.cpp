@@ -38,13 +38,17 @@ PreviewModel::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRead
 {
     auto modelExtractor = WarframeExporter::Model::ModelExtractor::getInstance();
 
+    WarframeExporter::Model::ModelReader* modelReader = modelExtractor->getModelReader(fileEntry, pkgs.getGame());
+	if (modelReader == nullptr)
+        throw WarframeExporter::unknown_format_error("Unable to match model " + std::to_string(fileEntry.commonHeader.type) + " with known format");
+
     WarframeExporter::Model::ModelHeaderExternal modelHeaderExt;
     WarframeExporter::Model::ModelBodyExternal modelBodyExt;
-    modelExtractor->extractExternal(fileEntry, pkgs.getGame(), modelHeaderExt, modelBodyExt);
+    modelExtractor->extractExternal(modelReader, fileEntry, pkgs.getGame(), modelHeaderExt, modelBodyExt);
 
     WarframeExporter::Model::ModelHeaderInternal headerInt;
 	WarframeExporter::Model::ModelBodyInternal bodyInt;
-    WarframeExporter::Model::ModelConverter::convertToInternal(modelHeaderExt, modelBodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), fileEntry.commonHeader.type)->ensmalleningScale(), fileEntry.internalPath);
+    WarframeExporter::Model::ModelConverter::convertToInternal(modelHeaderExt, modelBodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, modelReader->ensmalleningScale(), fileEntry.internalPath);
 
     m_modelWidget->loadModel(bodyInt);
 }

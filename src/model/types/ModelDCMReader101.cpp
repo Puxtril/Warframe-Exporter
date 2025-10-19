@@ -1,9 +1,9 @@
-#include "model/types/ModelReader101.h"
+#include "model/types/ModelDCMReader101.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelDCMReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
@@ -18,8 +18,8 @@ ModelReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32();
-    outHeader.boneCount = headerReader->readUInt32();
+    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
+    outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
     headerReader->seek(0x18, std::ios_base::cur);
 
@@ -48,7 +48,7 @@ ModelReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
+ModelDCMReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReader->seek(x.dataLength, std::ios_base::cur);
@@ -87,7 +87,12 @@ ModelReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
         outBody.UV2[x][1] = bodyReader->readHalf();
     }
 
-    bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
+    size_t remainingBytes = bodyReader->getLength() - bodyReader->tell();
+    size_t indicesSize = static_cast<size_t>(extHeader.faceCount) * 2;
+    if (remainingBytes > indicesSize)
+    {
+        bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
+    }
 
     if (!canContinueReading(bodyReader, extHeader.faceCount))
         throw unknown_format_error("Incorrect index count");

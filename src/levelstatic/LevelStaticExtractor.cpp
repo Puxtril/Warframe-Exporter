@@ -53,7 +53,8 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 				continue;
 			}
 
-			if (WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type) == nullptr)
+			Model::ModelReader* modelReader = Model::ModelExtractor::getInstance()->getModelReader(curLevelObjFile, pkgs.getGame());
+			if (modelReader == nullptr)
 			{
 				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curMeshPath));
 				continue;
@@ -61,7 +62,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 
 			WarframeExporter::Model::ModelHeaderExternal headerExt;
 			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
+			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
 
 			if (headerExt.meshInfos.size() == 0)
 			{
@@ -75,7 +76,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
 			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg, options.extractVertexColors);
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs.getGame(), curLevelObjFile.commonHeader.type)->ensmalleningScale(), curMeshPath);
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), curMeshPath);
 				
 			modelPathsInGltf[curMeshPath] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
 		}

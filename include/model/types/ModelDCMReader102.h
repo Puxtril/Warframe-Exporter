@@ -9,7 +9,9 @@
 #include "ExporterExceptions.h"
 
 #include <cassert>
+#include <cstring>
 #include <iomanip>
+#include <string_view>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -17,21 +19,23 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader101 : public ModelReader
+	class ModelDCMReader102 : public ModelReader
 	{
-		ModelReader101() = default;
+		ModelDCMReader102() = default;
 
 	public:
-		inline static ModelReader101* getInstance()
+		inline static ModelDCMReader102* getInstance()
 		{
-			static ModelReader101* instance = new ModelReader101();
+			static ModelDCMReader102* instance = new ModelDCMReader102();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME,  (int)ModelType::MODEL_DCM_101 },
+				{ LotusLib::Game::WARFRAME, (int)ModelDCMType::MODEL_DCM_102 },
+				{ LotusLib::Game::WARFRAME, (int)ModelDCMType::MODEL_DCM_105 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelDCMType::MODEL_DCM_105 },
 			};
 			return extTypes;
 		}
@@ -44,4 +48,4 @@ namespace WarframeExporter::Model
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override;
 	};
-}
+};

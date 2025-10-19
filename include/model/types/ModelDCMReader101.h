@@ -19,23 +19,21 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader102 : public ModelReader
+	class ModelDCMReader101 : public ModelReader
 	{
-		ModelReader102() = default;
+		ModelDCMReader101() = default;
 
 	public:
-		inline static ModelReader102* getInstance()
+		inline static ModelDCMReader101* getInstance()
 		{
-			static ModelReader102* instance = new ModelReader102();
+			static ModelDCMReader101* instance = new ModelDCMReader101();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_HLOD_OR_DCM_102 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_HLOD_OR_DCM_105 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_HLOD_OR_DCM_105 },
+				{ LotusLib::Game::WARFRAME, (int)ModelDCMType::MODEL_DCM_101 },
 			};
 			return extTypes;
 		}
@@ -47,11 +45,5 @@ namespace WarframeExporter::Model
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override;
-	
-	private:
-		// Hahahaha
-		// This sucks, man
-		// True for DCM, False for HLOD
-		bool isDCM(const LotusLib::CommonHeader& header);
 	};
 };

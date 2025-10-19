@@ -70,9 +70,13 @@ FormatPreview::clearPreview()
 void
 FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* pkgs, LotusLib::FileEntry& fileEntry)
 {
+    WarframeExporter::Model::ModelReader* modelReader = WarframeExporter::Model::ModelExtractor::getInstance()->getModelReader(fileEntry, pkgs->getGame());
+	if (modelReader == nullptr)
+		return;
+
     WarframeExporter::Model::ModelHeaderExternal headerExt;
     WarframeExporter::Model::ModelBodyExternal bodyExt;
-    WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(fileEntry, pkgs->getGame(), headerExt, bodyExt);
+    WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, fileEntry, pkgs->getGame(), headerExt, bodyExt);
 
     if (headerExt.meshInfos.size() == 0)
     {
@@ -80,12 +84,10 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
     }
     else
     {
-        std::optional<LotusLib::PackageReader> pkg = pkgs->getPackage("Misc");
-
         // Convert body/header data into internal format
         WarframeExporter::Model::ModelHeaderInternal headerInt;
         WarframeExporter::Model::ModelBodyInternal bodyInt;
-        WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, WarframeExporter::Model::g_enumMapModel.at(pkgs->getGame(), fileEntry.commonHeader.type)->ensmalleningScale(), fileEntry.internalPath);
+        WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, modelReader->ensmalleningScale(), fileEntry.internalPath);
     
         outStr << "Vertices: " << headerInt.vertexCount << std::endl;
         outStr << "Total faces: " << headerInt.faceCount / 3 << std::endl;

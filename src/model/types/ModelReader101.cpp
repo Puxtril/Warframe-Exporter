@@ -16,7 +16,6 @@ ModelReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
-    // Main model data
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
     outHeader.morphCount = headerReader->readUInt32();
@@ -29,6 +28,7 @@ ModelReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     headerReader->seek(0xC, std::ios_base::cur);
     uint32_t somePathLen = headerReader->readUInt32(0, 200, "SomePathLen too large");
     headerReader->seek(somePathLen, std::ios_base::cur);
+
     headerReader->seek(0x41, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);

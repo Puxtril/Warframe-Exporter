@@ -9,7 +9,10 @@ ModelReader99::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 
     skipPhysicsStruct(headerReader);
 
-    headerReader->seek(0x2E, std::ios_base::cur);
+    headerReader->seek(0x2C, std::ios_base::cur);
+
+    skipUnknownVector(headerReader);
+
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
@@ -22,7 +25,11 @@ ModelReader99::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 
     skipUnk64Array(headerReader);
 
-    headerReader->seek(0x51, std::ios_base::cur);
+    headerReader->seek(0xC, std::ios_base::cur);
+    uint32_t somePathLen = headerReader->readUInt32(0, 200, "SomePathLen too large");
+    headerReader->seek(somePathLen, std::ios_base::cur);
+    
+    headerReader->seek(0x41, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 

@@ -16,7 +16,6 @@ ModelReader86::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
-    // Main model data
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
     outHeader.morphCount = headerReader->readUInt32();

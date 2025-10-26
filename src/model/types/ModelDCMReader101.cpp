@@ -48,14 +48,14 @@ ModelDCMReader101::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, 
 }
 
 void
-ModelDCMReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
+ModelDCMReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
-        bodyReader->seek(x.dataLength, std::ios_base::cur);
+        bodyReaderB->seek(x.dataLength, std::ios_base::cur);
 
-    bodyReader->seek(64U * extHeader.boneCount, std::ios_base::cur);
+    bodyReaderB->seek(64U * extHeader.boneCount, std::ios_base::cur);
 
-    bodyReader->seek(0x2, std::ios_base::cur);
+    bodyReaderB->seek(0x2, std::ios_base::cur);
 
     outBody.positions.resize(extHeader.vertexCount);
     outBody.normals.resize(extHeader.vertexCount);
@@ -65,40 +65,40 @@ ModelDCMReader101::readBody(const ModelHeaderExternal& extHeader, BinaryReader::
     outBody.AO.resize(extHeader.vertexCount);
     for (uint32_t x = 0; x < extHeader.vertexCount; x++)
     {
-        outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
-        outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
-        outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
-        outBody.positions[x][3] = bodyReader->readInt16() / 32767.0F;
+        outBody.positions[x][0] = bodyReaderB->readInt16() / 32767.0F;
+        outBody.positions[x][1] = bodyReaderB->readInt16() / 32767.0F;
+        outBody.positions[x][2] = bodyReaderB->readInt16() / 32767.0F;
+        outBody.positions[x][3] = bodyReaderB->readInt16() / 32767.0F;
 
-        outBody.normals[x][0] = bodyReader->readUInt8();
-        outBody.normals[x][1] = bodyReader->readUInt8();
-        outBody.normals[x][2] = bodyReader->readUInt8();
-        outBody.normals[x][3] = bodyReader->readUInt8();
+        outBody.normals[x][0] = bodyReaderB->readUInt8();
+        outBody.normals[x][1] = bodyReaderB->readUInt8();
+        outBody.normals[x][2] = bodyReaderB->readUInt8();
+        outBody.normals[x][3] = bodyReaderB->readUInt8();
         
-        outBody.tangents[x][0] = bodyReader->readUInt8();
-        outBody.tangents[x][1] = bodyReader->readUInt8();
-        outBody.tangents[x][2] = bodyReader->readUInt8();
-        outBody.AO[x] = bodyReader->readUInt8();
+        outBody.tangents[x][0] = bodyReaderB->readUInt8();
+        outBody.tangents[x][1] = bodyReaderB->readUInt8();
+        outBody.tangents[x][2] = bodyReaderB->readUInt8();
+        outBody.AO[x] = bodyReaderB->readUInt8();
 
-        outBody.UV1[x][0] = bodyReader->readHalf();
-        outBody.UV1[x][1] = bodyReader->readHalf();
+        outBody.UV1[x][0] = bodyReaderB->readHalf();
+        outBody.UV1[x][1] = bodyReaderB->readHalf();
 
-        outBody.UV2[x][0] = bodyReader->readHalf();
-        outBody.UV2[x][1] = bodyReader->readHalf();
+        outBody.UV2[x][0] = bodyReaderB->readHalf();
+        outBody.UV2[x][1] = bodyReaderB->readHalf();
     }
 
-    size_t remainingBytes = bodyReader->getLength() - bodyReader->tell();
+    size_t remainingBytes = bodyReaderB->getLength() - bodyReaderB->tell();
     size_t indicesSize = static_cast<size_t>(extHeader.faceCount) * 2;
     if (remainingBytes > indicesSize)
     {
-        bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
+        bodyReaderB->seek(extHeader.vertexCount * 8, std::ios_base::cur);
     }
 
-    if (!canContinueReading(bodyReader, extHeader.faceCount))
+    if (!canContinueReading(bodyReaderB, extHeader.faceCount))
         throw unknown_format_error("Incorrect index count");
 
     outBody.indices.resize(extHeader.faceCount);
-    bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
+    bodyReaderB->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 
     if (extHeader.faceCount > 0 && outBody.indices[0] != 0)
         throw unknown_format_error("First index not 0, probably read model incorrectly");

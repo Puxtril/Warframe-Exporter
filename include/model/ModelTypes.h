@@ -6,6 +6,7 @@ namespace WarframeExporter::Model
     {
         MODEL_STATIC_86 = 86,
         MODEL_STATIC_96 = 96,
+        MODEL_STATIC_102 = 102,
         MODEL_LEVEL_99 = 99,
         MODEL_LEVEL_103 = 103,
         MODEL_LEVEL_106 = 106,

@@ -50,7 +50,7 @@ ModelExtractor::extractExternal(ModelReader* modelReader, LotusLib::FileEntry& f
 		throw unknown_format_error("Mesh has no body");
 
 	modelReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, outHeaderExt);
-	modelReader->readBody(outHeaderExt, &fileEntry.bData, outBodyExt);
+	modelReader->readBody(outHeaderExt, &fileEntry.bData, &fileEntry.fData, outBodyExt);
 }
 
 std::vector<std::vector<glm::u8vec4>>

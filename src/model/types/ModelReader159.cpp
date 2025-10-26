@@ -45,12 +45,12 @@ ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader159::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
+ModelReader159::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
-        bodyReader->seek(x.dataLength, std::ios_base::cur);
+        bodyReaderB->seek(x.dataLength, std::ios_base::cur);
 
-    bodyReader->seek(0x40 * extHeader.bodySkipLen1, std::ios::cur);
+    bodyReaderB->seek(0x40 * extHeader.bodySkipLen1, std::ios::cur);
 
     outBody.positions.resize(extHeader.vertexCount);
     outBody.UV1.resize(extHeader.vertexCount);
@@ -59,20 +59,20 @@ ModelReader159::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     outBody.colors[0].resize(extHeader.vertexCount);
     for (uint32_t x = 0; x < extHeader.vertexCount; x++)
     {
-        outBody.positions[x][0] = bodyReader->readHalf() - 0.5F;
-        outBody.positions[x][1] = bodyReader->readHalf();
-        outBody.positions[x][2] = bodyReader->readHalf() - 0.5F;
+        outBody.positions[x][0] = bodyReaderB->readHalf() - 0.5F;
+        outBody.positions[x][1] = bodyReaderB->readHalf();
+        outBody.positions[x][2] = bodyReaderB->readHalf() - 0.5F;
         
-        bodyReader->seek(6, std::ios::cur);
-        outBody.colors[0][x][0] = bodyReader->readUInt8();
-        outBody.colors[0][x][1] = bodyReader->readUInt8();
-        outBody.colors[0][x][2] = bodyReader->readUInt8();
-        outBody.colors[0][x][3] = bodyReader->readUInt8();
+        bodyReaderB->seek(6, std::ios::cur);
+        outBody.colors[0][x][0] = bodyReaderB->readUInt8();
+        outBody.colors[0][x][1] = bodyReaderB->readUInt8();
+        outBody.colors[0][x][2] = bodyReaderB->readUInt8();
+        outBody.colors[0][x][3] = bodyReaderB->readUInt8();
     }
 
-    if (!canContinueReading(bodyReader, extHeader.faceCount))
+    if (!canContinueReading(bodyReaderB, extHeader.faceCount))
         throw unknown_format_error("Incorrect index count");
 
     outBody.indices.resize(extHeader.faceCount);
-    bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
+    bodyReaderB->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 }

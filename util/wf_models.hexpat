@@ -135,3 +135,12 @@ struct PhysicsPath {
     }
     str32 path;
 };
+
+struct PhysicsPath2 {
+    u32 type;
+    u32 subtype;
+    if (type == 8 || subtype == 8) {
+        padding[0x2];
+    }
+    str32 path;
+};

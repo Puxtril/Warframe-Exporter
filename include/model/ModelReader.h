@@ -17,7 +17,7 @@ namespace WarframeExporter::Model
 		virtual ScaleType ensmalleningScale() const = 0;
 
 		virtual void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) = 0;
-		virtual void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) = 0;
+		virtual void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody) = 0;
 
 	protected:
 		void readWeightedBones(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outWeightedBones);
@@ -36,6 +36,7 @@ namespace WarframeExporter::Model
 		void skipMorphs(BinaryReader::BinaryReaderBuffered* reader);
 		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader);
 		void skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader);
+		void skipPhysicsStruct2(BinaryReader::BinaryReaderBuffered* reader);
 
 		bool canContinueReading(BinaryReader::BinaryReaderBuffered* reader, int vertexIndexCount);
 	};

@@ -10,6 +10,7 @@ namespace WarframeExporter::Model
         MODEL_LEVEL_99 = 99,
         MODEL_LEVEL_103 = 103,
         MODEL_LEVEL_106 = 106,
+        MODEL_LEVEL_109 = 109,
         MODEL_TERRAIN_159 = 159,
         MODEL_TERRAIN_160 = 160,
         MODEL_TERRAIN_163 = 163,

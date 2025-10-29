@@ -13,6 +13,7 @@ namespace WarframeExporter::Model
         MODEL_TERRAIN_159 = 159,
         MODEL_TERRAIN_160 = 160,
         MODEL_TERRAIN_163 = 163,
+        MODEL_TERRAIN_166 = 166,
         MODEL_RIGGED_269 = 269,
         MODEL_RIGGED_272 = 272,
         MODEL_RIGGED_275 = 275,

@@ -4,7 +4,7 @@
 #include <wf_common-header.hexpat>
 #include <wf_models.hexpat>
 
-struct Model96 {
+struct Model102 {
     padding[0x30];
     PhysicsPath2 physicsPath1;
     padding[0x28];
@@ -26,4 +26,4 @@ struct Model96 {
 };
 
 CommonHeader Header @ $;
-Model96 model @ $;
+Model102 model @ $;

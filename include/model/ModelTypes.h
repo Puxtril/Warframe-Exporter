@@ -21,6 +21,7 @@ namespace WarframeExporter::Model
         MODEL_RIGGED_281 = 281,
         MODEL_PACKED_289 = 289,
         MODEL_PACKED_290 = 290,
+        MODEL_PACKED_299 = 299,
         MODEL_PACKED_300 = 300,
         MODEL_PACKED_301 = 301
     };

@@ -34,6 +34,7 @@ namespace WarframeExporter::Model
         MODEL_DCM_101 = 101,
         MODEL_DCM_102 = 102,
         MODEL_DCM_105 = 105,
+        MODEL_DCM_108 = 108,
     };
 
     enum class ModelHLODType

@@ -1,5 +1,4 @@
 #include "model/types/ModelDCMReader108.h"
-#include "ExporterLogger.h"
 
 using namespace WarframeExporter::Model;
 

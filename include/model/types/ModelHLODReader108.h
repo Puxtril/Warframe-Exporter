@@ -20,23 +20,21 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelHLODReader : public ModelReader
+	class ModelHLODReader108 : public ModelReader
 	{
-		ModelHLODReader() = default;
+		ModelHLODReader108() = default;
 
 	public:
-		inline static ModelHLODReader* getInstance()
+		inline static ModelHLODReader108* getInstance()
 		{
-			static ModelHLODReader* instance = new ModelHLODReader();
+			static ModelHLODReader108* instance = new ModelHLODReader108();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelHLODType::MODEL_HLOD_102 },
-				{ LotusLib::Game::WARFRAME, (int)ModelHLODType::MODEL_HLOD_105 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelHLODType::MODEL_HLOD_105 },
+				{ LotusLib::Game::WARFRAME, (int)ModelHLODType::MODEL_HLOD_108 },
 			};
 			return extTypes;
 		}

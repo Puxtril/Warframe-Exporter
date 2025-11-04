@@ -19,6 +19,7 @@ namespace WarframeExporter::Shader
 		{
 			std::vector<int> extTypes = {
                 (int)ShaderType::SHADER_24,
+                (int)ShaderType::SHADER_25,
             };
 			return extTypes;
 		}

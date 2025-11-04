@@ -60,6 +60,7 @@ namespace WarframeExporter::Shader
 				//{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER, (int)ShaderType::SHADER_22 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_23 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_24 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_25 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::SHADER_PERMUTATION, (int)ShaderType::SHADER_26 },
 			};
 			return extTypes;

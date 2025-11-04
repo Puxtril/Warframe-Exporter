@@ -47,7 +47,8 @@ namespace WarframeExporter::Level
 		{
 			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_201 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_202 }
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_202 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_207 }
 			};
 			return extTypes;
 		}

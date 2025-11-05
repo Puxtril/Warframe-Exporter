@@ -71,7 +71,7 @@ ModelReader300::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader300::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
+ModelReader300::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
-    ModelReader290::getInstance()->readBody(extHeader, bodyReader, outBody);
+    ModelReader290::getInstance()->readBody(extHeader, bodyReaderB, bodyReaderF, outBody);
 }

@@ -16,7 +16,7 @@ TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t f
 	}
 	else
 	{
-		// Textures of type TEXTURE_COMPOSITE will have X sub-textures
+		// Textures of type TEXTURE_ARRAY will have X sub-textures
 		// But that is read by the external reader. This will just parse this field
 		subtextureNames = parseSubtextureString(headerExternal.textureNames);
 	}

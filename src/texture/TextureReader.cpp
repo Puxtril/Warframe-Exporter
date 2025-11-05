@@ -27,7 +27,7 @@ TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 
 	std::string texPaths = "";
 
-	if (commonHeader.type == (uint32_t)TextureType::TEXTURE_COMPOSITE)
+	if (commonHeader.type == (uint32_t)TextureType::TEXTURE_ARRAY)
 	{
 		headerReader->seek(0x2F, std::ios::cur);
 

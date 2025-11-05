@@ -32,7 +32,7 @@ namespace WarframeExporter::Model
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_STATIC_96 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_LEVEL_99 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_LEVEL1_99 },
 			};
 			return extTypes;
 		}
@@ -43,6 +43,6 @@ namespace WarframeExporter::Model
 		}
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
-		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override;
+		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody) override;
 	};
 }

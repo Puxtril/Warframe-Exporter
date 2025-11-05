@@ -4,31 +4,25 @@
 #include <wf_common-header.hexpat>
 #include <wf_models.hexpat>
 
-struct Model102 {
+struct Model105 {
     padding[0x30];
     PhysicsPath physicsPath1;
-    padding[0x4E];
+    padding[0x48];
     u32 vertexCount;
     u32 faceCount;
     u32 morphCount;
     u32 boneCount;
-    padding[0x18];
-    Unk64s unk64s;
-    padding[0x51];
+    padding[0x22];
+    u32 vertexCountBCache;
+    u32 faceCountBCache;
+    padding[0x3D];
     MeshInfos meshInfos;
     Unk16s unk16s;
-    // If the filename ends with _dcm, uncomment this.
-    // Imhex structs don't have the ability to seek backwards.
-    /*
-    padding[0x1];
-    u32 dcmEnum;
-    if (dcmEnum == 2) {
-        padding[6];
-    }
-    */
+    MaterialPaths materialPaths;
     PhysicsPath physicsPath2;
     PhysXMeshes physx;
+    Errors errors;
 };
 
 CommonHeader Header @ $;
-Model102 model @ $;
+Model105 model @ $;

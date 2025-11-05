@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BinaryReaderExceptions.h"
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
@@ -17,21 +16,21 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader101 : public ModelReader
+	class ModelReader299 : public ModelReader
 	{
-		ModelReader101() = default;
+		ModelReader299() = default;
 
 	public:
-		inline static ModelReader101* getInstance()
+		inline static ModelReader299* getInstance()
 		{
-			static ModelReader101* instance = new ModelReader101();
+			static ModelReader299* instance = new ModelReader299();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME,  (int)ModelType::MODEL_DCM_101 },
+				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_PACKED_299 },
 			};
 			return extTypes;
 		}
@@ -42,6 +41,6 @@ namespace WarframeExporter::Model
 		}
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
-		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody) override;
+		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody) override;
 	};
 }

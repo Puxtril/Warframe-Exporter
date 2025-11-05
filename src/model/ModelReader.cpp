@@ -236,6 +236,19 @@ ModelReader::skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader)
     reader->seek(pathLen, std::ios::cur);
 }
 
+void
+ModelReader::skipPhysicsStruct2(BinaryReader::BinaryReaderBuffered* reader)
+{
+    uint32_t type = reader->readUInt32();
+    uint32_t subType = reader->readUInt32();
+
+    if (type == 8 || subType == 8)
+        reader->seek(2, std::ios::cur);
+
+    uint32_t pathLen = reader->readUInt32();
+    reader->seek(pathLen, std::ios::cur);
+}
+
 bool
 ModelReader::canContinueReading(BinaryReader::BinaryReaderBuffered* reader, int vertexIndexCount)
 {

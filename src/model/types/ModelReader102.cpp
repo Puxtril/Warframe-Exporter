@@ -7,119 +7,108 @@ ModelReader102::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
-    skipPhysicsStruct(headerReader);
+    skipPhysicsStruct2(headerReader);
 
-    headerReader->seek(0x2E, std::ios_base::cur);
+    headerReader->seek(0x28, std::ios_base::cur);
+
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
-    outHeader.vertexCount = headerReader->readUInt32();
+    outHeader.vertexCount = headerReader->readUInt32(1, 100000, "Vertex count");
     outHeader.faceCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
-    outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
+    outHeader.morphCount = headerReader->readUInt32();
+    // Sometimes not 0
+    // Related to MeshInfo's Unknown name (skipped data)
+    outHeader.boneCount = headerReader->readUInt32();
 
-    headerReader->seek(0x18, std::ios_base::cur);
-
-    skipUnk64Array(headerReader);
-
-    headerReader->seek(0x51, std::ios_base::cur);
+    headerReader->seek(0x22, std::ios_base::cur);
+    outHeader.vertexCountB = headerReader->readUInt32(1, outHeader.vertexCount, "B Cache Vertex count");
+    outHeader.faceCountB = headerReader->readUInt32(1, outHeader.faceCount, "B Cache Face count");
+    headerReader->seek(0x3D, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
     skipUnk16Array(headerReader);
 
-    if (this->isDCM(header))
-    {
-        headerReader->seek(0x1, std::ios::cur);
-
-        int dcmSubEnum = headerReader->readUInt32();
-        if (dcmSubEnum == 2)
-            headerReader->seek(6, std::ios::cur);
-    }
-    else
-    {
-        headerReader->seek(4, std::ios::cur);
-    }
-
-    skipPhysicsStruct(headerReader);
+    skipPhysicsStruct2(headerReader);
 
     readPhysxMeshes(headerReader, outHeader.physXMeshes);
+
+    readErrors(headerReader, outHeader.errorMsgs);
+
+    if (headerReader->tell() != headerReader->getLength())
+        throw unknown_format_error("Did not reach end of file");
 }
 
 void
-ModelReader102::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReader, ModelBodyExternal& outBody)
+ModelReader102::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
-    for (const auto& x : extHeader.physXMeshes)
-        bodyReader->seek(x.dataLength, std::ios_base::cur);
-
-    bodyReader->seek(64U * extHeader.boneCount, std::ios_base::cur);
-
-    bodyReader->seek(0x2, std::ios_base::cur);
-
     outBody.positions.resize(extHeader.vertexCount);
     outBody.normals.resize(extHeader.vertexCount);
     outBody.tangents.resize(extHeader.vertexCount);
     outBody.UV1.resize(extHeader.vertexCount);
     outBody.UV2.resize(extHeader.vertexCount);
     outBody.AO.resize(extHeader.vertexCount);
-    for (uint32_t x = 0; x < extHeader.vertexCount; x++)
-    {
-        outBody.positions[x][0] = bodyReader->readInt16() / 32767.0F;
-        outBody.positions[x][1] = bodyReader->readInt16() / 32767.0F;
-        outBody.positions[x][2] = bodyReader->readInt16() / 32767.0F;
-        outBody.positions[x][3] = bodyReader->readInt16() / 32767.0F;
 
-        outBody.normals[x][0] = bodyReader->readUInt8();
-        outBody.normals[x][1] = bodyReader->readUInt8();
-        outBody.normals[x][2] = bodyReader->readUInt8();
-        outBody.normals[x][3] = bodyReader->readUInt8();
+    // B Cache
+    for (const auto& x : extHeader.physXMeshes)
+        bodyReaderB->seek(x.dataLength, std::ios_base::cur);
+
+    bodyReaderB->seek(0x2, std::ios_base::cur);
+
+    for (uint32_t x = 0; x < extHeader.vertexCountB; x++)
+    {
+        outBody.positions[x][0] = bodyReaderB->readInt16() / 32767.0F;
+        outBody.positions[x][1] = bodyReaderB->readInt16() / 32767.0F;
+        outBody.positions[x][2] = bodyReaderB->readInt16() / 32767.0F;
+        outBody.positions[x][3] = bodyReaderB->readInt16() / 32767.0F;
+
+        outBody.normals[x][0] = bodyReaderB->readUInt8();
+        outBody.normals[x][1] = bodyReaderB->readUInt8();
+        outBody.normals[x][2] = bodyReaderB->readUInt8();
+        outBody.normals[x][3] = bodyReaderB->readUInt8();
         
-        outBody.tangents[x][0] = bodyReader->readUInt8();
-        outBody.tangents[x][1] = bodyReader->readUInt8();
-        outBody.tangents[x][2] = bodyReader->readUInt8();
-        outBody.AO[x] = bodyReader->readUInt8();
+        outBody.tangents[x][0] = bodyReaderB->readUInt8();
+        outBody.tangents[x][1] = bodyReaderB->readUInt8();
+        outBody.tangents[x][2] = bodyReaderB->readUInt8();
+        outBody.AO[x] = bodyReaderB->readUInt8();
 
-        outBody.UV1[x][0] = bodyReader->readHalf();
-        outBody.UV1[x][1] = bodyReader->readHalf();
+        outBody.UV1[x][0] = bodyReaderB->readHalf();
+        outBody.UV1[x][1] = bodyReaderB->readHalf();
 
-        outBody.UV2[x][0] = bodyReader->readHalf();
-        outBody.UV2[x][1] = bodyReader->readHalf();
+        outBody.UV2[x][0] = bodyReaderB->readHalf();
+        outBody.UV2[x][1] = bodyReaderB->readHalf();
     }
-
-    size_t remainingBytes = bodyReader->getLength() - bodyReader->tell();
-    size_t indicesSize = static_cast<size_t>(extHeader.faceCount) * 2;
-    
-    // DCM Model
-    if (remainingBytes > indicesSize)
-    {
-        bodyReader->seek(extHeader.vertexCount * 8, std::ios_base::cur);
-    }
-
-    if (!canContinueReading(bodyReader, extHeader.faceCount))
-        throw unknown_format_error("Incorrect index count");
 
     outBody.indices.resize(extHeader.faceCount);
-    bodyReader->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
+    bodyReaderB->readUInt16Array(outBody.indices.data(), extHeader.faceCountB);
 
-    if (extHeader.faceCount > 0 && outBody.indices[0] != 0)
-        throw unknown_format_error("First index not 0, probably read model incorrectly");
-}
+    // F Cache
+    for (uint32_t x = extHeader.vertexCountB; x < extHeader.vertexCount; x++)
+    {
+        outBody.positions[x][0] = bodyReaderF->readInt16() / 32767.0F;
+        outBody.positions[x][1] = bodyReaderF->readInt16() / 32767.0F;
+        outBody.positions[x][2] = bodyReaderF->readInt16() / 32767.0F;
+        outBody.positions[x][3] = bodyReaderF->readInt16() / 32767.0F;
 
-bool
-ModelReader102::isDCM(const LotusLib::CommonHeader& header)
-{
-    if (header.paths.size() != 1)
-        return false;
+        outBody.normals[x][0] = bodyReaderF->readUInt8();
+        outBody.normals[x][1] = bodyReaderF->readUInt8();
+        outBody.normals[x][2] = bodyReaderF->readUInt8();
+        outBody.normals[x][3] = bodyReaderF->readUInt8();
+        
+        outBody.tangents[x][0] = bodyReaderF->readUInt8();
+        outBody.tangents[x][1] = bodyReaderF->readUInt8();
+        outBody.tangents[x][2] = bodyReaderF->readUInt8();
+        outBody.AO[x] = bodyReaderF->readUInt8();
 
-    const std::string& filePath = header.paths[0];
+        outBody.UV1[x][0] = bodyReaderF->readHalf();
+        outBody.UV1[x][1] = bodyReaderF->readHalf();
 
-    constexpr std::string_view dcmExt1 = "_dcm.fbx";
-    constexpr std::string_view dcmExt2 = "_dcm";
+        outBody.UV2[x][0] = bodyReaderF->readHalf();
+        outBody.UV2[x][1] = bodyReaderF->readHalf();
+    }
 
-    std::string_view ext1 = std::string_view(filePath.data() + (filePath.length() - 8), 8);
-    std::string_view ext2 = std::string_view(filePath.data() + (filePath.length() - 4), 4);
-
-    if (dcmExt1 == ext1 || dcmExt2 == ext2)
-        return true;
-    return false;
+    size_t indexOffset = extHeader.faceCountB;
+    size_t indexFfcount = extHeader.faceCount - extHeader.faceCountB;
+    bodyReaderF->readUInt16Array(outBody.indices.data() + indexOffset, indexFfcount);
 }

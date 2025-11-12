@@ -102,7 +102,7 @@ ModelRenderWidget::drawScene()
 }
 
 void
-ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelInternal)
+ModelRenderWidget::loadModel(const WarframeExporter::Model::ModelBodyExternal& modelExternal, const WarframeExporter::Model::ModelBodyInternal& modelInternal)
 {
     makeCurrent();
 
@@ -125,8 +125,8 @@ ModelRenderWidget::loadModel(WarframeExporter::Model::ModelBodyInternal& modelIn
         memcpy(&buf[0] + bufPtr, &all1, 3);
         bufPtr += 3;
 
-        if (i < modelInternal.normals.size()) {
-            memcpy(&buf[0] + bufPtr, &modelInternal.normals[i][0], sizeof(uint8_t) * 4);
+        if (i < modelExternal.normals.size()) {
+            memcpy(&buf[0] + bufPtr, &modelExternal.normals[i][0], sizeof(uint8_t) * 4);
         } else {
             uint8_t defaultNormal[4] = {128, 128, 255, 0};
             memcpy(&buf[0] + bufPtr, defaultNormal, sizeof(uint8_t) * 4);

@@ -125,7 +125,6 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
         newPositions[x][2] = extBody.positions[x][2] * modelScale[2];
     }
     outBody.positions = std::move(newPositions);
-    outBody.normals = std::move(extBody.normals);
     outBody.UV1 = std::move(extBody.UV1);
     outBody.UV2 = std::move(extBody.UV2);
     outBody.boneWeights = std::move(extBody.boneWeights);

@@ -23,7 +23,7 @@ public:
     void initializeGL() override;
     void drawScene() override;
 
-    void loadModel(WarframeExporter::Model::ModelBodyInternal& modelInternal);
+    void loadModel(const WarframeExporter::Model::ModelBodyExternal& modelExternal, const WarframeExporter::Model::ModelBodyInternal& modelInternal);
 private slots:
     void onLightDirectionChanged();
 

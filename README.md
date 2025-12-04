@@ -44,7 +44,7 @@ For more information on the cache file structure, read the [LotusLib documentati
 
 ## High-level overview
 
-Inside the Cache files Warframe stores on your computer (.toc and .cache), lie all the game's assets. The assets are not stored in standard formats like PNG images or FBX 3D models, they're stored in custom formats. This program reads these custom assets from the cache and converts them into sandard formats. Since it's only reading files from the cache, there is 0 risk of being banned from Warframe. Unless you run this while Warframe is running, then Warframe may detect something is reading the cache files.
+Inside the Cache files Warframe stores on your computer (.toc and .cache), lie all the game's assets. The assets are not stored in standard formats like PNG images or FBX 3D models, they're stored in custom formats. This program reads these custom assets from the cache and converts them into standard formats. Since it's only reading files from the cache, there is 0 risk of being banned from Warframe. Unless you run this while Warframe is running, then Warframe may detect something is reading the cache files.
 
 ## Low-level overview
 

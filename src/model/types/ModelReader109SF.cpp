@@ -1,15 +1,15 @@
-#include "model/types/ModelReader109.h"
+#include "model/types/ModelReader109SF.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader109::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader109SF::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
     skipPhysicsStruct(headerReader);
 
-    headerReader->seek(0x28, std::ios_base::cur);
+    headerReader->seek(0x2E, std::ios_base::cur);
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
@@ -18,7 +18,7 @@ ModelReader109::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
     outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
-    headerReader->seek(0x67, std::ios_base::cur);
+    headerReader->seek(0x7D, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
@@ -37,7 +37,7 @@ ModelReader109::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader109::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader109SF::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);
@@ -90,7 +90,7 @@ ModelReader109::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
 }
 
 bool
-ModelReader109::isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader)
+ModelReader109SF::isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader)
 {
     // Some models have no actual vertices, so this can hit EOF
     if (bodyReader->tell() + 0x120 > bodyReader->getLength())

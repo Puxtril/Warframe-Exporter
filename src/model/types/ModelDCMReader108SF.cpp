@@ -1,15 +1,15 @@
-#include "model/types/ModelDCMReader108.h"
+#include "model/types/ModelDCMReader108SF.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelDCMReader108::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelDCMReader108SF::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
     skipPhysicsStruct(headerReader);
 
-    headerReader->seek(0x28, std::ios_base::cur);
+    headerReader->seek(0x2E, std::ios_base::cur);
 
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
@@ -19,10 +19,15 @@ ModelDCMReader108::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, 
     outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
     outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
-    headerReader->seek(0x22, std::ios_base::cur);
+    headerReader->seek(0x18, std::ios_base::cur);
+
+    skipUnk64Array(headerReader);
+
+    headerReader->seek(0xC, std::ios_base::cur);
+
     outHeader.vertexCountB = headerReader->readUInt32(1, outHeader.vertexCount, "B Cache Vertex count");
     outHeader.faceCountB = headerReader->readUInt32(1, outHeader.faceCount, "B Cache Face count");
-    headerReader->seek(0x3D, std::ios_base::cur);
+    headerReader->seek(0x45, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
@@ -44,7 +49,7 @@ ModelDCMReader108::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, 
 }
 
 void
-ModelDCMReader108::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelDCMReader108SF::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);

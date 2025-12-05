@@ -19,14 +19,14 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelDCMReader108 : public ModelReader
+	class ModelDCMReader108WF : public ModelReader
 	{
-		ModelDCMReader108() = default;
+		ModelDCMReader108WF() = default;
 
 	public:
-		inline static ModelDCMReader108* getInstance()
+		inline static ModelDCMReader108WF* getInstance()
 		{
-			static ModelDCMReader108* instance = new ModelDCMReader108();
+			static ModelDCMReader108WF* instance = new ModelDCMReader108WF();
 			return instance;
 		}
 

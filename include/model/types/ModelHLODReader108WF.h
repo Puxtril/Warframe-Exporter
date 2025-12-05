@@ -20,14 +20,14 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelHLODReader108 : public ModelReader
+	class ModelHLODReader108WF : public ModelReader
 	{
-		ModelHLODReader108() = default;
+		ModelHLODReader108WF() = default;
 
 	public:
-		inline static ModelHLODReader108* getInstance()
+		inline static ModelHLODReader108WF* getInstance()
 		{
-			static ModelHLODReader108* instance = new ModelHLODReader108();
+			static ModelHLODReader108WF* instance = new ModelHLODReader108WF();
 			return instance;
 		}
 

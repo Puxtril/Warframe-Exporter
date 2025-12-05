@@ -1,25 +1,25 @@
-#include "model/types/ModelHLODReader108.h"
+#include "model/types/ModelHLODReader108SF.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelHLODReader108::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelHLODReader108SF::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
     skipPhysicsStruct(headerReader);
 
-    headerReader->seek(0x28, std::ios_base::cur);
+    headerReader->seek(0x2E, std::ios_base::cur);
 
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
+    outHeader.morphCount = headerReader->readUInt32();
     outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
-    headerReader->seek(0x67, std::ios_base::cur);
+    headerReader->seek(0x7D, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
@@ -33,7 +33,7 @@ ModelHLODReader108::readHeader(BinaryReader::BinaryReaderBuffered* headerReader,
 }
 
 void
-ModelHLODReader108::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelHLODReader108SF::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);

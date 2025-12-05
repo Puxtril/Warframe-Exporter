@@ -7,6 +7,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
+#include "BinaryReaderExceptions.h"
 
 #include <cassert>
 #include <iomanip>
@@ -17,21 +18,21 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader102 : public ModelReader
+	class ModelReader102SF : public ModelReader
 	{
-		ModelReader102() = default;
+		ModelReader102SF() = default;
 
 	public:
-		inline static ModelReader102* getInstance()
+		inline static ModelReader102SF* getInstance()
 		{
-			static ModelReader102* instance = new ModelReader102();
+			static ModelReader102SF* instance = new ModelReader102SF();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_STATIC_102 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_STATIC_102 },
 			};
 			return extTypes;
 		}

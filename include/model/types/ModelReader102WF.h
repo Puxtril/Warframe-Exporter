@@ -17,21 +17,21 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader96 : public ModelReader
+	class ModelReader102WF : public ModelReader
 	{
-		ModelReader96() = default;
+		ModelReader102WF() = default;
 
 	public:
-		inline static ModelReader96* getInstance()
+		inline static ModelReader102WF* getInstance()
 		{
-			static ModelReader96* instance = new ModelReader96();
+			static ModelReader102WF* instance = new ModelReader102WF();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_STATIC_96 },
+				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_STATIC_102 },
 			};
 			return extTypes;
 		}

@@ -8,7 +8,8 @@
 #include "model/types/ModelReader102WF.h"
 #include "model/types/ModelReader102SF.h"
 #include "model/types/ModelReader103.h"
-#include "model/types/ModelReader105.h"
+#include "model/types/ModelReader105WF.h"
+#include "model/types/ModelReader105SF.h"
 #include "model/types/ModelReader106.h"
 #include "model/types/ModelReader109.h"
 #include "model/types/ModelReader159.h"
@@ -37,7 +38,8 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader102WF::getInstance())
 		.registerClass(ModelReader102SF::getInstance())
 		.registerClass(ModelReader103::getInstance())
-		.registerClass(ModelReader105::getInstance())
+		.registerClass(ModelReader105WF::getInstance())
+		.registerClass(ModelReader105SF::getInstance())
 		.registerClass(ModelReader106::getInstance())
 		.registerClass(ModelReader109::getInstance())
 		.registerClass(ModelReader159::getInstance())

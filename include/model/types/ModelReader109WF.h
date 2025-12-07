@@ -17,36 +17,37 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader159 : public ModelReader
+	class ModelReader109WF : public ModelReader
 	{
-		ModelReader159() = default;
+		ModelReader109WF() = default;
 
 	public:
-		inline static ModelReader159* getInstance()
+		inline static ModelReader109WF* getInstance()
 		{
-			static ModelReader159* instance = new ModelReader159();
+			static ModelReader109WF* instance = new ModelReader109WF();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_159 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_160 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_166 },
+				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_LEVEL2_109 },
 			};
 			return extTypes;
 		}
 
 		inline ScaleType ensmalleningScale() const override
 		{
-			return ScaleType::XZ;
+			return ScaleType::NONE;
 		}
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody) override;
-	};
+	
+	private:
+		// This is 100% a workaround
+		bool isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader);
+};
+
+	
 }

@@ -1,24 +1,35 @@
-#include "model/types/ModelReader109.h"
+#include "model/types/ModelReader105SF.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader109::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader105SF::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
     skipPhysicsStruct(headerReader);
 
-    headerReader->seek(0x28, std::ios_base::cur);
+    headerReader->seek(0x2E, std::ios_base::cur);
+
+    skipUnknownVector(headerReader);
+
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
     headerReader->readSingleArray(&outHeader.ensmallening2[0], 4);
 
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.faceCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
+    outHeader.morphCount = headerReader->readUInt32();
     outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
-    headerReader->seek(0x67, std::ios_base::cur);
+    headerReader->seek(0x18, std::ios_base::cur);
+
+    skipUnk64Array(headerReader);
+
+    headerReader->seek(0xC, std::ios_base::cur);
+    uint32_t somePathLen = headerReader->readUInt32(0, 200, "SomePathLen too large");
+    headerReader->seek(somePathLen, std::ios_base::cur);
+    
+    headerReader->seek(0x49, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
@@ -37,15 +48,10 @@ ModelReader109::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader109::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader105SF::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);
-
-    bodyReaderB->seek(64U * extHeader.boneCount, std::ios_base::cur);
-
-    while (isMorePhysX(bodyReaderB))
-        bodyReaderB->seek(0x120, std::ios::cur);
 
     bodyReaderB->seek(0x2, std::ios_base::cur);
 
@@ -60,7 +66,7 @@ ModelReader109::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
         outBody.positions[x][0] = bodyReaderB->readFloat();
         outBody.positions[x][1] = bodyReaderB->readFloat();
         outBody.positions[x][2] = bodyReaderB->readFloat();
-        bodyReaderB->seek(4, std::ios_base::cur);
+        outBody.positions[x][3] = bodyReaderB->readFloat();
 
         outBody.normals[x][0] = bodyReaderB->readUInt8();
         outBody.normals[x][1] = bodyReaderB->readUInt8();
@@ -79,28 +85,9 @@ ModelReader109::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
         outBody.UV2[x][1] = bodyReaderB->readHalf();
     }
 
-    if (!canContinueReading(bodyReaderB, extHeader.faceCount))
-        throw unknown_format_error("Incorrect index count");
-
     outBody.indices.resize(extHeader.faceCount);
     bodyReaderB->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
 
     if (extHeader.faceCount > 0 && outBody.indices[0] != 0)
         throw unknown_format_error("First index not 0, probably read model incorrectly");
-}
-
-bool
-ModelReader109::isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader)
-{
-    // Some models have no actual vertices, so this can hit EOF
-    if (bodyReader->tell() + 0x120 > bodyReader->getLength())
-        return false;
-
-    // Some structs have data pretty far into the allocated 0x120 block size
-    bodyReader->seek(0x100, std::ios::cur);
-    uint64_t check1 = bodyReader->readUInt64();
-    uint64_t check2 = bodyReader->readUInt64();
-    bodyReader->seek(-0x110, std::ios::cur);
-
-    return check1 == 0 && check2 == 0;
 }

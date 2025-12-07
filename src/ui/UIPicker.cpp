@@ -12,7 +12,6 @@ UiPicker::setupUi(QDialog *WindowPicker)
     
     Ui_WindowPicker::setupUi(WindowPicker);
     WindowPicker->setWindowFlag(Qt::WindowContextHelpButtonHint, true);
-    setupMessageBoxes();
     addComboBoxOptions();
     loadVersion();
 
@@ -37,33 +36,6 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
     QObject::connect(this, &UiPicker::pickerDone, &UiSettings::getInstance(), &UiSettings::setSettings);
     QObject::connect(this->CacheWindowsBrowse, &QPushButton::clicked, this, &UiPicker::browseCacheWindows);
     QObject::connect(this->ExportPathBrowse, &QPushButton::clicked, this, &UiPicker::browseExportPath);
-
-    QObject::connect(&this->m_invalidExportFolderBox, &QMessageBox::buttonClicked, this, &UiPicker::createExportFolderAndLoad);
-    QObject::connect(this, &UiPicker::retryLoadPickerOptions, this, &UiPicker::parsePickerOptions);
-}
-
-void
-UiPicker::setupMessageBoxes()
-{
-    m_chosenGameMessage.setFixedSize(500, 200);
-    m_chosenGameMessage.setModal(true);
-    m_chosenGameMessage.setVisible(false);
-
-    m_invalidCacheFolderBox.setWindowTitle("Error");
-    m_invalidCacheFolderBox.setText("Cache.Windows folder is invalid");
-    m_invalidCacheFolderBox.setIcon(QMessageBox::Critical);
-    m_invalidCacheFolderBox.setFixedSize(500, 200);
-    m_invalidCacheFolderBox.setModal(true);
-    m_invalidCacheFolderBox.setVisible(false);
-
-    m_invalidExportFolderBox.setText("Export folder doesn't exist, create?");
-    m_invalidExportFolderBox.setWindowTitle("Error");
-    m_invalidExportFolderBox.setIcon(QMessageBox::Question);
-    m_invalidExportFolderBox.setFixedSize(500, 200);
-    m_invalidExportFolderBox.setModal(true);
-    m_invalidExportFolderBox.setVisible(false);
-
-    m_invalidExportFolderBox.addButton(QMessageBox::Cancel);
 }
 
 void
@@ -142,7 +114,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogError;
             msgBoxIcon = QMessageBox::Icon::Critical;
-            msgBoxMsg = "Darkness II is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged. I'd be surprised if anyone actually sees this message.";
+            msgBoxMsg = "Darkness II is currently unsupported, but it's possible to add functionality. If you wish to see support added, leave a reaction/response here https://github.com/Puxtril/Warframe-Exporter/discussions/60";
             disableLoadButton = true;
             break;
         }
@@ -164,9 +136,9 @@ UiPicker::cachePathUpdated(const QString& newPath)
         }
         case LotusLib::Game::SOULFRAME:
         {
-            buttonIcon = QIcon::ThemeIcon::DialogWarning;
-            msgBoxIcon = QMessageBox::Icon::Warning;
-            msgBoxMsg = "Soulframe Preludes 8 is the only supported version (currently). Newer versions may successfully load, but many files will be unsupported.";
+            buttonIcon = QIcon::ThemeIcon::DialogInformation;
+            msgBoxIcon = QMessageBox::Icon::Information;
+            msgBoxMsg = "Soulframe supported arrived with Preludes 11. However, game updates are likely to break extractor functionality.";
             disableLoadButton = false;
             break;
         }
@@ -195,19 +167,23 @@ void
 UiPicker::parsePickerOptions()
 {
     std::string cachePathStr = this->CacheWindowsInput->text().toUtf8().constData();
-    std::filesystem::path cachePath(cachePathStr);
-    if (!std::filesystem::is_directory(cachePath))
-    {
-        m_invalidCacheFolderBox.show();
-        return;
-    }
 
     std::string exportPathStr = this->ExportPathInput->text().toUtf8().constData();
     std::filesystem::path exportPath(exportPathStr);
     if (!std::filesystem::is_directory(exportPath))
     {
-        m_invalidExportFolderBox.show();
-        return;
+        QMessageBox::StandardButton reply = QMessageBox::question(this->LoadButton, "Error", "Export folder doesn't exist, create?", QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes)
+        {
+            if (!createExportFolder())
+            {
+                return;
+            }
+        }
+        else
+        {
+            return;
+        }
     }
 
     int exportTypes = 0;
@@ -251,12 +227,12 @@ UiPicker::parsePickerOptions()
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
 
-    LotusLib::Game game = LotusLib::guessGame(cachePath.string());
+    LotusLib::Game game = LotusLib::guessGame(cachePathStr);
     WarframeExporter::Logger::getInstance().info("Setting game to " + LotusLib::gameToString(game));
 
     WarframeExporter::Logger::getInstance().setLogProperties(exportPath / "Warframe-Exporter.log", g_logLevel);
     LotusLib::Logger::setLogProperties(spdlog::level::info);
-    emit pickerDone(cachePath, exportPath, (WarframeExporter::ExtractorType)exportTypes, game, options);
+    emit pickerDone(cachePathStr, exportPath, (WarframeExporter::ExtractorType)exportTypes, game, options);
 }
 
 void
@@ -278,24 +254,20 @@ UiPicker::browseExportPath()
     }
 }
 
-void
-UiPicker::createExportFolderAndLoad(QAbstractButton *button)
+bool
+UiPicker::createExportFolder()
 {
-    if (m_invalidExportFolderBox.standardButton(button) != QMessageBox::Ok)
-        return;
-
     std::string exportPathStr = this->ExportPathInput->text().toUtf8().constData();
     std::filesystem::path exportPath(exportPathStr);
     try
     {
         std::filesystem::create_directories(exportPath);
+        return true;
     }
     catch (std::exception& ex)
     {
         QMessageBox errBox;
         errBox.critical(nullptr, "Error creating folder", ex.what());
-        return;
+        return false;
     }
-
-    emit retryLoadPickerOptions();
 }

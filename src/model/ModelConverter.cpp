@@ -45,7 +45,16 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
         
         intNodes.push_back(newNode);
     }
-    // Prevent invinite loop, by default the top-most node has parent index of 0
+
+    // MODEL_PACKED_XXX models require a bone heirarchy shift
+    if (intNodes.size() >= 2 && intNodes[1].parentIndex == 1)
+    {
+        for (BoneTreeNodeInternal& curBoneNode : intNodes)
+            curBoneNode.parentIndex--;
+    }
+
+    // Prevent infinite loop
+    // By default, the 0-index node has parent index of 0
     if (intNodes.size() > 1 && intNodes[0].parentIndex == 0)
         intNodes[0].parentIndex = -1;
     

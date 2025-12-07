@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BinaryReaderExceptions.h"
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
@@ -15,23 +14,25 @@
 #include <iostream>
 #include <algorithm>
 
+#include "model/types/ModelReader290.h"
+
 namespace WarframeExporter::Model
 {
-	class ModelReader105 : public ModelReader
+	class ModelReader310 : public ModelReader
 	{
-		ModelReader105() = default;
+		ModelReader310() = default;
 
 	public:
-		inline static ModelReader105* getInstance()
+		inline static ModelReader310* getInstance()
 		{
-			static ModelReader105* instance = new ModelReader105();
+			static ModelReader310* instance = new ModelReader310();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_LEVEL1_105 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_PACKED_310 },
 			};
 			return extTypes;
 		}

@@ -80,14 +80,27 @@ TextureExtractor::writeTextureToFile(TextureInternal& texture, const LotusLib::C
 
 		out.write(data, dataLen);
 		out.close();
+
+		return;
 	}
 
-	else if (texture.header.formatEnum == TextureCompression::BC6)
-		TextureExporterConvert::convertAndWriteToHdr(data, dataLen, outputFile, texture.header.width, texture.header.height);
+	const char* dataFormatted = data;
+
+	std::vector<char> dataFormattedVec;
+	if (texture.header.formatEnum == TextureCompression::Uncompressed)
+	{
+		dataFormattedVec.resize(dataLen);
+		memcpy(dataFormattedVec.data(), data, dataLen);
+		TextureConverter::flipTextureChannels(dataFormattedVec.data(), dataLen);
+		dataFormatted = dataFormattedVec.data();
+	}
+
+	if (texture.header.formatEnum == TextureCompression::BC6)
+		TextureExporterConvert::convertAndWriteToHdr(dataFormatted, dataLen, outputFile, texture.header.width, texture.header.height);
 
 	else if (exportType == TextureExportType::TEXTURE_EXPORT_PNG)
-		TextureExporterConvert::convertAndWriteToPng(data, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
+		TextureExporterConvert::convertAndWriteToPng(dataFormatted, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 
 	else if (exportType == TextureExportType::TEXTURE_EXPORT_TGA)
-		TextureExporterConvert::convertAndWriteToTga(data, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
+		TextureExporterConvert::convertAndWriteToTga(dataFormatted, dataLen, outputFile, texture.header.formatEnum, texture.header.width, texture.header.height);
 }

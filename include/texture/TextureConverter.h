@@ -12,6 +12,7 @@ namespace WarframeExporter::Texture
 	{
 	public:
 		static TextureHeaderInternal convertHeader(TextureHeaderExternal& headerExternal, int32_t fileSize, uint32_t fileFormat);
+		static void flipTextureChannels(char* data, size_t dataLen);
 
 	private:
 		static std::pair<int16_t, int16_t> getCorrectResolution(uint16_t baseWidth, uint16_t baseHeight, bool isCompressed, int32_t textureLength, int blockSize);

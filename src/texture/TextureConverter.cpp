@@ -31,6 +31,13 @@ TextureConverter::convertHeader(TextureHeaderExternal& headerExternal, int32_t f
 	return TextureHeaderInternal{ static_cast<TextureCompression>(headerExternal.format), ddsFormat, mip0Len, std::get<0>(dimensions), std::get<1>(dimensions), subtextureNames };
 }
 
+void
+TextureConverter::flipTextureChannels(char* data, size_t dataLen)
+{
+	for (size_t i = 0; i < dataLen; i += 4)
+		std::swap(data[i], data[i+2]);
+}
+
 std::pair<int16_t, int16_t>
 TextureConverter::getCorrectResolution(uint16_t baseWidth, uint16_t baseHeight, bool isCompressed, int32_t textureLength, int blockSize)
 {

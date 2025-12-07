@@ -114,7 +114,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogError;
             msgBoxIcon = QMessageBox::Icon::Critical;
-            msgBoxMsg = "Darkness II is currently unsupported. It can be supported, but noone has showed interest so it's currently backlogged. I'd be surprised if anyone actually sees this message.";
+            msgBoxMsg = "Darkness II is currently unsupported, but it's possible to add functionality. If you wish to see support added, leave a reaction/response here https://github.com/Puxtril/Warframe-Exporter/discussions/60";
             disableLoadButton = true;
             break;
         }
@@ -136,9 +136,9 @@ UiPicker::cachePathUpdated(const QString& newPath)
         }
         case LotusLib::Game::SOULFRAME:
         {
-            buttonIcon = QIcon::ThemeIcon::DialogWarning;
-            msgBoxIcon = QMessageBox::Icon::Warning;
-            msgBoxMsg = "Soulframe Preludes 8 is the only supported version (currently). Newer versions may successfully load, but many files will be unsupported.";
+            buttonIcon = QIcon::ThemeIcon::DialogInformation;
+            msgBoxIcon = QMessageBox::Icon::Information;
+            msgBoxMsg = "Soulframe supported arrived with Preludes 11. However, game updates are likely to break extractor functionality.";
             disableLoadButton = false;
             break;
         }

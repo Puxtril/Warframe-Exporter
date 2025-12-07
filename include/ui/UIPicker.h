@@ -25,8 +25,6 @@ class UiPicker : public QObject, private Ui_WindowPicker
     Ui_AdditionalSettings m_additionalSettings;
 
     QMessageBox m_chosenGameMessage;
-    QMessageBox m_invalidCacheFolderBox;
-    QMessageBox m_invalidExportFolderBox;
 
 public:
     UiPicker(QObject *parent = nullptr);
@@ -37,9 +35,9 @@ public:
     void loadSettings();
 
 private:
-    void setupMessageBoxes();
     void addComboBoxOptions();
     void loadVersion();
+    bool createExportFolder();
     void cachePathUpdated(const QString& newPath);
 
 signals:
@@ -50,11 +48,9 @@ signals:
         LotusLib::Game game,
         WarframeExporter::ExtractOptions options
     );
-    void retryLoadPickerOptions();
 
 public slots:
     void parsePickerOptions();
     void browseCacheWindows();
     void browseExportPath();
-    void createExportFolderAndLoad(QAbstractButton *button);
 };

@@ -102,6 +102,14 @@ UiPicker::cachePathUpdated(const QString& newPath)
 
     switch (newGame)
     {
+        case LotusLib::Game::DARKSECTOR:
+        {
+            buttonIcon = QIcon::ThemeIcon::DialogError;
+            msgBoxIcon = QMessageBox::Icon::Critical;
+            msgBoxMsg = "Dark Sector will likely never be supported (by this tool). It's possible to extract data, but the cache files are too different compared to every other Evolution Engine game.";
+            disableLoadButton = true;
+            break;
+        }
         case LotusLib::Game::STARTREK:
         {
             buttonIcon = QIcon::ThemeIcon::DialogError;

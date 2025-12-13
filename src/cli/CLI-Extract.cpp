@@ -12,6 +12,7 @@ CLIExtract::CLIExtract()
 	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract shaders", false);
 	m_extLandscape = std::make_shared<TCLAP::SwitchArg>("", "extract-landscapes", "Extract landscapes", false);
 	m_extLevelStatic = std::make_shared<TCLAP::SwitchArg>("", "extract-levelstatic", "Extract static levels", false);
+	m_dumpPkgs = std::make_shared<TCLAP::SwitchArg>("", "dump-pkgs", "Dump the contents of Packages.bin", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include Vertex Colors on 3D models", false);
 	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format", false, "Binary", "Binary | Decompiled");
@@ -52,7 +53,8 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extAllCmd.get())
 		.add(m_extShaderCmd.get())
 		.add(m_extLandscape.get())
-		.add(m_extLevelStatic.get());
+		.add(m_extLevelStatic.get())
+		.add(m_dumpPkgs.get());
 }
 
 void
@@ -69,6 +71,17 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIExtract::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
+	if (m_dumpPkgs->getValue())
+	{
+		if (internalPath != "/")
+		{
+			WarframeExporter::Logger::getInstance().error("--internal-path doesn't work with --dump-pkgs");
+			exit(1);
+		}
+		bool success = dumpPkgsBin(cacheDirPath, outPath, game);
+		exit(success ? 0 : 1);
+	}
+
 	if (!m_extLevelStatic->getValue() && !m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
@@ -214,4 +227,46 @@ CLIExtract::tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::Lotus
 	}
 	
 	return false;
+}
+
+bool
+CLIExtract::dumpPkgsBin(const std::filesystem::path& cacheDirPath, const std::filesystem::path outPath, LotusLib::Game game)
+{
+	WarframeExporter::Logger& logger = WarframeExporter::Logger::getInstance();
+
+	
+	LotusLib::PackagesReader pkgs(cacheDirPath, game);
+	LotusLib::FileEntry entry = pkgs.getPackage("Misc")->getFile("Packages.bin", LotusLib::FileEntryReaderFlags::READ_H_CACHE);
+	LotusLib::PackagesBin pkgsBin;
+	try
+	{
+		pkgsBin.initilize(entry.headerData);
+	}
+	catch (LotusLib::LotusException& ex)
+	{
+		logger.error("Error reading Packages.bin, cannot continue");
+		logger.error(ex.what());
+		return false;
+	}
+
+	logger.info("Dumping Packages.bin...");
+	size_t i = 0;
+	for (auto iter : pkgsBin)
+	{
+		if (iter.second.decompressedLen == 0)
+			continue;
+		
+		std::filesystem::path curOutPath = (outPath / iter.first.substr(1, iter.first.length() - 1));
+		curOutPath.replace_extension("json");
+		std::filesystem::create_directories(curOutPath.parent_path());
+		std::ofstream outFile;
+		outFile.open (curOutPath);
+		std::string params = pkgsBin.getParametersJson(iter.first).dump(4);
+		outFile.write(params.c_str(), params.length());
+		outFile.close();
+		i++;
+	}
+
+	logger.info("Wrote " + std::to_string(i) + " entries to " + outPath.string());
+	return true;
 }

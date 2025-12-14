@@ -146,7 +146,7 @@ UiPicker::cachePathUpdated(const QString& newPath)
         {
             buttonIcon = QIcon::ThemeIcon::DialogInformation;
             msgBoxIcon = QMessageBox::Icon::Information;
-            msgBoxMsg = "Soulframe supported arrived with Preludes 11. However, game updates are likely to break extractor functionality.";
+            msgBoxMsg = "Soulframe supported arrived with Preludes 12. However, game updates are likely to break extractor functionality.";
             disableLoadButton = false;
             break;
         }

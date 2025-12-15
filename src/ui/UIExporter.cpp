@@ -299,7 +299,7 @@ UiExporter::onSearchTextChanged(const QString& text)
 void 
 UiExporter::filterTree() 
 {
-    const QString searchText = searchLineEdit->text().trimmed().toLower();
+    const QString searchText = searchLineEdit->text().trimmed();
     const bool isSearching = !searchText.isEmpty();
 
     if (!isSearching) {
@@ -309,12 +309,24 @@ UiExporter::filterTree()
         return;
     }
 
+    QRegularExpression regex(searchText, QRegularExpression::CaseInsensitiveOption);
+    bool useRegex = regex.isValid();
+
     for (const auto& pair : m_searchIndex) {
         const QString& itemText = pair.first;
         QTreeWidgetItem* item = pair.second;
         item->setHidden(true);
         item->setExpanded(false);
-        if (itemText.contains(searchText)) {
+
+        bool matches = false;
+        if (useRegex) {
+            QRegularExpressionMatch match = regex.match(itemText);
+            matches = match.hasMatch();
+        } else {
+            matches = itemText.contains(searchText.toLower());
+        }
+
+        if (matches) {
             item->setHidden(false);
             QTreeWidgetItem* parent = item->parent();
             while (parent) {

@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QHash>
 #include <QSet>
+#include <QRegularExpression>
 
 #include "LotusLib.h"
 #include "Extractor.h"

@@ -60,6 +60,16 @@ PreviewManager::clearPreview()
     PreviewMessage::getInstance()->hide();
 }
 
+void
+PreviewManager::playPauseAudio()
+{
+    PreviewAudio* audioPreview = PreviewAudio::getInstance();
+    if (audioPreview->isVisible())
+    {
+        audioPreview->playPause();
+    }
+}
+
 Preview*
 PreviewManager::getPreview(LotusLib::FileEntry& fileEntry)
 {

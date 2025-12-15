@@ -135,3 +135,9 @@ AudioPlaybackWidget::setVolume(int value)
 {
     m_audioOutput.setVolume(std::pow((value / 100.0), 3));
 }
+
+bool
+AudioPlaybackWidget::isPlaying()
+{
+    return m_mediaPlayer.isPlaying();
+}

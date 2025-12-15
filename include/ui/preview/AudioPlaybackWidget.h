@@ -49,4 +49,5 @@ public:
     // `value` is 0-100
     void timelinePositionDragged(int value);
     void setVolume(int value);
+    bool isPlaying();
 };

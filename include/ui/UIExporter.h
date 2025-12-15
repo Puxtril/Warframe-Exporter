@@ -56,6 +56,7 @@ public:
     void setup(UiMainWindow* MainWindow);
 
 private:
+    void setupShortcuts(UiMainWindow* MainWindow);
     void saveGeometry();
     void loadGeometry();
 

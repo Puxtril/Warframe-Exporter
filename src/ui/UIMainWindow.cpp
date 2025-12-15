@@ -1,8 +1,13 @@
 #include "ui/UIMainWindow.h"
+#include <QShortcut>
+#include <QApplication>
 
 UiMainWindow::UiMainWindow()
     : QMainWindow()
 {
+    QShortcut* quitShortcut = new QShortcut(QKeySequence("Ctrl+Q"), this);
+    connect(quitShortcut, &QShortcut::activated, this, &QWidget::close);
+
     loadGeometry();
 }
 

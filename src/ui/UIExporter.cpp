@@ -138,6 +138,12 @@ UiExporter::itemChanged()
 {
     QTreeWidgetItem* item = this->treeWidget->currentItem();
 
+    if (item == nullptr)
+    {
+        this->clearPreview();
+        return;
+    }
+
     int itemType = item->type();
     
     if (itemType == TreeItemDirectory::QTreeWidgetItemType)

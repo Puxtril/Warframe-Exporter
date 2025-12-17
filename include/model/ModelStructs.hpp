@@ -32,6 +32,7 @@ namespace WarframeExporter::Model
 		glm::vec4 vector2;
 		std::array<uint32_t, 5> faceLODOffsets;
 		std::array<uint32_t, 5> faceLODCounts;
+		std::array<uint32_t, 5> faceLODVertexOffsets;
 	};
 
 	struct PhysXMesh

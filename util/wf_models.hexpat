@@ -124,7 +124,7 @@ struct Morphs {
 
 struct Morphs2 {
     u32 count;
-    Morphs2 morphs[count];
+    Morph2 morphs[count];
 };
 
 struct PhysicsPath {

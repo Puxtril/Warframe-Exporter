@@ -182,45 +182,48 @@ ModelReader::skipMorphs(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 uint32_t
-ModelReader::skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader, std::vector<MeshInfoExternal>& outMeshInfos)
 {
-    // Specifications:
-    //   - Last in the following array
-    //   - Third in the repeating array
-    //   - Second value in the array. (technically 2, 3, and 4th index are the same)
-    uint32_t skipLen = 0;
+    uint32_t totalSkip = 0;
 
-    uint32_t morphStructArrayCount = reader->readUInt32();
-    for (uint32_t x = 0; x < morphStructArrayCount; x++)
+    uint32_t morphStructArrayCount = reader->readUInt32(outMeshInfos.size(), outMeshInfos.size(), "Morph array size (match MeshInfo size)");
+    for (uint32_t iMorphStruct = 0; iMorphStruct < morphStructArrayCount; iMorphStruct++)
     {
-        for (int y = 0; y < 4; y++)
-        {
-            if (y == 2)
-            {
-                uint32_t recurringUnkSubArr = reader->readUInt32();
-                reader->seek(4, std::ios_base::cur);
-                skipLen = reader->readUInt32();
-                reader->seek(4U * (recurringUnkSubArr - 2), std::ios_base::cur);
-            }
-            else
-            {
-                uint32_t recurringUnkSubArr = reader->readUInt32();
-                reader->seek(4U * recurringUnkSubArr, std::ios_base::cur);
-            }
-        }
+        MeshInfoExternal& curMeshInfo = outMeshInfos[iMorphStruct];
 
-        uint32_t morphNameArrCount = reader->readUInt32();
-        for (uint32_t x = 0; x < morphNameArrCount; x++)
-        {
-            uint32_t morphNameLen = reader->readUInt32();
-            reader->seek(morphNameLen, std::ios_base::cur);
-        }
+        // 4 arrays of 5 integers each
+        // 1st: Length Multipliers
+        // 2nd: Vertex Offsets
+        // 3rd: Face offsets?
+        // 4th: ???
+        reader->readUInt32(5, 5, "MorphStruct 1st 5");
+        uint32_t lengthMult = reader->readUInt32();
+        reader->seek(16, std::ios::cur);
 
-        uint32_t unkArrCount = reader->readUInt32();
-        reader->seek(unkArrCount * 4U, std::ios_base::cur);
+        reader->readUInt32(5, 5, "MorphStruct 2nd 5");
+        reader->readUInt32Array(&curMeshInfo.faceLODVertexOffsets[0], 5);
+
+        reader->readUInt32(5, 5, "MorphStruct 3rd 5");
+        reader->seek(20, std::ios::cur);
+
+        reader->readUInt32(5, 5, "MorphStruct 4th 5");
+        uint32_t lengthBase = reader->readUInt32();
+        reader->seek(16, std::ios::cur);
+
+        totalSkip += lengthBase * std::max(1u, lengthMult);
+        
+        int morphNameArrayLen = reader->readUInt32(1, 30, "Morph name array len");
+        for (uint32_t iMorphName = 0; iMorphName < morphNameArrayLen; iMorphName++)
+        {
+            int morphNameLen = reader->readUInt32(1, 80, "Morph name");
+            reader->seek(morphNameLen, std::ios::cur);
+        }
+        
+        int unkArrayCount = reader->readUInt32(0, 30, "Morph unk array count34");
+        reader->seek(unkArrayCount * 4, std::ios::cur);
     }
-    
-    return skipLen;
+
+    return totalSkip;
 }
 
 void

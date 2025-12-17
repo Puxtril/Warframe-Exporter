@@ -124,6 +124,19 @@ ModelConverter::convertInternalBodyStaticOrRigged(const ModelHeaderExternal& ext
 {
     outBody.indices = extBody.indices;
 
+    if (extHeader.morphCount > 0)
+    {
+        // Morphs (Shape Keys) strange offets
+        for (const MeshInfoExternal& meshInfo : extHeader.meshInfos)
+        {
+            size_t indexOffset = meshInfo.faceLODOffsets[0];
+            for (size_t i = 0; i < meshInfo.faceLODCounts[0]; i++)
+            {
+                outBody.indices[indexOffset + i] += meshInfo.faceLODVertexOffsets[0];
+            }
+        }
+    }
+
     // Apply global model scale
     std::vector<glm::vec3> newPositions;
     newPositions.resize(extBody.positions.size());

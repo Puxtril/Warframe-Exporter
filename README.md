@@ -12,6 +12,8 @@ Download the [latest release](https://github.com/Puxtril/Warframe-Exporter/relea
 - `Warframe-Exporter` is the easy-to-use program with a Graphical User Interface.
 - `Warframe-Exporter-CLI` is a Command-Line interface. This is useful for writing scripts to export files.
 
+**Linux: You must be using a distro >= Ubuntu 24.04. More specifically, `glibc` >= 2.39**
+
 # External Libraries
 
 * [LotusLib](https://github.com/Puxtril/LotusLib): Provides an interface for the Warframe files. [See requirements for Oodle](https://github.com/Puxtril/LotusLib#how-to-install).

@@ -116,24 +116,24 @@ PreviewAudio::createUi(QWidget* parentWidget)
     QHBoxLayout* horizontalLayout = new QHBoxLayout();
     m_playButton = new QPushButton(m_groupBox);
     m_playButton->setMinimumSize(QSize(40, 40));
-    m_playButton->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStart));
+    m_playButton->setIcon(QIcon::fromTheme("media-playback-start"));
     horizontalLayout->addWidget(m_playButton);
 
     m_pauseButton = new QPushButton(m_groupBox);
     m_pauseButton->setMinimumSize(QSize(40, 40));
-    m_pauseButton->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackPause));
+    m_pauseButton->setIcon(QIcon::fromTheme("media-playback-pause"));
     horizontalLayout->addWidget(m_pauseButton);
 
     m_replayButton = new QPushButton(m_groupBox);
     m_replayButton->setMinimumSize(QSize(40, 40));
-    m_replayButton->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaylistRepeat));
+    m_replayButton->setIcon(QIcon::fromTheme("media-playlist-repeat"));
     horizontalLayout->addWidget(m_replayButton);
 
     QSpacerItem* horizontalSpacer = new QSpacerItem(40, 50, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     horizontalLayout->addItem(horizontalSpacer);
 
     m_speakerLabel = new QLabel(m_groupBox);
-    QPixmap pixmap = QIcon::fromTheme(QIcon::ThemeIcon::AudioVolumeHigh).pixmap(20, 20);
+    QPixmap pixmap = QIcon::fromTheme("audio-volume-high").pixmap(20, 20);
     m_speakerLabel->setPixmap(pixmap);
     horizontalLayout->addWidget(m_speakerLabel);
 

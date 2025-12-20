@@ -32,7 +32,7 @@ AudioPlaybackWidget::connectToWidgets(QSlider* timelineSlider, QLabel* timelineT
 void
 AudioPlaybackWidget::unloadAudio()
 {
-    if (m_mediaPlayer.isPlaying())
+    if (m_mediaPlayer.playbackState() == QMediaPlayer::PlayingState)
         m_mediaPlayer.stop();
     m_audioData = nullptr;
     m_audioDataBuffer = nullptr;
@@ -99,7 +99,7 @@ AudioPlaybackWidget::buttonClickedReplay()
 void
 AudioPlaybackWidget::timelineSliderPressed()
 {
-    if (m_mediaPlayer.isPlaying())
+    if (m_mediaPlayer.playbackState() == QMediaPlayer::PlayingState)
     {
         m_mediaWasPlayingBeforeSliderDragEvent = true;
         m_mediaPlayer.pause();

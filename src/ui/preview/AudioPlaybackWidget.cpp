@@ -139,5 +139,5 @@ AudioPlaybackWidget::setVolume(int value)
 bool
 AudioPlaybackWidget::isPlaying()
 {
-    return m_mediaPlayer.isPlaying();
+    return m_mediaPlayer.playbackState() == QMediaPlayer::PlayingState;
 }

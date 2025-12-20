@@ -58,6 +58,25 @@ PreviewAudio::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesRead
 }
 
 void
+PreviewAudio::playPause()
+{
+    if (m_audioPlaybackWidget.isPlaying())
+    {
+        m_pauseButton->click();
+    }
+    else
+    {
+        m_playButton->click();
+    }
+}
+
+bool
+PreviewAudio::isVisible()
+{
+    return m_groupBox && m_groupBox->isVisible();
+}
+
+void
 PreviewAudio::createUi(QWidget* parentWidget)
 {
     m_rootLayout = new QVBoxLayout();

@@ -33,7 +33,7 @@
 	  <item>
            <widget class="QLineEdit" name="searchLineEdit">
             <property name="placeholderText">
-             <string>Search...</string>
+             <string>Regex Search...</string>
               </property>
                <property name="clearButtonEnabled">
                 <bool>true</bool>

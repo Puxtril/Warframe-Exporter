@@ -46,6 +46,8 @@ UiExporter::setup(UiMainWindow *MainWindow)
     m_previewManager.setupUis(this->Preview, this->verticalLayout_3, this->PreviewButtonsArea, this->horizontalLayout_5);
     m_metadataPreview.setupUis(this->MetadataCommonHeader, this->MetadataCompressedValue, this->MetadataDecompressedValue, this->MetadataModifiedValue);
     m_formatPreview.setupUis(this->Format, this->verticalLayout_6);
+
+    setupShortcuts(MainWindow);
 }
 
 void
@@ -134,6 +136,12 @@ void
 UiExporter::itemChanged()
 {
     QTreeWidgetItem* item = this->treeWidget->currentItem();
+
+    if (item == nullptr)
+    {
+        this->clearPreview();
+        return;
+    }
 
     int itemType = item->type();
     
@@ -296,7 +304,7 @@ UiExporter::onSearchTextChanged(const QString& text)
 void 
 UiExporter::filterTree() 
 {
-    const QString searchText = searchLineEdit->text().trimmed().toLower();
+    const QString searchText = searchLineEdit->text().trimmed();
     const bool isSearching = !searchText.isEmpty();
 
     if (!isSearching) {
@@ -306,12 +314,24 @@ UiExporter::filterTree()
         return;
     }
 
+    QRegularExpression regex(searchText, QRegularExpression::CaseInsensitiveOption);
+    bool useRegex = regex.isValid();
+
     for (const auto& pair : m_searchIndex) {
         const QString& itemText = pair.first;
         QTreeWidgetItem* item = pair.second;
         item->setHidden(true);
         item->setExpanded(false);
-        if (itemText.contains(searchText)) {
+
+        bool matches = false;
+        if (useRegex) {
+            QRegularExpressionMatch match = regex.match(itemText);
+            matches = match.hasMatch();
+        } else {
+            matches = itemText.contains(searchText.toLower());
+        }
+
+        if (matches) {
             item->setHidden(false);
             QTreeWidgetItem* parent = item->parent();
             while (parent) {
@@ -321,4 +341,70 @@ UiExporter::filterTree()
             }
         }
     }
+}
+
+void
+UiExporter::setupShortcuts(UiMainWindow* MainWindow)
+{
+    // Search shortcuts (Ctrl+F and /)
+    QShortcut* searchShortcut1 = new QShortcut(QKeySequence("Ctrl+F"), MainWindow);
+    QObject::connect(searchShortcut1, &QShortcut::activated, this->searchLineEdit, [this]() {
+        this->searchLineEdit->setFocus();
+        this->searchLineEdit->selectAll();
+    });
+
+    QShortcut* searchShortcut2 = new QShortcut(QKeySequence("/"), MainWindow);
+    QObject::connect(searchShortcut2, &QShortcut::activated, this->searchLineEdit, [this]() {
+        this->searchLineEdit->setFocus();
+        this->searchLineEdit->selectAll();
+    });
+
+    // Focus shortcuts
+    QShortcut* focusTreeShortcut = new QShortcut(QKeySequence("Ctrl+1"), MainWindow);
+    QObject::connect(focusTreeShortcut, &QShortcut::activated, this->treeWidget, [this]() {
+        this->treeWidget->setFocus();
+    });
+
+    QShortcut* focusPreviewShortcut = new QShortcut(QKeySequence("Ctrl+2"), MainWindow);
+    QObject::connect(focusPreviewShortcut, &QShortcut::activated, this->tabWidget, [this]() {
+        this->tabWidget->setCurrentWidget(this->Preview);
+    });
+
+    QShortcut* focusMetadataShortcut = new QShortcut(QKeySequence("Ctrl+3"), MainWindow);
+    QObject::connect(focusMetadataShortcut, &QShortcut::activated, this->tabWidget, [this]() {
+        this->tabWidget->setCurrentWidget(this->Metadata);
+    });
+
+    QShortcut* focusFormatShortcut = new QShortcut(QKeySequence("Ctrl+4"), MainWindow);
+    QObject::connect(focusFormatShortcut, &QShortcut::activated, this->tabWidget, [this]() {
+        this->tabWidget->setCurrentWidget(this->Format);
+    });
+
+    // Extract shortcuts (Space and Enter)
+    QShortcut* extractShortcut1 = new QShortcut(QKeySequence("Space"), MainWindow);
+    QObject::connect(extractShortcut1, &QShortcut::activated, this->ExtractButton, &QPushButton::click);
+
+    QShortcut* extractShortcut2 = new QShortcut(QKeySequence("Return"), MainWindow);
+    QObject::connect(extractShortcut2, &QShortcut::activated, this->ExtractButton, &QPushButton::click);
+
+    // Audio preview play/pause (Shift+Space)
+    QShortcut* audioShortcut = new QShortcut(QKeySequence("Shift+Space"), MainWindow);
+    QObject::connect(audioShortcut, &QShortcut::activated, this, [this]() {
+        m_previewManager.playPauseAudio();
+    });
+
+    // Cycle through tabs (Alt+Left/Right)
+    QShortcut* cycleLeftShortcut = new QShortcut(QKeySequence("Alt+Left"), MainWindow);
+    QObject::connect(cycleLeftShortcut, &QShortcut::activated, this->tabWidget, [this]() {
+        int currentIndex = this->tabWidget->currentIndex();
+        int newIndex = (currentIndex - 1 + this->tabWidget->count()) % this->tabWidget->count();
+        this->tabWidget->setCurrentIndex(newIndex);
+    });
+
+    QShortcut* cycleRightShortcut = new QShortcut(QKeySequence("Alt+Right"), MainWindow);
+    QObject::connect(cycleRightShortcut, &QShortcut::activated, this->tabWidget, [this]() {
+        int currentIndex = this->tabWidget->currentIndex();
+        int newIndex = (currentIndex + 1) % this->tabWidget->count();
+        this->tabWidget->setCurrentIndex(newIndex);
+    });
 }

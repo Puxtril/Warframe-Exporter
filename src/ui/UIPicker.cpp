@@ -17,6 +17,15 @@ UiPicker::setupUi(QDialog *WindowPicker)
 
     // When `CacheWindowsInput` is updated, this will show
     this->GameInfoButton->hide();
+
+    QShortcut* quitShortcut = new QShortcut(QKeySequence("Ctrl+Q"), WindowPicker);
+    QObject::connect(quitShortcut, &QShortcut::activated, WindowPicker, &QWidget::close);
+
+    QShortcut* settingsShortcut = new QShortcut(QKeySequence("Ctrl+."), WindowPicker);
+    QObject::connect(settingsShortcut, &QShortcut::activated, &m_additionalSettingsDialog, &QDialog::show);
+
+    QShortcut* loadShortcut = new QShortcut(QKeySequence("Return"), WindowPicker);
+    QObject::connect(loadShortcut, &QShortcut::activated, this->LoadButton, &QPushButton::click);
 }
 
 void

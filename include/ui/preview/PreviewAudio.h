@@ -40,6 +40,9 @@ public:
     void show() override;
     void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;
 
+    void playPause();
+    bool isVisible();
+
 private:
     void createUi(QWidget* parentWidget);
 };

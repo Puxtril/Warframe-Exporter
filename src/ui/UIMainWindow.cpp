@@ -1,6 +1,4 @@
 #include "ui/UIMainWindow.h"
-#include <QShortcut>
-#include <QApplication>
 
 UiMainWindow::UiMainWindow()
     : QMainWindow()

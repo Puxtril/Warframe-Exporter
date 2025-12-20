@@ -1,5 +1,4 @@
 #include "ui/UIPicker.h"
-#include <QShortcut>
 
 UiPicker::UiPicker(QObject *parent)
     : QObject(parent)

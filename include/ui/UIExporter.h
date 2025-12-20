@@ -10,6 +10,7 @@
 #include <QHash>
 #include <QSet>
 #include <QRegularExpression>
+#include <QShortcut>
 
 #include "LotusLib.h"
 #include "Extractor.h"

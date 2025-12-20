@@ -1,5 +1,4 @@
 #include "ui/UIExporter.h"
-#include <QShortcut>
 
 UiExporter::~UiExporter()
 {

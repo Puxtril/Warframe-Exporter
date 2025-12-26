@@ -37,6 +37,7 @@
 #include "model/types/ModelHLODReader102.h"
 #include "model/types/ModelHLODReader108WF.h"
 #include "model/types/ModelHLODReader108SF.h"
+#include "model/types/ModelHLODReader111.h"
 
 
 namespace WarframeExporter::Model
@@ -79,5 +80,6 @@ namespace WarframeExporter::Model
 	const static EnumMapGame<ModelReader> g_enumMapModelHLOD = EnumMapGame<ModelReader>()
 		.registerClass(ModelHLODReader102::getInstance())
 		.registerClass(ModelHLODReader108WF::getInstance())
-		.registerClass(ModelHLODReader108SF::getInstance());
+		.registerClass(ModelHLODReader108SF::getInstance())
+		.registerClass(ModelHLODReader111::getInstance());
 }

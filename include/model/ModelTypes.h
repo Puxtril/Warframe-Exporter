@@ -55,6 +55,7 @@ namespace WarframeExporter::Model
         MODEL_HLOD_102 = 102,
         MODEL_HLOD_105 = 105,
         MODEL_HLOD_108 = 108,
+        MODEL_HLOD_111 = 111,
     };
 
     enum class ScaleType

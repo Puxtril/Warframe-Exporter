@@ -4,8 +4,11 @@ run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on:
   workflow_dispatch:
   push:
+    tags:
+      - '**'
     branches:
       - 'dev'
+      - 'master'
   pull_request:
     opened:
     edited:

@@ -12,6 +12,7 @@ namespace WarframeExporter::Model
         MODEL_LEVEL1_105 = 105, // Also static model in Soulframe
         MODEL_LEVEL_106 = 106,
         MODEL_LEVEL2_109 = 109,
+        MODEL_LEVEL2_112 = 112,
         MODEL_TERRAIN_159 = 159,
         MODEL_TERRAIN_160 = 160,
         MODEL_TERRAIN_163 = 163,

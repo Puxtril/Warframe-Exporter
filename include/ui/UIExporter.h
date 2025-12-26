@@ -9,6 +9,8 @@
 #include <QTimer>
 #include <QHash>
 #include <QSet>
+#include <QRegularExpression>
+#include <QShortcut>
 
 #include "LotusLib.h"
 #include "Extractor.h"
@@ -56,6 +58,7 @@ public:
     void setup(UiMainWindow* MainWindow);
 
 private:
+    void setupShortcuts(UiMainWindow* MainWindow);
     void saveGeometry();
     void loadGeometry();
 

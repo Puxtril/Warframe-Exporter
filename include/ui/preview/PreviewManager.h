@@ -27,6 +27,7 @@ public:
 
     void swapToFilePreview(LotusLib::FileEntry& fileEntry);
     void clearPreview();
+    void playPauseAudio();
 
 private:
     Preview* getPreview(LotusLib::FileEntry& fileEntry);

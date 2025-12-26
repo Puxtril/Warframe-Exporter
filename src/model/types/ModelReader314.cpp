@@ -1,9 +1,9 @@
-#include "model/types/ModelReader289.h"
+#include "model/types/ModelReader314.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader314::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
@@ -21,11 +21,11 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     outHeader.vertexCount = headerReader->readUInt32();
     outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
 
-    headerReader->seek(0x8, std::ios_base::cur);
-    
-    skipUnk64Array(headerReader);
+    headerReader->seek(0x13, std::ios_base::cur);
 
-    headerReader->seek(0x31, std::ios_base::cur);
+    outHeader.vertexCountB = headerReader->readUInt32(0, outHeader.vertexCount, "B Cache Vertex count");
+    outHeader.faceCountB = headerReader->readUInt32(0, outHeader.faceCount, "B Cache Face count");
+    headerReader->seek(0x25, std::ios_base::cur);
 
     readBoneTree(headerReader, outHeader.boneTree);
 
@@ -55,10 +55,10 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
         headerReader->seek(0xC, std::ios::cur);
         uint32_t nameCount = headerReader->readUInt32(0, 100, "Sub-model name");
         headerReader->seek(nameCount, std::ios::cur);
-        headerReader->seek(72, std::ios::cur);
+        headerReader->seek(80, std::ios::cur);
     }
 
-    headerReader->seek(0x1D, std::ios::cur);
+    headerReader->seek(0x24, std::ios::cur);
 
     skipPhysicsStruct(headerReader);
 
@@ -67,11 +67,11 @@ ModelReader289::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     readErrors(headerReader, outHeader.errorMsgs);
 
     if (headerReader->tell() != headerReader->getLength())
-        throw unknown_format_error("Did not reach end of file");
+        throw unknown_format_error("Did not reach end of H file");
 }
 
 void
-ModelReader289::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader314::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     bodyReaderB->seek(0, std::ios_base::beg);
 
@@ -84,7 +84,25 @@ ModelReader289::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     reverseBinds.resize(extHeader.weightedBoneNames.size());
     for (size_t x = 0; x < extHeader.weightedBoneNames.size(); x++)
     {
-        bodyReaderB->readSingleArray(glm::value_ptr(reverseBinds[x]), 16);
+        reverseBinds[x][0][0] = bodyReaderB->readFloat();
+        reverseBinds[x][1][0] = bodyReaderB->readFloat();
+        reverseBinds[x][2][0] = bodyReaderB->readFloat();
+        reverseBinds[x][3][0] = bodyReaderB->readFloat();
+
+        reverseBinds[x][0][1] = bodyReaderB->readFloat();
+        reverseBinds[x][1][1] = bodyReaderB->readFloat();
+        reverseBinds[x][2][1] = bodyReaderB->readFloat();
+        reverseBinds[x][3][1] = bodyReaderB->readFloat();
+
+        reverseBinds[x][0][2] = bodyReaderB->readFloat();
+        reverseBinds[x][1][2] = bodyReaderB->readFloat();
+        reverseBinds[x][2][2] = bodyReaderB->readFloat();
+        reverseBinds[x][3][2] = bodyReaderB->readFloat();
+        
+        reverseBinds[x][0][3] = 0.0;
+        reverseBinds[x][1][3] = 0.0;
+        reverseBinds[x][2][3] = 0.0;
+        reverseBinds[x][3][3] = 1.0;
     }
 
     bodyReaderB->seek(extHeader.bodySkipLen1, std::ios_base::cur);
@@ -106,6 +124,16 @@ ModelReader289::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     if (extHeader.boneTree.size() > 0)
         bodyReaderB->seek(0x4, std::ios_base::cur);
 
+    // Sometimes vertexCountB is 0 and F cache is null.
+    // In that case, everything is in B.
+    uint32_t vertexBCache = extHeader.vertexCountB;
+    uint32_t faceBCache = extHeader.faceCountB;
+    if (extHeader.vertexCountB == 0)
+    {
+        vertexBCache = extHeader.vertexCount;
+        faceBCache = extHeader.faceCount;
+    }
+
     outBody.positions.resize(extHeader.vertexCount);
     outBody.normals.resize(extHeader.vertexCount);
     outBody.tangents.resize(extHeader.vertexCount);
@@ -114,7 +142,7 @@ ModelReader289::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     outBody.AO.resize(extHeader.vertexCount);
     outBody.boneIndices.resize(extHeader.vertexCount);
     outBody.boneWeights.resize(extHeader.vertexCount);
-    for (uint32_t x = 0; x < extHeader.vertexCount; x++)
+    for (uint32_t x = 0; x < vertexBCache; x++)
     {
         outBody.positions[x][0] = bodyReaderB->readInt16() / 32767.0F;
         outBody.positions[x][1] = bodyReaderB->readInt16() / 32767.0F;
@@ -160,12 +188,61 @@ ModelReader289::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
 
     bodyReaderB->seek(extHeader.bodySkipLen2 * 8U, std::ios_base::cur);
 
-    if (!canContinueReading(bodyReaderB, extHeader.faceCount))
-        throw unknown_format_error("Incorrect index count");
-
     outBody.indices.resize(extHeader.faceCount);
-    bodyReaderB->readUInt16Array(outBody.indices.data(), extHeader.faceCount);
+    bodyReaderB->readUInt16Array(outBody.indices.data(), faceBCache);
 
     if (bodyReaderB->tell() != bodyReaderB->getLength())
-        throw unknown_format_error("Did not reach end of file");
+        throw unknown_format_error("Did not reach end of B file");
+
+    // Everything's in B
+    if (bodyReaderF->getLength() == 0)
+        return;
+
+    // F Cache
+    for (uint32_t x = vertexBCache; x < extHeader.vertexCount; x++)
+    {
+        outBody.positions[x][0] = bodyReaderF->readInt16() / 32767.0F;
+        outBody.positions[x][1] = bodyReaderF->readInt16() / 32767.0F;
+        outBody.positions[x][2] = bodyReaderF->readInt16() / 32767.0F;
+        outBody.positions[x][3] = bodyReaderF->readInt16() / 32767.0F;
+
+        outBody.normals[x][0] = bodyReaderF->readUInt8();
+        outBody.normals[x][1] = bodyReaderF->readUInt8();
+        outBody.normals[x][2] = bodyReaderF->readUInt8();
+        outBody.normals[x][3] = bodyReaderF->readUInt8();
+        
+        outBody.tangents[x][0] = bodyReaderF->readUInt8();
+        outBody.tangents[x][1] = bodyReaderF->readUInt8();
+        outBody.tangents[x][2] = bodyReaderF->readUInt8();
+        outBody.AO[x] = bodyReaderF->readUInt8();
+
+        outBody.UV1[x][0] = bodyReaderF->readHalf();
+        outBody.UV1[x][1] = bodyReaderF->readHalf();
+
+        outBody.UV2[x][0] = bodyReaderF->readHalf();
+        outBody.UV2[x][1] = bodyReaderF->readHalf();
+
+        outBody.boneIndices[x][0] = bodyReaderF->readUInt8();
+        outBody.boneIndices[x][1] = bodyReaderF->readUInt8();
+        outBody.boneIndices[x][2] = bodyReaderF->readUInt8();
+        outBody.boneIndices[x][3] = bodyReaderF->readUInt8();
+
+        uint32_t weightUInt = bodyReaderF->readUInt32();
+        float weightLast = 1.0F;
+        for (int y = 0; y < 3; y++)
+        {
+            float curWeight = (float)(weightUInt & 0x3FF) / (float)0x3FF;
+            outBody.boneWeights[x][y] = curWeight;
+            weightUInt >>= 10;
+            weightLast -= curWeight;
+        }
+        // Migitate floating point errors
+        // This determines if the vertex is weighted,
+        //  so it's important this gets set to exactly 0
+        if (weightLast > 0.0001F)
+            outBody.boneWeights[x][3] = std::max(weightLast, 0.0F);
+    }
+
+    size_t indexFfcount = extHeader.faceCount - faceBCache;
+    bodyReaderF->readUInt16Array(outBody.indices.data() + faceBCache, indexFfcount);
 }

@@ -19,7 +19,7 @@ ModelReader281::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
     outHeader.faceCount = headerReader->readUInt32();
     outHeader.boneCount = headerReader->readUInt32();
     outHeader.vertexCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32();
+    outHeader.morphCount = headerReader->readUInt32() & 0xFFFF;
 
     headerReader->seek(0x13, std::ios_base::cur);
     outHeader.vertexCountB = headerReader->readUInt32(0, outHeader.vertexCount, "B Cache Vertex count");
@@ -43,7 +43,7 @@ ModelReader281::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     readBoneMaps(headerReader, outHeader.boneMaps);
 
-    outHeader.bodySkipLen2 = skipMorphStructsAndFindSkip(headerReader);
+    outHeader.bodySkipLen2 = skipMorphStructsAndFindSkip(headerReader, outHeader.meshInfos);
 
     headerReader->seek(0x2F, std::ios_base::cur);
 
@@ -179,7 +179,7 @@ ModelReader281::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     bodyReaderB->readUInt16Array(outBody.indices.data(), faceBCache);
 
     if (bodyReaderB->tell() != bodyReaderB->getLength())
-        throw unknown_format_error("Did not reach end of B cache");
+        throw unknown_format_error(std::to_string(extHeader.bodySkipLen2) + " Did not reach end of B cache");
 
     // Everything's in B
     if (bodyReaderF->getLength() == 0)

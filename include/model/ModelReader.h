@@ -4,7 +4,10 @@
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
 #include "EnumMapGame.h"
+#include "ExporterExceptions.h"
 #include "model/ModelTypes.h"
+
+#include <algorithm>
 
 namespace WarframeExporter::Model
 {
@@ -34,7 +37,7 @@ namespace WarframeExporter::Model
 		void skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader);
 		uint32_t skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader);
 		void skipMorphs(BinaryReader::BinaryReaderBuffered* reader);
-		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader);
+		uint32_t skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader, std::vector<MeshInfoExternal>& outMeshInfos);
 		void skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader);
 		void skipPhysicsStruct2(BinaryReader::BinaryReaderBuffered* reader);
 

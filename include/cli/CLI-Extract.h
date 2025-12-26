@@ -25,6 +25,7 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_extShaderCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extLandscape;
 	std::shared_ptr<TCLAP::SwitchArg> m_extLevelStatic;
+	std::shared_ptr<TCLAP::SwitchArg> m_dumpPkgs;
 
 	std::shared_ptr<TCLAP::SwitchArg> m_includeVertexColors;
 	std::shared_ptr<TCLAP::ValueArg<std::string>> m_shaderExportType;
@@ -57,4 +58,5 @@ private:
 	void checkOutputDir(const std::string& outPath);
 	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
 	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
+	bool dumpPkgsBin(const std::filesystem::path& cacheDirPath, const std::filesystem::path outPath, LotusLib::Game game);
 };

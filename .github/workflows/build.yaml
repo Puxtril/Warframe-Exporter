@@ -4,16 +4,21 @@ run-name: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
 on:
   workflow_dispatch:
   push:
-    tags:
-      - '**'
+    branches:
+      - 'dev'
+  pull_request:
+    opened:
+    edited:
 
-defaults:
-  run:
-    shell: powershell
+permissions:
+  contents: write
 
 jobs:
   Compile-Windows:
     runs-on: windows-2025
+    defaults:
+      run:
+        shell: powershell
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -79,5 +84,110 @@ jobs:
           cp build\Release\Warframe-Exporter-CLI.exe artifacts
       - uses: actions/upload-artifact@v4
         with:
-          name: Warframe-Exporter-Windows
+          name: Windows
           path: artifacts/
+
+  Compile-Linux:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y wget git make cmake g++ zlib1g-dev libglu1-mesa-dev qt6-base-dev libqt6multimedia6 qt6-multimedia-dev
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Init Extractor submodules
+        run: |
+          cd lib
+          git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
+          git submodule update --init tclap-code
+      - name: Init LotusLib submodule
+        run: |
+          cd lib/LotusLib/lib
+          git submodule update --init --depth 1
+      - name: Download Oodle binaries
+        run: |
+          mkdir -p bin/Linux
+          cd bin/Linux
+          wget https://github.com/WorkingRobot/OodleUE/raw/refs/heads/main/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.12/lib/Linux/liboo2corelinux64.a
+      - name: Initilize CMake
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+      - name: Compile project
+        run: |
+          cd build
+          cmake --build . -j8
+      - name: Download Linuxdeploy
+        run: |
+          cd build
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
+      - name: Create UI Appimage
+        run: |
+          cd build
+          mkdir AppDir-ui
+          cp ../assets/DesktopEntry.desktop AppDir-ui/DesktopEntry.desktop
+          echo "Name=Warframe Exporter" >> AppDir-ui/DesktopEntry.desktop
+          echo "Exec=Warframe-Exporter" >> AppDir-ui/DesktopEntry.desktop
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir-ui --plugin qt -i ../assets/AppIcon.png -d AppDir-ui/DesktopEntry.desktop -e Warframe-Exporter --output appimage
+      - name: Create CLI Appimage
+        run: |
+          cd build
+          mkdir AppDir-cli
+          cp ../assets/DesktopEntry.desktop AppDir-cli/DesktopEntry.desktop
+          echo "Name=Warframe Exporter CLI" >> AppDir-cli/DesktopEntry.desktop
+          echo "Exec=Warframe-Exporter-CLI" >> AppDir-cli/DesktopEntry.desktop
+          echo "Terminal=true" >> AppDir-cli/DesktopEntry.desktop
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir-cli -i ../assets/AppIcon.png -d AppDir-cli/DesktopEntry.desktop -e Warframe-Exporter-CLI --output appimage
+      - name: Prepare artifact upload
+        run: |
+          mkdir artifacts
+          rm build/linuxdeploy*
+          cp build/*.AppImage artifacts/
+          cd artifacts
+          for file in *; do mv "${file}" "${file/-x86_64/}"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Linux
+          path: artifacts/
+
+  Create-Release:
+    runs-on: ubuntu-24.04
+    needs:  [Compile-Linux, Compile-Windows]
+    if: github.ref_type == 'tag'
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+    - name: Download Windows artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: Windows
+        path: artifacts/
+    - name: Download Ubuntu artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: Linux
+        path: artifacts/
+    - name: Rename artifacts
+      run: |
+        cd artifacts
+        mv Warframe-Exporter.zip Warframe-Exporter_Windows.zip
+        mv Warframe-Exporter-CLI.exe Warframe-Exporter-CLI_Windows.exe
+        mv Warframe_Exporter.AppImage Warframe-Exporter_Linux.AppImage
+        mv Warframe_Exporter_CLI.AppImage Warframe-Exporter-CLI_Linux.AppImage
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        title: CI/CD Release DRAFT ${{ github.ref_name }}
+        draft: true
+        files: |
+          artifacts/*

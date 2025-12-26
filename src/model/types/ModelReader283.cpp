@@ -46,7 +46,7 @@ ModelReader283::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 
     readBoneMaps(headerReader, outHeader.boneMaps);
 
-    outHeader.bodySkipLen2 = skipMorphStructsAndFindSkip(headerReader);
+    outHeader.bodySkipLen2 = skipMorphStructsAndFindSkip(headerReader, outHeader.meshInfos);
 
     headerReader->seek(0x2F, std::ios_base::cur);
 

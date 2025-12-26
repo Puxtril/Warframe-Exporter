@@ -16,6 +16,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtCore/qtmetamacros.h>
 #include <QtWidgets/qfiledialog.h>
+#include <QShortcut>
 
 class UiPicker : public QObject, private Ui_WindowPicker
 {

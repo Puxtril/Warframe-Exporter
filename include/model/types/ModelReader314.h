@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BinaryReaderExceptions.h"
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
@@ -15,36 +14,32 @@
 #include <iostream>
 #include <algorithm>
 
+#include "model/types/ModelReader290.h"
+
 namespace WarframeExporter::Model
 {
-	class ModelReader159 : public ModelReader
+	class ModelReader314 : public ModelReader
 	{
-		ModelReader159() = default;
+		ModelReader314() = default;
 
 	public:
-		inline static ModelReader159* getInstance()
+		inline static ModelReader314* getInstance()
 		{
-			static ModelReader159* instance = new ModelReader159();
+			static ModelReader314* instance = new ModelReader314();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_159 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_160 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_169 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_PACKED_314 },
 			};
 			return extTypes;
 		}
 
 		inline ScaleType ensmalleningScale() const override
 		{
-			return ScaleType::XZ;
+			return ScaleType::XYZ;
 		}
 
 		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;

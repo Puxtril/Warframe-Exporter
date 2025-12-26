@@ -3,6 +3,7 @@
 #include "Settings.h"
 
 #include <QtWidgets/qmainwindow.h>
+#include <QShortcut>
 
 class UiMainWindow : public QMainWindow
 {

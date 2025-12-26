@@ -34,6 +34,13 @@ namespace WarframeExporter::Model
         MODEL_PACKED_314 = 314
     };
 
+    // Appeared in Soulframe late 2025
+    // Successor of Level1
+    enum class ModelSMType
+    {
+        MODEL_SM_105 = 105,
+    };
+
     enum class ModelDCMType
     {
         MODEL_DCM_101 = 101,

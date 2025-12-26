@@ -9,7 +9,6 @@
 #include "model/types/ModelReader102SF.h"
 #include "model/types/ModelReader103.h"
 #include "model/types/ModelReader105WF.h"
-#include "model/types/ModelReader105SF.h"
 #include "model/types/ModelReader106.h"
 #include "model/types/ModelReader109WF.h"
 #include "model/types/ModelReader109SF.h"
@@ -25,6 +24,8 @@
 #include "model/types/ModelReader300.h"
 #include "model/types/ModelReader310.h"
 #include "model/types/ModelReader314.h"
+
+#include "model/types/ModelSMReader105.h"
 
 #include "model/types/ModelDCMReader101.h"
 #include "model/types/ModelDCMReader102.h"
@@ -46,7 +47,6 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader102SF::getInstance())
 		.registerClass(ModelReader103::getInstance())
 		.registerClass(ModelReader105WF::getInstance())
-		.registerClass(ModelReader105SF::getInstance())
 		.registerClass(ModelReader106::getInstance())
 		.registerClass(ModelReader109WF::getInstance())
 		.registerClass(ModelReader109SF::getInstance())
@@ -62,6 +62,9 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader300::getInstance())
 		.registerClass(ModelReader310::getInstance())
 		.registerClass(ModelReader314::getInstance());
+
+	const static EnumMapGame<ModelReader> g_enumMapModelSM = EnumMapGame<ModelReader>()
+		.registerClass(ModelSMReader105::getInstance());
 
 	const static EnumMapGame<ModelReader> g_enumMapModelDCM = EnumMapGame<ModelReader>()
 		.registerClass(ModelDCMReader101::getInstance())

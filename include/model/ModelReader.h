@@ -4,6 +4,7 @@
 #include "model/ModelStructs.hpp"
 #include "CommonHeader.h"
 #include "EnumMapGame.h"
+#include "ExporterExceptions.h"
 #include "model/ModelTypes.h"
 
 #include <algorithm>

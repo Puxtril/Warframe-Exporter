@@ -186,7 +186,10 @@ ModelReader::skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* rea
 {
     uint32_t totalSkip = 0;
 
-    uint32_t morphStructArrayCount = reader->readUInt32(outMeshInfos.size(), outMeshInfos.size(), "Morph array size (match MeshInfo size)");
+    uint32_t morphStructArrayCount = reader->readUInt32();
+    if (morphStructArrayCount > 0 && morphStructArrayCount != outMeshInfos.size())
+        throw unknown_format_error("Morph Struct array count != meshinfo count (" + std::to_string(morphStructArrayCount) + " != " + std::to_string(outMeshInfos.size()) + ")");
+
     for (uint32_t iMorphStruct = 0; iMorphStruct < morphStructArrayCount; iMorphStruct++)
     {
         MeshInfoExternal& curMeshInfo = outMeshInfos[iMorphStruct];

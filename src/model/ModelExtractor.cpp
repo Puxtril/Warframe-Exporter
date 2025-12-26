@@ -37,7 +37,7 @@ ModelExtractor::getModelReader(LotusLib::FileEntry& fileEntry, LotusLib::Game ga
 	}
 	else if (strncmp(filename.c_str() + (filename.length() - 3), "_sm", 3) == 0)
 	{
-		modelReader = g_enumMapModelHLOD.at(game, fileEntry.commonHeader.type);
+		modelReader = g_enumMapModelSM.at(game, fileEntry.commonHeader.type);
 	}
 	else
 	{

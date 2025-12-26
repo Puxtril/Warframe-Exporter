@@ -39,6 +39,7 @@ namespace WarframeExporter::Model
     enum class ModelSMType
     {
         MODEL_SM_105 = 105,
+        MODEL_SM_108 = 108,
     };
 
     enum class ModelDCMType

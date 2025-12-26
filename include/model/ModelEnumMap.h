@@ -27,6 +27,7 @@
 #include "model/types/ModelReader314.h"
 
 #include "model/types/ModelSMReader105.h"
+#include "model/types/ModelSMReader108.h"
 
 #include "model/types/ModelDCMReader101.h"
 #include "model/types/ModelDCMReader102.h"
@@ -66,7 +67,8 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader314::getInstance());
 
 	const static EnumMapGame<ModelReader> g_enumMapModelSM = EnumMapGame<ModelReader>()
-		.registerClass(ModelSMReader105::getInstance());
+		.registerClass(ModelSMReader105::getInstance())
+		.registerClass(ModelSMReader108::getInstance());
 
 	const static EnumMapGame<ModelReader> g_enumMapModelDCM = EnumMapGame<ModelReader>()
 		.registerClass(ModelDCMReader101::getInstance())

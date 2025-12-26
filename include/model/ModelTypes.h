@@ -29,7 +29,8 @@ namespace WarframeExporter::Model
         MODEL_PACKED_299 = 299,
         MODEL_PACKED_300 = 300,
         MODEL_PACKED_301 = 301,
-        MODEL_PACKED_310 = 310
+        MODEL_PACKED_310 = 310,
+        MODEL_PACKED_314 = 314
     };
 
     enum class ModelDCMType

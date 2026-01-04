@@ -6,7 +6,8 @@ int main(int argc, char** argv)
     // QT dynamically attempts to load GStreamer instead of ffmpeg.
     // It was more difficult to replace this in the appimage itself,
     //   and this program only supports ffmpeg, anyway.
-    setenv("QT_MEDIA_BACKEND", "ffmpeg", 1);
+    char forceFfmpegEnv[] = "QT_MEDIA_BACKEND=ffmpeg";
+    putenv(forceFfmpegEnv);
 
     QApplication app(argc, argv);
     

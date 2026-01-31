@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../Extractor.h"
+#include "LotusLib/CommonHeader.h"
 #include "ModelConverter.h"
 #include "ModelExporterGltf.h"
-#include "BinaryReaderBuffered.h"
+#include "BinaryReader/Buffered.h"
 #include "ModelStructs.hpp"
 #include "model/ModelEnumMap.h"
 #include "ExporterExceptions.h"
@@ -24,7 +25,7 @@ namespace WarframeExporter::Model
 		ModelExtractor(const ModelExtractor&) = delete;
 		ModelExtractor operator=(const ModelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;
@@ -94,13 +95,22 @@ namespace WarframeExporter::Model
 
 		static ModelExtractor* getInstance();
 
-		void indexVertexColors(LotusLib::PackageReader& pkgs);
+		void indexVertexColors(LotusLib::Package& pkgs);
 		void cancelVertexColorIndexing();
 
-		ModelReader* getModelReader(LotusLib::FileEntry& fileEntry, LotusLib::Game game);
-		void extractExternal(ModelReader* modelReader, LotusLib::FileEntry& fileEntry, LotusLib::Game game, ModelHeaderExternal& outHeaderExt, ModelBodyExternal& outBodyExt);
-		std::vector<std::vector<glm::u8vec4>> getVertexColors(const LotusLib::LotusPath& modelPath, LotusLib::PackageReader& pkg, bool indexVertexColors);
+		ModelReader* getModelReader(const std::string& internalPath, uint32_t type, LotusLib::Game game);
+		void extractExternal(
+			ModelReader* modelReader,
+			LotusLib::CommonHeader& commonHeader,
+			BinaryReader::Buffered* headerReader,
+			BinaryReader::Buffered* bodyReader,
+			BinaryReader::Buffered* footerReader,
+			LotusLib::Game game,
+			ModelHeaderExternal& outHeaderExt,
+			ModelBodyExternal& outBodyExt
+		);
+		std::vector<std::vector<glm::u8vec4>> getVertexColors(const std::string& modelPath, LotusLib::Package& pkg, bool indexVertexColors);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) override;
 	};
 }

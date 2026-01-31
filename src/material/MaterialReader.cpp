@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Material;
 
 std::vector<std::string>
-MaterialReader::getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader)
+MaterialReader::getExtraNames(BinaryReader::Buffered* headerReader)
 {
     std::vector<std::string> outPaths;
 
@@ -19,7 +19,7 @@ MaterialReader::getExtraNames(BinaryReader::BinaryReaderBuffered* headerReader)
 }
 
 std::vector<std::string>
-MaterialReader::getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader)
+MaterialReader::getHlm3Textures(BinaryReader::Buffered* headerReader)
 {
     std::vector<std::string> outPaths;
 
@@ -34,7 +34,7 @@ MaterialReader::getHlm3Textures(BinaryReader::BinaryReaderBuffered* headerReader
 }
 
 std::vector<std::string>
-MaterialReader::getShaderSet1(BinaryReader::BinaryReaderBuffered* headerReader, int count)
+MaterialReader::getShaderSet1(BinaryReader::Buffered* headerReader, int count)
 {
     std::vector<std::string> shaders;
     for (int i = 0; i < count; i++)
@@ -48,7 +48,7 @@ MaterialReader::getShaderSet1(BinaryReader::BinaryReaderBuffered* headerReader, 
 }
 
 std::vector<std::string>
-MaterialReader::getShaderSet2(BinaryReader::BinaryReaderBuffered* headerReader, int count)
+MaterialReader::getShaderSet2(BinaryReader::Buffered* headerReader, int count)
 {
     std::vector<std::string> shaders;
     for (int i = 0; i < count; i++)

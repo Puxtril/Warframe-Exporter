@@ -21,7 +21,7 @@ namespace WarframeExporter::Landscape
 			return extTypes;
         }
 
-        LandscapeHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* reader) override;
-        std::vector<LandscapeBodyChunkExternal> readBody(BinaryReader::BinaryReaderBuffered* reader, const LandscapeHeaderExternal& header) override;
+        LandscapeHeaderExternal readHeader(BinaryReader::Buffered* reader) override;
+        std::vector<LandscapeBodyChunkExternal> readBody(BinaryReader::Buffered* reader, const LandscapeHeaderExternal& header) override;
     };
 }

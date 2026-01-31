@@ -3,9 +3,9 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include "LotusNotationParser.h"
+#include "LotusLib/EENotationParser.h"
 
-#include "LotusPath.h"
+
 #include "level/LevelStructs.h"
 #include "model/ModelStructs.hpp"
 #include "ExporterLogger.h"
@@ -16,7 +16,7 @@ namespace WarframeExporter::Level
 	class LevelConverter
 	{
 	public:
-		static void convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody);
+		static void convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const std::string& internalLevelPath, LevelInternal& intBody);
 		static void replaceOverrideMaterials(const std::vector<std::string>& materialNames, Model::ModelHeaderInternal& modelHeader);
 		static void convertLandscapeToInternal(const LevelExternal& levelExternal, LevelInternal& levelInternal);
 
@@ -30,7 +30,7 @@ namespace WarframeExporter::Level
 		// Ex
 		// AnimRetarget: /Lotus/Levels/Railjack/GrineerHangerShip/HangarPrisionInterior.level
 		// Misc: /Lotus/Levels/Railjack/GrineerHangerShip/HangarPrisionInterior/
-		static void fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string& outPath);
+		static void fixInternalPath(const std::filesystem::path& internalLevelPath, std::string& outPath);
 		static std::vector<std::string> getPrettyMaterialParams(nlohmann::json inputJson);
 	};
 };

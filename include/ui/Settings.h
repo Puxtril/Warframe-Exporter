@@ -3,7 +3,7 @@
 #include "Extractor.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
-#include "ExtractOptions.h"
+#include "Enums.h"
 
 #include <filesystem>
 #include <QtCore/qobject.h>

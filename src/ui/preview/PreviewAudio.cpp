@@ -52,9 +52,9 @@ PreviewAudio::show()
 }
 
 void
-PreviewAudio::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+PreviewAudio::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
-    m_audioPlaybackWidget.loadAudio(fileEntry, pkgs);
+    m_audioPlaybackWidget.loadAudio(fileEntry, pkgs, pkgsBin);
 }
 
 void

@@ -12,11 +12,8 @@ FormatPreview::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout)
 }
 
 void
-FormatPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
-{
-    LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER | LotusLib::READ_H_CACHE | LotusLib::READ_F_CACHE | LotusLib::READ_B_CACHE);
-    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(pkgs->getGame(), pkgs->getPackage(pkgName)->getPkgCategory(), fileEntry.commonHeader.type);
-    
+FormatPreview::setData(LotusLib::PackageCollection* pkgs, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor)
+{    
     if (extractor == nullptr)
         return;
 
@@ -68,15 +65,17 @@ FormatPreview::clearPreview()
 }
 
 void
-FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* pkgs, LotusLib::FileEntry& fileEntry)
+FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackageCollection* pkgs, LotusLib::FileEntry& fileEntry)
 {
-    WarframeExporter::Model::ModelReader* modelReader = WarframeExporter::Model::ModelExtractor::getInstance()->getModelReader(fileEntry, pkgs->getGame());
+    const std::string fullPath = LotusLib::getFullPath(fileEntry.headerNode);
+
+    WarframeExporter::Model::ModelReader* modelReader = WarframeExporter::Model::ModelExtractor::getInstance()->getModelReader(fullPath, fileEntry.commonHeader.type, pkgs->getGame());
 	if (modelReader == nullptr)
 		return;
 
     WarframeExporter::Model::ModelHeaderExternal headerExt;
     WarframeExporter::Model::ModelBodyExternal bodyExt;
-    WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, fileEntry, pkgs->getGame(), headerExt, bodyExt);
+    WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, fileEntry.commonHeader, &fileEntry.header, &fileEntry.body, &fileEntry.footer, pkgs->getGame(), headerExt, bodyExt);
 
     if (headerExt.meshInfos.size() == 0)
     {
@@ -87,7 +86,7 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
         // Convert body/header data into internal format
         WarframeExporter::Model::ModelHeaderInternal headerInt;
         WarframeExporter::Model::ModelBodyInternal bodyInt;
-        WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, modelReader->ensmalleningScale(), fileEntry.internalPath);
+        WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, modelReader->ensmalleningScale(), fullPath);
     
         outStr << "Vertices: " << headerInt.vertexCount << std::endl;
         outStr << "Total faces: " << headerInt.faceCount / 3 << std::endl;
@@ -121,10 +120,10 @@ FormatPreview::setupModel(std::stringstream& outStr, LotusLib::PackagesReader* p
 }
 
 void
-FormatPreview::setupTexture(std::stringstream& outStr, LotusLib::PackagesReader* pkgs, LotusLib::FileEntry& fileEntry)
+FormatPreview::setupTexture(std::stringstream& outStr, LotusLib::PackageCollection* pkgs, LotusLib::FileEntry& fileEntry)
 {
-    BinaryReader::BinaryReaderBuffered& entry = fileEntry.fData.getLength() != 0 ? fileEntry.fData : fileEntry.bData;
-    WarframeExporter::Texture::TextureHeaderExternal extHeader = WarframeExporter::Texture::TextureReader::readHeader(&fileEntry.headerData, fileEntry.commonHeader);
+    BinaryReader::Buffered& entry = fileEntry.footer.getLength() != 0 ? fileEntry.footer : fileEntry.body;
+    WarframeExporter::Texture::TextureHeaderExternal extHeader = WarframeExporter::Texture::TextureReader::readHeader(&fileEntry.header, fileEntry.commonHeader);
 
     bool knownFormat = WarframeExporter::Texture::internalFormatToDdsFormat.count(static_cast<WarframeExporter::Texture::TextureCompression>(extHeader.format)) != 0;
     WarframeExporter::Texture::TextureInternal intTexture;
@@ -188,7 +187,7 @@ FormatPreview::setupTexture(std::stringstream& outStr, LotusLib::PackagesReader*
 void
 FormatPreview::setupLevel(std::stringstream& outStr, LotusLib::FileEntry& fileEntry)
 {
-    WarframeExporter::Level::LevelExternal extLevel = WarframeExporter::Level::LevelExtractor::getInstance()->getLevelExternal(fileEntry);
+    WarframeExporter::Level::LevelExternal extLevel = WarframeExporter::Level::LevelExtractor::getInstance()->getLevelExternal(fileEntry.commonHeader.type, fileEntry.header, fileEntry.body);
 
     outStr << "Has Landscape: " << (extLevel.landscapeIndex > 0) << std::endl;
     outStr << "Meshes: " << extLevel.header.levelObjs.size() << std::endl;
@@ -218,7 +217,7 @@ FormatPreview::setupLevel(std::stringstream& outStr, LotusLib::FileEntry& fileEn
 void
 FormatPreview::setupAudio(std::stringstream& outStr, LotusLib::FileEntry& fileEntry)
 {
-    WarframeExporter::Audio::AudioCompression compression = WarframeExporter::Audio::AudioExtractorProxy::getInstance()->peekCompressionFormat(&fileEntry.headerData);
+    WarframeExporter::Audio::AudioCompression compression = WarframeExporter::Audio::AudioExtractorProxy::getInstance()->peekCompressionFormat(&fileEntry.header);
     
     WarframeExporter::Audio::AudioHeader audioHeader;
     std::string compressionName = "";
@@ -228,21 +227,21 @@ FormatPreview::setupAudio(std::stringstream& outStr, LotusLib::FileEntry& fileEn
         {
             compressionName = "ADPCM";
             WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioPCMReader[fileEntry.commonHeader.type];
-            reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
+            reader->readHeader(&fileEntry.header, fileEntry.commonHeader, audioHeader);
             break;
         }
         case WarframeExporter::Audio::AudioCompression::PCM:
         {
             compressionName = "PCM";
             WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioPCMReader[fileEntry.commonHeader.type];
-            reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
+            reader->readHeader(&fileEntry.header, fileEntry.commonHeader, audioHeader);
             break;
         }
         case WarframeExporter::Audio::AudioCompression::OPUS:
         {
             compressionName = "Opus";
             WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
-            reader->readHeader(&fileEntry.headerData, fileEntry.commonHeader, audioHeader);
+            reader->readHeader(&fileEntry.header, fileEntry.commonHeader, audioHeader);
             break;
         }
         default:
@@ -264,7 +263,7 @@ void
 FormatPreview::setupShader(std::stringstream& outStr, LotusLib::FileEntry& fileEntry)
 {
     WarframeExporter::Shader::ShaderReader* shaderReader = WarframeExporter::Shader::g_enumMapShader[fileEntry.commonHeader.type];
-    WarframeExporter::Shader::ShaderHeaderExternal shaderHeader = shaderReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader.type);
+    WarframeExporter::Shader::ShaderHeaderExternal shaderHeader = shaderReader->readHeader(&fileEntry.header, fileEntry.commonHeader.type);
 
     outStr << "Shader count: " << shaderHeader.shaderCount << std::endl;
 }
@@ -273,7 +272,7 @@ void
 FormatPreview::setupLandscape(std::stringstream& outStr, LotusLib::FileEntry& fileEntry)
 {
     WarframeExporter::Landscape::LandscapeReader* reader = WarframeExporter::Landscape::g_enumMapLandscape[fileEntry.commonHeader.type];
-    WarframeExporter::Landscape::LandscapeHeaderExternal external = reader->readHeader(&fileEntry.headerData);
+    WarframeExporter::Landscape::LandscapeHeaderExternal external = reader->readHeader(&fileEntry.header);
 
     outStr << "Grid size: " << external.rowCount << "x" << external.columnCount << std::endl;
     outStr << "Chunk count: " << external.chunks.size() << std::endl;

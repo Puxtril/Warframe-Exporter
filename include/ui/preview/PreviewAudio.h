@@ -38,7 +38,7 @@ public:
     void unloadData() override;
     void hide() override;
     void show() override;
-    void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) override;
+    void setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin) override;
 
     void playPause();
     bool isVisible();

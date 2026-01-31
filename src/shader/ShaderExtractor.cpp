@@ -17,21 +17,21 @@ ShaderHeaderExternal
 ShaderExtractor::getHeader(LotusLib::FileEntry& fileEntry)
 {
 	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
-	return shaderReader->readHeader(&fileEntry.headerData, fileEntry.commonHeader.type);
+	return shaderReader->readHeader(&fileEntry.header, fileEntry.commonHeader.type);
 }
 
 ShaderEntry
 ShaderExtractor::readEntry(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header, int index)
 {
 	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
-	return shaderReader->readShader(&fileEntry.bData, header, index);
+	return shaderReader->readShader(&fileEntry.body, header, index);
 }
 
 std::vector<ShaderEntry>
 ShaderExtractor::readAllEntries(LotusLib::FileEntry& fileEntry, const ShaderHeaderExternal& header)
 {
 	ShaderReader* shaderReader = g_enumMapShader[fileEntry.commonHeader.type];
-	return shaderReader->readAllShaders(&fileEntry.bData, header);
+	return shaderReader->readAllShaders(&fileEntry.body, header);
 }
 
 void
@@ -71,7 +71,7 @@ ShaderExtractor::writeShader(const ShaderEntry& shader, const std::filesystem::p
 }
 
 void
-ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options)
+ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options)
 {
     ShaderHeaderExternal externalHeader = getHeader(fileEntry);
 	ZstdShaderReader::getInstance()->initilizeDecompressor(pkgs);
@@ -83,7 +83,7 @@ ShaderExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReade
         if (options.shaderExportType == SHADER_EXPORT_D3DDECOMPILE)
 		    decompileShader(bodyEntries[iShader]);
 		if (!options.dryRun)
-        	writeShader(bodyEntries[iShader], outputDir, iShader);
+        	writeShader(bodyEntries[iShader], outputPath, iShader);
     }
 }
 

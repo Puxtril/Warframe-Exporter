@@ -21,15 +21,16 @@ PreviewManager::setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidg
 }
 
 void
-PreviewManager::setData(LotusLib::PackagesReader* pkgs)
+PreviewManager::setData(LotusLib::PackageCollection* pkgs, LotusLib::PackagesBin* pkgsBin)
 {
     m_pkgs = pkgs;
+    m_pkgsBin = pkgsBin;
 }
 
 void
-PreviewManager::swapToFilePreview(LotusLib::FileEntry& fileEntry)
+PreviewManager::swapToFilePreview(LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor)
 {
-    Preview* preview = getPreview(fileEntry);
+    Preview* preview = getPreview(fileEntry, extractor);
     
     clearPreview();
 
@@ -38,7 +39,7 @@ PreviewManager::swapToFilePreview(LotusLib::FileEntry& fileEntry)
         // OpenGL widgets do initlization before the first draw call.
         // So lets initilize OpenGL (by rendering once) before setting textures/models.
         preview->show();
-        preview->setupWidget(fileEntry, *m_pkgs);
+        preview->setupWidget(fileEntry, *m_pkgs, *m_pkgsBin);
     }
     catch (std::exception&)
     {
@@ -71,10 +72,8 @@ PreviewManager::playPauseAudio()
 }
 
 Preview*
-PreviewManager::getPreview(LotusLib::FileEntry& fileEntry)
+PreviewManager::getPreview(LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor)
 {
-    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(m_pkgs->getGame(), LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
-
     if (extractor == nullptr)
     {
         PreviewMessage::getInstance()->setMessage("Preview Not Supported");

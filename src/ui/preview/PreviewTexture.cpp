@@ -42,7 +42,7 @@ PreviewTexture::show()
 }
 
 void
-PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
     auto textureExtractor = WarframeExporter::Texture::TextureExtractor::getInstance();
 

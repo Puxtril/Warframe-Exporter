@@ -9,7 +9,7 @@
 #include <QtCore/QThread>
 #include <QtWidgets/QApplication>
 
-#include "LotusLib.h"
+#include "LotusLib/TOCTree.h"
 #include "EnumMapExtractor.h"
 
 #include "ui/TreeItemSubtypes.h"
@@ -20,7 +20,7 @@ class LoadTreeThread : public QThread
 
     QBrush m_dirBrush;
 
-    LotusLib::PackagesReader* m_pkgs;
+    LotusLib::PackageCollection* m_pkgs;
     std::vector<std::string> m_exportPkgNames;
     WarframeExporter::ExtractorType m_extractTypes;
     QTreeWidget* m_treeWidget;
@@ -33,7 +33,7 @@ public:
 
     void setData(
         WarframeExporter::ExtractorType extractTypes,
-        LotusLib::PackagesReader& pkgs,
+        LotusLib::PackageCollection& pkgs,
         QTreeWidget* parentWidget,
         bool shouldFilterFiles
     );
@@ -46,14 +46,14 @@ private:
     // Some directories may be null. That's fine. But we need to ensure curEntries[i] 
     //   lines up with pkgNames[i], even if curEntries[i] is currently null
     void setupTree();
-    void setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*> curEntries, QTreeWidgetItem* parentWidget);
+    void setupTreeRecursive(std::vector<const LotusLib::DirNode*> curEntries, QTreeWidgetItem* parentWidget);
 
     // Increments the processed file count
     // Determines when to emit the signal `treeItemLoaded`
     void incrementFileCounter();
 
     // Derrive package names from extractor types
-    std::vector<std::string> findPkgNames(LotusLib::PackagesReader& pkgsReader, WarframeExporter::ExtractorType extractTypes);
+    std::vector<std::string> findPkgNames(LotusLib::PackageCollection& pkgsReader, WarframeExporter::ExtractorType extractTypes);
 
 signals:
     void treeItemsLoaded(size_t newSize);

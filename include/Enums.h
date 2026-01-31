@@ -1,9 +1,17 @@
 #pragma once
 
+#include "LotusLib/TOCTree.h"
+#include "LotusLib/Utils.h"
+#include "LotusLib/PackagesBin.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
 #include "level/LevelExtractOptions.h"
 #include "material/MaterialExtractOptions.h"
+
+#include "LotusLib/CommonHeader.h"
+#include "LotusLib/Package.h"
+#include "BinaryReader/Buffered.h"
+#include "nlohmann/json.hpp"
 
 namespace WarframeExporter
 {

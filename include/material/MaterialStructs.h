@@ -1,7 +1,6 @@
 #pragma once
 
-#include "LotusPath.h"
-#include "LotusNotationParser.h"
+#include "LotusLib/EENotationParser.h"
 
 #include <vector>
 #include <string>

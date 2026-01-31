@@ -22,7 +22,7 @@ namespace WarframeExporter::LevelStatic
 			return extTypes;
         }
 
-        void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, LevelStaticHeaderExternal& outHeader) override;
-        void readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const LevelStaticHeaderExternal& extHeader, LevelStaticBodyExternal& outBody) override;
+        void readHeader(BinaryReader::Buffered* headerReader, LevelStaticHeaderExternal& outHeader) override;
+        void readBody(BinaryReader::Buffered* bodyReader, const LevelStaticHeaderExternal& extHeader, LevelStaticBodyExternal& outBody) override;
     };
 };

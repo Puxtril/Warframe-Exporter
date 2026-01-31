@@ -38,7 +38,7 @@ public:
     void setup();
     void connectToWidgets(QSlider* timelineSlider, QLabel* timelineText, QSlider* volumeSlider, QPushButton* playButton, QPushButton* pauseButton, QPushButton* replayButton);
     void unloadAudio();
-    void loadAudio(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs);
+    void loadAudio(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin);
 
     void mediaStateChanged(QMediaPlayer::MediaStatus status);
     void playbackPositionChanged(qint64 milliseconds);

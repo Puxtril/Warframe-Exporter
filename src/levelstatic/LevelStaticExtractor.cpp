@@ -15,23 +15,23 @@ LevelStaticExtractor::read(LotusLib::FileEntry& fileEntry)
 	LevelStaticReader* reader = g_enumMapLevelStatic[fileEntry.commonHeader.type];
 
 	LevelStaticExternal external;
-	reader->readHeader(&fileEntry.headerData, external.header);
-	reader->readBody(&fileEntry.bData, external.header, external.body);
+	reader->readHeader(&fileEntry.header, external.header);
+	reader->readBody(&fileEntry.body, external.header, external.body);
 
 	return external;
 }
 
 void
-LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, ExtractOptions options)
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, const LotusLib::PackageCollection& pkgs, fx::gltf::Document& gltf, ExtractOptions options)
 {
 	std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf;
 	addModelsToGltf(external, pkgs, gltf, modelPathsInGltf, options);
 }
 
 void
-LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::PackagesReader& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf, ExtractOptions options)
+LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, const LotusLib::PackageCollection& pkgs, fx::gltf::Document& gltf, std::unordered_map<std::string, std::vector<int32_t>> modelPathsInGltf, ExtractOptions options)
 {
-	LotusLib::PackageReader miscPkg = pkgs.getPackage("Misc").value();
+	LotusLib::Package miscPkg = pkgs.getPackage("Misc");
 	
 	for (int i = 0; i < external.body.objects.size(); i++)
 	{
@@ -45,24 +45,23 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 		// We have not extracted this model into the output gltf file
 		if (modelPathsInGltf.count(curMeshPath) == 0)
 		{
-			LotusLib::FileEntry curLevelObjFile = miscPkg.getFile(curMeshPath);
-
-			if (curLevelObjFile.headerData.getLength() == 0)
+			if (!miscPkg.fileExists(curMeshPath))
 			{
 				m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curMeshPath));
 				continue;
 			}
 
-			Model::ModelReader* modelReader = Model::ModelExtractor::getInstance()->getModelReader(curLevelObjFile, pkgs.getGame());
+			LotusLib::FileEntry curMeshEntry = miscPkg.getFileEntry(curMeshPath);
+			Model::ModelReader* modelReader = Model::ModelExtractor::getInstance()->getModelReader(curMeshPath, curMeshEntry.commonHeader.type, pkgs.getGame());
 			if (modelReader == nullptr)
 			{
-				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelObjFile.commonHeader.type, curMeshPath));
+				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curMeshEntry.commonHeader.type, curMeshPath));
 				continue;
 			}
 
 			WarframeExporter::Model::ModelHeaderExternal headerExt;
 			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curLevelObjFile, pkgs.getGame(), headerExt, bodyExt);
+			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curMeshEntry.commonHeader, &curMeshEntry.header, &curMeshEntry.body, &curMeshEntry.footer, pkgs.getGame(), headerExt, bodyExt);
 
 			if (headerExt.meshInfos.size() == 0)
 			{
@@ -76,7 +75,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 			WarframeExporter::Model::ModelHeaderInternal headerInt;
 			WarframeExporter::Model::ModelBodyInternal bodyInt;
 			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg, options.extractVertexColors);
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelObjFile.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), curMeshPath);
+			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curMeshEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), curMeshPath);
 				
 			modelPathsInGltf[curMeshPath] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
 		}
@@ -86,7 +85,7 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, LotusLib::P
 }
 
 void
-LevelStaticExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
+LevelStaticExtractor::extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options)
 {
 	LevelStaticExternal external = read(fileEntry);
 	fx::gltf::Document gltf;

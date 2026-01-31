@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Audio;
 
 const std::string&
-AudioExtractorProxy::getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const
+AudioExtractorProxy::getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const
 {
 	AudioCompression compressionEnum = peekCompressionFormat(hReader);
 	Extractor* extractor = g_enumMapAudioExtractor.at(LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)compressionEnum);
@@ -18,15 +18,15 @@ AudioExtractorProxy::getInstance()
 }
 
 void
-AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
+AudioExtractorProxy::extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options)
 {
-	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.headerData);
+	AudioCompression compressionEnum = peekCompressionFormat(&fileEntry.header);
 	Extractor* extractor = g_enumMapAudioExtractor.at(LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)compressionEnum);
-	extractor->extract(fileEntry, pkgs, outputPath, options);
+	extractor->extract(fileEntry, pkgs, pkgsBin, outputPath, options);
 }
 
 AudioCompression
-AudioExtractorProxy::peekCompressionFormat(BinaryReader::BinaryReaderBuffered* headerReader) const
+AudioExtractorProxy::peekCompressionFormat(BinaryReader::Buffered* headerReader) const
 {
 	int compressionFormat = headerReader->readUInt32();
 	headerReader->seek(-4, std::ios::cur);

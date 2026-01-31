@@ -46,7 +46,7 @@ main(int argc, char** argv)
 	// Basic checks
 	checkDirs(cacheDirCmd.getValue());
 	createLoggers(g_logLevel, outPathCmd.getValue());
-	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
+	std::string fixedPath = forgiveLotusPath(intPathCmd.getValue());
 	LotusLib::Game game = getGame(gameCmd.getValue(), cacheDirCmd.getValue());
 	
 	// Basic logs
@@ -94,8 +94,8 @@ checkDirs(const std::filesystem::path& cacheDir)
 	}
 }
 
-LotusLib::LotusPath
-forgiveLotusPath(LotusLib::LotusPath inPath)
+std::string
+forgiveLotusPath(const std::filesystem::path& inPath)
 {
 	if (inPath.string().size() == 1)
 		return inPath;
@@ -144,7 +144,7 @@ void
 createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath)
 {
 #ifdef WF_DEBUG
-	LotusLib::Logger::setLogProperties(outPath / "LotusLib.log", logLevel, logLevel);
+	LotusLib::Logger::setLogProperties(logLevel);
 #endif
 	WarframeExporter::Logger::getInstance().setLogProperties(outPath / "Warframe-Exporter.log", logLevel);
 	LotusLib::Logger::setLogProperties(spdlog::level::info);

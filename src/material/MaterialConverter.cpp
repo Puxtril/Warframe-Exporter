@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Material;
 
 MaterialInternal
-MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial, LotusLib::LotusPath& internalPath, LotusLib::PackagesReader& pkgs)
+MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial, const std::string& internalPath, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
     MaterialInternal internal;
 
@@ -13,27 +13,27 @@ MaterialConverter::convertMaterial(const MaterialExternal& externalMaterial, Lot
 
     // Essentially, this is setting `internal.shaderAttributes` to `currentJson`.
     // But, we still want to fix relative file paths.
-    nlohmann::json currentJson = LotusLib::LotusNotationParser::parse(externalMaterial.attributes.c_str(), externalMaterial.attributes.length());
+    nlohmann::json currentJson = LotusLib::EENotationParser::parse(externalMaterial.attributes.c_str(), externalMaterial.attributes.length());
     internal.shaderAttributes = nlohmann::json::object();
     combineAttributes(internal.shaderAttributes, currentJson, internalPath);
     
     // Go through Packages.bin to add material heirarchy
-    pkgs.initilizePackagesBin();
-    LotusLib::PackageReader pkg = pkgs.getPackage("Misc").value();
-    LotusLib::LotusPath currentPath = internalPath;
-    while (currentPath != "")
+    if (pkgsBin.isInitSuccess())
     {
-        LotusLib::FileEntry entry = pkg.getFile(currentPath, LotusLib::READ_EXTRA_ATTRIBUTES);
-        nlohmann::json parentAttrs = LotusLib::LotusNotationParser::parse(entry.extra.attributes.c_str(), entry.extra.attributes.size());
-        combineAttributes(internal.shaderAttributes, parentAttrs, currentPath);
-        currentPath = entry.extra.parent;
+        std::string currentPath = internalPath;
+        while (currentPath != "")
+        {
+            nlohmann::json parentAttrs = pkgsBin.getParametersJson(currentPath);
+            combineAttributes(internal.shaderAttributes, parentAttrs, currentPath);
+            currentPath = pkgsBin.getParent(currentPath);
+        }
     }
 
     return internal;
 }
 
 void
-MaterialConverter::combineAttributes(nlohmann::json& currentAttrs, const nlohmann::json& parentAttrs, const LotusLib::LotusPath& parentPath)
+MaterialConverter::combineAttributes(nlohmann::json& currentAttrs, const nlohmann::json& parentAttrs, const std::string& parentPath)
 {
     for (const auto& curJson : parentAttrs.items())
     {
@@ -45,7 +45,7 @@ MaterialConverter::combineAttributes(nlohmann::json& currentAttrs, const nlohman
                 std::string value = curJson.value().get<std::string>();
                 if (value[0] != '/')
                 {
-                    currentAttrs[curJson.key()] = parentPath.parent_path().string() + "/" + value;
+                    currentAttrs[curJson.key()] = std::filesystem::path(parentPath).parent_path().string() + "/" + value;
                     continue;
                 }
             }

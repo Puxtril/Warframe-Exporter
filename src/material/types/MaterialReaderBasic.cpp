@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Material;
 
 MaterialExternal
-MaterialReaderBasic::readData(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
+MaterialReaderBasic::readData(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
     MaterialExternal extMaterial;
 

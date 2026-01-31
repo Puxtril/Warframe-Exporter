@@ -1,32 +1,33 @@
 #pragma once
 
-#include "LotusLib.h"
+#include "LotusLib/TOCTree.h"
+#include "LotusLib/Utils.h"
 
 #include <QtWidgets/QTreeWidget>
 
 class TreeItemDirectory : public QTreeWidgetItem
 {
-    std::string m_fullInternalPath;
+    const LotusLib::DirNode* m_node;
 
 public:
     static constexpr int QTreeWidgetItemType = 1005;
 
-    TreeItemDirectory(std::string fullInternalPath);
-    TreeItemDirectory(QTreeWidgetItem* parentWidget, std::string fullInternalPath);
+    TreeItemDirectory(const LotusLib::DirNode* node);
+    TreeItemDirectory(QTreeWidgetItem* parentWidget, const LotusLib::DirNode* node);
 
-    const std::string& getFullInternalPath() const;
+    const LotusLib::DirNode* getNode() const;
 };
 
 class TreeItemFile : public QTreeWidgetItem
 {
-    const LotusLib::FileEntries::FileNode* m_file;
+    const LotusLib::FileNode& m_file;
     const std::string& m_pkg;
 
 public:
     static constexpr int QTreeWidgetItemType = 1006;
 
-    TreeItemFile(const LotusLib::FileEntries::FileNode* fileNode, const std::string& pkgName);
-    TreeItemFile(QTreeWidgetItem* parentWidget, const LotusLib::FileEntries::FileNode* fileNode, const std::string& pkgName);
+    TreeItemFile(const LotusLib::FileNode& fileNode, const std::string& pkgName);
+    TreeItemFile(QTreeWidgetItem* parentWidget, const LotusLib::FileNode& fileNode, const std::string& pkgName);
 
     QString getQName() const;
     QString getQFullpath() const;

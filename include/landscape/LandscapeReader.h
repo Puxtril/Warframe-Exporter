@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BinaryReaderBuffered.h"
+#include "BinaryReader/Buffered.h"
 #include "EnumMap.h"
-#include "CommonHeader.h"
+#include "LotusLib/CommonHeader.h"
 #include "ExporterLogger.h"
 #include "ExporterExceptions.h"
 #include "landscape/LandscapeStructs.h"
@@ -14,10 +14,10 @@ namespace WarframeExporter::Landscape
     class LandscapeReader : public EnumMapValue
     {
     public:
-        virtual LandscapeHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* reader) = 0;
-        virtual std::vector<LandscapeBodyChunkExternal> readBody(BinaryReader::BinaryReaderBuffered* reader, const LandscapeHeaderExternal& header) = 0;
+        virtual LandscapeHeaderExternal readHeader(BinaryReader::Buffered* reader) = 0;
+        virtual std::vector<LandscapeBodyChunkExternal> readBody(BinaryReader::Buffered* reader, const LandscapeHeaderExternal& header) = 0;
 
     protected:
-        LandscapeBodyChunkExternal readPhysxHeightField(BinaryReader::BinaryReaderBuffered* reader);
+        LandscapeBodyChunkExternal readPhysxHeightField(BinaryReader::Buffered* reader);
     };
 }

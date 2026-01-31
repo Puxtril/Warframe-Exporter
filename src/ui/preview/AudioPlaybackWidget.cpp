@@ -39,19 +39,19 @@ AudioPlaybackWidget::unloadAudio()
 }
 
 void
-AudioPlaybackWidget::loadAudio(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+AudioPlaybackWidget::loadAudio(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
     membuf<> memoryBuffer;
     std::ostream extractedFile(&memoryBuffer);
     // TODO: Add this `extract` signature to base extractor class as abstract method
-    switch (WarframeExporter::Audio::AudioExtractorProxy::getInstance()->peekCompressionFormat(&fileEntry.headerData))
+    switch (WarframeExporter::Audio::AudioExtractorProxy::getInstance()->peekCompressionFormat(&fileEntry.header))
     {
         case (WarframeExporter::Audio::AudioCompression::ADPCM):
         case (WarframeExporter::Audio::AudioCompression::PCM):
-            WarframeExporter::Audio::AudioPCMExtractor::getInstance()->extract(fileEntry, pkgs, extractedFile, {});
+            WarframeExporter::Audio::AudioPCMExtractor::getInstance()->extract(fileEntry, pkgs, pkgsBin, extractedFile, {});
             break;
         case (WarframeExporter::Audio::AudioCompression::OPUS):
-            WarframeExporter::Audio::AudioOpusExtractor::getInstance()->extract(fileEntry, pkgs, extractedFile, {});
+            WarframeExporter::Audio::AudioOpusExtractor::getInstance()->extract(fileEntry, pkgs, pkgsBin, extractedFile, {});
     }
 
     m_audioData = std::make_unique<QByteArray>((char*)memoryBuffer.get_memptr(), memoryBuffer.get_size());

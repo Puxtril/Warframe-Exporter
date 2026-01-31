@@ -3,10 +3,11 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const LotusLib::LotusPath& internalLevelPath, LevelInternal& intBody)
+LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const std::string& internalLevelPath, LevelInternal& intBody)
 {
 	intBody.objs.resize(extHeader.levelObjs.size());
-	auto parser = LotusLib::LotusNotationParser();
+	auto parser = LotusLib::EENotationParser();
+	const std::filesystem::path internalLevelPathObj(internalLevelPath);
 	for (size_t x = 0; x < intBody.objs.size(); x++)
 	{
 		LevelObjectHeaderExternal& extObj = extHeader.levelObjs[x];
@@ -20,7 +21,7 @@ LevelConverter::convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExter
 		intObj.rot = std::move(extObj.rot);
 
 		splitAttributes(intObj.attributes, intBody.objs[x]);
-		fixInternalPath(internalLevelPath, intObj.meshPath);
+		fixInternalPath(internalLevelPathObj, intObj.meshPath);
 	}
 }
 
@@ -53,7 +54,7 @@ LevelConverter::splitAttributes(nlohmann::json& json, LevelObjectInternal& intOb
 }
 
 void
-LevelConverter::fixInternalPath(const LotusLib::LotusPath& internalLevelPath, std::string& outPath)
+LevelConverter::fixInternalPath(const std::filesystem::path& internalLevelPath, std::string& outPath)
 {
 	// Already absolute path
 	if (outPath.size() < 5 || outPath[0] == '/')
@@ -74,7 +75,7 @@ LevelConverter::convertLandscapeToInternal(const LevelExternal& levelExternal, L
 	const LevelObjectHeaderExternal& objHeader = levelExternal.header.levelObjs[levelExternal.landscapeIndex];
 	const std::vector<char>& attributesRaw = levelExternal.body.attributes[levelExternal.landscapeIndex];
 
-	auto parser = LotusLib::LotusNotationParser();
+	auto parser = LotusLib::EENotationParser();
 	nlohmann::json attrs = parser.parse(attributesRaw.data(), attributesRaw.size());
 
 	levelInternal.landscape.pos = objHeader.pos;

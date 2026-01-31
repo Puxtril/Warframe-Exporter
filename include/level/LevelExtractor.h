@@ -2,13 +2,13 @@
 
 #include "Extractor.h"
 #include "LevelEnumMap.h"
-#include "BinaryReaderBuffered.h"
+#include "BinaryReader/Buffered.h"
 #include "ExporterExceptions.h"
 #include "level/LevelConverter.h"
 #include "level/LevelExporterGltf.h"
 #include "model/ModelExtractor.h"
 #include "landscape/LandscapeExtractor.h"
-#include "CommonHeader.h"
+#include "LotusLib/CommonHeader.h"
 
 namespace WarframeExporter::Level
 {
@@ -20,7 +20,7 @@ namespace WarframeExporter::Level
 		LevelExtractor(const LevelExtractor&) = delete;
 		LevelExtractor operator=(const LevelExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			static std::string outFileExt = "glb";
 			return outFileExt;
@@ -56,18 +56,18 @@ namespace WarframeExporter::Level
 
 		static LevelExtractor* getInstance();
 
-		LevelExternal getLevelExternal(LotusLib::FileEntry& fileEntry);
-		LevelInternal convertToInternal(LotusLib::FileEntry& fileEntry, LevelExternal& levelExternal);
-		Document createGltfCombined(LotusLib::PackagesReader& pkgs, LevelInternal& bodyInt, ExtractOptions options);
+		LevelExternal getLevelExternal(uint32_t fileType, BinaryReader::Buffered& headerData, BinaryReader::Buffered& bodyData);
+		LevelInternal convertToInternal(const std::string& internalPath, LevelExternal& levelExternal);
+		Document createGltfCombined(const LotusLib::PackageCollection& pkgs, LevelInternal& bodyInt, ExtractOptions options);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) override;
 		
 		// More attribute may exist in Packages.bin
-		void findExtraAttributes(LotusLib::PackagesReader& pkgs, LevelExternal& levelExternal);
+		void findExtraAttributes(const std::string& pkgsbinAttributes, LevelExternal& levelExternal);
 	
 	private:
 		void writeAndAdvanceBuffer(Document& gltfDoc, const std::filesystem::path& outputPath);
 		void findLandscape(LevelExternal& levelExternal);
-		void addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, LotusLib::PackagesReader& pkgs);
+		void addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, const LotusLib::PackageCollection& pkgs);
 	};
 }

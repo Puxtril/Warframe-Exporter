@@ -4,10 +4,9 @@
 #include "cli/CLI-Extract.h"
 #include "tclap/ValueArg.h"
 #include "tclap/CmdLine.h"
-#include "DebugUtils.h"
 
-#include "CachePair.h"
-#include "PackageCollection.h"
+#include "LotusLib/PackageSplit.h"
+#include "LotusLib/PackageCollection.h"
 
 #include <filesystem>
 #include <memory>
@@ -29,9 +28,12 @@ public:
 	const std::string& getFeatureName() override;
 	void addMainCmds(TCLAP::OneOf& oneOfCmd) override;
 	void addMiscCmds(TCLAP::CmdLine& cmdLine) override;
-	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
+	void processCmd(const std::filesystem::path& outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
 
 private:
-	void printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath, LotusLib::Game game);
-	void writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game);
+	void printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game);
+	void writeRaw(const std::filesystem::path outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game);
+
+	void printEnumCounts(LotusLib::Package& pkg, const std::string& internalPath);
+	void writeAllFilesRaw(LotusLib::Package& pkg, const LotusLib::FileNode& fileNode, const std::filesystem::path& baseOutputPath);
 };

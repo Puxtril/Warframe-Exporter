@@ -10,7 +10,7 @@ LandscapeReader4X::getInstance()
 }
 
 LandscapeHeaderExternal
-LandscapeReader4X::readHeader(BinaryReader::BinaryReaderBuffered* reader)
+LandscapeReader4X::readHeader(BinaryReader::Buffered* reader)
 {
     LandscapeHeaderExternal outHeader;
 
@@ -68,7 +68,7 @@ LandscapeReader4X::readHeader(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 std::vector<LandscapeBodyChunkExternal>
-LandscapeReader4X::readBody(BinaryReader::BinaryReaderBuffered* reader, const LandscapeHeaderExternal& header)
+LandscapeReader4X::readBody(BinaryReader::Buffered* reader, const LandscapeHeaderExternal& header)
 {
     std::vector<LandscapeBodyChunkExternal> heightfieldChunks;
 

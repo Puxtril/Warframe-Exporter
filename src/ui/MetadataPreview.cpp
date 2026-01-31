@@ -14,19 +14,15 @@ MetdataPreview::setupUis(QPlainTextEdit* textWidget, QLabel* compressed, QLabel*
 }
 
 void
-MetdataPreview::setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath)
+MetdataPreview::setData(const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::string& pkgName, LotusLib::FileEntry& fileEntry)
 {
-    pkgs->initilizePackagesBin();
-    LotusLib::FileEntry fileEntry = pkgs->getPackage(pkgName).value().getFile(internalPath, LotusLib::READ_COMMON_HEADER);
-
     std::stringstream outStr;
-    setupCommonHeader(outStr, pkgs->getGame(), fileEntry);
-    addPackagesBinHeirarchy(outStr, pkgs->getPackage(pkgName).value(), internalPath.string());
+    setupCommonHeader(outStr, pkgs.getGame(), pkgName, fileEntry);
+    addPackagesBinHeirarchy(outStr, pkgsBin, LotusLib::getFullPath(fileEntry.headerNode));
     std::string outStrTmp = outStr.str();
     m_textWidget->setPlainText(QString(outStrTmp.c_str()));
 
-    auto pkg = pkgs->getPackage(pkgName).value();
-    setFiledata(pkg, fileEntry);
+    setFiledata(pkgs.getPackage(pkgName), fileEntry.headerNode);
 }
 
 void
@@ -39,18 +35,18 @@ MetdataPreview::clearPreview()
 }
 
 void
-MetdataPreview::setupCommonHeader(std::stringstream& outStr, LotusLib::Game game, LotusLib::FileEntry& fileEntry)
+MetdataPreview::setupCommonHeader(std::stringstream& outStr, LotusLib::Game game, const std::string& pkgName, LotusLib::FileEntry& fileEntry)
 {
     outStr << "Type Enum: ";
     outStr << fileEntry.commonHeader.type << " ";
-    auto extractor = WarframeExporter::g_enumMapExtractor.at(game, LotusLib::findPackageCategory(fileEntry.srcPkgName), fileEntry.commonHeader.type);
+    auto extractor = WarframeExporter::g_enumMapExtractor.at(game, LotusLib::findPackageCategory(pkgName), fileEntry.commonHeader.type);
     if (extractor != nullptr)
         outStr << "(" << extractor->getFriendlyName() << ")";
     else
         outStr << "(Unknown)";
     
     outStr << std::endl;
-    outStr << "Package: " << fileEntry.srcPkgName << std::endl;
+    outStr << "Package: " << pkgName << std::endl;
     
     outStr << std::endl;
 
@@ -66,31 +62,25 @@ MetdataPreview::setupCommonHeader(std::stringstream& outStr, LotusLib::Game game
 }
 
 void
-MetdataPreview::setFiledata(LotusLib::PackageReader& pkgs, LotusLib::FileEntry& fileEntry)
+MetdataPreview::setFiledata(const LotusLib::Package& pkgs, LotusLib::FileNode& fileNode)
 {
-    m_labelModified->setText(timestampToQString(fileEntry.metadata->getTimeStamp()));
-    int totalCompressed = fileEntry.metadata->getCompLen();
-    int totalDecompressed = fileEntry.metadata->getLen();
+    m_labelModified->setText(timestampToQString(fileNode.timeStamp));
+    int totalCompressed = fileNode.compLen;
+    int totalDecompressed = fileNode.len;
 
     try
     {
-        const LotusLib::FileEntries::FileNode* bNode = pkgs.getFileNode(fileEntry.internalPath, LotusLib::PackageTrioType::B);
-        if (bNode != nullptr)
-        {
-            totalCompressed += bNode->getCompLen();
-            totalDecompressed += bNode->getLen();
-        }
+        const LotusLib::FileNode& bNode = pkgs.getFileNode(LotusLib::PkgSplitType::BODY, fileNode);
+        totalCompressed += bNode.compLen;
+        totalDecompressed += bNode.len;
     }
     catch (LotusLib::InternalEntryNotFound& ex) {}
 
     try
     {
-        const LotusLib::FileEntries::FileNode* fNode = pkgs.getFileNode(fileEntry.internalPath, LotusLib::PackageTrioType::F);
-        if (fNode != nullptr)
-        {
-            totalCompressed += fNode->getCompLen();
-            totalDecompressed += fNode->getLen();
-        }
+        const LotusLib::FileNode& fNode = pkgs.getFileNode(LotusLib::PkgSplitType::FOOTER, fileNode);
+        totalCompressed += fNode.compLen;
+        totalDecompressed += fNode.len;
     }
     catch (LotusLib::InternalEntryNotFound& ex) {}
 
@@ -128,7 +118,7 @@ MetdataPreview::filesizeToQString(int input)
 }
 
 void
-MetdataPreview::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::PackageReader pkg, const std::string& filePath)
+MetdataPreview::addPackagesBinHeirarchy(std::stringstream& outStr, const LotusLib::PackagesBin& pkgsBin, const std::string& filePath)
 {
     std::stack<std::string> heirarchy;
 
@@ -136,8 +126,7 @@ MetdataPreview::addPackagesBinHeirarchy(std::stringstream& outStr, LotusLib::Pac
     while (curFile != "")
     {
         heirarchy.push(curFile);
-        LotusLib::FileEntry nextEntry = pkg.getFile(curFile, LotusLib::READ_EXTRA_ATTRIBUTES);
-        curFile = nextEntry.extra.parent.string();
+        curFile = pkgsBin.getParent(curFile);
     }
 
     if (heirarchy.size() == 1)

@@ -2,14 +2,14 @@
 
 using namespace WarframeExporter::Texture;
 
-BinaryReader::BinaryReaderBuffered*
-TextureReader::getCorrectBodyReader(BinaryReader::BinaryReaderBuffered* FfileReader, BinaryReader::BinaryReaderBuffered* BfileReader)
+BinaryReader::Buffered*
+TextureReader::getCorrectBodyReader(BinaryReader::Buffered* FfileReader, BinaryReader::Buffered* BfileReader)
 {
 	return FfileReader->getLength() > BfileReader->getLength() ? FfileReader : BfileReader;
 }
 
 TextureHeaderExternal
-TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
+TextureReader::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
 	uint8_t enum1 = headerReader->readUInt8();
 	uint8_t enum2 = headerReader->readUInt8();
@@ -39,7 +39,7 @@ TextureReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 }
 
 std::vector<char>
-TextureReader::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderExternal& headerExternal)
+TextureReader::readBody(BinaryReader::Buffered* bodyReader, const TextureHeaderExternal& headerExternal)
 {
 	std::vector<char> data(bodyReader->getLength());
 	std::memcpy(data.data(), bodyReader->getPtr().data(), bodyReader->getLength());

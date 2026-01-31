@@ -7,7 +7,7 @@ VertexColorIndexer::VertexColorIndexer()
 {}
 
 void
-VertexColorIndexer::getModelColors(const LotusLib::LotusPath& modelPath, std::vector<vertexColorData>& outColors, LotusLib::PackageReader& pkg)
+VertexColorIndexer::getModelColors(const std::string& modelPath, std::vector<vertexColorData>& outColors, LotusLib::Package& pkg)
 {
 	if (!isIndexed(pkg))
 	{
@@ -16,19 +16,19 @@ VertexColorIndexer::getModelColors(const LotusLib::LotusPath& modelPath, std::ve
 	}
 
 	modelToColorList& colorList = getColorList(pkg);
-	std::vector<LotusLib::LotusPath>& vcPaths = colorList[modelPath.string()];
+	std::vector<std::string>& vcPaths = colorList[modelPath];
 
 	size_t curVcArrayIndex = outColors.size();
 	outColors.resize(outColors.size() + vcPaths.size());
 
-	for (const LotusLib::LotusPath& vcPath : vcPaths)
+	for (const std::string& vcPath : vcPaths)
 	{
 		readColor(pkg, vcPath, outColors[curVcArrayIndex++]);
 	}
 }
 
 void
-VertexColorIndexer::indexVertexColors(LotusLib::PackageReader& pkg)
+VertexColorIndexer::indexVertexColors(LotusLib::Package& pkg)
 {
 	if (!isIndexed(pkg))
 		indexColors(pkg);
@@ -41,7 +41,7 @@ VertexColorIndexer::cancelIndexing()
 }
 
 int
-VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
+VertexColorIndexer::indexColors(LotusLib::Package& pkg)
 {
 	modelToColorList& curColorList = getColorList(pkg);
 
@@ -61,16 +61,17 @@ VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
 		// Just skip these.
 		try
 		{
-			LotusLib::FileEntry curFileEntry = pkg.getFile(&curFile, LotusLib::READ_COMMON_HEADER);
-
-			VertexColorReader* vertexColorReader = g_enumMapVertexColor[curFileEntry.commonHeader.type];
+			VertexColorReader* vertexColorReader = g_enumMapVertexColor[pkg.readCommonHeaderFormat(curFile)];
 			if (vertexColorReader == nullptr)
 				continue;
 
 			VertexColorHeader vertexColorHeader;
-			vertexColorReader->readHeader(&curFileEntry.headerData, vertexColorHeader);
+			BinaryReader::Buffered headerReader = pkg.getFile(LotusLib::PkgSplitType::HEADER, curFile);
+			
+			headerReader.seek(LotusLib::commonHeaderFindLen(headerReader, pkg.getGame()), std::ios::beg);
+			vertexColorReader->readHeader(&headerReader, vertexColorHeader);
 
-			curColorList[vertexColorHeader.modelPath].push_back(LotusLib::LotusPath(curFile.getFullPath()));
+			curColorList[vertexColorHeader.modelPath].push_back(LotusLib::getFullPath(curFile));
 		}
 		catch (std::exception&)
 		{
@@ -81,13 +82,15 @@ VertexColorIndexer::indexColors(LotusLib::PackageReader& pkg)
 }
 
 void
-VertexColorIndexer::readColor(LotusLib::PackageReader& pkg, LotusLib::LotusPath vertexColorPath, vertexColorData& outData)
+VertexColorIndexer::readColor(LotusLib::Package& pkg, std::string vertexColorPath, vertexColorData& outData)
 {
 	try
 	{
-		LotusLib::FileEntry curFileEntry = pkg.getFile(vertexColorPath);
-		VertexColorReader* vertexColorReader = g_enumMapVertexColor[curFileEntry.commonHeader.type];
-		vertexColorReader->readBody(&curFileEntry.bData, outData);
+		LotusLib::FileNode curFileNode = pkg.getFileNode(LotusLib::PkgSplitType::HEADER, vertexColorPath);
+		BinaryReader::Buffered bodyReader(pkg.getFile(LotusLib::PkgSplitType::BODY, curFileNode));
+
+		VertexColorReader* vertexColorReader = g_enumMapVertexColor[pkg.readCommonHeaderFormat(curFileNode)];
+		vertexColorReader->readBody(&bodyReader, outData);
 	}
 	catch (LotusLib::LotusException&)
 	{
@@ -96,7 +99,7 @@ VertexColorIndexer::readColor(LotusLib::PackageReader& pkg, LotusLib::LotusPath 
 }
 
 bool
-VertexColorIndexer::isIndexed(LotusLib::PackageReader& pkg)
+VertexColorIndexer::isIndexed(LotusLib::Package& pkg)
 {
 	const std::filesystem::path& cachePath = pkg.getDirectory();
 
@@ -106,7 +109,7 @@ VertexColorIndexer::isIndexed(LotusLib::PackageReader& pkg)
 }
 
 VertexColorIndexer::modelToColorList&
-VertexColorIndexer::getColorList(LotusLib::PackageReader& pkg)
+VertexColorIndexer::getColorList(LotusLib::Package& pkg)
 {
 	const std::filesystem::path& cachePath = pkg.getDirectory();
 	return m_vertexColorMap[cachePath];

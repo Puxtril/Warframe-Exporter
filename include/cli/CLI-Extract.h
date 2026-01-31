@@ -2,12 +2,12 @@
 
 #include "cli/CLI-Feature.h"
 #include "EnumMapExtractor.h"
-#include "ExportSingleFile.h"
 
 #include "tclap/MultiArg.h"
 #include "tclap/ValueArg.h"
 #include "tclap/CmdLine.h"
-#include "BatchIteratorExport.h"
+#include "ExtractFile.h"
+#include "Enums.h"
 #include "model/ModelExtractor.h"
 
 #include <memory>
@@ -47,7 +47,7 @@ public:
 	const std::string& getFeatureName() override;
 	void addMainCmds(TCLAP::OneOf& oneOfCmd) override;
 	void addMiscCmds(TCLAP::CmdLine& cmdLine) override;
-	void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
+	void processCmd(const std::filesystem::path& outPath, const std::string& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
 
 private:
 	WarframeExporter::Shader::ShaderExportType getShaderFormat(const std::string& cmdValue);
@@ -56,7 +56,6 @@ private:
 	WarframeExporter::Level::LevelHlodExtractMode getLevelHlodMode(const std::string commandValue);
 
 	void checkOutputDir(const std::string& outPath);
-	void extract(const std::filesystem::path& cacheDirPath, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
-	bool tryExtractFile(LotusLib::PackagesReader& pkgs, const LotusLib::LotusPath& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
+	void extract(const std::filesystem::path& cacheDirPath, const std::string& intPath, const std::filesystem::path outPath, WarframeExporter::ExtractorType types, LotusLib::Game game, WarframeExporter::ExtractOptions options);
 	bool dumpPkgsBin(const std::filesystem::path& cacheDirPath, const std::filesystem::path outPath, LotusLib::Game game);
 };

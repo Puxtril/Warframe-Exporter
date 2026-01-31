@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "BinaryReaderBuffered.h"
+#include "BinaryReader/Buffered.h"
 #include "ExporterLogger.h"
-#include "LotusLib.h"
+#include "LotusLib/PackageCollection.h"
 #include "zstd.h"
 
 namespace WarframeExporter::Shader
@@ -19,11 +19,11 @@ namespace WarframeExporter::Shader
     public:
         WarframeDecompressZstd();
 
-        void initilize(LotusLib::PackagesReader& pkgsReader);
+        void initilize(const LotusLib::PackageCollection& pkgsReader);
         size_t decompress(const char* inData, size_t inDataLen, const char* outData, size_t outDataCapacity, int dictIndex) const;
         bool initSuccess() const;
 
     private:
-        std::vector<size_t> findZstdDictionaryOffsets(BinaryReader::BinaryReaderBuffered& reader) const;
+        std::vector<size_t> findZstdDictionaryOffsets(BinaryReader::Buffered& reader) const;
     };
 };

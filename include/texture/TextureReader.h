@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BinaryReaderBuffered.h"
-#include "LotusLib.h"
+#include "BinaryReader/Buffered.h"
+#include "LotusLib/CommonHeader.h"
 #include "TextureStructs.hpp"
 
 namespace WarframeExporter::Texture
@@ -9,8 +9,8 @@ namespace WarframeExporter::Texture
 	class TextureReader
 	{
 	public:
-		static BinaryReader::BinaryReaderBuffered* getCorrectBodyReader(BinaryReader::BinaryReaderBuffered* FfileReader, BinaryReader::BinaryReaderBuffered* BfileReader);
-		static TextureHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
-		static std::vector<char> readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const TextureHeaderExternal& headerExternal);
+		static BinaryReader::Buffered* getCorrectBodyReader(BinaryReader::Buffered* FfileReader, BinaryReader::Buffered* BfileReader);
+		static TextureHeaderExternal readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader);
+		static std::vector<char> readBody(BinaryReader::Buffered* bodyReader, const TextureHeaderExternal& headerExternal);
 	};
 }

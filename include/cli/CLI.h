@@ -13,9 +13,7 @@
 #include "tclap/ArgException.h"
 #include "tclap/UnlabeledValueArg.h"
 #include "tclap/SwitchArg.h"
-#include "LotusLib.h"
-#include "BatchIteratorExport.h"
-#include "LotusPath.h"
+
 #include "cli/CLI-Feature.h"
 #include "cli/CLI-Extract.h"
 #include "cli/CLI-Debug.h"
@@ -41,6 +39,6 @@ const std::vector<CLIFeature*> g_features = {
 int main(int argc, char** argv);
 
 void checkDirs(const std::filesystem::path& cacheDir);
-LotusLib::LotusPath forgiveLotusPath(LotusLib::LotusPath inPath);
+std::string forgiveLotusPath(const std::filesystem::path& inPath);
 LotusLib::Game getGame(const std::string& gameStr, const std::filesystem::path& cacheDir);
 void createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath);

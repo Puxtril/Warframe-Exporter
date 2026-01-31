@@ -10,7 +10,7 @@ MaterialExtractor::getInstance()
 }
 
 MaterialExternal
-MaterialExtractor::getExternalMaterial(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
+MaterialExtractor::getExternalMaterial(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
 	MaterialReader* reader = g_enumMapMaterial[commonHeader.type];
 	MaterialExternal external = reader->readData(headerReader, commonHeader);
@@ -33,10 +33,10 @@ MaterialExtractor::writeOut(const MaterialInternal& materialInternal, const std:
 }
 
 void
-MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
+MaterialExtractor::extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options)
 {
-	MaterialExternal external = getExternalMaterial(&fileEntry.headerData, fileEntry.commonHeader);
-	MaterialInternal internal = MaterialConverter::convertMaterial(external, fileEntry.internalPath, pkgs);
+	MaterialExternal external = getExternalMaterial(&fileEntry.header, fileEntry.commonHeader);
+	MaterialInternal internal = MaterialConverter::convertMaterial(external, LotusLib::getFullPath(fileEntry.headerNode), pkgs, pkgsBin);
 
 	if (!options.dryRun)
 		writeOut(internal, outputPath, options);

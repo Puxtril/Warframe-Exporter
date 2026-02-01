@@ -108,23 +108,17 @@ ModelRenderWidget::drawScene()
 
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
-
-    // CLEARLY this isn't correct
-    // Since this is just for previewing, I don't care to get this perfect
-    // Divide this by 3 and some faces will be missing
-    // Pas in `m_indexCount` directly and faces will draw over each other
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indexCount / 2.9), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_SHORT, 0);
 
     glBindVertexArray(0);
     glUseProgram(0);
 }
 
 void
-ModelRenderWidget::loadModel(const WarframeExporter::Model::ModelBodyExternal& modelExternal, const WarframeExporter::Model::ModelBodyInternal& modelInternal)
+ModelRenderWidget::loadModel(const WarframeExporter::Model::ModelBodyExternal& modelExternal, const WarframeExporter::Model::ModelBodyInternal& modelInternal, const WarframeExporter::Model::ModelHeaderInternal headerInternal)
 {
     makeCurrent();
 
-    m_indexCount = modelInternal.indices.size();
 
     glBindVertexArray(m_glVertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, m_glVertexBufferObject);
@@ -153,8 +147,24 @@ ModelRenderWidget::loadModel(const WarframeExporter::Model::ModelBodyExternal& m
 
     glBufferData(GL_ARRAY_BUFFER, combinedVertSize * modelInternal.positions.size(), buf.data(), GL_STATIC_DRAW);
 
+    // Buffer indices
+    // Calculate index count
+    m_indexCount = 0;
+    for (const WarframeExporter::Model::MeshInfoInternal& meshInfo : headerInternal.meshInfos)
+        m_indexCount += meshInfo.faceLODCounts[0];
+
+    // Copy indices into separate buffer
+    size_t indexCursor = 0;
+    std::vector<uint16_t> indices(m_indexCount);
+    for (const WarframeExporter::Model::MeshInfoInternal& meshInfo : headerInternal.meshInfos)
+    {
+        memcpy(indices.data() + indexCursor, modelInternal.indices.data() + meshInfo.faceLODOffsets[0], meshInfo.faceLODCounts[0] * sizeof(uint16_t));
+        indexCursor += meshInfo.faceLODCounts[0];
+    }
+
+    // OpenGL Buffer indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glElementBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * modelInternal.indices.size(), modelInternal.indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * m_indexCount, indices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, combinedVertSize, (void*)0);
     glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, combinedVertSize, (void*)(sizeof(float) * 3));

@@ -51,5 +51,5 @@ PreviewModel::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::Packag
 	WarframeExporter::Model::ModelBodyInternal bodyInt;
     WarframeExporter::Model::ModelConverter::convertToInternal(modelHeaderExt, modelBodyExt, fileEntry.commonHeader.attributes, std::vector<std::vector<glm::u8vec4>>(), headerInt, bodyInt, modelReader->ensmalleningScale(), internalPath);
 
-    m_modelWidget->loadModel(modelBodyExt, bodyInt);
+    m_modelWidget->loadModel(modelBodyExt, bodyInt, headerInt);
 }

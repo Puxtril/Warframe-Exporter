@@ -13,6 +13,7 @@
 
 class TextureRenderWidget : public QtOpenGLViewer
 {
+    QOpenGLContext* m_openGLContext;
     unsigned int m_glVertexArray;
     unsigned int m_glVertexBufferObject;
     unsigned int m_glElementBufferObject;

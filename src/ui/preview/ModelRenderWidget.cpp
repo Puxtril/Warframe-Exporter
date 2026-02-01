@@ -65,7 +65,25 @@ ModelRenderWidget::onLightDirectionChanged()
 void
 ModelRenderWidget::initializeGL()
 {
-    initializeOpenGLFunctions();
+    QSurfaceFormat format;
+    format.setMajorVersion(4);
+    format.setMinorVersion(5);
+    format.setProfile( QSurfaceFormat::CompatibilityProfile );
+
+    m_openGLContext = new QOpenGLContext();
+    m_openGLContext->setFormat( format );
+    if (!m_openGLContext->create())
+    {
+        WarframeExporter::Logger::getInstance().error("Failed to initialize OpenGL Context");
+        return;
+    }
+
+    if (!initializeOpenGLFunctions())
+    {
+        WarframeExporter::Logger::getInstance().error("Failed to initialize openGL");
+        return;
+    }
+
     loadShaders();
     loadModel();
     loadUniforms();

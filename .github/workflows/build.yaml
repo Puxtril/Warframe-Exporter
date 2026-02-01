@@ -51,12 +51,12 @@ jobs:
       - name: Init Extractor submodules
         run: |
           cd lib
-          git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
+          git submodule update --init --depth 1 LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm libspng PhysxParser
           git submodule update --init tclap-code
       - name: Init LotusLib submodule
         run: |
           cd lib/LotusLib/lib
-          git submodule update --init
+          git submodule update --init --depth 1
       - name: Download Oodle binaries
         run: |
           mkdir bin\Win64
@@ -102,7 +102,7 @@ jobs:
       - name: Init Extractor submodules
         run: |
           cd lib
-          git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
+          git submodule update --init --depth 1 LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm libspng PhysxParser
           git submodule update --init tclap-code
       - name: Init LotusLib submodule
         run: |

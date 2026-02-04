@@ -25,6 +25,7 @@ class CLIExtract : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_extShaderCmd;
 	std::shared_ptr<TCLAP::SwitchArg> m_extLandscape;
 	std::shared_ptr<TCLAP::SwitchArg> m_extLevelStatic;
+	std::shared_ptr<TCLAP::SwitchArg> m_extIcon;
 	std::shared_ptr<TCLAP::SwitchArg> m_dumpPkgs;
 
 	std::shared_ptr<TCLAP::SwitchArg> m_includeVertexColors;

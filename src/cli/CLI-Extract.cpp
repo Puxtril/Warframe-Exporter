@@ -12,6 +12,7 @@ CLIExtract::CLIExtract()
 	m_extShaderCmd = std::make_shared<TCLAP::SwitchArg>("", "extract-shaders", "Extract shaders", false);
 	m_extLandscape = std::make_shared<TCLAP::SwitchArg>("", "extract-landscapes", "Extract landscapes", false);
 	m_extLevelStatic = std::make_shared<TCLAP::SwitchArg>("", "extract-levelstatic", "Extract static levels", false);
+	m_extIcon = std::make_shared<TCLAP::SwitchArg>("", "extract-icons", "Extract icons", false);
 	m_dumpPkgs = std::make_shared<TCLAP::SwitchArg>("", "dump-pkgs", "Dump the contents of Packages.bin", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include Vertex Colors on 3D models", false);
@@ -54,6 +55,7 @@ CLIExtract::addMainCmds(TCLAP::OneOf& oneOfCmd)
 		.add(m_extShaderCmd.get())
 		.add(m_extLandscape.get())
 		.add(m_extLevelStatic.get())
+		.add(m_extIcon.get())
 		.add(m_dumpPkgs.get());
 }
 
@@ -82,7 +84,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const std::string& 
 		exit(success ? 0 : 1);
 	}
 
-	if (!m_extLevelStatic->getValue() && !m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
+	if (!m_extIcon->getValue() && !m_extLevelStatic->getValue() && !m_extLandscape->getValue() && !m_extShaderCmd->getValue() && !m_extTextCmd->getValue() && !m_extModelCmd->getValue() && !m_extMatCmd->getValue() && !m_extAudioCmd->getValue() && !m_extLevelCmd->getValue() && !m_extAllCmd->getValue())
 		return;
 
 	WarframeExporter::ExtractOptions options;
@@ -111,6 +113,8 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const std::string& 
 		types |= (int)WarframeExporter::ExtractorType::Landscape;
 	if (m_extLevelStatic->getValue() || m_extAllCmd->getValue())
 		types |= (int)WarframeExporter::ExtractorType::LevelStatic;
+	if (m_extIcon->getValue() || m_extAllCmd->getValue())
+		types |= (int)WarframeExporter::ExtractorType::Icon;
 
 	// Debug information
 	WarframeExporter::Logger::getInstance().debug("Type Flags: " + std::to_string(types));

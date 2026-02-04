@@ -13,15 +13,16 @@ namespace WarframeExporter
 {
 	enum class ExtractorType
 	{
-		Model = 1,
-		Texture = 2,
-		Material = 4,
-		VERTEX_COLOR = 8,
-		Level = 32,
-		Audio = 64,
-		Shader = 128,
-		Landscape = 256,
-		LevelStatic = 512,
+		Model =			1 << 0,
+		Texture = 		1 << 1,
+		Material = 		1 << 2,
+		VERTEX_COLOR =	1 << 3,
+		Level =			1 << 4,
+		Audio =			1 << 5,
+		Shader =		1 << 6,
+		Landscape =		1 << 7,
+		LevelStatic =	1 << 8,
+		Icon =			1 << 9,
 	};
 
 	// This is how Extractors register with specific Games and Package Categories.

@@ -151,6 +151,10 @@ CLIDebug::printEnumCounts(LotusLib::Package& pkg, const std::string& internalPat
 			WarframeExporter::Logger::getInstance().warn("Decompress error: " + internalPath);
 			continue;
 		}
+		catch (LotusLib::CommonHeaderError&)
+		{
+			continue;
+		}
 		catch (LotusLib::LotusException& ex)
 		{
 			WarframeExporter::Logger::getInstance().error(ex.what());

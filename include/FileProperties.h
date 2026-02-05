@@ -8,6 +8,8 @@
 
 #if defined WIN32 || defined MINGW
 	#define WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
 	#include <Windows.h>
 #else
 	#define UNIX

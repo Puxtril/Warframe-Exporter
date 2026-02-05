@@ -39,6 +39,6 @@ const std::vector<CLIFeature*> g_features = {
 int main(int argc, char** argv);
 
 void checkDirs(const std::filesystem::path& cacheDir);
-std::string forgiveLotusPath(const std::filesystem::path& inPath);
+std::filesystem::path forgiveLotusPath(const std::filesystem::path& inPath);
 LotusLib::Game getGame(const std::string& gameStr, const std::filesystem::path& cacheDir);
 void createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath);

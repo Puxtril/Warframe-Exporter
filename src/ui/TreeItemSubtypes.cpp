@@ -1,5 +1,7 @@
 #include "ui/TreeItemSubtypes.h"
 
+#define _CRT_SECURE_NO_WARNINGS
+
 TreeItemDirectory::TreeItemDirectory(const LotusLib::DirNode* node)
     : QTreeWidgetItem(TreeItemDirectory::QTreeWidgetItemType), m_node(node)
 {}

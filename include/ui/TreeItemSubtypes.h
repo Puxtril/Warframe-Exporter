@@ -1,5 +1,7 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "LotusLib/TOCTree.h"
 #include "LotusLib/Utils.h"
 

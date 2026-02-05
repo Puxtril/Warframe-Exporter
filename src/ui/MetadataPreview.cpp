@@ -1,7 +1,5 @@
 #include "ui/MetadataPreview.h"
 
-#define _CRT_SECURE_NO_WARNINGS
-
 MetdataPreview::MetdataPreview()
     : m_textWidget(nullptr)
 { }

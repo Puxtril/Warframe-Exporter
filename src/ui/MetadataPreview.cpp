@@ -75,6 +75,7 @@ MetdataPreview::setFiledata(const LotusLib::Package& pkgs, LotusLib::FileNode& f
         totalDecompressed += bNode.len;
     }
     catch (LotusLib::InternalEntryNotFound& ex) {}
+    catch (LotusLib::PackageSplitNotFound& ex) {}
 
     try
     {
@@ -83,6 +84,7 @@ MetdataPreview::setFiledata(const LotusLib::Package& pkgs, LotusLib::FileNode& f
         totalDecompressed += fNode.len;
     }
     catch (LotusLib::InternalEntryNotFound& ex) {}
+    catch (LotusLib::PackageSplitNotFound& ex) {}
 
     m_labelCompressed->setText(filesizeToQString(totalCompressed));
     m_labelDecompressed->setText(filesizeToQString(totalDecompressed));

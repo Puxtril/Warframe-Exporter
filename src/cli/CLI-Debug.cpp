@@ -5,6 +5,7 @@ CLIDebug::CLIDebug()
 	m_printEnums = std::make_shared<TCLAP::SwitchArg>("", "print-enums", "Print file enums", false);
 	m_writeRaw = std::make_shared<TCLAP::SwitchArg>("", "write-raw", "Write unprocessed decompressed file(s)", false);
 	m_dryRun = std::make_shared<TCLAP::SwitchArg>("", "dry-run", "Extract without writing files to disk", false);
+	m_ls = std::make_shared<TCLAP::SwitchArg>("", "ls", "List the contents of a directory", false);
 }
 
 CLIDebug*
@@ -26,7 +27,8 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 {
 	oneOfCmd
 		.add(m_printEnums.get())
-		.add(m_writeRaw.get());
+		.add(m_writeRaw.get())
+		.add(m_ls.get());
 }
 
 void
@@ -65,6 +67,15 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const std::string& in
 			return;
 		}
 		writeRaw(outPath, internalPath, pkgName, cacheDirPath, game);
+	}
+	else if (m_ls->getValue())
+	{
+		if (pkgName.empty())
+		{
+			WarframeExporter::Logger::getInstance().error("Must use --package with --ls");
+			return;
+		}
+		ls(internalPath, pkgName, cacheDirPath, game);
 	}
 	else if (m_dryRun->getValue())
 	{
@@ -118,6 +129,97 @@ CLIDebug::writeRaw(const std::filesystem::path outPath, const std::string& inter
 	else
 	{
 		WarframeExporter::Logger::getInstance().error("Internal path doesn't exist: " + internalPath);
+	}
+}
+
+void
+CLIDebug::ls(const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
+{
+	try
+	{
+		LotusLib::PackageCollection pkgs(cacheDirPath, game);
+		LotusLib::Package pkg = pkgs.getPackage(pkgName);
+		LotusLib::DirNode rootDir = pkg.getDirNode(LotusLib::PkgSplitType::HEADER, internalPath);
+
+		for (const LotusLib::DirNode* curDir : rootDir.childDirs)
+		{
+			const std::string curDirPath = LotusLib::getFullPath(*curDir);
+
+			char splitStr[] = {'H', '-', '-', '\0'};
+			if (pkg.dirExists(PkgSplitType::BODY, curDirPath))
+				splitStr[1] = 'B';
+			if (pkg.dirExists(PkgSplitType::FOOTER, curDirPath))
+				splitStr[2] = 'F';
+
+			std::cout
+				<< splitStr << " "
+				<< std::setw(5) << std::left << "" << " "
+				<< std::setw(5) << std::left << "" << " "
+				<< std::setw(12) << std::left << "" << " "
+				<< curDir->name
+				<< std::endl;
+		}
+		
+		char timeStrBuf[80];
+		for (const LotusLib::FileNode* curFile : rootDir.childFiles)
+		{
+			const std::string curFilePath = LotusLib::getFullPath(*curFile);
+
+			auto sizes = getFileSize(pkg, curFilePath);
+			std::string comSize = getFileSizeStr(std::get<0>(sizes));
+			std::string size = getFileSizeStr(std::get<1>(sizes));
+
+			time_t epochTime = curFile->timeStamp / 10000000UL - 11644473600UL;
+			const tm* timeInfo = gmtime(&std::max((time_t)0, epochTime));
+			strftime(timeStrBuf, 80, "%h %d %G", timeInfo);
+
+			char splitStr[] = {'H', '-', '-', '\0'};
+			if (pkg.fileExists(PkgSplitType::BODY, curFilePath))
+				splitStr[1] = 'B';
+			if (pkg.fileExists(PkgSplitType::FOOTER, curFilePath))
+				splitStr[2] = 'F';
+
+			std::cout
+				<< splitStr << " "
+				<< std::setw(5) << std::left << comSize << " "
+				<< std::setw(5) << std::left << size << " "
+				<< std::setw(12) << std::left << timeStrBuf << " "
+				<< curFile->name
+				<< std::endl;
+		}
+
+		for (const LotusLib::FileNode* curFile : rootDir.childFileDupes)
+		{
+			const std::string curFilePath = LotusLib::getFullPath(*curFile);
+
+			auto sizes = getFileSize(pkg, curFilePath);
+			std::string comSize = getFileSizeStr(std::get<0>(sizes));
+			std::string size = getFileSizeStr(std::get<1>(sizes));
+
+			char splitStr[] = {'H', '-', '-', '\0'};
+			if (pkg.fileExists(PkgSplitType::BODY, curFilePath))
+				splitStr[1] = 'B';
+			if (pkg.fileExists(PkgSplitType::FOOTER, curFilePath))
+				splitStr[2] = 'F';
+
+			std::cout
+				<< splitStr << " "
+				<< std::setw(5) << std::left << "????" << " "
+				<< std::setw(5) << std::left << "????" << " "
+				<< std::setw(12) << std::left << "DELETED" << " "
+				<< curFile->name
+				<< std::endl;
+		}
+	}
+	catch (LotusLib::InternalDirectoryNotFound&)
+	{
+		std::cout << "Cannot find directory " + internalPath << std::endl;
+		return;
+	}
+	catch (LotusLib::PackageNotFound&)
+	{
+		std::cout << "Unkown package " << pkgName << std::endl;
+		return;
 	}
 }
 
@@ -213,4 +315,46 @@ CLIDebug::writeAllFilesRaw(LotusLib::Package& pkg, const LotusLib::FileNode& fil
 		out.write((char*)entry.footer.getPtr().data(), entry.footer.getLength());
 		out.close();
 	}
+}
+
+std::tuple<int, int>
+CLIDebug::getFileSize(LotusLib::Package& pkg, const std::string& internalPath)
+{
+	int compressed = 0;
+	int uncompressed = 0;
+
+	auto headerNode = pkg.getFileNode(PkgSplitType::HEADER, internalPath);
+	compressed += headerNode.compLen;
+	uncompressed = headerNode.len;
+
+	if (pkg.fileExists(PkgSplitType::BODY, internalPath))
+	{
+		auto bodyNode = pkg.getFileNode(PkgSplitType::BODY, internalPath);
+		compressed += bodyNode.compLen;
+		uncompressed = bodyNode.len;
+	}
+	if (pkg.fileExists(PkgSplitType::FOOTER, internalPath))
+	{
+		auto footerNode = pkg.getFileNode(PkgSplitType::FOOTER, internalPath);
+		compressed += footerNode.compLen;
+		uncompressed = footerNode.len;
+	}
+	
+	return {compressed, uncompressed};
+}
+
+std::string
+CLIDebug::getFileSizeStr(int size)
+{
+	const char* prefixes[] = { "B", "K", "M", "G" };
+	int exponent = 1;
+
+	double sizeF = size;
+	while (sizeF > 1024.0)
+	{
+		sizeF /= 1000.0;
+		exponent++;
+	}
+
+	return std::to_string((int)sizeF) + prefixes[exponent-1]; 
 }

@@ -17,6 +17,7 @@ class CLIDebug : public CLIFeature
 	std::shared_ptr<TCLAP::SwitchArg> m_printEnums;
 	std::shared_ptr<TCLAP::SwitchArg> m_writeRaw;
 	std::shared_ptr<TCLAP::SwitchArg> m_dryRun;
+	std::shared_ptr<TCLAP::SwitchArg> m_ls;
 	
 	CLIDebug();
 
@@ -33,7 +34,11 @@ public:
 private:
 	void printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game);
 	void writeRaw(const std::filesystem::path outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game);
+	void ls(const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game);
 
 	void printEnumCounts(LotusLib::Package& pkg, const std::string& internalPath);
 	void writeAllFilesRaw(LotusLib::Package& pkg, const LotusLib::FileNode& fileNode, const std::filesystem::path& baseOutputPath);
+
+	static std::tuple<int, int> getFileSize(LotusLib::Package& pkg, const std::string& internalPath);
+	static std::string getFileSizeStr(int size);
 };

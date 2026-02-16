@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <memory>
 #include <vector>
+#include <time.h>
 
 class CLIDebug : public CLIFeature
 {

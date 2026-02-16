@@ -141,8 +141,11 @@ CLIDebug::ls(const std::string& internalPath, const std::string& pkgName, const 
 		LotusLib::Package pkg = pkgs.getPackage(pkgName);
 		LotusLib::DirNode rootDir = pkg.getDirNode(LotusLib::PkgSplitType::HEADER, internalPath);
 
+		std::vector<std::tuple<std::string, std::string>> lines;
+		
 		for (const LotusLib::DirNode* curDir : rootDir.childDirs)
 		{
+			std::ostringstream outStreamBuf;
 			const std::string curDirPath = LotusLib::getFullPath(*curDir);
 
 			char splitStr[] = {'H', '-', '-', '\0'};
@@ -151,18 +154,18 @@ CLIDebug::ls(const std::string& internalPath, const std::string& pkgName, const 
 			if (pkg.dirExists(PkgSplitType::FOOTER, curDirPath))
 				splitStr[2] = 'F';
 
-			std::cout
+			outStreamBuf
 				<< splitStr << " "
 				<< std::setw(5) << std::left << "" << " "
 				<< std::setw(5) << std::left << "" << " "
-				<< std::setw(12) << std::left << "" << " "
-				<< curDir->name
-				<< std::endl;
+				<< std::setw(10) << std::left << "" << " "
+				<< "\033[34m" << curDir->name << "\033[0m";
+			lines.push_back({curDir->name, outStreamBuf.str()});
 		}
 		
-		char timeStrBuf[80];
 		for (const LotusLib::FileNode* curFile : rootDir.childFiles)
 		{
+			std::ostringstream outStreamBuf;
 			const std::string curFilePath = LotusLib::getFullPath(*curFile);
 
 			auto sizes = getFileSize(pkg, curFilePath);
@@ -170,8 +173,8 @@ CLIDebug::ls(const std::string& internalPath, const std::string& pkgName, const 
 			std::string size = getFileSizeStr(std::get<1>(sizes));
 
 			time_t epochTime = curFile->timeStamp / 10000000UL - 11644473600UL;
-			const tm* timeInfo = gmtime(&std::max((time_t)0, epochTime));
-			strftime(timeStrBuf, 80, "%h %d %G", timeInfo);
+			std::time_t rawtime = static_cast<std::time_t>(epochTime);
+			std::tm* dt = std::gmtime(&rawtime);
 
 			char splitStr[] = {'H', '-', '-', '\0'};
 			if (pkg.fileExists(PkgSplitType::BODY, curFilePath))
@@ -179,37 +182,31 @@ CLIDebug::ls(const std::string& internalPath, const std::string& pkgName, const 
 			if (pkg.fileExists(PkgSplitType::FOOTER, curFilePath))
 				splitStr[2] = 'F';
 
-			std::cout
+			outStreamBuf
 				<< splitStr << " "
 				<< std::setw(5) << std::left << comSize << " "
 				<< std::setw(5) << std::left << size << " "
-				<< std::setw(12) << std::left << timeStrBuf << " "
-				<< curFile->name
-				<< std::endl;
+				<< std::left << std::put_time(dt, "%Y-%m-%d") << " "
+				<< curFile->name;
+			lines.push_back({curFile->name, outStreamBuf.str()});
 		}
 
 		for (const LotusLib::FileNode* curFile : rootDir.childFileDupes)
 		{
-			const std::string curFilePath = LotusLib::getFullPath(*curFile);
+			std::ostringstream outStreamBuf;
 
-			auto sizes = getFileSize(pkg, curFilePath);
-			std::string comSize = getFileSizeStr(std::get<0>(sizes));
-			std::string size = getFileSizeStr(std::get<1>(sizes));
-
-			char splitStr[] = {'H', '-', '-', '\0'};
-			if (pkg.fileExists(PkgSplitType::BODY, curFilePath))
-				splitStr[1] = 'B';
-			if (pkg.fileExists(PkgSplitType::FOOTER, curFilePath))
-				splitStr[2] = 'F';
-
-			std::cout
-				<< splitStr << " "
+			outStreamBuf
+				<< "H?? "
 				<< std::setw(5) << std::left << "????" << " "
 				<< std::setw(5) << std::left << "????" << " "
-				<< std::setw(12) << std::left << "DELETED" << " "
-				<< curFile->name
-				<< std::endl;
+				<< std::setw(10) << std::left << "DELETED" << " "
+				<< "\x1b[38;5;196m" << (curFile->name.empty() ? "???" : curFile->name) << "\033[0m";
+			lines.push_back({curFile->name.empty() ? "" : curFile->name, outStreamBuf.str()});
 		}
+
+		std::sort(lines.begin(), lines.end(), [](const std::tuple<std::string, std::string> &x, const std::tuple<std::string, std::string> &y){ return (std::get<0>(x) < std::get<0>(y));});
+		for (const auto& x : lines)
+			std::cout << std::get<1>(x) << std::endl;
 	}
 	catch (LotusLib::InternalDirectoryNotFound&)
 	{

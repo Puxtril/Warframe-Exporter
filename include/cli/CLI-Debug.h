@@ -1,5 +1,7 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "cli/CLI-Feature.h"
 #include "cli/CLI-Extract.h"
 #include "tclap/ValueArg.h"

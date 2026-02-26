@@ -26,15 +26,18 @@ ModelExtractor::getModelReader(const std::string& filename, uint32_t type, Lotus
 {
 	ModelReader* modelReader = nullptr;
 
-	if (strncmp(filename.c_str() + (filename.length() - 4), "_dcm", 4) == 0)
+	// Strip file extension
+	const std::string name = std::filesystem::path(filename).stem().string();
+
+	if (strncmp(name.c_str() + (name.length() - 4), "_dcm", 4) == 0)
 	{
 		modelReader = g_enumMapModelDCM.at(game, type);
 	}
-	else if (strncmp(filename.c_str() + (filename.length() - 5), "_hlod", 5) == 0)
+	else if (strncmp(name.c_str() + (name.length() - 5), "_hlod", 5) == 0)
 	{
 		modelReader = g_enumMapModelHLOD.at(game, type);
 	}
-	else if (strncmp(filename.c_str() + (filename.length() - 3), "_sm", 3) == 0)
+	else if (strncmp(name.c_str() + (name.length() - 3), "_sm", 3) == 0)
 	{
 		modelReader = g_enumMapModelSM.at(game, type);
 	}

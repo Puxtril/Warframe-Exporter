@@ -46,7 +46,8 @@ jobs:
           cmake --build . --config Release
           cmake --install .
           cd ..\install\lib
-          rm z.lib z.dll
+          rm z.lib
+          rm z.dll
           mv zs.lib z.lib
       - name: Init Extractor submodules
         run: |

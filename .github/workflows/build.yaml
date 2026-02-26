@@ -46,8 +46,7 @@ jobs:
           cmake --build . --config Release
           cmake --install .
           cd ..\install\lib
-          mv zlib.lib zlib-dynamic.lib
-          mv zlibstatic.lib zlib.lib
+          mv zs.lib zlib.lib
       - name: Init Extractor submodules
         run: |
           cd lib

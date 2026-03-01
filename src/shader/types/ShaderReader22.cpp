@@ -10,7 +10,7 @@ ShaderReader22::getInstance()
 }
 
 ShaderHeaderExternal
-ShaderReader22::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int shaderEnumType)
+ShaderReader22::readHeader(BinaryReader::Buffered* headerReader, int shaderEnumType)
 {
     // Intentional
     // I don't know what to do with this data
@@ -132,7 +132,7 @@ ShaderReader22::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int
 }
 
 void
-ShaderReader22::skipStringArray(BinaryReader::BinaryReaderBuffered* headerReader, const std::string& msg)
+ShaderReader22::skipStringArray(BinaryReader::Buffered* headerReader, const std::string& msg)
 {
     uint32_t arrLen = headerReader->readUInt32(0, 500, msg);
     for (uint32_t i = 0; i < arrLen; i++)
@@ -143,7 +143,7 @@ ShaderReader22::skipStringArray(BinaryReader::BinaryReaderBuffered* headerReader
 }
 
 void
-ShaderReader22::skipAttributePackaged(BinaryReader::BinaryReaderBuffered* headerReader, const std::string& msg)
+ShaderReader22::skipAttributePackaged(BinaryReader::Buffered* headerReader, const std::string& msg)
 {
     uint32_t attributePackageCount = headerReader->readUInt32();
     for (uint32_t i = 0; i < attributePackageCount; i++)

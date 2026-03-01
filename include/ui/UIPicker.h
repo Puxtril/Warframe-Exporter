@@ -8,8 +8,7 @@
 #include "Meta.h"
 #include "shader/ShaderExportType.h"
 #include "texture/TextureExportTypes.h"
-#include "ExtractOptions.h"
-#include "LotusUtils.h"
+#include "Enums.h"
 
 #include <QtWidgets/qdialog.h>
 #include <QtWidgets/qmainwindow.h>

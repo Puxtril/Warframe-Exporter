@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelReader99::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader99::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
@@ -48,7 +48,7 @@ ModelReader99::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, cons
 }
 
 void
-ModelReader99::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader99::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);
@@ -102,7 +102,7 @@ ModelReader99::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bina
 
 // This is 100% a workaround
 bool
-ModelReader99::isMorePhysX(BinaryReader::BinaryReaderBuffered* bodyReader)
+ModelReader99::isMorePhysX(BinaryReader::Buffered* bodyReader)
 {
     // Some models have no actual vertices, so this can hit EOF
     if (bodyReader->tell() + 0x120 > bodyReader->getLength())

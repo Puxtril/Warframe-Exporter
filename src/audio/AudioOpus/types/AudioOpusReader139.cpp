@@ -10,7 +10,7 @@ AudioOpusReader139::getInstance()
 }
 
 void
-AudioOpusReader139::readBody(const AudioHeader& extHeader, BinaryReader::BinaryReaderBuffered* fReader, BinaryReader::BinaryReaderBuffered* bReader, AudioBody& outBody)
+AudioOpusReader139::readBody(const AudioHeader& extHeader, BinaryReader::Buffered* fReader, BinaryReader::Buffered* bReader, AudioBody& outBody)
 {
 	std::vector<char>& data = outBody.data;
 

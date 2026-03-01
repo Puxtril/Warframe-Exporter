@@ -1,11 +1,10 @@
 #pragma once
 
-//#include "EnumMapExtractorValue.h"
-#include "BinaryReaderBuffered.h"
-#include "CommonHeader.h"
+#include "BinaryReader/Buffered.h"
+#include "LotusLib/CommonHeader.h"
 #include "ExporterLogger.h"
-#include "LotusLib.h"
-#include "ExtractOptions.h"
+#include "LotusLib/PackageCollection.h"
+#include "Enums.h"
 
 #include <string>
 #include <vector>
@@ -14,15 +13,16 @@ namespace WarframeExporter
 {
 	enum class ExtractorType
 	{
-		Model = 1,
-		Texture = 2,
-		Material = 4,
-		VERTEX_COLOR = 8,
-		Level = 32,
-		Audio = 64,
-		Shader = 128,
-		Landscape = 256,
-		LevelStatic = 512,
+		Model =			1 << 0,
+		Texture = 		1 << 1,
+		Material = 		1 << 2,
+		VERTEX_COLOR =	1 << 3,
+		Level =			1 << 4,
+		Audio =			1 << 5,
+		Shader =		1 << 6,
+		Landscape =		1 << 7,
+		LevelStatic =	1 << 8,
+		Icon =			1 << 9,
 	};
 
 	// This is how Extractors register with specific Games and Package Categories.
@@ -43,12 +43,12 @@ namespace WarframeExporter
 	
 	public:
 		virtual const std::string& getFriendlyName() const = 0;
-		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const = 0;
+		virtual const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const = 0;
 		// If true, `outputPath` in `extract` will be a folder.
 		// Otherwise, will be a file with the correct extension
 		virtual bool isMultiExport() const = 0;
 		virtual ExtractorType getExtractorType() const = 0;
-		virtual void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) = 0;
+		virtual void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) = 0;
 	};
 
 	// This class should only be instanced once, statically.

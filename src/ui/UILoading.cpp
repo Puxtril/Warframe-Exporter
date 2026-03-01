@@ -7,7 +7,7 @@ UILoading::setupUi(QDialog* dialog)
 }
 
 void
-UILoading::initProgressBar(LotusLib::PackagesReader& pkgs, WarframeExporter::ExtractorType extractTypes)
+UILoading::initProgressBar(LotusLib::PackageCollection& pkgs, WarframeExporter::ExtractorType extractTypes)
 {
     size_t totalFiles = getTotalFileCount(pkgs, extractTypes);
     this->progressBar->setRange(0, totalFiles);
@@ -15,18 +15,17 @@ UILoading::initProgressBar(LotusLib::PackagesReader& pkgs, WarframeExporter::Ext
 }
 
 size_t
-UILoading::getTotalFileCount(LotusLib::PackagesReader& pkgs, WarframeExporter::ExtractorType extractTypes)
+UILoading::getTotalFileCount(LotusLib::PackageCollection& pkgs, WarframeExporter::ExtractorType extractTypes)
 {
     size_t fileCount = 0;
 
     LotusLib::PackageCategory pkgCategories = WarframeExporter::g_enumMapExtractor.getPkgCategories(pkgs.getGame(), extractTypes);
 
-    for (const std::string& curPkgName : pkgs)
+    for (const LotusLib::Package& curPkg : pkgs)
     {
-        std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(curPkgName);
-        if (!pkg || ((int)pkg->getPkgCategory() & (int)pkgCategories) == 0)
+        if (((int)curPkg.getPkgCategory() & (int)pkgCategories) == 0)
             continue;
-        for (auto& i : pkg.value())
+        for (auto& i : curPkg)
             fileCount++;
     }
 

@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType, const LotusLib::LotusPath& internalPath)
+ModelConverter::convertToInternal(ModelHeaderExternal& extHeader, ModelBodyExternal& extBody, const std::string& attributes, std::vector<std::vector<glm::u8vec4>> vertexColors, ModelHeaderInternal& outHeader, ModelBodyInternal& outBody, ScaleType scaleType, const std::string& internalPath)
 
 {
     if (extHeader.boneTree.size() > 1)
@@ -87,7 +87,7 @@ ModelConverter::convertInternalHeaderRigged(ModelHeaderExternal& extHeader, Mode
 }
 
 void
-ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader, const LotusLib::LotusPath& internalPath)
+ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHeader, const std::string& attributes, ModelHeaderInternal& outHeader, const std::string& internalPath)
 {
     outHeader.vertexCount = extHeader.vertexCount;
     outHeader.boneCount = extHeader.boneCount;
@@ -108,7 +108,7 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
 
         std::string matName = x < materialNames.size() ? materialNames[x] : "None";
         if (matName[0] != '/' && matName != "None")
-            newMeshInfo.matName = (internalPath.parent_path() / matName).string();
+            newMeshInfo.matName = (std::filesystem::path(internalPath).parent_path() / matName).string();
         else
             newMeshInfo.matName = matName;
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "LotusLib.h"
-#include "LotusPath.h"
-#include "ExportSingleFile.h"
+#include "Extractor.h"
+#include "LotusLib/PackageCollection.h"
+#include "Enums.h"
+#include "ExtractFile.h"
 
 #include <QtCore/QThread>
 #include <string>
@@ -12,17 +13,19 @@ class ExporterFileThread : public QThread
 {
     Q_OBJECT
 
-    LotusLib::PackagesReader* m_pkgsReader;
+    LotusLib::PackageCollection* m_pkgsReader;
+    LotusLib::PackagesBin* m_pkgsBin;
     std::filesystem::path m_exportPath;
+    WarframeExporter::ExtractorType m_extractTypes;
     std::string m_pkgName;
-    LotusLib::LotusPath m_internalFilePath;
+    std::string m_internalFilePath;
     WarframeExporter::ExtractOptions m_options;
 
 public:
     ExporterFileThread();
 
-    void setData(LotusLib::PackagesReader* pkgsReader, std::filesystem::path exportPath, WarframeExporter::ExtractOptions options);
-    void setFileData(LotusLib::LotusPath internalFilePath, std::string pkgName);
+    void setData(LotusLib::PackageCollection* pkgsReader, LotusLib::PackagesBin* pkgsBin, std::filesystem::path exportPath, WarframeExporter::ExtractorType extractTypes, WarframeExporter::ExtractOptions options);
+    void setFileData(std::string internalFilePath, std::string pkgName);
     void extractCancelled();
     void run();
     
@@ -30,5 +33,5 @@ signals:
     void extractStart(int totalItems);
     void extractError(std::string msg);
     void extractItemComplete(int curItemCount);
-    void extractComplete();
+    void extractComplete(int totalItems);
 };

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "LotusLib.h"
+#include "LotusLib/PackageCollection.h"
+#include "LotusLib/PackagesBin.h"
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -12,5 +13,5 @@ public:
     virtual void unloadData() = 0;
     virtual void hide() = 0;
     virtual void show() = 0;
-    virtual void setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs) = 0;
+    virtual void setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin) = 0;
 };

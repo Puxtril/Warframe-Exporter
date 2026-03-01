@@ -39,12 +39,13 @@ PreviewMaterial::show()
 }
 
 void
-PreviewMaterial::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+PreviewMaterial::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
     auto materialExtractor = WarframeExporter::Material::MaterialExtractor::getInstance();
+    const std::string internalPath = LotusLib::getFullPath(fileEntry.headerNode);
 
-    WarframeExporter::Material::MaterialExternal matExternal = materialExtractor->getExternalMaterial(&fileEntry.headerData, fileEntry.commonHeader);
-    WarframeExporter::Material::MaterialInternal matInternal = WarframeExporter::Material::MaterialConverter::convertMaterial(matExternal, fileEntry.internalPath, pkgs);    
+    WarframeExporter::Material::MaterialExternal matExternal = materialExtractor->getExternalMaterial(&fileEntry.header, fileEntry.commonHeader);
+    WarframeExporter::Material::MaterialInternal matInternal = WarframeExporter::Material::MaterialConverter::convertMaterial(matExternal, internalPath, pkgs, pkgsBin);    
     std::string matStr = WarframeExporter::Material::MaterialExporter::combineMaterialToTxt(matInternal);
 
     QString materialData(matStr.c_str());

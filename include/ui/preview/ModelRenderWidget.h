@@ -10,6 +10,7 @@
 
 class ModelRenderWidget : public QtOpenGLViewer
 {
+    QOpenGLContext* m_openGLContext;
     unsigned int m_glVertexArray;
     unsigned int m_glVertexBufferObject;
     unsigned int m_glElementBufferObject;
@@ -23,7 +24,8 @@ public:
     void initializeGL() override;
     void drawScene() override;
 
-    void loadModel(const WarframeExporter::Model::ModelBodyExternal& modelExternal, const WarframeExporter::Model::ModelBodyInternal& modelInternal);
+    void loadModel(const WarframeExporter::Model::ModelBodyExternal& modelExternal, const WarframeExporter::Model::ModelBodyInternal& modelInternal, const WarframeExporter::Model::ModelHeaderInternal headerInternal);
+
 private slots:
     void onLightDirectionChanged();
 

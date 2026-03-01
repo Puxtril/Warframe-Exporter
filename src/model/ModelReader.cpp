@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelReader::readWeightedBones(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outWeightedBones)
+ModelReader::readWeightedBones(BinaryReader::Buffered* reader, std::vector<std::string>& outWeightedBones)
 {
     uint32_t weightedBoneCount = reader->readUInt32(0, 500, "Too many weighted bones");
     for (uint32_t x = 0; x < weightedBoneCount; x++)
@@ -14,7 +14,7 @@ ModelReader::readWeightedBones(BinaryReader::BinaryReaderBuffered* reader, std::
 }
 
 void
-ModelReader::readBoneTree(BinaryReader::BinaryReaderBuffered* reader, std::vector<BoneTreeNodeExternal>& outBoneTree)
+ModelReader::readBoneTree(BinaryReader::Buffered* reader, std::vector<BoneTreeNodeExternal>& outBoneTree)
 {
     uint32_t boneTreeLen = reader->readUInt32(0, 500, "Too many items in Bone Tree");
     outBoneTree.resize(boneTreeLen);
@@ -32,7 +32,7 @@ ModelReader::readBoneTree(BinaryReader::BinaryReaderBuffered* reader, std::vecto
 }
 
 void
-ModelReader::readBoneMaps(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::vector<uint32_t>>& outBoneMaps)
+ModelReader::readBoneMaps(BinaryReader::Buffered* reader, std::vector<std::vector<uint32_t>>& outBoneMaps)
 {
     uint32_t boneMapCount = reader->readUInt32(0, 500, "Too many Bone Maps");
     outBoneMaps.resize(boneMapCount);
@@ -50,7 +50,7 @@ ModelReader::readBoneMaps(BinaryReader::BinaryReaderBuffered* reader, std::vecto
 }
 
 void
-ModelReader::readMeshInfos(BinaryReader::BinaryReaderBuffered* reader, std::vector<MeshInfoExternal>& outMeshInfos)
+ModelReader::readMeshInfos(BinaryReader::Buffered* reader, std::vector<MeshInfoExternal>& outMeshInfos)
 {
     uint32_t meshInfoCount = reader->readUInt32(0, 50, "Too many meshinfos");
     
@@ -76,7 +76,7 @@ ModelReader::readMeshInfos(BinaryReader::BinaryReaderBuffered* reader, std::vect
 }
 
 void
-ModelReader::readMaterialPaths(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outMaterialpaths)
+ModelReader::readMaterialPaths(BinaryReader::Buffered* reader, std::vector<std::string>& outMaterialpaths)
 {
     uint32_t materialPathArrayLen = reader->readUInt32(0, 100, "Too many materials");
 
@@ -88,7 +88,7 @@ ModelReader::readMaterialPaths(BinaryReader::BinaryReaderBuffered* reader, std::
 }
 
 void
-ModelReader::readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::vector<PhysXMesh>& outPhysxMeshes)
+ModelReader::readPhysxMeshes(BinaryReader::Buffered* reader, std::vector<PhysXMesh>& outPhysxMeshes)
 {
     uint32_t physXMeshCount = reader->readUInt32(0, 300, "Too many PhysX Meshes");
     outPhysxMeshes.resize(physXMeshCount);
@@ -119,7 +119,7 @@ ModelReader::readPhysxMeshes(BinaryReader::BinaryReaderBuffered* reader, std::ve
 }
 
 void
-ModelReader::readErrors(BinaryReader::BinaryReaderBuffered* reader, std::vector<std::string>& outErrors)
+ModelReader::readErrors(BinaryReader::Buffered* reader, std::vector<std::string>& outErrors)
 {
     uint32_t errorCount = reader->readUInt32();
     outErrors.resize(errorCount);
@@ -132,7 +132,7 @@ ModelReader::readErrors(BinaryReader::BinaryReaderBuffered* reader, std::vector<
 }
 
 void
-ModelReader::skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipUnknownVector(BinaryReader::Buffered* reader)
 {
     // I really don't know
     uint16_t vecCheck = reader->readUInt16();
@@ -141,21 +141,21 @@ ModelReader::skipUnknownVector(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 void
-ModelReader::skipUnk16Array(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipUnk16Array(BinaryReader::Buffered* reader)
 {
     uint32_t unkShortLen = reader->readUInt32(0, 30, "Too many UnkShort values");
     reader->seek(unkShortLen * 2, std::ios_base::cur);
 }
 
 void
-ModelReader::skipUnk64Array(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipUnk64Array(BinaryReader::Buffered* reader)
 {
     uint32_t uint64LODUnkLen = reader->readUInt32(0, 10, "Too many Unk64 values");
     reader->seek(uint64LODUnkLen * 8U, std::ios_base::cur);
 }
 
 uint32_t
-ModelReader::skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipUnknownStructs(BinaryReader::Buffered* reader)
 {
     uint32_t unkStructCount = reader->readUInt32();
     for (uint32_t x = 0; x < unkStructCount; x++)
@@ -170,7 +170,7 @@ ModelReader::skipUnknownStructs(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 void
-ModelReader::skipMorphs(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipMorphs(BinaryReader::Buffered* reader)
 {
     uint32_t morphArrCount = reader->readUInt32();
     for (uint32_t x = 0; x < morphArrCount; x++)
@@ -182,7 +182,7 @@ ModelReader::skipMorphs(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 uint32_t
-ModelReader::skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* reader, std::vector<MeshInfoExternal>& outMeshInfos)
+ModelReader::skipMorphStructsAndFindSkip(BinaryReader::Buffered* reader, std::vector<MeshInfoExternal>& outMeshInfos)
 {
     uint32_t totalSkip = 0;
 
@@ -230,7 +230,7 @@ ModelReader::skipMorphStructsAndFindSkip(BinaryReader::BinaryReaderBuffered* rea
 }
 
 void
-ModelReader::skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipPhysicsStruct(BinaryReader::Buffered* reader)
 {
     uint32_t type = reader->readUInt32();
     uint32_t subType = reader->readUInt32();
@@ -243,7 +243,7 @@ ModelReader::skipPhysicsStruct(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 void
-ModelReader::skipPhysicsStruct2(BinaryReader::BinaryReaderBuffered* reader)
+ModelReader::skipPhysicsStruct2(BinaryReader::Buffered* reader)
 {
     uint32_t type = reader->readUInt32();
     uint32_t subType = reader->readUInt32();
@@ -256,7 +256,7 @@ ModelReader::skipPhysicsStruct2(BinaryReader::BinaryReaderBuffered* reader)
 }
 
 bool
-ModelReader::canContinueReading(BinaryReader::BinaryReaderBuffered* reader, int vertexIndexCount)
+ModelReader::canContinueReading(BinaryReader::Buffered* reader, int vertexIndexCount)
 {
     int remainingBytes = reader->getLength() - reader->tell();
     if ((vertexIndexCount * 2) > remainingBytes)

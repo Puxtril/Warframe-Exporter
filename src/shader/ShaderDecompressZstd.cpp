@@ -7,7 +7,7 @@ WarframeDecompressZstd::WarframeDecompressZstd()
 { }
 
 void
-WarframeDecompressZstd::initilize(LotusLib::PackagesReader& pkgsReader)
+WarframeDecompressZstd::initilize(const LotusLib::PackageCollection& pkgsReader)
 {
     if (m_isInitilized)
         return;
@@ -15,26 +15,26 @@ WarframeDecompressZstd::initilize(LotusLib::PackagesReader& pkgsReader)
     m_isInitilized = true;
     m_errorReading = true;
 
-    std::optional<LotusLib::PackageReader> pkg = pkgsReader.getPackage("ShaderDictionaryDx11");
-    if (!pkg)
+    if (!pkgsReader.hasPackage("ShaderDictionaryDx11"))
         return;
+    LotusLib::Package pkg = pkgsReader.getPackage("ShaderDictionaryDx11");
 
-    LotusLib::FileEntry fileEntry = pkg.value().getFile("/EE/Types/GraphicsRes/ShaderDictionary");
+    BinaryReader::Buffered bodyReader(pkg.getFile(LotusLib::PkgSplitType::BODY, "/EE/Types/GraphicsRes/ShaderDictionary"));
 
     m_zstdContext = ZSTD_createDCtx();
 
-    std::vector<size_t> zstdDictOffsets = findZstdDictionaryOffsets(fileEntry.bData);
+    std::vector<size_t> zstdDictOffsets = findZstdDictionaryOffsets(bodyReader);
 
     for (int iDict = 0; iDict < zstdDictOffsets.size(); iDict++)
     {
-        const unsigned char* start = fileEntry.bData.getPtr().data() + zstdDictOffsets[iDict];
-        const size_t nextStart = iDict+2 <= zstdDictOffsets.size() ? zstdDictOffsets[iDict+1] : fileEntry.bData.getLength();
+        const unsigned char* start = bodyReader.getPtr().data() + zstdDictOffsets[iDict];
+        const size_t nextStart = iDict+2 <= zstdDictOffsets.size() ? zstdDictOffsets[iDict+1] : bodyReader.getLength();
         const size_t length = nextStart - zstdDictOffsets[iDict];
 
         ZSTD_DDict* dict = ZSTD_createDDict(start, length);
         if (dict == nullptr)
         {
-            std::cout << "Error creating zstd Dictionary " << iDict << std::endl;
+            WarframeExporter::Logger::getInstance().warn("Error creating zstd Dictionary " + std::to_string(iDict));
             return;
         }
 
@@ -72,7 +72,7 @@ WarframeDecompressZstd::initSuccess() const
 
 
 std::vector<size_t>
-WarframeDecompressZstd::findZstdDictionaryOffsets(BinaryReader::BinaryReaderBuffered& reader) const
+WarframeDecompressZstd::findZstdDictionaryOffsets(BinaryReader::Buffered& reader) const
 {
     std::vector<size_t> foundOffsets;
     reader.seek(0, std::ios::beg);

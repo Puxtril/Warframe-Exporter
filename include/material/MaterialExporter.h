@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 #include "material/MaterialStructs.h"
 
 namespace WarframeExporter::Material

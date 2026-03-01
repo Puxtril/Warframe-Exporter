@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Landscape;
 
 LandscapeBodyChunkExternal
-LandscapeReader::readPhysxHeightField(BinaryReader::BinaryReaderBuffered* reader)
+LandscapeReader::readPhysxHeightField(BinaryReader::Buffered* reader)
 {
     Physx::PhysxReader physxReader(reader);
 

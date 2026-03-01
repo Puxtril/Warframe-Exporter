@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader159::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     uint32_t strLen = headerReader->readUInt32(0, 200, "First strLen");
     headerReader->seek(strLen, std::ios::cur);
@@ -45,7 +45,7 @@ ModelReader159::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader159::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader159::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);

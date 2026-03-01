@@ -17,4 +17,6 @@
 #include <QtWidgets/qstylefactory.h>
 #include <QtGui/QPalette>
 
+#include <cstdlib>
+
 int main(int argc, char** argv);

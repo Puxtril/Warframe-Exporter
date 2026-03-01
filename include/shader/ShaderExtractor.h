@@ -34,7 +34,7 @@ namespace WarframeExporter::Shader
 			return friendlyName;
         }
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const override
         {
             const static std::string ext = "hlsl";
 			return ext;
@@ -78,7 +78,7 @@ namespace WarframeExporter::Shader
 
         void writeShader(const ShaderEntry& shader, const std::filesystem::path& outputDir, int shaderIndex = 0);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputDir, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) override;
 		
 	private:
 		void _decompileShader(ShaderEntry& shaderEntry, int index = -1);

@@ -9,8 +9,8 @@
 #endif
 
 #include "tclap/CmdLine.h"
-#include "LotusLib.h"
-#include "LotusPath.h"
+#include "LotusLib/Enums.h"
+
 
 #include <string>
 #include <filesystem>
@@ -26,5 +26,5 @@ protected:
 		virtual const std::string& getFeatureName() = 0;
 		virtual void addMainCmds(TCLAP::OneOf& oneOfCmd) = 0;
 		virtual void addMiscCmds(TCLAP::CmdLine& cmdLine) = 0;
-		virtual void processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, LotusLib::Game game) = 0;
+		virtual void processCmd(const std::filesystem::path& outPath, const std::string& internalPath, const std::string& pkg, const std::filesystem::path& cacheDirPath, LotusLib::Game game) = 0;
 };

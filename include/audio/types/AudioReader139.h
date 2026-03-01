@@ -16,6 +16,6 @@ namespace WarframeExporter::Audio
 			return extTypes;
 		}
 
-		void readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, AudioHeader& outHeader) override;
+		void readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, AudioHeader& outHeader) override;
 	};
 }

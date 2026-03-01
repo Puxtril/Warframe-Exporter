@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Model;
 
 void
-ModelReader281::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader281::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
@@ -58,7 +58,7 @@ ModelReader281::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, con
 }
 
 void
-ModelReader281::readBody(const ModelHeaderExternal& extHeader, BinaryReader::BinaryReaderBuffered* bodyReaderB, BinaryReader::BinaryReaderBuffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader281::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     bodyReaderB->seek(0, std::ios_base::beg);
 
@@ -179,7 +179,7 @@ ModelReader281::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Bin
     bodyReaderB->readUInt16Array(outBody.indices.data(), faceBCache);
 
     if (bodyReaderB->tell() != bodyReaderB->getLength())
-        throw unknown_format_error(std::to_string(extHeader.bodySkipLen2) + " Did not reach end of B cache");
+        throw unknown_format_error("Did not reach end of B cache " + std::to_string((int64_t)bodyReaderB->getLength() - (int64_t)bodyReaderB->tell()) + " bytes from end");
 
     // Everything's in B
     if (bodyReaderF->getLength() == 0)

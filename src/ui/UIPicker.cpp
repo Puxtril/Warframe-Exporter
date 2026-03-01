@@ -214,7 +214,7 @@ UiPicker::parsePickerOptions()
     if (this->ModelCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Model;
     if (this->TextureCheckbox->isChecked())
-        exportTypes |= (int)WarframeExporter::ExtractorType::Texture;
+        exportTypes |= (int)WarframeExporter::ExtractorType::Texture | (int)WarframeExporter::ExtractorType::Icon;
     if (this->ShaderCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Shader;
 

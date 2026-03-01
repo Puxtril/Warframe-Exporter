@@ -2,6 +2,18 @@
 
 int main(int argc, char** argv)
 {
+    // I encountered this bug when packaging as an appimage.
+    // QT dynamically attempts to load GStreamer instead of ffmpeg.
+    // It was more difficult to replace this in the appimage itself,
+    //   and this program only supports ffmpeg, anyway.
+    char forceFfmpegEnv[] = "QT_MEDIA_BACKEND=ffmpeg";
+    #if defined WIN32 || defined MINGW
+        // WHY????????????????????????????????????????????
+	    _putenv(forceFfmpegEnv);
+    #else
+        putenv(forceFfmpegEnv);
+    #endif
+
     QApplication app(argc, argv);
     
     app.setStyle(QStyleFactory::create("Fusion"));

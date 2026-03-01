@@ -16,19 +16,20 @@
 
 class PreviewManager
 {
-    LotusLib::PackagesReader* m_pkgs;
+    LotusLib::PackageCollection* m_pkgs;
+    LotusLib::PackagesBin* m_pkgsBin;
     std::map<WarframeExporter::ExtractorType, Preview*> m_previewWidgets;
 
 public:
     PreviewManager();
 
     void setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidget* previewButtonArea, QHBoxLayout* previewButtonLayout);
-    void setData(LotusLib::PackagesReader* pkgs);
+    void setData(LotusLib::PackageCollection* pkgs, LotusLib::PackagesBin* pkgsBin);
 
-    void swapToFilePreview(LotusLib::FileEntry& fileEntry);
+    void swapToFilePreview(LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor);
     void clearPreview();
     void playPauseAudio();
 
 private:
-    Preview* getPreview(LotusLib::FileEntry& fileEntry);
+    Preview* getPreview(LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor);
 };

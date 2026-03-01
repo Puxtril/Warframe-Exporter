@@ -45,6 +45,6 @@ PreviewMessage::show()
 }
 
 void
-PreviewMessage::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+PreviewMessage::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
 }

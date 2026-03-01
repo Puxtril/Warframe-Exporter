@@ -19,7 +19,11 @@ PreviewTexture::setupUi(QWidget* parentWidget, QVBoxLayout* parentLayout, QWidge
     m_showAlphaCheckbox->setText("Apply Alpha");
     m_showAlphaCheckbox->hide();
 
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    QObject::connect(m_showAlphaCheckbox, &QCheckBox::checkStateChanged, m_textureWidget, &TextureRenderWidget::showAlpha);
+    #else
     QObject::connect(m_showAlphaCheckbox, &QCheckBox::stateChanged, m_textureWidget, &TextureRenderWidget::showAlpha);
+    #endif
 }
 
 void
@@ -42,7 +46,7 @@ PreviewTexture::show()
 }
 
 void
-PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+PreviewTexture::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
     auto textureExtractor = WarframeExporter::Texture::TextureExtractor::getInstance();
 

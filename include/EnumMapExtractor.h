@@ -9,6 +9,7 @@
 #include "shader/ShaderExtractor.h"
 #include "landscape/LandscapeExtractor.h"
 #include "levelstatic/LevelStaticExtractor.h"
+#include "icon/IconExtractor.h"
 
 namespace WarframeExporter
 {
@@ -22,5 +23,6 @@ namespace WarframeExporter
         .registerClass(Audio::AudioExtractorProxy::getInstance())
         .registerClass(Shader::ShaderExtractor::getInstance())
         .registerClass(Landscape::LandscapeExtractor::getInstance())
-        .registerClass(LevelStatic::LevelStaticExtractor::getInstance());
+        .registerClass(LevelStatic::LevelStaticExtractor::getInstance())
+        .registerClass(Icon::IconExtractor::getInstance());
 };

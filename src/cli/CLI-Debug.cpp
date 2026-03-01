@@ -5,6 +5,7 @@ CLIDebug::CLIDebug()
 	m_printEnums = std::make_shared<TCLAP::SwitchArg>("", "print-enums", "Print file enums", false);
 	m_writeRaw = std::make_shared<TCLAP::SwitchArg>("", "write-raw", "Write unprocessed decompressed file(s)", false);
 	m_dryRun = std::make_shared<TCLAP::SwitchArg>("", "dry-run", "Extract without writing files to disk", false);
+	m_ls = std::make_shared<TCLAP::SwitchArg>("", "ls", "List the contents of a directory", false);
 }
 
 CLIDebug*
@@ -26,7 +27,8 @@ CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 {
 	oneOfCmd
 		.add(m_printEnums.get())
-		.add(m_writeRaw.get());
+		.add(m_writeRaw.get())
+		.add(m_ls.get());
 }
 
 void
@@ -36,7 +38,7 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 }
 
 void
-CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
+CLIDebug::processCmd(const std::filesystem::path& outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
 	if (m_printEnums->getValue())
 	{
@@ -54,7 +56,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 			WarframeExporter::Logger::getInstance().error("Must use --package with --write-raw");
 			return;
 		}
-		if (internalPath == LotusLib::LotusPath("/"))
+		if (internalPath == std::string("/"))
 		{
 			WarframeExporter::Logger::getInstance().error("Must use --internal-path with --write-raw");
 			return;
@@ -66,6 +68,15 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 		}
 		writeRaw(outPath, internalPath, pkgName, cacheDirPath, game);
 	}
+	else if (m_ls->getValue())
+	{
+		if (pkgName.empty())
+		{
+			WarframeExporter::Logger::getInstance().error("Must use --package with --ls");
+			return;
+		}
+		ls(internalPath, pkgName, cacheDirPath, game);
+	}
 	else if (m_dryRun->getValue())
 	{
 		CLIExtract::getInstance()->setDryRun(m_dryRun->getValue());
@@ -73,7 +84,7 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const LotusLib::Lotus
 }
 
 void
-CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const LotusLib::LotusPath& internalPath, LotusLib::Game game)
+CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game)
 {
 	if (m_printEnums->getValue())
 	{
@@ -82,37 +93,265 @@ CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::strin
 			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
 			return;
 		}
-		LotusLib::PackagesReader pkgs(cacheDirPath, game);
-		std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
+		LotusLib::PackageCollection pkgs(cacheDirPath, game);
+		std::optional<LotusLib::Package> pkg = pkgs.getPackage(pkgName);
 		if (!pkg)
 			throw std::runtime_error("Package does not exist: " + pkgName);
 
-		WarframeExporter::DebugUtils::printEnumCounts(pkg.value(), internalPath);
+		printEnumCounts(pkg.value(), internalPath);
 	}
 }
 
 void
-CLIDebug::writeRaw(const std::filesystem::path outPath, const LotusLib::LotusPath& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
+CLIDebug::writeRaw(const std::filesystem::path outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
-	LotusLib::PackagesReader pkgs(cacheDirPath, game);
-	std::optional<LotusLib::PackageReader> pkg = pkgs.getPackage(pkgName);
-	if (!pkg)
+	LotusLib::PackageCollection pkgs(cacheDirPath, game);
+	
+	if (!pkgs.hasPackage(pkgName))
 		throw std::runtime_error("Package does not exist: " + pkgName);
+	LotusLib::Package pkg = pkgs.getPackage(pkgName);
 
+	if (pkg.dirExists(LotusLib::PkgSplitType::HEADER, internalPath))
+	{
+		size_t entries = 0;
+		for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
+		{
+			writeAllFilesRaw(pkg, *iter, outPath);
+			entries++;
+		}
+		WarframeExporter::Logger::getInstance().info("Wrote " + std::to_string(entries) + " raw entries");
+	}
+	else if (pkg.fileExists(internalPath))
+	{
+		writeAllFilesRaw(pkg, pkg.getFileNode(PkgSplitType::HEADER, internalPath), outPath);
+		WarframeExporter::Logger::getInstance().info("Wrote raw entry to " + outPath.string());
+	}
+	else
+	{
+		WarframeExporter::Logger::getInstance().error("Internal path doesn't exist: " + internalPath);
+	}
+}
+
+void
+CLIDebug::ls(const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
+{
 	try
 	{
-		// Test if `internalPath` is a directory
-		pkg.value().getDirNode(internalPath);
+		LotusLib::PackageCollection pkgs(cacheDirPath, game);
+		LotusLib::Package pkg = pkgs.getPackage(pkgName);
+		LotusLib::DirNode rootDir = pkg.getDirNode(LotusLib::PkgSplitType::HEADER, internalPath);
 
-		for (auto iter = pkg.value().getIter(internalPath); iter != pkg.value().getIter(); iter++)
+		std::vector<std::tuple<std::string, std::string>> lines;
+		
+		for (const LotusLib::DirNode* curDir : rootDir.childDirs)
 		{
-			LotusLib::FileEntry fileEntry = pkg.value().getFile(*iter, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
-			WarframeExporter::DebugUtils::writeAllDebugs(pkg.value(), fileEntry, outPath);
+			std::ostringstream outStreamBuf;
+			const std::string curDirPath = LotusLib::getFullPath(*curDir);
+
+			char splitStr[] = {'H', '-', '-', '\0'};
+			if (pkg.dirExists(PkgSplitType::BODY, curDirPath))
+				splitStr[1] = 'B';
+			if (pkg.dirExists(PkgSplitType::FOOTER, curDirPath))
+				splitStr[2] = 'F';
+
+			outStreamBuf
+				<< splitStr << " "
+				<< std::setw(5) << std::left << "" << " "
+				<< std::setw(5) << std::left << "" << " "
+				<< std::setw(10) << std::left << "" << " "
+				<< "\033[34m" << curDir->name << "\033[0m";
+			lines.push_back({curDir->name, outStreamBuf.str()});
+		}
+		
+		for (const LotusLib::FileNode* curFile : rootDir.childFiles)
+		{
+			std::ostringstream outStreamBuf;
+			const std::string curFilePath = LotusLib::getFullPath(*curFile);
+
+			auto sizes = getFileSize(pkg, curFilePath);
+			std::string comSize = getFileSizeStr(std::get<0>(sizes));
+			std::string size = getFileSizeStr(std::get<1>(sizes));
+
+			time_t epochTime = curFile->timeStamp / 10000000UL - 11644473600UL;
+			std::time_t rawtime = static_cast<std::time_t>(epochTime);
+			std::tm* dt = std::gmtime(&rawtime);
+
+			char splitStr[] = {'H', '-', '-', '\0'};
+			if (pkg.fileExists(PkgSplitType::BODY, curFilePath))
+				splitStr[1] = 'B';
+			if (pkg.fileExists(PkgSplitType::FOOTER, curFilePath))
+				splitStr[2] = 'F';
+
+			outStreamBuf
+				<< splitStr << " "
+				<< std::setw(5) << std::left << comSize << " "
+				<< std::setw(5) << std::left << size << " "
+				<< std::left << std::put_time(dt, "%Y-%m-%d") << " "
+				<< curFile->name;
+			lines.push_back({curFile->name, outStreamBuf.str()});
+		}
+
+		for (const LotusLib::FileNode* curFile : rootDir.childFileDupes)
+		{
+			std::ostringstream outStreamBuf;
+
+			outStreamBuf
+				<< "H?? "
+				<< std::setw(5) << std::left << "????" << " "
+				<< std::setw(5) << std::left << "????" << " "
+				<< std::setw(10) << std::left << "DELETED" << " "
+				<< "\x1b[38;5;196m" << (curFile->name.empty() ? "???" : curFile->name) << "\033[0m";
+			lines.push_back({curFile->name.empty() ? "" : curFile->name, outStreamBuf.str()});
+		}
+
+		std::sort(lines.begin(), lines.end(), [](const std::tuple<std::string, std::string> &x, const std::tuple<std::string, std::string> &y){ return (std::get<0>(x) < std::get<0>(y));});
+		for (const auto& x : lines)
+			std::cout << std::get<1>(x) << std::endl;
+	}
+	catch (LotusLib::InternalDirectoryNotFound&)
+	{
+		std::cout << "Cannot find directory " + internalPath << std::endl;
+		return;
+	}
+	catch (LotusLib::PackageNotFound&)
+	{
+		std::cout << "Unkown package " << pkgName << std::endl;
+		return;
+	}
+}
+
+void
+CLIDebug::printEnumCounts(LotusLib::Package& pkg, const std::string& internalPath)
+{
+	std::map<uint32_t, int> enumCounts;
+	std::map<uint32_t, std::vector<std::string>> enumExamples;
+
+	WarframeExporter::Logger::getInstance().info("Collecting Common Header Format stats");
+	for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
+	{
+		try
+		{
+			uint32_t type = pkg.readCommonHeaderFormat(*iter);
+			enumCounts[type]++;
+			
+			// For the first 10 files, add directly into examples
+			if (enumExamples[type].size() < 10)
+				enumExamples[type].push_back(getFullPath(*iter));
+			
+			// Every 10 new files, replace an existing example
+			else if (enumCounts[type] % 10 == 0)
+			{
+				int newIndex = enumCounts[type] % 100 / 10;
+				enumExamples[type][newIndex] = getFullPath(*iter);
+			}
+		}
+		catch (LotusLib::DecompressionException&)
+		{
+			WarframeExporter::Logger::getInstance().warn("Decompress error: " + internalPath);
+			continue;
+		}
+		catch (LotusLib::CommonHeaderError&)
+		{
+			continue;
+		}
+		catch (LotusLib::LotusException& ex)
+		{
+			WarframeExporter::Logger::getInstance().error(ex.what());
+			continue;
+		}
+		catch (BinaryReader::LimitException& ex)
+		{
+			WarframeExporter::Logger::getInstance().warn(std::string(ex.what()) + internalPath);
+			continue;
+		}
+		catch (std::exception& ex)
+		{
+			WarframeExporter::Logger::getInstance().error(std::string(ex.what()) + ": " + internalPath);
+			continue;
 		}
 	}
-	catch (std::exception&)
+
+	for (auto& x : enumCounts)
 	{
-		LotusLib::FileEntry fileEntry = pkg.value().getFile(internalPath, LotusLib::READ_H_CACHE | LotusLib::READ_B_CACHE | LotusLib::READ_F_CACHE);
-		WarframeExporter::DebugUtils::writeAllDebugs(pkg.value(), fileEntry, outPath);
+		std::cout << "Type " << pkg.getName() << "/" << x.first << ": " << x.second << " entries " << std::endl;
+		for (auto& str : enumExamples[x.first])
+			std::cout << "  " << str << std::endl;
 	}
+}
+
+void
+CLIDebug::writeAllFilesRaw(LotusLib::Package& pkg, const LotusLib::FileNode& fileNode, const std::filesystem::path& baseOutputPath)
+{
+	LotusLib::FileEntry entry = pkg.getFileEntry(fileNode);
+	const std::string internalPath = LotusLib::getFullPath(fileNode);
+
+	std::filesystem::path debugPath = baseOutputPath / "Debug" / std::filesystem::path(internalPath).relative_path();
+	if (!std::filesystem::exists(debugPath.parent_path()))
+		std::filesystem::create_directories(debugPath.parent_path());
+
+	if (entry.header.getLength() > 0)
+	{
+		std::ofstream out;
+		out.open(debugPath.string() + "_H", std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write((char*)entry.header.getPtr().data(), entry.header.getLength());
+		out.close();
+	}
+
+	if (entry.body.getLength() > 0)
+	{
+		std::ofstream out;
+		out.open(debugPath.string() + "_B", std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write((char*)entry.body.getPtr().data(), entry.body.getLength());
+		out.close();
+	}
+
+	if (entry.footer.getLength() > 0)
+	{
+		std::ofstream out;
+		out.open(debugPath.string() + "_F", std::ios::binary | std::ios::out | std::ofstream::trunc);
+		out.write((char*)entry.footer.getPtr().data(), entry.footer.getLength());
+		out.close();
+	}
+}
+
+std::tuple<int, int>
+CLIDebug::getFileSize(LotusLib::Package& pkg, const std::string& internalPath)
+{
+	int compressed = 0;
+	int uncompressed = 0;
+
+	auto headerNode = pkg.getFileNode(PkgSplitType::HEADER, internalPath);
+	compressed += headerNode.compLen;
+	uncompressed = headerNode.len;
+
+	if (pkg.fileExists(PkgSplitType::BODY, internalPath))
+	{
+		auto bodyNode = pkg.getFileNode(PkgSplitType::BODY, internalPath);
+		compressed += bodyNode.compLen;
+		uncompressed = bodyNode.len;
+	}
+	if (pkg.fileExists(PkgSplitType::FOOTER, internalPath))
+	{
+		auto footerNode = pkg.getFileNode(PkgSplitType::FOOTER, internalPath);
+		compressed += footerNode.compLen;
+		uncompressed = footerNode.len;
+	}
+	
+	return {compressed, uncompressed};
+}
+
+std::string
+CLIDebug::getFileSizeStr(int size)
+{
+	const char* prefixes[] = { "B", "K", "M", "G" };
+	int exponent = 1;
+
+	double sizeF = size;
+	while (sizeF > 1024.0)
+	{
+		sizeF /= 1000.0;
+		exponent++;
+	}
+
+	return std::to_string((int)sizeF) + prefixes[exponent-1]; 
 }

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ios>
 #include <streambuf>
+#include <new>
 
 // std::streambuf implementation in memory with efficient resizing and possibility to keep the buffer after exit
 template<std::streamsize BLOCK_SIZE = 1024>

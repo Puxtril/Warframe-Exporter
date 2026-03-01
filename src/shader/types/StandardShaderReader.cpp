@@ -10,7 +10,7 @@ StandardShaderReader::getInstance()
 }
 
 ShaderHeaderExternal
-StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int shaderTypeEnum)
+StandardShaderReader::readHeader(BinaryReader::Buffered* headerReader, int shaderTypeEnum)
 {
     ShaderHeaderExternal shaderHeader;
 
@@ -61,7 +61,7 @@ StandardShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReade
 }
 
 ShaderEntry
-StandardShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader, const ShaderHeaderExternal& shaderHeader, int index)
+StandardShaderReader::readShader(BinaryReader::Buffered* bodyReader, const ShaderHeaderExternal& shaderHeader, int index)
 {
     uint32_t firstShaderOffset = static_cast<uint32_t>(bodyReader->getLength()) - shaderHeader.shaderCodeTotalSize;
     bodyReader->seek(firstShaderOffset, std::ios::beg);
@@ -85,7 +85,7 @@ StandardShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader,
 }
 
 std::vector<ShaderEntry>
-StandardShaderReader::readAllShaders(BinaryReader::BinaryReaderBuffered* bodyReader, const ShaderHeaderExternal& shaderHeader)
+StandardShaderReader::readAllShaders(BinaryReader::Buffered* bodyReader, const ShaderHeaderExternal& shaderHeader)
 {
     uint32_t firstShaderOffset = static_cast<uint32_t>(bodyReader->getLength()) - shaderHeader.shaderCodeTotalSize;
     bodyReader->seek(firstShaderOffset, std::ios::beg);

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ExtractOptions.h"
+#include "Enums.h"
 #include "Extractor.h"
 #include "texture/TextureStructs.hpp"
-#include "BinaryReaderBuffered.h"
+#include "BinaryReader/Buffered.h"
 #include "texture/TextureReader.h"
 #include "texture/TextureConverter.h"
 #include "texture/TextureExporterDDS.h"
@@ -22,7 +22,7 @@ namespace WarframeExporter::Texture
 		TextureExtractor(const TextureExtractor&) = delete;
 		TextureExtractor operator=(const TextureExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			size_t curOffset = hReader->tell();
 			TextureHeaderExternal extHeader = TextureReader::readHeader(hReader, commonHeader);
@@ -122,10 +122,10 @@ namespace WarframeExporter::Texture
 
 		static TextureExtractor* getInstance();
 
-		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs);
+		TextureInternal getTexture(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs);
 		static void writeData (TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const std::filesystem::path& outputFile, TextureExportType exportType);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) override;
 
 	private:
 		static void writeArray(TextureInternal& texture, const LotusLib::CommonHeader& commonHeader, const char* data, size_t dataLen, const std::filesystem::path& outputFile, TextureExportType exportType);

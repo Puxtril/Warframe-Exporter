@@ -22,12 +22,12 @@ public:
     FormatPreview();
 
     void setupUis(QWidget* parentWidget, QVBoxLayout* parentLayout);
-    void setData(LotusLib::PackagesReader* pkgs, const std::string& pkgName, const LotusLib::LotusPath& internalPath);
+    void setData(LotusLib::PackageCollection* pkgs, LotusLib::FileEntry& fileEntry, WarframeExporter::Extractor* extractor);
     void clearPreview();
 
 private:
-    void setupModel(std::stringstream& outStr, LotusLib::PackagesReader* pkgs, LotusLib::FileEntry& fileEntry);
-    void setupTexture(std::stringstream& outStr, LotusLib::PackagesReader* pkgs, LotusLib::FileEntry& fileEntry);
+    void setupModel(std::stringstream& outStr, LotusLib::PackageCollection* pkgs, LotusLib::FileEntry& fileEntry);
+    void setupTexture(std::stringstream& outStr, LotusLib::PackageCollection* pkgs, LotusLib::FileEntry& fileEntry);
     void setupLevel(std::stringstream& outStr, LotusLib::FileEntry& fileEntry);
     void setupAudio(std::stringstream& outStr, LotusLib::FileEntry& fileEntry);
     void setupShader(std::stringstream& outStr, LotusLib::FileEntry& fileEntry);

@@ -10,13 +10,13 @@ ZstdShaderReader::getInstance()
 }
 
 void
-ZstdShaderReader::initilizeDecompressor(LotusLib::PackagesReader& pkgs)
+ZstdShaderReader::initilizeDecompressor(const LotusLib::PackageCollection& pkgs)
 {
     m_zstdDecompressor.initilize(pkgs);
 }
 
 ShaderHeaderExternal
-ZstdShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, int shaderTypeEnum)
+ZstdShaderReader::readHeader(BinaryReader::Buffered* headerReader, int shaderTypeEnum)
 {
     ShaderHeaderExternal shaderHeader;
 
@@ -67,7 +67,7 @@ ZstdShaderReader::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, i
 }
 
 ShaderEntry
-ZstdShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader, const ShaderHeaderExternal& shaderHeader, int index)
+ZstdShaderReader::readShader(BinaryReader::Buffered* bodyReader, const ShaderHeaderExternal& shaderHeader, int index)
 {
     uint32_t firstShaderOffset = static_cast<uint32_t>(bodyReader->getLength()) - shaderHeader.shaderCodeTotalSize;
     bodyReader->seek(firstShaderOffset, std::ios::beg);
@@ -91,7 +91,7 @@ ZstdShaderReader::readShader(BinaryReader::BinaryReaderBuffered* bodyReader, con
 }
 
 std::vector<ShaderEntry>
-ZstdShaderReader::readAllShaders(BinaryReader::BinaryReaderBuffered* bodyReader, const ShaderHeaderExternal& shaderHeader)
+ZstdShaderReader::readAllShaders(BinaryReader::Buffered* bodyReader, const ShaderHeaderExternal& shaderHeader)
 {
     static std::vector<uint8_t> bufferDecompress(10485760); // 10MB
 

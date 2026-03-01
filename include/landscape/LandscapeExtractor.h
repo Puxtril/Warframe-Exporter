@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Extractor.h"
-#include "BinaryReaderBuffered.h"
+#include "BinaryReader/Buffered.h"
 #include "landscape/LandscapeTypes.h"
 #include "landscape/LandscapeStructs.h"
 #include "landscape/LandscapeEnumMap.h"
@@ -18,7 +18,7 @@ namespace WarframeExporter::Landscape
 		LandscapeExtractor(const LandscapeExtractor&) = delete;
 		LandscapeExtractor operator=(const LandscapeExtractor&) = delete;
 
-		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::BinaryReaderBuffered* hReader, WarframeExporter::ExtractOptions options) const override
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const override
 		{
 			const static std::string outFileExt = "glb";
 			return outFileExt;
@@ -53,13 +53,13 @@ namespace WarframeExporter::Landscape
 
 		static LandscapeExtractor* getInstance();
 
-		LandscapeHeaderExternal readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader);
-		std::vector<LandscapeBodyChunkExternal> readLandscapeChunks(BinaryReader::BinaryReaderBuffered* bodyReader, const LandscapeHeaderExternal extHeader, const LotusLib::CommonHeader& commonHeader);
+		LandscapeHeaderExternal readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader);
+		std::vector<LandscapeBodyChunkExternal> readLandscapeChunks(BinaryReader::Buffered* bodyReader, const LandscapeHeaderExternal extHeader, const LotusLib::CommonHeader& commonHeader);
 		LandscapeInternal formatLandscape(const LandscapeHeaderExternal& landscapeHeader, const std::vector<LandscapeBodyChunkExternal>& landscapeBody);
 		Document convertToGltf(const LandscapeInternal& internal);
 
 		void write(Document& gltf, const std::filesystem::path& outputPath);
 
-		void extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) override;
 	};
 }

@@ -46,7 +46,7 @@ main(int argc, char** argv)
 	// Basic checks
 	checkDirs(cacheDirCmd.getValue());
 	createLoggers(g_logLevel, outPathCmd.getValue());
-	LotusLib::LotusPath fixedPath = forgiveLotusPath(intPathCmd.getValue());
+	std::filesystem::path fixedPath = forgiveLotusPath(intPathCmd.getValue());
 	LotusLib::Game game = getGame(gameCmd.getValue(), cacheDirCmd.getValue());
 	
 	// Basic logs
@@ -61,7 +61,7 @@ main(int argc, char** argv)
 	try
 	{
 		for (CLIFeature* feat : g_features)
-			feat->processCmd(outPathCmd.getValue(), fixedPath, pkgCmd.getValue(), cacheDirCmd.getValue(), game);
+			feat->processCmd(outPathCmd.getValue(), fixedPath.string(), pkgCmd.getValue(), cacheDirCmd.getValue(), game);
 	}
 	catch (std::exception& e)
 	{
@@ -94,11 +94,11 @@ checkDirs(const std::filesystem::path& cacheDir)
 	}
 }
 
-LotusLib::LotusPath
-forgiveLotusPath(LotusLib::LotusPath inPath)
+std::filesystem::path
+forgiveLotusPath(const std::filesystem::path& inPath)
 {
 	if (inPath.string().size() == 1)
-		return inPath;
+		return inPath.string();
 
 	std::basic_stringstream<std::filesystem::path::value_type> fixedPath;
 	for(std::filesystem::path::string_type token : inPath)
@@ -144,7 +144,7 @@ void
 createLoggers(spdlog::level::level_enum logLevel, const std::filesystem::path& outPath)
 {
 #ifdef WF_DEBUG
-	LotusLib::Logger::setLogProperties(outPath / "LotusLib.log", logLevel, logLevel);
+	LotusLib::Logger::setLogProperties(logLevel);
 #endif
 	WarframeExporter::Logger::getInstance().setLogProperties(outPath / "Warframe-Exporter.log", logLevel);
 	LotusLib::Logger::setLogProperties(spdlog::level::info);

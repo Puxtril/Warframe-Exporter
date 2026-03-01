@@ -23,6 +23,6 @@ namespace WarframeExporter::Material
 			return extTypes;
         }
 
-        MaterialExternal readData(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader) override;
+        MaterialExternal readData(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader) override;
     };
 };

@@ -78,32 +78,34 @@ UiExporter::clearPreview()
 void
 UiExporter::setPreview(TreeItemFile* file)
 {
+    LotusLib::FileEntry fileEntry = m_packages->getPackage(file->getPkg()).getFileEntry(file->getQFullpath().toStdString());
+    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(m_packages->getGame(), LotusLib::findPackageCategory(file->getPkg()), fileEntry.commonHeader.type);
+    
     if (this->tabWidget->currentWidget() == this->Preview)
     {
-        LotusLib::FileEntry fileEntry = m_packages.getPackage(file->getPkg()).value().getFile(file->getQFullpath().toStdString());
-        m_previewManager.swapToFilePreview(fileEntry);
+        m_previewManager.swapToFilePreview(fileEntry, extractor);
     }
     else if (this->tabWidget->currentWidget() == this->Metadata)
     {
         m_metadataPreview.clearPreview();
-        m_metadataPreview.setData(&m_packages, file->getPkg(), file->getQFullpath().toStdString());
+        m_metadataPreview.setData(m_packages.value(), m_packagesBin, file->getPkg(), fileEntry);
     }
     else if (this->tabWidget->currentWidget() == this->Format)
     {
         m_formatPreview.clearPreview();
-        m_formatPreview.setData(&m_packages, file->getPkg(), file->getQFullpath().toStdString());
+        m_formatPreview.setData(&m_packages.value(), fileEntry, extractor);
     }
 }
 
 void
-UiExporter::extractDirectory(LotusLib::LotusPath internalPath)
+UiExporter::extractDirectory(std::string internalPath)
 {
     m_exporterDirectoryThread.setInternalPath(internalPath);
     m_exporterDirectoryThread.start();
 }
 
 void
-UiExporter::extractFile(LotusLib::LotusPath internalPath, const std::string& pkgName)
+UiExporter::extractFile(std::string internalPath, const std::string& pkgName)
 {
     m_exporterFileThread.setFileData(internalPath, pkgName);
     m_exporterFileThread.start();
@@ -166,18 +168,21 @@ UiExporter::setData(
         WarframeExporter::ExtractOptions options
 )
 {
-    m_packages.setData(cachePath, game);
+    m_packages = LotusLib::PackageCollection(cachePath, game);
     m_cacheDirPath = cachePath;
     m_exportPath = exportPath / "Extracted";
     m_extractTypes = extractTypes;
-    m_exporterDirectoryThread.setData(&m_packages, exportPath, extractTypes, options);
-    m_exporterFileThread.setData(&m_packages, exportPath, options);
-    m_previewManager.setData(&m_packages);
+    m_exporterDirectoryThread.setData(&m_packages.value(), &m_packagesBin, exportPath, extractTypes, options);
+    m_exporterFileThread.setData(&m_packages.value(), &m_packagesBin, exportPath, extractTypes, options);
 
-    m_loading.initProgressBar(m_packages, extractTypes);
+	auto pkgsBinData = m_packages->getFile("Misc", LotusLib::PkgSplitType::HEADER, "/Packages.bin");
+	m_packagesBin.initilize(pkgsBinData);
+    m_previewManager.setData(&m_packages.value(), &m_packagesBin);
+
+    m_loading.initProgressBar(m_packages.value(), extractTypes);
     m_loadingDialog.show();
 
-    m_loadTreeThread.setData(m_extractTypes, m_packages, this->treeWidget, options.filterUiFiles);
+    m_loadTreeThread.setData(m_extractTypes, m_packages.value(), this->treeWidget, options.filterUiFiles);
     m_loadTreeThread.start();
 }
 
@@ -211,15 +216,14 @@ UiExporter::extractButtonClicked()
     if (itemType == TreeItemDirectory::QTreeWidgetItemType)
     {
         TreeItemDirectory* itemCasted = static_cast<TreeItemDirectory*>(selectedItem);
-        LotusLib::LotusPath internalPath = itemCasted->getFullInternalPath();
-        this->extractDirectory(internalPath);
+        this->extractDirectory(LotusLib::getFullPath(*itemCasted->getNode()));
         swapToCancelButton();
     }
 
     else if (itemType == TreeItemFile::QTreeWidgetItemType)
     {
         TreeItemFile* itemCasted = static_cast<TreeItemFile*>(selectedItem);
-        LotusLib::LotusPath internalPath = itemCasted->getQFullpath().toStdString();
+        std::string internalPath = itemCasted->getQFullpath().toStdString();
         this->extractFile(internalPath, itemCasted->getPkg());
         this->ExtractButton->setEnabled(false);
     }
@@ -245,7 +249,6 @@ UiExporter::extractIndexingStarted()
 void
 UiExporter::extractStart(int totalItems)
 {
-    this->ExtractProgressBar->setMinimum(0);
     this->ExtractProgressBar->setMaximum(totalItems);
     this->ExtractProgressBar->setFormat("Extracting %v/%m");
 }
@@ -272,9 +275,10 @@ UiExporter::extractError(std::string msg)
 }
 
 void
-UiExporter::extractComplete()
+UiExporter::extractComplete(int totalItems)
 {
     this->ExtractProgressBar->setFormat("Done %v/%m");\
+    this->ExtractProgressBar->setValue(totalItems);
     swapToExtractButton();
 }
 
@@ -288,7 +292,7 @@ void UiExporter::buildSearchIndex(QTreeWidgetItem* parent)
             text = fileItem->getQFullpath().toLower();
         } else if (item->type() == TreeItemDirectory::QTreeWidgetItemType) {
             TreeItemDirectory* dirItem = static_cast<TreeItemDirectory*>(item);
-            text = QString::fromStdString(dirItem->getFullInternalPath()).toLower();
+            text = QString::fromStdString(LotusLib::getFullPath(*dirItem->getNode())).toLower();
         }
         m_searchIndex.append(qMakePair(text, item));
         buildSearchIndex(item);

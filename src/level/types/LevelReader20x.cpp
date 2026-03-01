@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Level;
 
 void
-LevelReader20x::readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHeaderExternal& outHeader) const
+LevelReader20x::readHeader(BinaryReader::Buffered& reader, LevelHeaderExternal& outHeader) const
 {	
 	uint32_t pathCount1 = reader.readUInt32();
 	outHeader.paths.resize(pathCount1);
@@ -57,7 +57,7 @@ LevelReader20x::readHeader(BinaryReader::BinaryReaderBuffered& reader, LevelHead
 }
 
 void
-LevelReader20x::readBody(BinaryReader::BinaryReaderBuffered& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const
+LevelReader20x::readBody(BinaryReader::Buffered& reader, const LevelHeaderExternal& extHeader, LevelBodyExternal& outBody) const
 {
 	std::vector<uint32_t> attributeLens(extHeader.levelObjs.size());
 	reader.readUInt32Array(attributeLens.data(), extHeader.levelObjs.size());

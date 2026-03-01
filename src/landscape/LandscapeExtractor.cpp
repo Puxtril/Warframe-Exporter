@@ -10,7 +10,7 @@ LandscapeExtractor::getInstance()
 }
 
 LandscapeHeaderExternal
-LandscapeExtractor::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, const LotusLib::CommonHeader& commonHeader)
+LandscapeExtractor::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& commonHeader)
 {
     LandscapeReader* reader = g_enumMapLandscape[commonHeader.type];
     LandscapeHeaderExternal external = reader->readHeader(headerReader);
@@ -18,7 +18,7 @@ LandscapeExtractor::readHeader(BinaryReader::BinaryReaderBuffered* headerReader,
 }
 
 std::vector<LandscapeBodyChunkExternal>
-LandscapeExtractor::readLandscapeChunks(BinaryReader::BinaryReaderBuffered* bodyReader, const LandscapeHeaderExternal extHeader, const LotusLib::CommonHeader& commonHeader)
+LandscapeExtractor::readLandscapeChunks(BinaryReader::Buffered* bodyReader, const LandscapeHeaderExternal extHeader, const LotusLib::CommonHeader& commonHeader)
 {
     LandscapeReader* reader = g_enumMapLandscape[commonHeader.type];
     std::vector<LandscapeBodyChunkExternal> chunks = reader->readBody(bodyReader, extHeader);
@@ -61,10 +61,10 @@ LandscapeExtractor::write(Document& gltf, const std::filesystem::path& outputPat
 }
 
 void
-LandscapeExtractor::extract(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs, const std::filesystem::path& outputPath, ExtractOptions options)
+LandscapeExtractor::extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options)
 {
-    LandscapeHeaderExternal extHeader = readHeader(&fileEntry.headerData, fileEntry.commonHeader);
-    std::vector<LandscapeBodyChunkExternal> chunks = readLandscapeChunks(&fileEntry.bData, extHeader, fileEntry.commonHeader);
+    LandscapeHeaderExternal extHeader = readHeader(&fileEntry.header, fileEntry.commonHeader);
+    std::vector<LandscapeBodyChunkExternal> chunks = readLandscapeChunks(&fileEntry.body, extHeader, fileEntry.commonHeader);
     LandscapeInternal intLandscape = formatLandscape(extHeader, chunks);
     Document gltf = convertToGltf(intLandscape);
     if (!options.dryRun)

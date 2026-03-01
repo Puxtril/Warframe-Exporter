@@ -1,31 +1,31 @@
 #include "ui/TreeItemSubtypes.h"
 
-TreeItemDirectory::TreeItemDirectory(std::string fullInternalPath)
-    : QTreeWidgetItem(TreeItemDirectory::QTreeWidgetItemType), m_fullInternalPath(fullInternalPath)
+TreeItemDirectory::TreeItemDirectory(const LotusLib::DirNode* node)
+    : QTreeWidgetItem(TreeItemDirectory::QTreeWidgetItemType), m_node(node)
 {}
 
-TreeItemDirectory::TreeItemDirectory(QTreeWidgetItem* parentWidget, std::string fullInternalPath)
-    : QTreeWidgetItem(parentWidget, TreeItemDirectory::QTreeWidgetItemType), m_fullInternalPath(fullInternalPath)
+TreeItemDirectory::TreeItemDirectory(QTreeWidgetItem* parentWidget, const LotusLib::DirNode* node)
+    : QTreeWidgetItem(parentWidget, TreeItemDirectory::QTreeWidgetItemType), m_node(node)
 {}
 
-const std::string&
-TreeItemDirectory::getFullInternalPath() const
+const LotusLib::DirNode*
+TreeItemDirectory::getNode() const
 {
-    return m_fullInternalPath;
+    return m_node;
 }
 
-TreeItemFile::TreeItemFile(const LotusLib::FileEntries::FileNode* fileNode, const std::string& pkgName)
+TreeItemFile::TreeItemFile(const LotusLib::FileNode& fileNode, const std::string& pkgName)
     : QTreeWidgetItem(TreeItemFile::QTreeWidgetItemType), m_file(fileNode), m_pkg(pkgName)
 {}
 
-TreeItemFile::TreeItemFile(QTreeWidgetItem* parentWidget, const LotusLib::FileEntries::FileNode* fileNode, const std::string& pkgName)
+TreeItemFile::TreeItemFile(QTreeWidgetItem* parentWidget, const LotusLib::FileNode& fileNode, const std::string& pkgName)
     : QTreeWidgetItem(parentWidget, TreeItemFile::QTreeWidgetItemType), m_file(fileNode), m_pkg(pkgName)
 {}
 
 QString
 TreeItemFile::getQName() const
 {
-    std::string fullPath = m_file->getName();
+    std::string fullPath = m_file.name;
     QString fullPathQ(fullPath.c_str());
     return fullPathQ;
 }
@@ -33,7 +33,7 @@ TreeItemFile::getQName() const
 QString
 TreeItemFile::getQFullpath() const
 {
-    std::string fullPath = m_file->getFullPath();
+    std::string fullPath = LotusLib::getFullPath(m_file);
     QString fullPathQ(fullPath.c_str());
     return fullPathQ;
 }
@@ -41,7 +41,7 @@ TreeItemFile::getQFullpath() const
 QString
 TreeItemFile::getQSize() const
 {
-    std::string compressedLen = bytesToHumanReadable(m_file->getLen());
+    std::string compressedLen = bytesToHumanReadable(m_file.compLen);
     QString compressedLenQ(compressedLen.c_str());
     return compressedLenQ;
 }
@@ -49,7 +49,7 @@ TreeItemFile::getQSize() const
 QString
 TreeItemFile::getQCompressedSize() const
 {
-    std::string compressedLen = bytesToHumanReadable(m_file->getCompLen());
+    std::string compressedLen = bytesToHumanReadable(m_file.compLen);
     QString compressedLenQ(compressedLen.c_str());
     return compressedLenQ;
 }
@@ -59,7 +59,7 @@ TreeItemFile::getQTimestamp() const
 {
     char buffer[80];
 
-    time_t epochTime = m_file->getTimeStamp() / 10000000UL - 11644473600UL;
+    time_t epochTime = m_file.timeStamp / 10000000UL - 11644473600UL;
     const tm* timeInfo = gmtime(&std::max((time_t)0, epochTime));
     strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", timeInfo);
 

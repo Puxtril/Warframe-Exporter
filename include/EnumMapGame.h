@@ -1,7 +1,7 @@
 #pragma once
 
-#include "LotusLib.h"
-#include "LotusUtils.h"
+#include "LotusLib/Enums.h"
+#include "LotusLib/Utils.h"
 
 #include <map>
 #include <stdexcept>

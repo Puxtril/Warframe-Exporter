@@ -41,25 +41,25 @@ jobs:
         run: |
           mkdir zlib
           cd zlib
-          Invoke-WebRequest -Uri https://zlib.net/zlib-1.3.1.tar.gz -OutFile zlib.tar.gz
+          Invoke-WebRequest -Uri https://zlib.net/zlib-1.3.2.tar.gz -OutFile zlib.tar.gz
           tar -xzf .\zlib.tar.gz
           mkdir build
           cd build
-          cmake ..\zlib-1.3.1 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\zlib\install
+          cmake ..\zlib-1.3.2 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\zlib\install
           cmake --build . --config Release
           cmake --install .
           cd ..\install\lib
-          mv zlib.lib zlib-dynamic.lib
-          mv zlibstatic.lib zlib.lib
+          rm z.lib
+          mv zs.lib z.lib
       - name: Init Extractor submodules
         run: |
           cd lib
-          git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
+          git submodule update --init --depth 1 LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm libspng PhysxParser
           git submodule update --init tclap-code
       - name: Init LotusLib submodule
         run: |
           cd lib/LotusLib/lib
-          git submodule update --init
+          git submodule update --init --depth 1
       - name: Download Oodle binaries
         run: |
           mkdir bin\Win64
@@ -105,7 +105,7 @@ jobs:
       - name: Init Extractor submodules
         run: |
           cd lib
-          git submodule update --init --depth 1 Binary-Reader LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm json libspng spdlog PhysxParser
+          git submodule update --init --depth 1 LotusLib QtOpenGLViewer bcdec ddspp fx-gltf glm libspng PhysxParser
           git submodule update --init tclap-code
       - name: Init LotusLib submodule
         run: |

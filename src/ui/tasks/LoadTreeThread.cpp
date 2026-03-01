@@ -11,7 +11,7 @@ LoadTreeThread::LoadTreeThread()
 void
 LoadTreeThread::setData(
     WarframeExporter::ExtractorType extractTypes,
-    LotusLib::PackagesReader& pkgs,
+    LotusLib::PackageCollection& pkgs,
     QTreeWidget* parentWidget,
     bool shouldFilterFiles
 )
@@ -39,10 +39,10 @@ LoadTreeThread::setupTree()
     for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
         std::string& curPkgName = m_exportPkgNames[iPkg];
-        if (!m_pkgs->getPackage(curPkgName))
+        if (!m_pkgs->hasPackage(curPkgName))
             continue;
 
-        const LotusLib::FileEntries::DirNode* curEntry = m_pkgs->getPackage(curPkgName).value().getDirNode("/");
+        const LotusLib::DirNode* curEntry = &m_pkgs->getDirNode(curPkgName, LotusLib::PkgSplitType::HEADER, "/");
 
         // Purposefully commented out because these clutter the root directory
         // Misc package has lots of root files that can't be extracted
@@ -58,10 +58,10 @@ LoadTreeThread::setupTree()
         }
         */
 
-        for (int i = 0; i < static_cast<int>(curEntry->getDirCount()); i++)
+        for (int i = 0; i < static_cast<int>(curEntry->childDirs.size()); i++)
         {
-            const LotusLib::FileEntries::DirNode* curNode = curEntry->getChildDir(i);
-            dirNamesInAllPkgs.insert(curNode->getName());
+            const LotusLib::DirNode* curNode = curEntry->childDirs[i];
+            dirNamesInAllPkgs.insert(curNode->name);
         }
     }
 
@@ -69,15 +69,16 @@ LoadTreeThread::setupTree()
     for (const std::string& curDirName : dirNamesInAllPkgs)
     {
         TreeItemDirectory* newDirWidget = nullptr;
-        std::vector<const LotusLib::FileEntries::DirNode*> dirEntries;
+        std::vector<const LotusLib::DirNode*> dirEntries;
 
         for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
             const std::string& curPkgName = m_exportPkgNames[iPkg];
-            if (!m_pkgs->getPackage(curPkgName))
+            if (!m_pkgs->hasPackage(curPkgName))
                 continue;
 
-            const LotusLib::FileEntries::DirNode* curEntry = m_pkgs->getPackage(curPkgName).value().getDirNode("/")->getChildDir(curDirName);
+            const LotusLib::DirNode* pkgRootNode = &m_pkgs->getDirNode(curPkgName, LotusLib::PkgSplitType::HEADER, "/");
+            const LotusLib::DirNode* curEntry = LotusLib::getChildDir(*pkgRootNode, curDirName);
 
             // Ensure relation in pkgNames and curEntries
             if (curEntry == nullptr)
@@ -88,15 +89,15 @@ LoadTreeThread::setupTree()
 
             if (newDirWidget == nullptr)
             {
-                newDirWidget = new TreeItemDirectory(nullptr, curEntry->getFullPath());
-                newDirWidget->setData(0, 0, curEntry->getName().c_str());
+                newDirWidget = new TreeItemDirectory(nullptr, curEntry);
+                newDirWidget->setData(0, 0, curEntry->name.c_str());
                 newDirWidget->setForeground(0, m_dirBrush);
                 topLevelItems.push_back(newDirWidget);
             }
 
             dirEntries.push_back(curEntry);
         }
-        
+                
         setupTreeRecursive(dirEntries, newDirWidget);
     }
 
@@ -117,23 +118,23 @@ LoadTreeThread::setupTree()
 }
 
 void
-LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirNode*> curEntries, QTreeWidgetItem* parentWidget)
+LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::DirNode*> curEntries, QTreeWidgetItem* parentWidget)
 {
     // 1. Collect all file names and put into parentWidget
     // 2. Initial pass to collect all unique directory names
     // Nasty but slightly more optimized this way
-    std::set<std::string_view> dirNamesInAllPkgs;
+    std::set<std::string> dirNamesInAllPkgs;
     for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
     {
-        const LotusLib::FileEntries::DirNode* curEntry = curEntries[iPkg];
+        const LotusLib::DirNode* curEntry = curEntries[iPkg];
 
-        if (curEntry == nullptr || (curEntry->getDirCount() == 0 && curEntry->getFileCount() == 0))
+        if (curEntry == nullptr || (curEntry->childDirs.size() == 0 && curEntry->childFiles.size() == 0))
             continue;
 
         // Append file entries
-        for (int i = 0; i < static_cast<int>(curEntry->getFileCount()); i++)
+        for (int i = 0; i < static_cast<int>(curEntry->childFiles.size()); i++)
         {
-            const LotusLib::FileEntries::FileNode* curNode = curEntry->getChildFile(i);
+            const LotusLib::FileNode* curNode = curEntry->childFiles[i];
             incrementFileCounter();
 
             // Adds lots of extra processing time
@@ -141,8 +142,8 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
             {   
                 try
                 {
-                    int format = m_pkgs->getPackage(m_exportPkgNames[iPkg]).value().getFileFormat(curNode);
-                    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(m_pkgs->getGame(), m_pkgs->getPackage(m_exportPkgNames[iPkg])->getPkgCategory() ,format);
+                    int format = m_pkgs->getPackage(m_exportPkgNames[iPkg]).readCommonHeaderFormat(*curNode);
+                    WarframeExporter::Extractor* extractor = WarframeExporter::g_enumMapExtractor.at(m_pkgs->getGame(), m_pkgs->getPackage(m_exportPkgNames[iPkg]).getPkgCategory() ,format);
                     if (extractor == nullptr)
                         continue;
                     WarframeExporter::ExtractorType curEntryType = extractor->getExtractorType();
@@ -157,37 +158,38 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
                 }
             }
 
-            TreeItemFile* fileWidget = new TreeItemFile(parentWidget, curNode, m_exportPkgNames[iPkg]);
-            fileWidget->setData(0, 0, curNode->getName().c_str());
+            TreeItemFile* fileWidget = new TreeItemFile(parentWidget, *curNode, m_exportPkgNames[iPkg]);
+            fileWidget->setData(0, 0, curNode->name.c_str());
         }
 
         // Collect directory names
-        for (int i = 0; i < static_cast<int>(curEntry->getDirCount()); i++)
+        for (int i = 0; i < static_cast<int>(curEntry->childDirs.size()); i++)
         {
-            const LotusLib::FileEntries::DirNode* curNode = curEntry->getChildDir(i);
-            dirNamesInAllPkgs.insert(curNode->getName());
+            const LotusLib::DirNode* curNode = curEntry->childDirs[i];
+            dirNamesInAllPkgs.insert(curNode->name);
         }
     }
 
     // Build parameters for recursive call
-    for (const std::string_view& curDirName : dirNamesInAllPkgs)
+    for (const std::string& curDirName : dirNamesInAllPkgs)
     {
         TreeItemDirectory* newDirWidget = nullptr;
-        std::vector<const LotusLib::FileEntries::DirNode*> dirEntries;
+        std::vector<const LotusLib::DirNode*> dirEntries;
         size_t validDirCount = 0;
 
         for (size_t iPkg = 0; iPkg < m_exportPkgNames.size(); iPkg++)
         {
             // Ensure relation in m_viewPkgNames and curEntries
-            if (curEntries[iPkg] == nullptr || (curEntries[iPkg]->getDirCount() == 0 && curEntries[iPkg]->getFileCount() == 0))
+            if (curEntries[iPkg] == nullptr || (curEntries[iPkg]->childDirs.size() == 0 && curEntries[iPkg]->childFiles.size() == 0))
             {
                 dirEntries.push_back(nullptr);
                 continue;
             }
 
-            const LotusLib::FileEntries::DirNode* curEntry = curEntries[iPkg]->getChildDir(std::string(curDirName));
+            //const LotusLib::DirNode* curEntry = curEntries[iPkg]->getChildDir(std::string(curDirName));
+            const LotusLib::DirNode* curEntry = LotusLib::getChildDir(*curEntries[iPkg], curDirName);
 
-            if (curEntry == nullptr || (curEntry->getDirCount() == 0 && curEntry->getFileCount() == 0))
+            if (curEntry == nullptr || (curEntry->childDirs.size() == 0 && curEntry->childFiles.size() == 0))
             {
                 dirEntries.push_back(nullptr);
                 continue;
@@ -195,8 +197,8 @@ LoadTreeThread::setupTreeRecursive(std::vector<const LotusLib::FileEntries::DirN
 
             if (newDirWidget == nullptr)
             {
-                newDirWidget = new TreeItemDirectory(parentWidget, curEntry->getFullPath());
-                newDirWidget->setData(0, 0, curEntry->getName().c_str());
+                newDirWidget = new TreeItemDirectory(parentWidget, curEntry);
+                newDirWidget->setData(0, 0, curEntry->name.c_str());
                 newDirWidget->setForeground(0, m_dirBrush);
                 validDirCount++;
             }
@@ -224,17 +226,16 @@ LoadTreeThread::incrementFileCounter()
 }
 
 std::vector<std::string>
-LoadTreeThread::findPkgNames(LotusLib::PackagesReader& pkgsReader, WarframeExporter::ExtractorType extractTypes)
+LoadTreeThread::findPkgNames(LotusLib::PackageCollection& pkgsReader, WarframeExporter::ExtractorType extractTypes)
 {
     std::vector<std::string> pkgNames;
 
     LotusLib::PackageCategory pkgCategories = WarframeExporter::g_enumMapExtractor.getPkgCategories(pkgsReader.getGame(), extractTypes);
-    for (const std::string& curPkgName : pkgsReader)
+    for (const LotusLib::Package& pkg : pkgsReader)
     {
-        std::optional<LotusLib::PackageReader> pkg = pkgsReader.getPackage(curPkgName);
-        if (!pkg || ((int)pkg->getPkgCategory() & (int)pkgCategories) == 0)
+        if (((int)pkg.getPkgCategory() & (int)pkgCategories) == 0)
             continue;
-        pkgNames.push_back(pkg->getName());
+        pkgNames.push_back(pkg.getName());
     }
 
     return pkgNames;

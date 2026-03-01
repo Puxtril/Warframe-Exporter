@@ -40,6 +40,6 @@ PreviewUnsupported::show()
 }
 
 void
-PreviewUnsupported::setupWidget(LotusLib::FileEntry& fileEntry, LotusLib::PackagesReader& pkgs)
+PreviewUnsupported::setupWidget(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin)
 {
 }

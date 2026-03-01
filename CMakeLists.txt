@@ -64,6 +64,7 @@ file(GLOB WARFRAME_EXPORTER_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/landscape/types/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/levelstatic/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/levelstatic/types/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/icon/*.cpp
 )
 
 file(GLOB WARFRAME_EXPORTER_CLI_SOURCES CONFIGURE_DEPENDS 
@@ -107,8 +108,8 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/tclap-code/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/fx-gltf/include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/lib/Binary-Reader/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/ddspp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Binary-Reader/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/Oodle-2.9/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/lib/LotusLib/lib/liblzf/include"

@@ -3,7 +3,7 @@
 using namespace WarframeExporter::LevelStatic;
 
 void
-LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader, LevelStaticHeaderExternal& outHeader)
+LevelStaticReader28::readHeader(BinaryReader::Buffered* headerReader, LevelStaticHeaderExternal& outHeader)
 {
     uint32_t unkPaths = headerReader->readUInt32();
     while (unkPaths--)
@@ -89,7 +89,7 @@ LevelStaticReader28::readHeader(BinaryReader::BinaryReaderBuffered* headerReader
 }
 
 void
-LevelStaticReader28::readBody(BinaryReader::BinaryReaderBuffered* bodyReader, const LevelStaticHeaderExternal& extHeader, LevelStaticBodyExternal& outBody)
+LevelStaticReader28::readBody(BinaryReader::Buffered* bodyReader, const LevelStaticHeaderExternal& extHeader, LevelStaticBodyExternal& outBody)
 {
     outBody.objects.resize(extHeader.vertexCount);
 

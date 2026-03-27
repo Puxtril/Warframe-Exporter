@@ -49,7 +49,8 @@ namespace WarframeExporter::Level
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_201 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_202 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_202 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_207 }
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_207 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelType::LEVEL_209 },
 			};
 			return extTypes;
 		}

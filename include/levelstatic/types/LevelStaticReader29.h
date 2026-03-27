@@ -18,6 +18,7 @@ namespace WarframeExporter::LevelStatic
         {
             std::vector<int> extTypes = {
                 (int)LevelStaticType::LEVELSTATIC_29,
+                (int)LevelStaticType::LEVELSTATIC_30,
             };
 			return extTypes;
         }

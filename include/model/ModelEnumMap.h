@@ -35,11 +35,13 @@
 #include "model/types/ModelDCMReader108WF.h"
 #include "model/types/ModelDCMReader108SF.h"
 #include "model/types/ModelDCMReader111.h"
+#include "model/types/ModelDCMReader112.h"
 
 #include "model/types/ModelHLODReader102.h"
 #include "model/types/ModelHLODReader108WF.h"
 #include "model/types/ModelHLODReader108SF.h"
 #include "model/types/ModelHLODReader111.h"
+#include "model/types/ModelHLODReader112.h"
 
 
 namespace WarframeExporter::Model
@@ -79,11 +81,13 @@ namespace WarframeExporter::Model
 		.registerClass(ModelDCMReader102::getInstance())
 		.registerClass(ModelDCMReader108WF::getInstance())
 		.registerClass(ModelDCMReader108SF::getInstance())
-		.registerClass(ModelDCMReader111::getInstance());
+		.registerClass(ModelDCMReader111::getInstance())
+		.registerClass(ModelDCMReader112::getInstance());
 
 	const static EnumMapGame<ModelReader> g_enumMapModelHLOD = EnumMapGame<ModelReader>()
 		.registerClass(ModelHLODReader102::getInstance())
 		.registerClass(ModelHLODReader108WF::getInstance())
 		.registerClass(ModelHLODReader108SF::getInstance())
-		.registerClass(ModelHLODReader111::getInstance());
+		.registerClass(ModelHLODReader111::getInstance())
+		.registerClass(ModelHLODReader112::getInstance());
 }

@@ -1,0 +1,49 @@
+#pragma once
+
+#include "BinaryReader/Exceptions.h"
+#include "glm/vec4.hpp"
+#include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "model/ModelReader.h"
+#include "ExporterExceptions.h"
+
+#include <cassert>
+#include <cstring>
+#include <iomanip>
+#include <string_view>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <algorithm>
+
+namespace WarframeExporter::Model
+{
+	class ModelDCMReader112 : public ModelReader
+	{
+		ModelDCMReader112() = default;
+
+	public:
+		inline static ModelDCMReader112* getInstance()
+		{
+			static ModelDCMReader112* instance = new ModelDCMReader112();
+			return instance;
+		}
+
+		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
+		{
+			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
+				{ LotusLib::Game::SOULFRAME, (int)ModelDCMType::MODEL_DCM_112 },
+			};
+			return extTypes;
+		}
+
+		inline ScaleType ensmalleningScale() const override
+		{
+			return ScaleType::XYZ;
+		}
+
+		void readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
+		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody) override;
+	};
+};

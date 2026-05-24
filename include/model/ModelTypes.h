@@ -75,6 +75,7 @@ namespace WarframeExporter::Model
         MODEL_DCM_105 = 105,
         MODEL_DCM_108 = 108,
         MODEL_DCM_111 = 111,
+        MODEL_DCM_112 = 112,
     };
 
     // Overlaps with other types.
@@ -85,6 +86,7 @@ namespace WarframeExporter::Model
         MODEL_HLOD_105 = 105,
         MODEL_HLOD_108 = 108,
         MODEL_HLOD_111 = 111,
+        MODEL_HLOD_112 = 112,
     };
 
     enum class ScaleType

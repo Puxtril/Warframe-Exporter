@@ -53,7 +53,6 @@ namespace WarframeExporter::Model
 		.registerClass(ModelReader103::getInstance())
 		.registerClass(ModelReader105SF::getInstance())
 		.registerClass(ModelReader105WF::getInstance())
-		.registerClass(ModelReader106::getInstance())
 		.registerClass(ModelReader109WF::getInstance())
 		.registerClass(ModelReader109SF::getInstance())
 		.registerClass(ModelReader112::getInstance())
@@ -72,6 +71,7 @@ namespace WarframeExporter::Model
 
 	const static EnumMapGame<ModelReader> g_enumMapModelSM = EnumMapGame<ModelReader>()
 		.registerClass(ModelSMReader105::getInstance())
+		.registerClass(ModelReader106::getInstance())
 		.registerClass(ModelSMReader108::getInstance());
 
 	const static EnumMapGame<ModelReader> g_enumMapModelDCM = EnumMapGame<ModelReader>()

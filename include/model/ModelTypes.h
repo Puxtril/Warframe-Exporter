@@ -63,6 +63,7 @@ namespace WarframeExporter::Model
         MODEL_SM_105 = 105,
         MODEL_SM_106 = 106,
         MODEL_SM_108 = 108,
+        MODEL_SM_109 = 109,
     };
 
     // Overlaps with other types.

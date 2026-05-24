@@ -8,6 +8,7 @@ namespace WarframeExporter::Model
         MODEL_STATIC_96 = 96,
         MODEL_STATIC_102 = 102,
         MODEL_STATIC_105 = 105,
+        MODEL_STATIC_106 = 106,
     };
 
     enum class ModelLevel1Type

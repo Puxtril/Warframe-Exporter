@@ -60,7 +60,7 @@ namespace WarframeExporter::Model
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel2Type::MODEL_LEVEL2_103 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, 105 }, // Shared by DCM/HLOD
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, 105 }, // Shared by DCM/HLOD
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelSMType::MODEL_SM_106 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)106 }, // Shared by SM/Static
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, 108 }, // Shared by DCM/HLOD
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, 108 }, // Shared by DCM/HLOD/SM
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel2Type::MODEL_LEVEL2_109 },

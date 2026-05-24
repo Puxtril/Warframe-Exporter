@@ -91,6 +91,7 @@ namespace WarframeExporter::Model
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_301 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_310 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_314 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_315 },
 			};
 			return extTypes;
 		}

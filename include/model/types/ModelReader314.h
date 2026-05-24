@@ -33,6 +33,7 @@ namespace WarframeExporter::Model
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
 				{ LotusLib::Game::SOULFRAME, (int)ModelPackedType::MODEL_PACKED_314 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelPackedType::MODEL_PACKED_315 },
 			};
 			return extTypes;
 		}

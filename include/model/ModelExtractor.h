@@ -67,6 +67,7 @@ namespace WarframeExporter::Model
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)109 }, // Overlaps with SM/Level2
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)111 }, // Shared by DCM/HLOD
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)112 }, // Shared by DCM/HLOD/Level2
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel2Type::MODEL_LEVEL2_113 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_159 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_160 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_163 },

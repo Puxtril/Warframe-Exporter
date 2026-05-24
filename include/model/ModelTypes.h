@@ -22,6 +22,7 @@ namespace WarframeExporter::Model
         MODEL_LEVEL2_103 = 103,
         MODEL_LEVEL2_109 = 109,
         MODEL_LEVEL2_112 = 112,
+        MODEL_LEVEL2_113 = 113,
     };
 
     enum class ModelTerrainType

@@ -32,6 +32,7 @@ namespace WarframeExporter::Model
         MODEL_TERRAIN_163 = 163,
         MODEL_TERRAIN_166 = 166,
         MODEL_TERRAIN_169 = 169,
+        MODEL_TERRAIN_170 = 170,
     };
 
     enum class ModelRiggedType

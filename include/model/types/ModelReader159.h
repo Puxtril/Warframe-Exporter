@@ -38,6 +38,7 @@ namespace WarframeExporter::Model
 				{ LotusLib::Game::WARFRAME, (int)ModelTerrainType::MODEL_TERRAIN_166 },
 				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_166 },
 				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_169 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_170 },
 			};
 			return extTypes;
 		}

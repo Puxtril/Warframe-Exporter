@@ -1,9 +1,9 @@
-#include "model/types/ModelReader106.h"
+#include "model/types/ModelSMReader106.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader106::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelSMReader106::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
@@ -37,7 +37,7 @@ ModelReader106::readHeader(BinaryReader::Buffered* headerReader, const LotusLib:
 }
 
 void
-ModelReader106::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelSMReader106::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);
@@ -90,7 +90,7 @@ ModelReader106::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buf
 }
 
 bool
-ModelReader106::isMorePhysX(BinaryReader::Buffered* bodyReader)
+ModelSMReader106::isMorePhysX(BinaryReader::Buffered* bodyReader)
 {
     // Some models have no actual vertices, so this can hit EOF
     if (bodyReader->tell() + 0x120 > bodyReader->getLength())

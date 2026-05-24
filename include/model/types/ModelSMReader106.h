@@ -17,14 +17,14 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader106 : public ModelReader
+	class ModelSMReader106 : public ModelReader
 	{
-		ModelReader106() = default;
+		ModelSMReader106() = default;
 
 	public:
-		inline static ModelReader106* getInstance()
+		inline static ModelSMReader106* getInstance()
 		{
-			static ModelReader106* instance = new ModelReader106();
+			static ModelSMReader106* instance = new ModelSMReader106();
 			return instance;
 		}
 

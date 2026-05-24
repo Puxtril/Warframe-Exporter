@@ -32,7 +32,10 @@ ModelReader287::readHeader(BinaryReader::Buffered* headerReader, const LotusLib:
     uint32_t unkStructCount = skipUnknownStructs(headerReader);
 
     headerReader->seek(0x1A, std::ios_base::cur);
-    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 5000, "BodySkipLen1");
+    // Related to bones somehow
+    // /SF/Characters/PlayerCharacters/Hair/MaleLongHair05/Cloth/MaleLongHair05_skel.fbx
+    // Or any of the other hair models, probably.
+    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 10000, "BodySkipLen1");
     headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
     headerReader->seek(0x8, std::ios_base::cur);
 

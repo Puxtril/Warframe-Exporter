@@ -45,6 +45,7 @@ namespace WarframeExporter::Model
         MODEL_RIGGED_281 = 281,
         MODEL_RIGGED_283 = 283,
         MODEL_RIGGED_287 = 287,
+        MODEL_RIGGED_288 = 288,
     };
 
     enum class ModelPackedType

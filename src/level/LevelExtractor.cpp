@@ -81,7 +81,7 @@ LevelExtractor::createGltfCombined(const LotusLib::PackageCollection& pkgs, Leve
 
 	LotusLib::Package miscPkg = pkgs.getPackage("Misc");
 
-	if (!bodyInt.landscape.landscapePath.empty())
+	if (!bodyInt.landscape.landscapePath.empty() && options.includeLandscapeInLevel)
 		addLandscapeToGltf(outGltf, bodyInt, pkgs);
 
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)

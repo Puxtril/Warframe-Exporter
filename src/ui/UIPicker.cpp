@@ -90,6 +90,7 @@ UiPicker::loadSettings()
 
     m_additionalSettings.FilterFilesCheckbox->setCheckState(options.filterUiFiles ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     m_additionalSettings.ExtractVertexColorsCheckbox->setCheckState(options.extractVertexColors ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    m_additionalSettings.IncludeLandscapesCheckbox->setCheckState(options.includeLandscapeInLevel ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
 void
@@ -208,7 +209,7 @@ UiPicker::parsePickerOptions()
     if (this->AudioCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Audio;
     if (this->LevelCheckbox->isChecked())
-        exportTypes |= (int)WarframeExporter::ExtractorType::Level | (int)WarframeExporter::ExtractorType::LevelStatic;
+        exportTypes |= (int)WarframeExporter::ExtractorType::Level | (int)WarframeExporter::ExtractorType::LevelStatic | (int)WarframeExporter::ExtractorType::Landscape;
     if (this->MaterialCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Material;
     if (this->ModelCheckbox->isChecked())
@@ -243,6 +244,7 @@ UiPicker::parsePickerOptions()
 
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
+    options.includeLandscapeInLevel = m_additionalSettings.IncludeLandscapesCheckbox->isChecked();
 
     LotusLib::Game game = LotusLib::guessGame(cachePathStr);
     WarframeExporter::Logger::getInstance().info("Setting game to " + LotusLib::gameToString(game));

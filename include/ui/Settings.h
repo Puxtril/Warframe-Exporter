@@ -38,6 +38,7 @@ class UiSettings : public QObject
     static const inline QString m_filterExportTypes = "additionalsettings/filterfiles";
     static const inline QString m_extractVertexColors = "additionalsettings/vertexcolors";
     static const inline QString m_levelHlodExportType = "additionalsettings/levelhlod";
+    static const inline QString m_includeLandscapesInLevel = "additionalsettings/levellandscape";
 
     static const inline QString m_audioVolume = "preview/audiovolume";
 

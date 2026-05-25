@@ -8,5 +8,6 @@ namespace WarframeExporter::Level
 		LEVEL_202 = 202,
 		LEVEL_207 = 207,
 		LEVEL_209 = 209,
+		LEVEL_212 = 212,
 	};
 }

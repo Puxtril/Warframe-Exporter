@@ -59,25 +59,34 @@ LevelStaticExtractor::addModelsToGltf(LevelStaticExternal& external, const Lotus
 				continue;
 			}
 
-			WarframeExporter::Model::ModelHeaderExternal headerExt;
-			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curMeshEntry.commonHeader, &curMeshEntry.header, &curMeshEntry.body, &curMeshEntry.footer, pkgs.getGame(), headerExt, bodyExt);
-
-			if (headerExt.meshInfos.size() == 0)
+			try
 			{
-				m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", curMeshPath));
+				WarframeExporter::Model::ModelHeaderExternal headerExt;
+				WarframeExporter::Model::ModelBodyExternal bodyExt;
+				WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curMeshEntry.commonHeader, &curMeshEntry.header, &curMeshEntry.body, &curMeshEntry.footer, pkgs.getGame(), headerExt, bodyExt);
+
+				if (headerExt.meshInfos.size() == 0)
+				{
+					m_logger.debug(spdlog::fmt_lib::format("Skipping zero meshinfos {}", curMeshPath));
+					continue;
+				}
+
+				// Gltf exporter doesn't like multiple rigged models
+				headerExt.boneTree.clear();
+
+				WarframeExporter::Model::ModelHeaderInternal headerInt;
+				WarframeExporter::Model::ModelBodyInternal bodyInt;
+				auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg, options.extractVertexColors);
+				WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curMeshEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), curMeshPath);
+					
+				modelPathsInGltf[curMeshPath] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
+			}
+			catch (std::exception& ex)
+			{
+				if (curMeshPath.length() > 5)
+					m_logger.error(spdlog::fmt_lib::format("{}: {}", ex.what(), curMeshPath));
 				continue;
 			}
-
-			// Gltf exporter doesn't like multiple rigged models
-			headerExt.boneTree.clear();
-
-			WarframeExporter::Model::ModelHeaderInternal headerInt;
-			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curMeshPath, miscPkg, options.extractVertexColors);
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curMeshEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), curMeshPath);
-				
-			modelPathsInGltf[curMeshPath] = ExporterGltf::addModel(gltf, headerInt, bodyInt, bodyExt);
 		}
 
 		ExporterGltf::addModelInstance(gltf, external.header, curLevelObj, modelPathsInGltf[curMeshPath]);

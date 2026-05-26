@@ -16,6 +16,7 @@ class UiSettings : public QObject
 {
     QSettings m_settings;
 
+    static const inline QString m_cacheWindowsPresetsKey = "load/cachePathPresets";
     static const inline QString m_cacheWindowsKey = "load/cachePath";
     static const inline QString m_exportPathKey = "load/exportPath";
 
@@ -48,6 +49,9 @@ class UiSettings : public QObject
 
 public:
     static UiSettings& getInstance();
+
+    QStringList getCacheWindowsPathPresets() const;
+    void setCacheWindowsPathPreset(QStringList presets);
 
     QString getCacheWindowsPath() const;
     QString getExportPath() const;

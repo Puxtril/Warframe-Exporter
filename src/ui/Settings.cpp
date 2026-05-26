@@ -12,6 +12,18 @@ UiSettings::getInstance()
     return instance;
 }
 
+QStringList
+UiSettings::getCacheWindowsPathPresets() const
+{
+    return m_settings.value(m_cacheWindowsPresetsKey).toStringList();
+}
+
+void
+UiSettings::setCacheWindowsPathPreset(QStringList presets)
+{
+    m_settings.setValue(m_cacheWindowsPresetsKey, presets);
+}
+
 QString
 UiSettings::getCacheWindowsPath() const
 {

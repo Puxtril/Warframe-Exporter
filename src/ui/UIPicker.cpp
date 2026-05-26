@@ -36,6 +36,7 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
     QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::rejected, &m_additionalSettingsDialog, &QDialog::hide);
 
     QObject::connect(this->CacheWindowsInput, &QLineEdit::textChanged, this, &UiPicker::cachePathUpdated);
+    QObject::connect(this->CacheWindowsPresetPicker, &QComboBox::activated, this, &UiPicker::cachePathComboChanged);
     QObject::connect(this->GameInfoButton, &QPushButton::clicked, &this->m_chosenGameMessage, &QMessageBox::show);
 
     QObject::connect(this->LoadButton, &QPushButton::clicked, this, &UiPicker::parsePickerOptions);
@@ -71,6 +72,22 @@ void
 UiPicker::loadSettings()
 {
     UiSettings& settings = UiSettings::getInstance();
+
+    // Ensure all saved paths are still valid
+    QStringList validSavedPaths;
+    QStringList currentSavedPaths = settings.getCacheWindowsPathPresets();
+    for (int i = 0; i < currentSavedPaths.count(); i++)
+    {
+        const QString& gamePath = currentSavedPaths[i];
+
+        LotusLib::Game newGame = LotusLib::guessGame(gamePath.toStdString());
+        if (newGame != LotusLib::Game::UNKNOWN)
+        {
+            this->CacheWindowsPresetPicker->insertItem(i, QString::fromStdString(LotusLib::gameToString(newGame)), gamePath);
+            validSavedPaths.append(gamePath);
+        }
+    }
+    settings.setCacheWindowsPathPreset(validSavedPaths);
 
     this->CacheWindowsInput->setText(settings.getCacheWindowsPath());
     this->ExportPathInput->setText(settings.getExportPath());
@@ -171,6 +188,34 @@ UiPicker::cachePathUpdated(const QString& newPath)
         }
     }
 
+    // Valid game selected
+    if (!disableLoadButton)
+    {
+        int presetIndex = this->CacheWindowsPresetPicker->findData(newPath);
+
+        // Game hasn't been seen before. Add as a preset.
+        if (presetIndex == -1)
+        {
+            this->CacheWindowsPresetPicker->addItem(QString::fromStdString(LotusLib::gameToString(newGame)), newPath);
+            presetIndex = this->CacheWindowsPresetPicker->findData(newPath);
+            
+            QStringList values;
+            for (int i = 0; i < this->CacheWindowsPresetPicker->count(); i++)
+                values.append(this->CacheWindowsPresetPicker->itemData(i).toString());
+            UiSettings::getInstance().setCacheWindowsPathPreset(values);
+        }
+
+        if (presetIndex != this->CacheWindowsPresetPicker->currentIndex())
+            this->CacheWindowsPresetPicker->setCurrentIndex(presetIndex);
+    }
+    else
+    {
+        this->CacheWindowsPresetPicker->setCurrentIndex(-1);
+    }
+
+    // Don't even make this visible for one-game users
+    this->CacheWindowsPresetPicker->setVisible(this->CacheWindowsPresetPicker->count() > 1);
+
     this->LoadButton->setDisabled(disableLoadButton);
     this->GameInfoButton->show();
     this->GameInfoButton->setIcon(QIcon::fromTheme(buttonIconName).pixmap(100, 100));
@@ -179,6 +224,17 @@ UiPicker::cachePathUpdated(const QString& newPath)
 
     std::string newTitle = LotusLib::gameToString(newGame) + " Information";
     m_chosenGameMessage.setWindowTitle(newTitle.c_str());
+}
+
+void
+UiPicker::cachePathComboChanged(int index)
+{
+    if (index == -1)
+        return;
+
+    QString newCachePath = this->CacheWindowsPresetPicker->itemData(index).toString();
+    // This will trigger the signal QLineEdit::textChanged, and thus, this->cachePathUpdated
+    this->CacheWindowsInput->setText(newCachePath);
 }
 
 void

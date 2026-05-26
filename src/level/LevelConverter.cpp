@@ -44,6 +44,8 @@ LevelConverter::splitAttributes(nlohmann::json& json, LevelObjectInternal& intOb
 	{
 		if (element.key() == "Mesh")
 			intObj.meshPath = element.value().get<std::string>();
+		else if (element.key() == "Material")
+			intObj.materials = {element.value().get<std::string>()};
 		else if (element.key() == "OverrideMaterial")
 			intObj.materials = element.value().get<std::vector<std::string>>();
 		else if (element.key() == "MeshScale")

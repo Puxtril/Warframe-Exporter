@@ -37,6 +37,7 @@ public:
 private:
     void addComboBoxOptions();
     void loadVersion();
+    void loadCachePresets();
     bool createExportFolder();
     void cachePathUpdated(const QString& newPath);
 

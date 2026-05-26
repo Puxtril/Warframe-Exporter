@@ -73,21 +73,7 @@ UiPicker::loadSettings()
 {
     UiSettings& settings = UiSettings::getInstance();
 
-    // Ensure all saved paths are still valid
-    QStringList validSavedPaths;
-    QStringList currentSavedPaths = settings.getCacheWindowsPathPresets();
-    for (int i = 0; i < currentSavedPaths.count(); i++)
-    {
-        const QString& gamePath = currentSavedPaths[i];
-
-        LotusLib::Game newGame = LotusLib::guessGame(gamePath.toStdString());
-        if (newGame != LotusLib::Game::UNKNOWN)
-        {
-            this->CacheWindowsPresetPicker->insertItem(i, QString::fromStdString(LotusLib::gameToString(newGame)), gamePath);
-            validSavedPaths.append(gamePath);
-        }
-    }
-    settings.setCacheWindowsPathPreset(validSavedPaths);
+    loadCachePresets();
 
     this->CacheWindowsInput->setText(settings.getCacheWindowsPath());
     this->ExportPathInput->setText(settings.getExportPath());
@@ -115,6 +101,51 @@ UiPicker::loadVersion()
 {
     QString version = std::string(g_version).c_str();
     this->VersionLabel->setText(version);
+}
+
+void
+UiPicker::loadCachePresets()
+{
+    // If multiple of the same game is present, display LotusLib::gameIdentifier instead.
+    // A little annoying, but worth it visually.
+    std::map<LotusLib::Game, int> gameCount;
+    std::vector<std::tuple<LotusLib::Game, std::string, QString>> gameIdentifiers;
+    // Ensure all saved paths are still valid.
+    QStringList validSavedPaths;
+
+    // Populate the above 3 variables
+    QStringList currentSavedPaths = UiSettings::getInstance().getCacheWindowsPathPresets();
+    for (int i = 0; i < currentSavedPaths.count(); i++)
+    {
+        const QString& curPath = currentSavedPaths[i];
+
+        std::tuple<LotusLib::Game, std::string> newGame = LotusLib::gameIdentifier(curPath.toStdString());
+        if (std::get<0>(newGame) != LotusLib::Game::UNKNOWN)
+        {
+            gameIdentifiers.push_back({std::get<0>(newGame), std::get<1>(newGame), curPath});
+            gameCount[std::get<0>(newGame)] = gameCount[std::get<0>(newGame)] + 1;
+            validSavedPaths.append(curPath);
+        }
+    }
+
+    // Sort by the identifier
+    sort(gameIdentifiers.begin(), gameIdentifiers.end(), [](const std::tuple<LotusLib::Game, std::string, QString>& a, const std::tuple<LotusLib::Game, std::string, QString>& b) -> bool { return std::get<1>(a) > std::get<1>(b);});
+
+    // Populate `this->CacheWindowsPresetPicker`
+    for (int i = 0; i < gameIdentifiers.size(); i++)
+    {
+        const std::tuple<LotusLib::Game, std::string, QString> curIdentifier = gameIdentifiers[i];
+
+        QString name = "";
+        if (gameCount[std::get<0>(curIdentifier)] > 1)
+            name = QString::fromStdString(std::get<1>(curIdentifier));
+        else
+            name = QString::fromStdString(LotusLib::gameToString(std::get<0>(curIdentifier)));
+        this->CacheWindowsPresetPicker->insertItem(i, name, std::get<2>(curIdentifier));
+    }
+
+    // Re-save only valid values
+    UiSettings::getInstance().setCacheWindowsPathPreset(validSavedPaths);
 }
 
 void

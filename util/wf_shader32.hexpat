@@ -1,62 +1,6 @@
 #pragma once
 
-#include <std/string.pat>
-#include <std/io.pat>
-
-using str32;
-fn fmt_str32(str32 var) {
-    return var.s;
-};
-struct str32 {
-    u32 strLen [[hidden]];
-    char s[strLen];
-} [[format("fmt_str32")]];
-
-struct str32Arr32 {
-    u32 strCount;
-    str32 strs[strCount];
-};
-
-using vec2Float;
-fn fmt_vec2Float(vec2Float var) {
-    return std::format("({:.3f}, {:.3f})", var.x, var.y);
-};
-struct vec2Float {
-    float x;
-    float y;
-};
-
-using vec3Float;
-fn fmt_vec3Float(vec3Float var) {
-    return std::format("({:.3f}, {:.3f}, {:.3f})", var.x, var.y, var.z);
-};
-struct vec3Float {
-    float x;
-    float y;
-    float z;
-} [[format("fmt_vec3Float")]];
-
-using vec4Float;
-fn fmt_vec4Float(vec4Float var) {
-    return std::format("({:.3f}, {:.3f}, {:.3f}, {:.3f})", var.x, var.y, var.z, var.w);
-};
-struct vec4Float {
-    float x;
-    float y;
-    float z;
-    float w;
-} [[format("fmt_vec4Float")]];
-
-struct CommonHeader {
-    char hash[16];
-    str32Arr32 entries;
-    u32 propsLen;
-    char propsStr[propsLen];
-    if (propsLen != 0) {
-        char;
-    }
-    u32 fileTypeEnum;
-};
+#include <wf_common-header.hexpat>
 
 fn fmt_name(auto var) {
     return var.name;
@@ -155,9 +99,12 @@ struct Shader32 {
     u32 Att2Len [[hidden]];
     Attribute2 att7[Att2Len];
     
-    // Seems like an array length....
-    padding[4];
-
+    // I need more than 1 sample to understand this struct
+    u32 unkStruct;
+    if (unkStruct != 0) {
+        padding[0x47];
+    }
+    
     ShaderMaster masters[4];
 
     s32 shaderBytecodeCheck;

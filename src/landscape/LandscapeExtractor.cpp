@@ -39,7 +39,7 @@ LandscapeExtractor::formatLandscape(const LandscapeHeaderExternal& landscapeHead
 
         Physx::HeightFieldMesh mesh = Physx::HeightFieldReader::convertToMesh(curChunk.header, curChunk.samples);
         LandscapeConverter::scaleChunks(mesh, landscapeHeader.chunks[i], curChunk);
-        internal.chunks.push_back(mesh);
+        internal.chunks.push_back({curChunk.header, mesh, landscapeHeader.chunks[i].scale });
     }
 
     LandscapeConverter::addTransforms(internal);

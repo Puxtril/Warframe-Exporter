@@ -24,10 +24,12 @@ void
 LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader, const std::vector<LandscapeBodyChunkExternal>& externalChunks, LandscapeInternal& internal)
 {
     std::tuple<int, int> grid = fixGridCount(externalHeader);
+    internal.chunkCountY = std::get<0>(grid);
+    internal.chunkCountX = std::get<1>(grid);
 
-    for (int iRow = 0; iRow < std::get<0>(grid); iRow++)
+    for (int iRow = 0; iRow < internal.chunkCountY; iRow++)
     {
-        for (int iColumn = 0; iColumn < std::get<1>(grid); iColumn++)
+        for (int iColumn = 0; iColumn < internal.chunkCountX; iColumn++)
         {
             int chunkIndex = iRow + iColumn;
             const glm::vec3& scale = externalHeader.chunks[chunkIndex].scale;

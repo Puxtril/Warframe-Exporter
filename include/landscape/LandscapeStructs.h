@@ -30,10 +30,19 @@ namespace WarframeExporter::Landscape
         std::vector<Physx::HeightFieldSample> samples;
     };
 
+    struct LandscapeChunkInternal
+    {
+        Physx::HeightFieldHeader header;
+        Physx::HeightFieldMesh body;
+        glm::vec3 scale;
+    };
+
     struct LandscapeInternal
     {
         std::vector<glm::vec3> positions;
-        std::vector<Physx::HeightFieldMesh> chunks;
+        int chunkCountX;
+        int chunkCountY;
+        std::vector<LandscapeChunkInternal> chunks;
         std::vector<std::vector<std::string>> materialPathArrays;
         std::vector<glm::mat4> transforms;
     };

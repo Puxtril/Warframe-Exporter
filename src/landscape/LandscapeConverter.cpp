@@ -66,3 +66,71 @@ LandscapeConverter::addTransforms(LandscapeInternal& landscape)
         landscape.transforms.push_back(rotate * translate);
     }
 }
+
+std::vector<LandscapeChunkInternal>
+LandscapeConverter::convertToInternalMultithread(const LandscapeHeaderExternal& landscapeHeader, const std::vector<LandscapeBodyChunkExternal>& landscapeBody)
+{
+    const size_t chunkCount = landscapeBody.size();
+    std::vector<LandscapeChunkInternal> outputChunks(chunkCount);
+
+    const size_t threadCount = std::min(std::max((size_t)8, (size_t)std::thread::hardware_concurrency()), chunkCount);
+    size_t runningThreadCount = 0;
+    size_t remainingChunkCount = chunkCount;
+
+    std::vector<bool> inputQueue(chunkCount, false);
+    std::vector<std::thread> runningQueue(chunkCount);
+
+    // Populate the output queue
+    for (size_t i = 0; i < threadCount; i++)
+    {
+        runningQueue[i] = std::thread(LandscapeConverter::convertLandscapeTask, &landscapeBody[i], &landscapeHeader.chunks[i], &outputChunks, i);
+        inputQueue[i] = true;
+        runningThreadCount++;
+        remainingChunkCount--;
+    }
+
+    // Parse output queue
+    while (true)
+    {
+        // Join completed threads
+        for (size_t i = 0; i < chunkCount; i++)
+        {
+            if (runningQueue[i].joinable() && outputChunks[i].header.sampleCount == landscapeBody[i].samples.size())
+            {
+                runningQueue[i].join();
+                runningThreadCount--;
+            }
+        }
+
+        // Create new threads
+        for (size_t i = 0; i < chunkCount; i++)
+        {
+            if (runningThreadCount < threadCount)
+            {
+                if (!runningQueue[i].joinable() && !inputQueue[i])
+                {
+                    runningQueue[i] = std::thread(LandscapeConverter::convertLandscapeTask, &landscapeBody[i], &landscapeHeader.chunks[i], &outputChunks, i);
+                    inputQueue[i] = true;
+                    runningThreadCount++;
+                    remainingChunkCount--;
+                }
+            }
+        }
+
+        // Done
+        if (runningThreadCount == 0 && remainingChunkCount == 0)
+            break;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    return outputChunks;
+}
+
+void
+LandscapeConverter::convertLandscapeTask(const LandscapeBodyChunkExternal* chunk, const LandscapeHeaderChunkExternal* eeChunkHeader, std::vector<LandscapeChunkInternal>* outputChunks, size_t outputChunkIndex)
+{
+    Physx::HeightFieldIndexedMesh mesh = Physx::HeightFieldReader::convertToIndexedMesh(chunk->header, chunk->samples);
+    LandscapeConverter::scaleChunks(mesh, *eeChunkHeader, *chunk);
+    (*outputChunks)[outputChunkIndex] = {chunk->header, mesh, eeChunkHeader->scale };
+}

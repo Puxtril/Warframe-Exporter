@@ -37,7 +37,7 @@ LandscapeExtractor::formatLandscape(const LandscapeHeaderExternal& landscapeHead
     {
         const LandscapeBodyChunkExternal& curChunk = landscapeBody[i];
 
-        Physx::HeightFieldMesh mesh = Physx::HeightFieldReader::convertToMesh(curChunk.header, curChunk.samples);
+        Physx::HeightFieldIndexedMesh mesh = Physx::HeightFieldReader::convertToIndexedMesh(curChunk.header, curChunk.samples);
         LandscapeConverter::scaleChunks(mesh, landscapeHeader.chunks[i], curChunk);
         internal.chunks.push_back({curChunk.header, mesh, landscapeHeader.chunks[i].scale });
     }
@@ -50,7 +50,7 @@ Document
 LandscapeExtractor::convertToGltf(const LandscapeInternal& internal)
 {
     Document gltf;
-    LandscapeExporterGltf::addLandscapeChunks(gltf, internal);
+    LandscapeExporterGltf::addLandscapeChunks(gltf, internal, {0, 0, 0});
     return gltf;
 }
 

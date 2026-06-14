@@ -22,7 +22,7 @@ namespace WarframeExporter::Landscape
         static std::tuple<int, int> fixGridCount(const LandscapeHeaderExternal& externalHeader);
 
         static void positionChunks(const LandscapeHeaderExternal& externalHeader, const std::vector<LandscapeBodyChunkExternal>& externalChunks, LandscapeInternal& internal);
-        static void scaleChunks(Physx::HeightFieldMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk);
+        static void scaleChunks(Physx::HeightFieldIndexedMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk);
         static void addTransforms(LandscapeInternal& landscape);
     };
 }

@@ -33,7 +33,7 @@ namespace WarframeExporter::Landscape
     struct LandscapeChunkInternal
     {
         Physx::HeightFieldHeader header;
-        Physx::HeightFieldMesh body;
+        Physx::HeightFieldIndexedMesh body;
         glm::vec3 scale;
     };
 

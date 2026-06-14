@@ -180,7 +180,7 @@ LevelExtractor::addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyI
     auto intLandscape = landscapeExtractor->formatLandscape(extHeader, chunks);
 
 	size_t modelCountPre = gltfDoc.meshes.size();
-	Landscape::LandscapeExporterGltf::addLandscapeChunks(gltfDoc, intLandscape);
+	Landscape::LandscapeExporterGltf::addLandscapeChunks(gltfDoc, intLandscape, {bodyInt.landscape.pos.x, 0, bodyInt.landscape.pos.z});
 	
 	// Add level-specific attributes to each landscape chunk
 	for (size_t modelIndex = modelCountPre; modelIndex < gltfDoc.meshes.size(); modelIndex++)

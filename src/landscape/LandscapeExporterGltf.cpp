@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Landscape;
 
 void
-LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape)
+LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape, const glm::vec3& pos)
 {
     for (size_t i = 0; i < landscape.chunks.size(); i++)
     {
@@ -24,8 +24,10 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
         gltfDoc.scenes.resize(1);
         Scene& scene = gltfDoc.scenes[0];
 
-        Node curNode;        
-        std::memcpy(&curNode.matrix[0], &landscape.transforms[i][0], 16 * sizeof(float));
+        Node curNode;
+        glm::mat4 transforms = glm::translate(landscape.transforms[i], pos);
+        std::memcpy(&curNode.matrix[0], &transforms[0], 16 * sizeof(float));
+        
         curNode.mesh = curMeshIndex;
         int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
         gltfDoc.nodes.push_back(curNode);
@@ -41,6 +43,7 @@ LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const LandscapeChun
     Attributes vertAttributes = _addLandscapeVertices(gltfDoc, chunk, buf);
 
     Primitive primitive;
+    primitive.indices = _addIndices(gltfDoc, chunk, buf);
     primitive.mode = Primitive::Mode::Triangles;
     primitive.attributes = vertAttributes;
 
@@ -91,10 +94,42 @@ LandscapeExporterGltf::_addPositions(Document& gltfDoc, const LandscapeChunkInte
     return posAccIndex;
 }
 
+int32_t 
+LandscapeExporterGltf::_addIndices(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
+{
+    Buffer& buf = _getBuffer(gltfDoc);
+
+	uint32_t indexSize = (uint32_t)chunk.body.indices.size() * sizeof(uint32_t);
+	uint32_t startOffset = buf.byteLength;
+
+	buf.data.resize(startOffset + indexSize);
+	std::memcpy(&buf.data[startOffset], chunk.body.indices.data(), indexSize);
+	buf.byteLength += indexSize;
+
+	BufferView bufView;
+	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
+	bufView.buffer = gltfDoc.buffers.size() - 1;
+	bufView.byteOffset = startOffset;
+	bufView.byteLength = indexSize;
+	bufView.target = BufferView::TargetType::ElementArrayBuffer;
+	gltfDoc.bufferViews.push_back(bufView);
+
+    Accessor curAcc;
+    int32_t curAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+    curAcc.bufferView = bufViewIndex;
+    curAcc.byteOffset = 0;
+    curAcc.count = chunk.body.indices.size();
+    curAcc.type = Accessor::Type::Scalar;
+    curAcc.componentType = Accessor::ComponentType::UnsignedInt;
+    gltfDoc.accessors.push_back(curAcc);
+    
+	return curAccIndex;
+}
+
 int32_t
 LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
 {
-    const uint32_t uvDataSize = static_cast<uint32_t>(chunk.body.vertexPositions.size()) * (sizeof(float) * 2);
+    const uint32_t uvDataSize = static_cast<uint32_t>(chunk.body.vertexPositions.size()) * (sizeof(uint16_t) * 2);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + uvDataSize;
     buffer.data.resize(newSize);
@@ -102,10 +137,10 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChun
 
     for (size_t i = 0; i < chunk.body.vertexPositions.size(); i++)
     {
-        const float v = chunk.body.vertexPositions[i][2] / chunk.scale.x;
-        const float u = 1.0F - chunk.body.vertexPositions[i][0] / chunk.scale.y;
-        memcpy(buffer.data.data() + curSize + (i * 2 * 4), &v, 4);
-        memcpy(buffer.data.data() + curSize + (i * 2 * 4) + 4, &u, 4);
+        const uint16_t v = (chunk.body.vertexPositions[i][2] / chunk.scale.x) * UINT16_MAX;
+        const uint16_t u = (1.0F - chunk.body.vertexPositions[i][0] / chunk.scale.y) * UINT16_MAX;
+        memcpy(buffer.data.data() + curSize + (i * 2 * 2), &v, 2);
+        memcpy(buffer.data.data() + curSize + (i * 2 * 2) + 2, &u, 2);
     }
 
     BufferView bufView;
@@ -113,7 +148,7 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChun
 	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = curSize;
 	bufView.byteLength = uvDataSize;
-	bufView.byteStride = sizeof(float) * 2;
+	bufView.byteStride = sizeof(uint16_t) * 2;
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	gltfDoc.bufferViews.push_back(bufView);
 
@@ -123,7 +158,10 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChun
 	uvAcc.byteOffset = 0;
 	uvAcc.count = static_cast<uint32_t>(chunk.body.vertexPositions.size());
 	uvAcc.type = Accessor::Type::Vec2;
-	uvAcc.componentType = Accessor::ComponentType::Float;
+	uvAcc.componentType = Accessor::ComponentType::UnsignedShort;
+    uvAcc.normalized = true;
+    uvAcc.max = {UINT16_MAX, UINT16_MAX, UINT16_MAX};
+    uvAcc.min = {0, 0, 0};
 	gltfDoc.accessors.push_back(uvAcc);
 
     return uvAccIndex;
@@ -132,9 +170,7 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChun
 int32_t
 LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
 {
-    // * 3 for vertices
-    // * 3 for Vec3
-    const uint32_t colorDataSize = static_cast<uint32_t>(chunk.body.materials.size()) * 3 * 3;
+    const uint32_t colorDataSize = static_cast<uint32_t>(chunk.body.materials.size() * 3);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + colorDataSize;
     buffer.data.resize(newSize);
@@ -142,7 +178,7 @@ LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const LandscapeChunkI
 
     for (size_t i = 0; i < chunk.body.materials.size(); i++)
     {
-        std::fill_n(buffer.data.data() + curSize + (i * 9), 9, chunk.body.materials[i]);
+        std::fill_n(buffer.data.data() + curSize + (i * 3), 3, chunk.body.materials[i]);
     }
 
     BufferView bufView;
@@ -158,7 +194,7 @@ LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const LandscapeChunkI
 	int32_t colAccIndex = (int32_t)gltfDoc.accessors.size();
 	colAcc.bufferView = bufViewIndex;
 	colAcc.byteOffset = 0;
-	colAcc.count = static_cast<uint32_t>(chunk.body.materials.size() * 3);
+	colAcc.count = static_cast<uint32_t>(chunk.body.materials.size());
 	colAcc.type = Accessor::Type::Vec3;
     colAcc.normalized = true;
 	colAcc.componentType = Accessor::ComponentType::UnsignedByte;

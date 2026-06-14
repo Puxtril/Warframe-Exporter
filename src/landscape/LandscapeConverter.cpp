@@ -39,7 +39,7 @@ LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader
 }
 
 void
-LandscapeConverter::scaleChunks(Physx::HeightFieldMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk)
+LandscapeConverter::scaleChunks(Physx::HeightFieldIndexedMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk)
 {
     for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
     {

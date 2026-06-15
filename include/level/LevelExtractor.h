@@ -69,7 +69,7 @@ namespace WarframeExporter::Level
 	
 	private:
 		void writeAndAdvanceBuffer(Document& gltfDoc, const std::filesystem::path& outputPath);
-		void findLandscape(LevelExternal& levelExternal);
-		void addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, const LotusLib::PackageCollection& pkgs);
+		void addModelToGltf(const LevelObjectInternal& levelObj, bool extractVertexColors, const LotusLib::PackageCollection& pkgs, Document& gltfDoc);
+		void addLandscapeToGltf(const LevelObjectInternal& levelObj, const LevelInternal& bodyInt, const LotusLib::PackageCollection& pkgs, Document& gltfDoc);
 	};
 }

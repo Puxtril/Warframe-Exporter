@@ -18,10 +18,9 @@ namespace WarframeExporter::Level
 	public:
 		static void convertToInternal(LevelHeaderExternal& extHeader, LevelBodyExternal& extBody, const std::string& internalLevelPath, LevelInternal& intBody);
 		static void replaceOverrideMaterials(const std::vector<std::string>& materialNames, Model::ModelHeaderInternal& modelHeader);
-		static void convertLandscapeToInternal(const LevelExternal& levelExternal, LevelInternal& levelInternal);
 
 	private:
-		static void splitAttributes(nlohmann::json& json, LevelObjectInternal& intObj);
+		static void splitAttributes(nlohmann::json::object_t& json, LevelObjectInternal& intObj);
 
 		// Sometimes the internal path to files are relative
 		// Each level file in AnimRetarget has a corresponding folder in Misc

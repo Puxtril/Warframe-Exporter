@@ -19,7 +19,6 @@ LevelExtractor::getLevelExternal(uint32_t fileType, BinaryReader::Buffered& head
 	levelReader->readHeader(headerData, external.header);
 	levelReader->readBody(bodyData, external.header, external.body);
 
-	findLandscape(external);
 	return external;
 }
 
@@ -28,7 +27,6 @@ LevelExtractor::convertToInternal(const std::string& internalPath, LevelExternal
 {
 	LevelInternal bodyInt;
 	LevelConverter::convertToInternal(levelExternal.header, levelExternal.body, internalPath, bodyInt);
-	LevelConverter::convertLandscapeToInternal(levelExternal, bodyInt);
 	return bodyInt;
 }
 
@@ -81,18 +79,15 @@ LevelExtractor::createGltfCombined(const LotusLib::PackageCollection& pkgs, Leve
 
 	LotusLib::Package miscPkg = pkgs.getPackage("Misc");
 
-	if (!bodyInt.landscape.landscapePath.empty() && options.includeLandscapeInLevel)
-		addLandscapeToGltf(outGltf, bodyInt, pkgs);
-
 	for (size_t x = 0; x < bodyInt.objs.size(); x++)
 	{
 		// >3GB
 		if (outGltf.buffers.size() > 0 && outGltf.buffers.back().data.size() > 3221225472)
 			outGltf.buffers.resize(outGltf.buffers.size() + 1);
 
-		LevelObjectInternal& curLevelObj = bodyInt.objs[x];
+		const LevelObjectInternal& curLevelObj = bodyInt.objs[x];
 
-		if (curLevelObj.meshPath == "")
+		if (curLevelObj.meshPath == "" && curLevelObj.objTypePath != "/EE/Types/Effects/Landscape")
 			continue;
 
 		bool isHlod = curLevelObj.objTypePath.length() >= 19 && curLevelObj.objTypePath.compare(curLevelObj.objTypePath.length() - 19, 19, "HLODAggregateEntity") == 0;
@@ -103,39 +98,10 @@ LevelExtractor::createGltfCombined(const LotusLib::PackageCollection& pkgs, Leve
 
 		try
 		{
-			LotusLib::FileEntry curLevelEntry = pkgs.getPackage("Misc").getFileEntry(curLevelObj.meshPath);
-
-			if (curLevelEntry.header.getLength() == 0)
-			{
-				m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", curLevelObj.meshPath));
-				continue;
-			}
-
-			Model::ModelReader* modelReader = Model::ModelExtractor::getInstance()->getModelReader(curLevelObj.meshPath, curLevelEntry.commonHeader.type, pkgs.getGame());
-			if (modelReader == nullptr)
-			{
-				m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelEntry.commonHeader.type, curLevelObj.meshPath));
-				continue;
-			}
-
-			WarframeExporter::Model::ModelHeaderExternal headerExt;
-			WarframeExporter::Model::ModelBodyExternal bodyExt;
-			WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curLevelEntry.commonHeader, &curLevelEntry.header, &curLevelEntry.body, &curLevelEntry.footer, pkgs.getGame(), headerExt, bodyExt);
-
-			if (headerExt.meshInfos.size() == 0)
-				continue;
-
-			// Gltf exporter doesn't like multiple rigged models
-			headerExt.boneTree.clear();
-
-			WarframeExporter::Model::ModelHeaderInternal headerInt;
-			WarframeExporter::Model::ModelBodyInternal bodyInt;
-			auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(curLevelObj.meshPath, miscPkg, options.extractVertexColors);
-			WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), curLevelObj.meshPath);
-
-			LevelConverter::replaceOverrideMaterials(curLevelObj.materials, headerInt);
-
-			LevelExporterGltf::addModel(outGltf, headerInt, bodyInt, bodyExt, curLevelObj);
+			if (curLevelObj.objTypePath == "/EE/Types/Effects/Landscape" && options.includeLandscapeInLevel)
+				addLandscapeToGltf(curLevelObj, bodyInt, pkgs, outGltf);
+			else
+				addModelToGltf(curLevelObj, options.extractVertexColors, pkgs, outGltf);
 		}
 		catch (std::exception& ex)
 		{
@@ -149,43 +115,71 @@ LevelExtractor::createGltfCombined(const LotusLib::PackageCollection& pkgs, Leve
 }
 
 void
-LevelExtractor::findLandscape(LevelExternal& levelExternal)
+LevelExtractor::addModelToGltf(const LevelObjectInternal& levelObj, bool extractVertexColors, const LotusLib::PackageCollection& pkgs, Document& gltfDoc)
 {
-	for (size_t i = 0; i < levelExternal.header.levelObjs.size(); i++)
+	LotusLib::Package miscPkg = pkgs.getPackage("Misc");
+	LotusLib::FileEntry curLevelEntry = miscPkg.getFileEntry(levelObj.meshPath);
+
+	if (curLevelEntry.header.getLength() == 0)
 	{
-		if (levelExternal.header.levelObjs[i].objTypePath == "/EE/Types/Effects/Landscape")
-		{
-			levelExternal.landscapeIndex = i;
-			break;
-		}
+		m_logger.warn(spdlog::fmt_lib::format("Object doesn't exist: {}", levelObj.meshPath));
+		return;
 	}
+
+	Model::ModelReader* modelReader = Model::ModelExtractor::getInstance()->getModelReader(levelObj.meshPath, curLevelEntry.commonHeader.type, pkgs.getGame());
+	if (modelReader == nullptr)
+	{
+		m_logger.warn(spdlog::fmt_lib::format("Skipping unsupported type {}: {}", curLevelEntry.commonHeader.type, levelObj.meshPath));
+		return;
+	}
+
+	WarframeExporter::Model::ModelHeaderExternal headerExt;
+	WarframeExporter::Model::ModelBodyExternal bodyExt;
+	WarframeExporter::Model::ModelExtractor::getInstance()->extractExternal(modelReader, curLevelEntry.commonHeader, &curLevelEntry.header, &curLevelEntry.body, &curLevelEntry.footer, pkgs.getGame(), headerExt, bodyExt);
+
+	if (headerExt.meshInfos.size() == 0)
+		return;
+
+	// Gltf exporter doesn't like multiple rigged models
+	headerExt.boneTree.clear();
+
+	WarframeExporter::Model::ModelHeaderInternal headerInt;
+	WarframeExporter::Model::ModelBodyInternal bodyInt;
+	auto vertexColors = WarframeExporter::Model::ModelExtractor::getInstance()->getVertexColors(levelObj.meshPath, miscPkg, extractVertexColors);
+	WarframeExporter::Model::ModelConverter::convertToInternal(headerExt, bodyExt, curLevelEntry.commonHeader.attributes, vertexColors, headerInt, bodyInt, modelReader->ensmalleningScale(), levelObj.meshPath);
+
+	LevelConverter::replaceOverrideMaterials(levelObj.materials, headerInt);
+
+	LevelExporterGltf::addModel(gltfDoc, headerInt, bodyInt, bodyExt, levelObj);
 }
 
 void
-LevelExtractor::addLandscapeToGltf(Document& gltfDoc, const LevelInternal& bodyInt, const LotusLib::PackageCollection& pkgs)
+LevelExtractor::addLandscapeToGltf(const LevelObjectInternal& levelObj, const LevelInternal& bodyInt, const LotusLib::PackageCollection& pkgs, Document& gltfDoc)
 {
 	auto landscapeExtractor = Landscape::LandscapeExtractor::getInstance();
 
-	if (!pkgs.getPackage("Misc").fileExists(bodyInt.landscape.landscapePath))
+	const std::string landscapePath = levelObj.attributes.at("DataRes").get<std::string>();
+
+	if (!pkgs.getPackage("Misc").fileExists(landscapePath))
 	{
-		WarframeExporter::Logger::getInstance().error("Unable to find landscape " + bodyInt.landscape.landscapePath);
+		WarframeExporter::Logger::getInstance().error("Unable to find landscape " + landscapePath);
 		return;
 	}
 
 	LotusLib::Package pkg = pkgs.getPackage("Misc");
-	LotusLib::FileEntry landscapeEntry = pkg.getFileEntry(bodyInt.landscape.landscapePath);
+	LotusLib::FileEntry landscapeEntry = pkg.getFileEntry(landscapePath);
 
 	auto extHeader = landscapeExtractor->readHeader(&landscapeEntry.header, landscapeEntry.commonHeader);
     auto chunks = landscapeExtractor->readLandscapeChunks(&landscapeEntry.body, extHeader, landscapeEntry.commonHeader);
     auto intLandscape = landscapeExtractor->formatLandscape(extHeader, chunks);
 
 	size_t modelCountPre = gltfDoc.meshes.size();
-	Landscape::LandscapeExporterGltf::addLandscapeChunks(gltfDoc, intLandscape, {bodyInt.landscape.pos.x, 0, bodyInt.landscape.pos.z});
+	Landscape::LandscapeExporterGltf::addLandscapeChunks(gltfDoc, intLandscape, {levelObj.pos.x, 0, levelObj.pos.z});
 	
 	// Add level-specific attributes to each landscape chunk
 	for (size_t modelIndex = modelCountPre; modelIndex < gltfDoc.meshes.size(); modelIndex++)
 	{
-		for (auto& attribute : bodyInt.landscape.attributes)
+		for (auto& attribute : levelObj.attributes)
 		{
 			gltfDoc.meshes[modelIndex].extensionsAndExtras["extras"][attribute.first] = attribute.second;
 		}

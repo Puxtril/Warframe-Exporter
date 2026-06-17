@@ -33,7 +33,7 @@ LandscapeExtractor::formatLandscape(const LandscapeHeaderExternal& landscapeHead
     LandscapeConverter::positionChunks(landscapeHeader, landscapeBody, internal);
     internal.materialPathArrays = std::move(landscapeHeader.materialPathArrays);
     internal.chunks = LandscapeConverter::convertToInternalMultithread(landscapeHeader, landscapeBody);
-    LandscapeConverter::addTransforms(internal);
+    LandscapeConverter::addTransforms(internal, landscapeHeader);
     
     return internal;
 }

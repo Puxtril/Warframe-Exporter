@@ -25,7 +25,7 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
         Scene& scene = gltfDoc.scenes[0];
 
         Node curNode;
-        glm::mat4 transforms = glm::translate(landscape.transforms[i], pos);
+        glm::mat4 transforms = glm::translate(landscape.transforms[i], {pos.z, pos.y, pos.x});
         std::memcpy(&curNode.matrix[0], &transforms[0], 16 * sizeof(float));
         
         curNode.mesh = curMeshIndex;

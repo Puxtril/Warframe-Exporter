@@ -53,12 +53,15 @@ LandscapeReader4X::readHeader(BinaryReader::Buffered* reader)
     {
         LandscapeHeaderChunkExternal& curChunk = outHeader.chunks[i];
 
-        reader->seek(0x8, std::ios::cur);
+        reader->seek(0x3C, std::ios::cur);
 
-        float scale = reader->readFloat();
-        curChunk.scale = { scale, scale, scale };
+        curChunk.scale = { 
+            reader->readFloat(),
+            reader->readFloat(),
+            reader->readFloat(),
+        };
 
-        reader->seek(0x80, std::ios::cur);
+        reader->seek(0x44, std::ios::cur);
 
         curChunk.bodyLen = reader->readUInt32();
         reader->seek(8, std::ios::cur);

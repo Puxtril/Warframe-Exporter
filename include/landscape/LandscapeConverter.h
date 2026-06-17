@@ -28,7 +28,7 @@ namespace WarframeExporter::Landscape
 
         static void positionChunks(const LandscapeHeaderExternal& externalHeader, const std::vector<LandscapeBodyChunkExternal>& externalChunks, LandscapeInternal& internal);
         static void scaleChunks(Physx::HeightFieldIndexedMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk);
-        static void addTransforms(LandscapeInternal& landscape);
+        static void addTransforms(LandscapeInternal& landscape, const LandscapeHeaderExternal& externalHeader);
 
         // The Physx code to convert chunks into meshes is CPU-intensive.
         // Especially when large landscapes can reach 200 chunks (Soulframe MidrathRedux is 14x14).

@@ -57,11 +57,16 @@ LandscapeConverter::scaleChunks(Physx::HeightFieldIndexedMesh& mesh, const Lands
 }
 
 void
-LandscapeConverter::addTransforms(LandscapeInternal& landscape)
+LandscapeConverter::addTransforms(LandscapeInternal& landscape, const LandscapeHeaderExternal& externalHeader)
 {
     for (size_t i = 0; i < landscape.chunks.size(); i++)
     {
-        glm::mat4 translate = glm::translate(glm::mat4(1.0F), glm::vec3(landscape.positions[i][0], 0.0, landscape.positions[i][2]));
+        // Landscapes have this concept of "bouandry" chunks that are present in the external header, but fixed in the internal header.
+        // And the Position of the landscape includes the bouandry chunks.
+        float positionOffsetX = (externalHeader.columnCount - landscape.chunkCountX) * externalHeader.chunks[i].scale.x / 2.0;
+        float positionOffsetY = (externalHeader.rowCount - landscape.chunkCountY) * externalHeader.chunks[i].scale.z / 2.0;
+
+        glm::mat4 translate = glm::translate(glm::mat4(1.0F), glm::vec3(landscape.positions[i][0] + positionOffsetX, 0.0, landscape.positions[i][2] + positionOffsetY));
         glm::mat4 rotate = glm::rotate(glm::mat4(1.0F), glm::radians(90.0F), glm::vec3(0.0F, 1.0F, 0.0F));
         landscape.transforms.push_back(rotate * translate);
     }

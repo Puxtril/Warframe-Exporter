@@ -203,7 +203,7 @@ CLIExtract::extract(const std::filesystem::path& cacheDirPath, const std::string
 
 	LotusLib::PackagesBin pkgsBin;
 	auto pkgsBinData = pkgs.getFile("Misc", LotusLib::PkgSplitType::HEADER, "/Packages.bin");
-	pkgsBin.initilize(pkgsBinData);
+	pkgsBin.initilize(pkgsBinData, game);
 
 	if (WarframeExporter::tryExtractFile(pkgs, pkgsBin, intPath, outPath, types, options))
 		return;
@@ -221,7 +221,7 @@ CLIExtract::dumpPkgsBin(const std::filesystem::path& cacheDirPath, const std::fi
 	try
 	{
 		auto pkgsBinData = pkgs.getFile("Misc", LotusLib::PkgSplitType::HEADER, "/Packages.bin");
-		pkgsBin.initilize(pkgsBinData);
+		pkgsBin.initilize(pkgsBinData, game);
 	}
 	catch (LotusLib::LotusException& ex)
 	{

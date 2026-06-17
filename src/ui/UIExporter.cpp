@@ -176,7 +176,7 @@ UiExporter::setData(
     m_exporterFileThread.setData(&m_packages.value(), &m_packagesBin, exportPath, extractTypes, options);
 
 	auto pkgsBinData = m_packages->getFile("Misc", LotusLib::PkgSplitType::HEADER, "/Packages.bin");
-	m_packagesBin.initilize(pkgsBinData);
+	m_packagesBin.initilize(pkgsBinData, game);
     m_previewManager.setData(&m_packages.value(), &m_packagesBin);
 
     m_loading.initProgressBar(m_packages.value(), extractTypes);

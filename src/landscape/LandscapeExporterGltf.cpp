@@ -141,7 +141,7 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChun
     for (size_t i = 0; i < chunk.body.vertexPositions.size(); i++)
     {
         const uint16_t v = (chunk.body.vertexPositions[i][2] / chunk.scale.x) * UINT16_MAX;
-        const uint16_t u = (1.0F - chunk.body.vertexPositions[i][0] / chunk.scale.y) * UINT16_MAX;
+        const uint16_t u = (1.0F - chunk.body.vertexPositions[i][0] / chunk.scale.z) * UINT16_MAX;
         memcpy(buffer.data.data() + curSize + (i * 2 * 2), &v, 2);
         memcpy(buffer.data.data() + curSize + (i * 2 * 2) + 2, &u, 2);
     }

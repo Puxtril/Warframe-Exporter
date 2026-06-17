@@ -40,6 +40,10 @@ namespace WarframeExporter::Landscape
     struct LandscapeInternal
     {
         std::vector<glm::vec3> positions;
+        // These are pulled from the file and include border chunks.
+        int srcChunkCountX;
+        int srcChunkCountY;
+        // These are the chunks we have data for.
         int chunkCountX;
         int chunkCountY;
         std::vector<LandscapeChunkInternal> chunks;

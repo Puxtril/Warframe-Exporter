@@ -5,6 +5,9 @@ using namespace WarframeExporter::Landscape;
 void
 LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape, const glm::vec3& pos)
 {
+    int chunkOffsetX = (landscape.srcChunkCountX - landscape.chunkCountX) / 2;
+    int chunkOffsetY = (landscape.srcChunkCountY - landscape.chunkCountY) / 2;
+
     for (size_t i = 0; i < landscape.chunks.size(); i++)
     {
         int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
@@ -14,8 +17,8 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
 
         Mesh gltfMesh = _addLandscapeChunk(gltfDoc, landscape.chunks[i]);
 
-        int nameX = i % landscape.chunkCountX;
-        int nameY = landscape.chunkCountY - 1 - (i / landscape.chunkCountX);
+        int nameX = (i % landscape.chunkCountX) + chunkOffsetX;
+        int nameY = (landscape.chunkCountY - 1 - (i / landscape.chunkCountX)) + chunkOffsetY;
         gltfMesh.name = "Landscape T" + std::to_string(nameX) + "u" + std::to_string(nameY);
 
         _addExtraAttributes(gltfDoc, landscape.materialPathArrays, gltfMesh, i);

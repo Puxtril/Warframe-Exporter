@@ -26,6 +26,8 @@ LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader
     std::tuple<int, int> grid = fixGridCount(externalHeader);
     internal.chunkCountY = std::get<0>(grid);
     internal.chunkCountX = std::get<1>(grid);
+    internal.srcChunkCountX = externalHeader.rowCount;
+    internal.srcChunkCountY = externalHeader.columnCount;
 
     for (int iRow = 0; iRow < internal.chunkCountY; iRow++)
     {

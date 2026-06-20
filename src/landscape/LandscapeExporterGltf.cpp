@@ -3,7 +3,7 @@
 using namespace WarframeExporter::Landscape;
 
 void
-LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape, const glm::vec3& pos)
+LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape, const glm::vec3& pos, const std::string& materialPath)
 {
     int chunkOffsetX = (landscape.srcChunkCountX - landscape.chunkCountX) / 2;
     int chunkOffsetY = (landscape.srcChunkCountY - landscape.chunkCountY) / 2;
@@ -15,7 +15,7 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
         if (landscape.chunks[i].body.vertexPositions.size() <= 12)
             continue;
 
-        Mesh gltfMesh = _addLandscapeChunk(gltfDoc, landscape.chunks[i]);
+        Mesh gltfMesh = _addLandscapeChunk(gltfDoc, landscape.chunks[i], materialPath);
 
         int nameX = (i % landscape.chunkCountX) + chunkOffsetX;
         int nameY = (landscape.chunkCountY - 1 - (i / landscape.chunkCountX)) + chunkOffsetY;
@@ -39,7 +39,7 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
 }
 
 Mesh
-LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const LandscapeChunkInternal& chunk)
+LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const LandscapeChunkInternal& chunk, const std::string& materialPath)
 {
     Buffer& buf = _getBuffer(gltfDoc);
 
@@ -49,6 +49,8 @@ LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const LandscapeChun
     primitive.indices = _addIndices(gltfDoc, chunk, buf);
     primitive.mode = Primitive::Mode::Triangles;
     primitive.attributes = vertAttributes;
+    if (!materialPath.empty())
+        primitive.material = WarframeExporter::Model::ModelExporterGltf::_findOrCreateMaterial(gltfDoc, materialPath);
 
     Mesh gltfMesh;
     gltfMesh.primitives.push_back(std::move(primitive));

@@ -69,7 +69,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DZLIB_ROOT=${{ github.workspace }}\zlib\install
+          cmake .. -DZLIB_ROOT=${{ github.workspace }}\zlib\install -DCMAKE_POLICY_VERSION_MINIMUM="3.5"
       - name: Compile project
         run: |
           cd build

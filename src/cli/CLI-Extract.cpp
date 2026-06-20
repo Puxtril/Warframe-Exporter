@@ -16,6 +16,7 @@ CLIExtract::CLIExtract()
 	m_dumpPkgs = std::make_shared<TCLAP::SwitchArg>("", "dump-pkgs", "Dump the contents of Packages.bin", false);
 
 	m_includeVertexColors = std::make_shared<TCLAP::SwitchArg>("", "vertex-colors", "Include Vertex Colors on 3D models", false);
+	m_includeLandscapesInLevel = std::make_shared<TCLAP::SwitchArg>("", "level-landscapes", "Include Landscapes on level extract", true);
 	m_shaderExportType = std::make_shared<TCLAP::ValueArg<std::string>>("", "shader-format", "Shader export format", false, "Binary", "Binary | Decompiled");
 	m_textureFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "texture-format", "Texture output format", false, "DDS", "DDS | PNG | TGA");
 	m_materialFormat = std::make_shared<TCLAP::ValueArg<std::string>>("", "material-format", "Material output format", false, "TXT", "TXT | JSON");
@@ -64,6 +65,7 @@ CLIExtract::addMiscCmds(TCLAP::CmdLine& cmdLine)
 {
 	cmdLine
 	.add(m_includeVertexColors.get())
+	.add(m_includeLandscapesInLevel.get())
 	.add(m_shaderExportType.get())
 	.add(m_textureFormat.get())
 	.add(m_materialFormat.get())
@@ -90,6 +92,7 @@ CLIExtract::processCmd(const std::filesystem::path& outPath, const std::string& 
 	WarframeExporter::ExtractOptions options;
 
 	options.extractVertexColors = m_includeVertexColors->getValue();
+	options.includeLandscapeInLevel = m_includeLandscapesInLevel->getValue();
 	options.dryRun = m_dryRun;
 	options.shaderExportType = getShaderFormat(m_shaderExportType->getValue());
 	options.textureExportType = getTextureFormat(m_textureFormat->getValue());
@@ -200,7 +203,7 @@ CLIExtract::extract(const std::filesystem::path& cacheDirPath, const std::string
 
 	LotusLib::PackagesBin pkgsBin;
 	auto pkgsBinData = pkgs.getFile("Misc", LotusLib::PkgSplitType::HEADER, "/Packages.bin");
-	pkgsBin.initilize(pkgsBinData);
+	pkgsBin.initilize(pkgsBinData, game);
 
 	if (WarframeExporter::tryExtractFile(pkgs, pkgsBin, intPath, outPath, types, options))
 		return;
@@ -218,7 +221,7 @@ CLIExtract::dumpPkgsBin(const std::filesystem::path& cacheDirPath, const std::fi
 	try
 	{
 		auto pkgsBinData = pkgs.getFile("Misc", LotusLib::PkgSplitType::HEADER, "/Packages.bin");
-		pkgsBin.initilize(pkgsBinData);
+		pkgsBin.initilize(pkgsBinData, game);
 	}
 	catch (LotusLib::LotusException& ex)
 	{

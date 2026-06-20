@@ -17,13 +17,13 @@ namespace WarframeExporter::Material
         inline std::vector<int> getEnumMapKeys() const override
         {
             std::vector<int> extTypes = {
-                (int)MaterialType::MATERIAL_203,
-                (int)MaterialType::MATERIAL_204,
-                (int)MaterialType::MATERIAL_205,
-                (int)MaterialType::MATERIAL_206,
-                (int)MaterialType::MATERIAL_208,
-                (int)MaterialType::MATERIAL_209,
-                (int)MaterialType::MATERIAL_210
+                (int)MaterialBasicType::MATERIAL_203,
+                (int)MaterialBasicType::MATERIAL_204,
+                (int)MaterialBasicType::MATERIAL_205,
+                (int)MaterialBasicType::MATERIAL_206,
+                (int)MaterialBasicType::MATERIAL_208,
+                (int)MaterialBasicType::MATERIAL_209,
+                (int)MaterialBasicType::MATERIAL_210
             };
 			return extTypes;
         }

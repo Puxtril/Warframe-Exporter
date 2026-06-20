@@ -17,34 +17,35 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader99 : public ModelReader
+	class ModelSMReader106 : public ModelReader
 	{
-		ModelReader99() = default;
+		ModelSMReader106() = default;
 
 	public:
-		inline static ModelReader99* getInstance()
+		inline static ModelSMReader106* getInstance()
 		{
-			static ModelReader99* instance = new ModelReader99();
+			static ModelSMReader106* instance = new ModelSMReader106();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelLevel1Type::MODEL_LEVEL1_99 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelSMType::MODEL_SM_106 },
 			};
 			return extTypes;
 		}
 
 		inline ScaleType ensmalleningScale() const override
 		{
-			return ScaleType::XYZ;
+			return ScaleType::NONE;
 		}
 
 		void readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody) override;
-
+	
 	private:
+		// This is 100% a workaround
 		bool isMorePhysX(BinaryReader::Buffered* bodyReader);
 };
 

@@ -12,6 +12,18 @@ UiSettings::getInstance()
     return instance;
 }
 
+QStringList
+UiSettings::getCacheWindowsPathPresets() const
+{
+    return m_settings.value(m_cacheWindowsPresetsKey).toStringList();
+}
+
+void
+UiSettings::setCacheWindowsPathPreset(QStringList presets)
+{
+    m_settings.setValue(m_cacheWindowsPresetsKey, presets);
+}
+
 QString
 UiSettings::getCacheWindowsPath() const
 {
@@ -67,6 +79,7 @@ UiSettings::loadOptions()
 
     options.filterUiFiles = m_settings.value(m_filterExportTypes).isValid() ? m_settings.value(m_filterExportTypes).toBool() : options.filterUiFiles;
     options.extractVertexColors = m_settings.value(m_extractVertexColors).isValid() ? m_settings.value(m_extractVertexColors).toBool() : options.extractVertexColors;
+    options.includeLandscapeInLevel = m_settings.value(m_includeLandscapesInLevel).isValid() ? m_settings.value(m_includeLandscapesInLevel).toBool() : options.includeLandscapeInLevel;
 
     int value = m_settings.value(m_comboShaderFormat).isValid() ? m_settings.value(m_comboShaderFormat).toInt() : options.shaderExportType;
     options.shaderExportType = static_cast<WarframeExporter::Shader::ShaderExportType>(value);
@@ -155,4 +168,5 @@ UiSettings::setSettings(
     m_settings.setValue(m_extractVertexColors, options.extractVertexColors);
     m_settings.setValue(m_comboMaterialFormat, options.materialExtractMode);
     m_settings.setValue(m_levelHlodExportType, options.levelHlodExtractMode);
+    m_settings.setValue(m_includeLandscapesInLevel, options.includeLandscapeInLevel);
 }

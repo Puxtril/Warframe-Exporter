@@ -13,12 +13,16 @@ namespace WarframeExporter::LevelStatic
 {
     struct LevelStaticHeaderExternal
     {
+        uint32_t unk64Count;
         uint32_t vertexCount;
         uint32_t indices1Count;
         uint32_t indices2Count;
         uint32_t matrixCount;
         uint32_t unk1Count;
         uint32_t unk2Count;
+        uint32_t unk3Count;
+        uint32_t unk4Count;
+        uint32_t unk5Count;
         std::vector<std::string> modelPaths;
         std::vector<std::string> naturalPaths;
         std::vector<std::string> attributes;

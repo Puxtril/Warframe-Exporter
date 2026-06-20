@@ -1,13 +1,13 @@
-#include "model/types/ModelReader287.h"
+#include "model/types/ModelReader316.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelReader287::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelReader316::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
-    skipPhysicsStruct2(headerReader);
+    skipPhysicsStruct(headerReader);
 
     headerReader->seek(0x2C, std::ios_base::cur);
     headerReader->readSingleArray(&outHeader.ensmallening1[0], 4);
@@ -19,7 +19,7 @@ ModelReader287::readHeader(BinaryReader::Buffered* headerReader, const LotusLib:
     outHeader.faceCount = headerReader->readUInt32();
     outHeader.boneCount = headerReader->readUInt32();
     outHeader.vertexCount = headerReader->readUInt32();
-    outHeader.morphCount = headerReader->readUInt32();
+    outHeader.morphCount = headerReader->readUInt32(0, 0, "Non-zero Morphs");
 
     headerReader->seek(0x13, std::ios_base::cur);
 
@@ -32,10 +32,7 @@ ModelReader287::readHeader(BinaryReader::Buffered* headerReader, const LotusLib:
     uint32_t unkStructCount = skipUnknownStructs(headerReader);
 
     headerReader->seek(0x1A, std::ios_base::cur);
-    // Related to bones somehow
-    // /SF/Characters/PlayerCharacters/Hair/MaleLongHair05/Cloth/MaleLongHair05_skel.fbx
-    // Or any of the other hair models, probably.
-    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 10000, "BodySkipLen1");
+    outHeader.bodySkipLen1 = headerReader->readUInt32(0, 1000, "BodySkipLen1");
     headerReader->seek(0x10 * unkStructCount, std::ios_base::cur);
     headerReader->seek(0x8, std::ios_base::cur);
 
@@ -51,18 +48,30 @@ ModelReader287::readHeader(BinaryReader::Buffered* headerReader, const LotusLib:
 
     headerReader->seek(0x2F, std::ios_base::cur);
 
-    skipPhysicsStruct2(headerReader);
+    // Sub models?
+    uint32_t subModelCount = headerReader->readUInt32(0, 30, "Submodel count");
+    for (uint32_t x = 0; x < subModelCount; x++)
+    {
+        headerReader->seek(0xC, std::ios::cur);
+        uint32_t nameCount = headerReader->readUInt32(0, 100, "Sub-model name");
+        headerReader->seek(nameCount, std::ios::cur);
+        headerReader->seek(80, std::ios::cur);
+    }
+
+    headerReader->seek(0x28, std::ios::cur);
+
+    skipPhysicsStruct(headerReader);
 
     readPhysxMeshes(headerReader, outHeader.physXMeshes);
 
     readErrors(headerReader, outHeader.errorMsgs);
 
     if (headerReader->tell() != headerReader->getLength())
-        throw unknown_format_error("Did not reach end of H cache");
+        throw unknown_format_error("Did not reach end of H file");
 }
 
 void
-ModelReader287::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelReader316::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     bodyReaderB->seek(0, std::ios_base::beg);
 
@@ -113,7 +122,7 @@ ModelReader287::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buf
     bodyReaderB->seek(2 * extHeader.boneTree.size(), std::ios_base::cur);
 
     if (extHeader.boneTree.size() > 0)
-        bodyReaderB->seek(0x8, std::ios_base::cur);
+        bodyReaderB->seek(0x4, std::ios_base::cur);
 
     // Sometimes vertexCountB is 0 and F cache is null.
     // In that case, everything is in B.
@@ -183,7 +192,7 @@ ModelReader287::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buf
     bodyReaderB->readUInt16Array(outBody.indices.data(), faceBCache);
 
     if (bodyReaderB->tell() != bodyReaderB->getLength())
-        throw unknown_format_error("Did not reach end of B cache");
+        throw unknown_format_error("Did not reach end of B file");
 
     // Everything's in B
     if (bodyReaderF->getLength() == 0)

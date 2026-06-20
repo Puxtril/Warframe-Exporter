@@ -7,9 +7,12 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
+#include "model/ModelTypes.h"
 
 #include <cassert>
+#include <cstring>
 #include <iomanip>
+#include <string_view>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -17,21 +20,21 @@
 
 namespace WarframeExporter::Model
 {
-	class ModelReader99 : public ModelReader
+	class ModelHLODReader112 : public ModelReader
 	{
-		ModelReader99() = default;
+		ModelHLODReader112() = default;
 
 	public:
-		inline static ModelReader99* getInstance()
+		inline static ModelHLODReader112* getInstance()
 		{
-			static ModelReader99* instance = new ModelReader99();
+			static ModelHLODReader112* instance = new ModelHLODReader112();
 			return instance;
 		}
 
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelLevel1Type::MODEL_LEVEL1_99 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelHLODType::MODEL_HLOD_112 },
 			};
 			return extTypes;
 		}
@@ -43,10 +46,5 @@ namespace WarframeExporter::Model
 
 		void readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader) override;
 		void readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody) override;
-
-	private:
-		bool isMorePhysX(BinaryReader::Buffered* bodyReader);
+	};
 };
-
-	
-}

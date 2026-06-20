@@ -42,6 +42,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QComboBox" name="CacheWindowsPresetPicker">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="editable">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

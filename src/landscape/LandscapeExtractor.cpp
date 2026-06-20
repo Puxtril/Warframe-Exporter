@@ -32,17 +32,9 @@ LandscapeExtractor::formatLandscape(const LandscapeHeaderExternal& landscapeHead
 
     LandscapeConverter::positionChunks(landscapeHeader, landscapeBody, internal);
     internal.materialPathArrays = std::move(landscapeHeader.materialPathArrays);
-
-    for (size_t i = 0; i < landscapeBody.size(); i++)
-    {
-        const LandscapeBodyChunkExternal& curChunk = landscapeBody[i];
-
-        Physx::HeightFieldMesh mesh = Physx::HeightFieldReader::convertToMesh(curChunk.header, curChunk.samples);
-        LandscapeConverter::scaleChunks(mesh, landscapeHeader.chunks[i], curChunk);
-        internal.chunks.push_back(mesh);
-    }
-
-    LandscapeConverter::addTransforms(internal);
+    internal.chunks = LandscapeConverter::convertToInternalMultithread(landscapeHeader, landscapeBody);
+    LandscapeConverter::addTransforms(internal, landscapeHeader);
+    
     return internal;
 }
 
@@ -50,7 +42,7 @@ Document
 LandscapeExtractor::convertToGltf(const LandscapeInternal& internal)
 {
     Document gltf;
-    LandscapeExporterGltf::addLandscapeChunks(gltf, internal);
+    LandscapeExporterGltf::addLandscapeChunks(gltf, internal, {0, 0, 0});
     return gltf;
 }
 

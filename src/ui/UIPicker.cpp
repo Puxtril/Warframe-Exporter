@@ -36,6 +36,7 @@ UiPicker::connect(QDialog *WindowPicker, QMainWindow* mainWindow, UiExporter* ex
     QObject::connect(m_additionalSettings.buttonBox, &QDialogButtonBox::rejected, &m_additionalSettingsDialog, &QDialog::hide);
 
     QObject::connect(this->CacheWindowsInput, &QLineEdit::textChanged, this, &UiPicker::cachePathUpdated);
+    QObject::connect(this->CacheWindowsPresetPicker, &QComboBox::activated, this, &UiPicker::cachePathComboChanged);
     QObject::connect(this->GameInfoButton, &QPushButton::clicked, &this->m_chosenGameMessage, &QMessageBox::show);
 
     QObject::connect(this->LoadButton, &QPushButton::clicked, this, &UiPicker::parsePickerOptions);
@@ -72,6 +73,8 @@ UiPicker::loadSettings()
 {
     UiSettings& settings = UiSettings::getInstance();
 
+    loadCachePresets();
+
     this->CacheWindowsInput->setText(settings.getCacheWindowsPath());
     this->ExportPathInput->setText(settings.getExportPath());
 
@@ -90,6 +93,7 @@ UiPicker::loadSettings()
 
     m_additionalSettings.FilterFilesCheckbox->setCheckState(options.filterUiFiles ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     m_additionalSettings.ExtractVertexColorsCheckbox->setCheckState(options.extractVertexColors ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    m_additionalSettings.IncludeLandscapesCheckbox->setCheckState(options.includeLandscapeInLevel ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
 void
@@ -97,6 +101,51 @@ UiPicker::loadVersion()
 {
     QString version = std::string(g_version).c_str();
     this->VersionLabel->setText(version);
+}
+
+void
+UiPicker::loadCachePresets()
+{
+    // If multiple of the same game is present, display LotusLib::gameIdentifier instead.
+    // A little annoying, but worth it visually.
+    std::map<LotusLib::Game, int> gameCount;
+    std::vector<std::tuple<LotusLib::Game, std::string, QString>> gameIdentifiers;
+    // Ensure all saved paths are still valid.
+    QStringList validSavedPaths;
+
+    // Populate the above 3 variables
+    QStringList currentSavedPaths = UiSettings::getInstance().getCacheWindowsPathPresets();
+    for (int i = 0; i < currentSavedPaths.count(); i++)
+    {
+        const QString& curPath = currentSavedPaths[i];
+
+        std::tuple<LotusLib::Game, std::string> newGame = LotusLib::gameIdentifier(curPath.toStdString());
+        if (std::get<0>(newGame) != LotusLib::Game::UNKNOWN)
+        {
+            gameIdentifiers.push_back({std::get<0>(newGame), std::get<1>(newGame), curPath});
+            gameCount[std::get<0>(newGame)] = gameCount[std::get<0>(newGame)] + 1;
+            validSavedPaths.append(curPath);
+        }
+    }
+
+    // Sort by the identifier
+    sort(gameIdentifiers.begin(), gameIdentifiers.end(), [](const std::tuple<LotusLib::Game, std::string, QString>& a, const std::tuple<LotusLib::Game, std::string, QString>& b) -> bool { return std::get<1>(a) > std::get<1>(b);});
+
+    // Populate `this->CacheWindowsPresetPicker`
+    for (int i = 0; i < gameIdentifiers.size(); i++)
+    {
+        const std::tuple<LotusLib::Game, std::string, QString> curIdentifier = gameIdentifiers[i];
+
+        QString name = "";
+        if (gameCount[std::get<0>(curIdentifier)] > 1)
+            name = QString::fromStdString(std::get<1>(curIdentifier));
+        else
+            name = QString::fromStdString(LotusLib::gameToString(std::get<0>(curIdentifier)));
+        this->CacheWindowsPresetPicker->insertItem(i, name, std::get<2>(curIdentifier));
+    }
+
+    // Re-save only valid values
+    UiSettings::getInstance().setCacheWindowsPathPreset(validSavedPaths);
 }
 
 void
@@ -170,6 +219,34 @@ UiPicker::cachePathUpdated(const QString& newPath)
         }
     }
 
+    // Valid game selected
+    if (!disableLoadButton)
+    {
+        int presetIndex = this->CacheWindowsPresetPicker->findData(newPath);
+
+        // Game hasn't been seen before. Add as a preset.
+        if (presetIndex == -1)
+        {
+            this->CacheWindowsPresetPicker->addItem(QString::fromStdString(LotusLib::gameToString(newGame)), newPath);
+            presetIndex = this->CacheWindowsPresetPicker->findData(newPath);
+            
+            QStringList values;
+            for (int i = 0; i < this->CacheWindowsPresetPicker->count(); i++)
+                values.append(this->CacheWindowsPresetPicker->itemData(i).toString());
+            UiSettings::getInstance().setCacheWindowsPathPreset(values);
+        }
+
+        if (presetIndex != this->CacheWindowsPresetPicker->currentIndex())
+            this->CacheWindowsPresetPicker->setCurrentIndex(presetIndex);
+    }
+    else
+    {
+        this->CacheWindowsPresetPicker->setCurrentIndex(-1);
+    }
+
+    // Don't even make this visible for one-game users
+    this->CacheWindowsPresetPicker->setVisible(this->CacheWindowsPresetPicker->count() > 1);
+
     this->LoadButton->setDisabled(disableLoadButton);
     this->GameInfoButton->show();
     this->GameInfoButton->setIcon(QIcon::fromTheme(buttonIconName).pixmap(100, 100));
@@ -178,6 +255,17 @@ UiPicker::cachePathUpdated(const QString& newPath)
 
     std::string newTitle = LotusLib::gameToString(newGame) + " Information";
     m_chosenGameMessage.setWindowTitle(newTitle.c_str());
+}
+
+void
+UiPicker::cachePathComboChanged(int index)
+{
+    if (index == -1)
+        return;
+
+    QString newCachePath = this->CacheWindowsPresetPicker->itemData(index).toString();
+    // This will trigger the signal QLineEdit::textChanged, and thus, this->cachePathUpdated
+    this->CacheWindowsInput->setText(newCachePath);
 }
 
 void
@@ -208,7 +296,7 @@ UiPicker::parsePickerOptions()
     if (this->AudioCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Audio;
     if (this->LevelCheckbox->isChecked())
-        exportTypes |= (int)WarframeExporter::ExtractorType::Level | (int)WarframeExporter::ExtractorType::LevelStatic;
+        exportTypes |= (int)WarframeExporter::ExtractorType::Level | (int)WarframeExporter::ExtractorType::LevelStatic | (int)WarframeExporter::ExtractorType::Landscape;
     if (this->MaterialCheckbox->isChecked())
         exportTypes |= (int)WarframeExporter::ExtractorType::Material;
     if (this->ModelCheckbox->isChecked())
@@ -243,6 +331,7 @@ UiPicker::parsePickerOptions()
 
     options.filterUiFiles = m_additionalSettings.FilterFilesCheckbox->isChecked();
     options.extractVertexColors = m_additionalSettings.ExtractVertexColorsCheckbox->isChecked();
+    options.includeLandscapeInLevel = m_additionalSettings.IncludeLandscapesCheckbox->isChecked();
 
     LotusLib::Game game = LotusLib::guessGame(cachePathStr);
     WarframeExporter::Logger::getInstance().info("Setting game to " + LotusLib::gameToString(game));

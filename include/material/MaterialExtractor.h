@@ -50,18 +50,19 @@ namespace WarframeExporter::Material
 		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
 			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_203 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_204 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_205 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_206 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_208 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_208 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_209 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_210 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_214 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_216 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_216 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialType::MATERIAL_217 }
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_203 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_204 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_205 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_206 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_208 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_208 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_209 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialBasicType::MATERIAL_209 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialHLMType::MATERIAL_HLM_214 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialHLMType::MATERIAL_HLM_216 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialHLMType::MATERIAL_HLM_216 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)MaterialHLMType::MATERIAL_HLM_217 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)MaterialHLMType::MATERIAL_HLM_217 }
 			};
 			return extTypes;
 		}

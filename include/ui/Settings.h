@@ -16,6 +16,7 @@ class UiSettings : public QObject
 {
     QSettings m_settings;
 
+    static const inline QString m_cacheWindowsPresetsKey = "load/cachePathPresets";
     static const inline QString m_cacheWindowsKey = "load/cachePath";
     static const inline QString m_exportPathKey = "load/exportPath";
 
@@ -38,6 +39,7 @@ class UiSettings : public QObject
     static const inline QString m_filterExportTypes = "additionalsettings/filterfiles";
     static const inline QString m_extractVertexColors = "additionalsettings/vertexcolors";
     static const inline QString m_levelHlodExportType = "additionalsettings/levelhlod";
+    static const inline QString m_includeLandscapesInLevel = "additionalsettings/levellandscape";
 
     static const inline QString m_audioVolume = "preview/audiovolume";
 
@@ -47,6 +49,9 @@ class UiSettings : public QObject
 
 public:
     static UiSettings& getInstance();
+
+    QStringList getCacheWindowsPathPresets() const;
+    void setCacheWindowsPathPreset(QStringList presets);
 
     QString getCacheWindowsPath() const;
     QString getExportPath() const;

@@ -2,7 +2,7 @@
 
 namespace WarframeExporter::Material
 {
-    enum class MaterialType
+    enum class MaterialBasicType
 	{
 		MATERIAL_203 = 203,
 		MATERIAL_204 = 204,
@@ -11,8 +11,11 @@ namespace WarframeExporter::Material
 		MATERIAL_208 = 208,
 		MATERIAL_209 = 209,
 		MATERIAL_210 = 210,
-		MATERIAL_214 = 214,
-		MATERIAL_216 = 216,
-		MATERIAL_217 = 217
+	};
+	enum class MaterialHLMType
+	{
+		MATERIAL_HLM_214 = 214,
+		MATERIAL_HLM_216 = 216,
+		MATERIAL_HLM_217 = 217,
 	};
 };

@@ -31,7 +31,7 @@ namespace WarframeExporter::Model
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_STATIC_86 },
+				{ LotusLib::Game::WARFRAME, (int)ModelStaticType::MODEL_STATIC_86 },
 			};
 			return extTypes;
 		}

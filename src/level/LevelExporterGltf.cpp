@@ -58,10 +58,10 @@ LevelExporterGltf::_addModelToScene(Document& gltfDoc, const LevelObjectInternal
 	insertedMesh.extensionsAndExtras["extras"]["Scale"] = levelObj.scale;
 
 	// Before adding the remaining JSON values, we need to check for valid ASCII
-	for (const auto& x : levelObj.attributes.items())
+	for (const auto& x : levelObj.attributes)
 	{
 		bool canAdd = true;
-		for (const char& curChar : x.key())
+		for (const char& curChar : x.first)
 		{
 			if (curChar < 0 || curChar > 126)
 			{
@@ -70,7 +70,7 @@ LevelExporterGltf::_addModelToScene(Document& gltfDoc, const LevelObjectInternal
 			}
 		}
 		if (canAdd)
-			insertedMesh.extensionsAndExtras["extras"][x.key()] = x.value();
+			insertedMesh.extensionsAndExtras["extras"][x.first] = x.second;
 	}
 }
 

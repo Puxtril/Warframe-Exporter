@@ -1,10 +1,9 @@
 #include <wf_common-header.hexpat>
 
 struct LandscapeChunk {
-    u32 unk1;
-    float unk2;
-    padding[0x7C];
-    u64 unkBig;
+    padding[0x3C];
+    float scale[3];
+    padding[0x44];
     u32 bodyLen;
     u32 unk4;
     u32 unk5;

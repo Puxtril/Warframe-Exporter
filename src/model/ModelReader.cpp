@@ -16,7 +16,7 @@ ModelReader::readWeightedBones(BinaryReader::Buffered* reader, std::vector<std::
 void
 ModelReader::readBoneTree(BinaryReader::Buffered* reader, std::vector<BoneTreeNodeExternal>& outBoneTree)
 {
-    uint32_t boneTreeLen = reader->readUInt32(0, 500, "Too many items in Bone Tree");
+    uint32_t boneTreeLen = reader->readUInt32(0, 1500, "Too many items in Bone Tree");
     outBoneTree.resize(boneTreeLen);
 
     for (uint32_t x = 0; x < boneTreeLen; x++)

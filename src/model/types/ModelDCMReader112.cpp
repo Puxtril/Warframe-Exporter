@@ -1,13 +1,13 @@
-#include "model/types/ModelHLODReader108WF.h"
+#include "model/types/ModelDCMReader112.h"
 
 using namespace WarframeExporter::Model;
 
 void
-ModelHLODReader108WF::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
+ModelDCMReader112::readHeader(BinaryReader::Buffered* headerReader, const LotusLib::CommonHeader& header, ModelHeaderExternal& outHeader)
 {
     headerReader->seek(0x30, std::ios_base::cur);
 
-    skipPhysicsStruct(headerReader);
+    skipPhysicsStruct2(headerReader);
 
     headerReader->seek(0x28, std::ios_base::cur);
 
@@ -20,23 +20,33 @@ ModelHLODReader108WF::readHeader(BinaryReader::Buffered* headerReader, const Lot
     outHeader.boneCount = headerReader->readUInt32(0, 0, "Bones on static mesh");
 
     headerReader->seek(0x22, std::ios_base::cur);
+
     outHeader.vertexCountB = headerReader->readUInt32(1, outHeader.vertexCount, "B Cache Vertex count");
     outHeader.faceCountB = headerReader->readUInt32(1, outHeader.faceCount, "B Cache Face count");
+
     headerReader->seek(0x3D, std::ios_base::cur);
 
     readMeshInfos(headerReader, outHeader.meshInfos);
 
     skipUnk16Array(headerReader);
 
-    headerReader->seek(4, std::ios::cur);
+    headerReader->seek(0x1, std::ios::cur);
+    int dcmSubEnum = headerReader->readUInt32();
+    if (dcmSubEnum == 2)
+        headerReader->seek(6, std::ios::cur);
 
-    skipPhysicsStruct(headerReader);
+    skipPhysicsStruct2(headerReader);
 
     readPhysxMeshes(headerReader, outHeader.physXMeshes);
+
+    readErrors(headerReader, outHeader.errorMsgs);
+
+    if (headerReader->tell() != headerReader->getLength())
+        throw unknown_format_error("Did not reach end of file");
 }
 
 void
-ModelHLODReader108WF::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
+ModelDCMReader112::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buffered* bodyReaderB, BinaryReader::Buffered* bodyReaderF, ModelBodyExternal& outBody)
 {
     for (const auto& x : extHeader.physXMeshes)
         bodyReaderB->seek(x.dataLength, std::ios_base::cur);

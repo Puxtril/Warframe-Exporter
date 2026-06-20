@@ -50,21 +50,11 @@ namespace WarframeExporter::Level
 		float scale;
 		std::string meshPath;
 		std::vector<std::string> materials;
-		nlohmann::json attributes;
-	};
-
-	struct LandscapeObject
-	{
-		glm::vec3 pos;
-		std::string landscapePath;
 		nlohmann::json::object_t attributes;
 	};
 
-	// For optimization purposes, keep the entire attributes string as an std::string
-	// For each level object, use std::string_view to substring this
 	struct LevelInternal
 	{
-		LandscapeObject landscape;
 		std::vector<LevelObjectInternal> objs;
 	};
 }

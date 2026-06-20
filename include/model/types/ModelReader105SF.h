@@ -8,6 +8,7 @@
 #include "model/ModelReader.h"
 #include "ExporterExceptions.h"
 #include "BinaryReader/Exceptions.h"
+#include "model/ModelTypes.h"
 
 #include <cassert>
 #include <iomanip>
@@ -32,7 +33,8 @@ namespace WarframeExporter::Model
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::SOULFRAME, (int)105 }, // Static model
+				{ LotusLib::Game::SOULFRAME, (int)ModelStaticType::MODEL_STATIC_105 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelStaticType::MODEL_STATIC_106 },
 			};
 			return extTypes;
 		}

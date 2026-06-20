@@ -51,44 +51,48 @@ namespace WarframeExporter::Model
 		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_86 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_96 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL1_99 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL1_99 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelStaticType::MODEL_STATIC_86 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelStaticType::MODEL_STATIC_96 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel1Type::MODEL_LEVEL1_99 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelDCMType::MODEL_DCM_101 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, 102 }, // Shared by DCM/HLOD/Model
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_STATIC_102 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL2_103 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelStaticType::MODEL_STATIC_102 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel2Type::MODEL_LEVEL2_103 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, 105 }, // Shared by DCM/HLOD
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, 105 }, // Shared by DCM/HLOD
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL_106 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)106 }, // Shared by SM/Static
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, 108 }, // Shared by DCM/HLOD
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, 108 }, // Shared by DCM/HLOD/SM
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL2_109 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL2_109 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel2Type::MODEL_LEVEL2_109 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)109 }, // Overlaps with SM/Level2
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)111 }, // Shared by DCM/HLOD
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_LEVEL2_112 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_159 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_160 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_TERRAIN_169 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_269 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_272 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_275 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_277 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_278 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_281 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_283 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_RIGGED_287 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_289 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_290 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_299 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_300 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_301 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_310 },
-				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelType::MODEL_PACKED_314 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)112 }, // Shared by DCM/HLOD/Level2
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel2Type::MODEL_LEVEL2_113 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_159 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_160 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_163 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_166 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_166 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_169 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelTerrainType::MODEL_TERRAIN_170 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_269 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_272 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_275 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_277 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_278 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_281 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_283 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_287 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelRiggedType::MODEL_RIGGED_288 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_289 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_290 },
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_299 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_300 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_301 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_310 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_314 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_315 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::MISC, (int)ModelPackedType::MODEL_PACKED_316 },
 			};
 			return extTypes;
 		}

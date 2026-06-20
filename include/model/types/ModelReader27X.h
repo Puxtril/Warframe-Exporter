@@ -32,13 +32,13 @@ namespace WarframeExporter::Model
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_RIGGED_272},
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_RIGGED_275},
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_RIGGED_275},
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_RIGGED_277},
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_RIGGED_277},
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_RIGGED_278},
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_RIGGED_278},
+				{ LotusLib::Game::WARFRAME, (int)ModelRiggedType::MODEL_RIGGED_272},
+				{ LotusLib::Game::WARFRAME, (int)ModelRiggedType::MODEL_RIGGED_275},
+				{ LotusLib::Game::SOULFRAME, (int)ModelRiggedType::MODEL_RIGGED_275},
+				{ LotusLib::Game::WARFRAME, (int)ModelRiggedType::MODEL_RIGGED_277},
+				{ LotusLib::Game::SOULFRAME, (int)ModelRiggedType::MODEL_RIGGED_277},
+				{ LotusLib::Game::WARFRAME, (int)ModelRiggedType::MODEL_RIGGED_278},
+				{ LotusLib::Game::SOULFRAME, (int)ModelRiggedType::MODEL_RIGGED_278},
 			};
 			return extTypes;
 		}

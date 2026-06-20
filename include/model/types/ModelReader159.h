@@ -31,13 +31,14 @@ namespace WarframeExporter::Model
 		inline std::vector<std::tuple<LotusLib::Game, int>> getEnumMapKeys() const override
 		{
 			std::vector<std::tuple<LotusLib::Game, int>> extTypes = {
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_159 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_160 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_163 },
-				{ LotusLib::Game::WARFRAME, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_166 },
-				{ LotusLib::Game::SOULFRAME, (int)ModelType::MODEL_TERRAIN_169 },
+				{ LotusLib::Game::WARFRAME, (int)ModelTerrainType::MODEL_TERRAIN_159 },
+				{ LotusLib::Game::WARFRAME, (int)ModelTerrainType::MODEL_TERRAIN_160 },
+				{ LotusLib::Game::WARFRAME, (int)ModelTerrainType::MODEL_TERRAIN_163 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_163 },
+				{ LotusLib::Game::WARFRAME, (int)ModelTerrainType::MODEL_TERRAIN_166 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_166 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_169 },
+				{ LotusLib::Game::SOULFRAME, (int)ModelTerrainType::MODEL_TERRAIN_170 },
 			};
 			return extTypes;
 		}

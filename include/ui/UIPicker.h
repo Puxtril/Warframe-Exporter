@@ -37,6 +37,7 @@ public:
 private:
     void addComboBoxOptions();
     void loadVersion();
+    void loadCachePresets();
     bool createExportFolder();
     void cachePathUpdated(const QString& newPath);
 
@@ -50,7 +51,9 @@ signals:
     );
 
 public slots:
+    void cachePathComboChanged(int index);
     void parsePickerOptions();
     void browseCacheWindows();
     void browseExportPath();
+    
 };

@@ -3,17 +3,23 @@
 using namespace WarframeExporter::Landscape;
 
 void
-LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape)
+LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInternal& landscape, const glm::vec3& pos, const std::string& materialPath)
 {
+    int chunkOffsetX = (landscape.srcChunkCountX - landscape.chunkCountX) / 2;
+    int chunkOffsetY = (landscape.srcChunkCountY - landscape.chunkCountY) / 2;
+
     for (size_t i = 0; i < landscape.chunks.size(); i++)
     {
         int32_t curMeshIndex = static_cast<int32_t>(gltfDoc.meshes.size());
 
-        if (landscape.chunks[i].vertexPositions.size() <= 12)
+        if (landscape.chunks[i].body.vertexPositions.size() <= 12)
             continue;
 
-        Mesh gltfMesh = _addLandscapeChunk(gltfDoc, landscape.chunks[i]);
-        gltfMesh.name = "Landscape " + std::to_string(i);
+        Mesh gltfMesh = _addLandscapeChunk(gltfDoc, landscape.chunks[i], materialPath);
+
+        int nameX = (i % landscape.chunkCountX) + chunkOffsetX;
+        int nameY = (landscape.chunkCountY - 1 - (i / landscape.chunkCountX)) + chunkOffsetY;
+        gltfMesh.name = "Landscape T" + std::to_string(nameX) + "u" + std::to_string(nameY);
 
         _addExtraAttributes(gltfDoc, landscape.materialPathArrays, gltfMesh, i);
         
@@ -21,8 +27,10 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
         gltfDoc.scenes.resize(1);
         Scene& scene = gltfDoc.scenes[0];
 
-        Node curNode;        
-        std::memcpy(&curNode.matrix[0], &landscape.transforms[i][0], 16 * sizeof(float));
+        Node curNode;
+        glm::mat4 transforms = glm::translate(landscape.transforms[i], {pos.z, pos.y, pos.x});
+        std::memcpy(&curNode.matrix[0], &transforms[0], 16 * sizeof(float));
+        
         curNode.mesh = curMeshIndex;
         int curNodeIndex = static_cast<int>(gltfDoc.nodes.size());
         gltfDoc.nodes.push_back(curNode);
@@ -31,15 +39,18 @@ LandscapeExporterGltf::addLandscapeChunks(Document& gltfDoc, const LandscapeInte
 }
 
 Mesh
-LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const Physx::HeightFieldMesh& mesh)
+LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const LandscapeChunkInternal& chunk, const std::string& materialPath)
 {
     Buffer& buf = _getBuffer(gltfDoc);
 
-    Attributes vertAttributes = _addLandscapeVertices(gltfDoc, mesh, buf);
+    Attributes vertAttributes = _addLandscapeVertices(gltfDoc, chunk, buf);
 
     Primitive primitive;
+    primitive.indices = _addIndices(gltfDoc, chunk, buf);
     primitive.mode = Primitive::Mode::Triangles;
     primitive.attributes = vertAttributes;
+    if (!materialPath.empty())
+        primitive.material = WarframeExporter::Model::ModelExporterGltf::_findOrCreateMaterial(gltfDoc, materialPath);
 
     Mesh gltfMesh;
     gltfMesh.primitives.push_back(std::move(primitive));
@@ -48,24 +59,24 @@ LandscapeExporterGltf::_addLandscapeChunk(Document& gltfDoc, const Physx::Height
 }
 
 Attributes
-LandscapeExporterGltf::_addLandscapeVertices(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
+LandscapeExporterGltf::_addLandscapeVertices(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
 {
     Attributes attrs;
-	attrs["POSITION"] = _addPositions(gltfDoc, mesh, buffer);
-    attrs["TEXCOORD_0"] = _generateAndAddUVs(gltfDoc, mesh, buffer);
-    attrs["COLOR_0"] = _addVertexColors(gltfDoc, mesh, buffer);
+	attrs["POSITION"] = _addPositions(gltfDoc, chunk, buffer);
+    attrs["TEXCOORD_0"] = _generateAndAddUVs(gltfDoc, chunk, buffer);
+    attrs["COLOR_0"] = _addVertexColors(gltfDoc, chunk, buffer);
     return attrs;
 }
 
 int32_t
-LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
+LandscapeExporterGltf::_addPositions(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
 {
-    const uint32_t vertexDataSize = static_cast<uint32_t>(mesh.vertexPositions.size()) * sizeof(std::array<float, 3>);
+    const uint32_t vertexDataSize = static_cast<uint32_t>(chunk.body.vertexPositions.size()) * sizeof(std::array<float, 3>);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + vertexDataSize;
     buffer.data.resize(newSize);
     buffer.byteLength = newSize;
-    memcpy(buffer.data.data() + curSize, mesh.vertexPositions.data(), vertexDataSize);
+    memcpy(buffer.data.data() + curSize, chunk.body.vertexPositions.data(), vertexDataSize);
     
     BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
@@ -80,7 +91,7 @@ LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightField
 	int32_t posAccIndex = (int32_t)gltfDoc.accessors.size();
 	posAcc.bufferView = bufViewIndex;
 	posAcc.byteOffset = 0;
-	posAcc.count = static_cast<uint32_t>(mesh.vertexPositions.size());
+	posAcc.count = static_cast<uint32_t>(chunk.body.vertexPositions.size());
 	posAcc.type = Accessor::Type::Vec3;
 	posAcc.componentType = Accessor::ComponentType::Float;
 	gltfDoc.accessors.push_back(posAcc);
@@ -88,39 +99,61 @@ LandscapeExporterGltf::_addPositions(Document& gltfDoc, const Physx::HeightField
     return posAccIndex;
 }
 
-int32_t
-LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
+int32_t 
+LandscapeExporterGltf::_addIndices(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
 {
-    const uint32_t uvDataSize = static_cast<uint32_t>(mesh.vertexPositions.size()) * (sizeof(float) * 2);
+    Buffer& buf = _getBuffer(gltfDoc);
+
+	uint32_t indexSize = (uint32_t)chunk.body.indices.size() * sizeof(uint32_t);
+	uint32_t startOffset = buf.byteLength;
+
+	buf.data.resize(startOffset + indexSize);
+	std::memcpy(&buf.data[startOffset], chunk.body.indices.data(), indexSize);
+	buf.byteLength += indexSize;
+
+	BufferView bufView;
+	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
+	bufView.buffer = gltfDoc.buffers.size() - 1;
+	bufView.byteOffset = startOffset;
+	bufView.byteLength = indexSize;
+	bufView.target = BufferView::TargetType::ElementArrayBuffer;
+	gltfDoc.bufferViews.push_back(bufView);
+
+    Accessor curAcc;
+    int32_t curAccIndex = static_cast<int32_t>(gltfDoc.accessors.size());
+    curAcc.bufferView = bufViewIndex;
+    curAcc.byteOffset = 0;
+    curAcc.count = chunk.body.indices.size();
+    curAcc.type = Accessor::Type::Scalar;
+    curAcc.componentType = Accessor::ComponentType::UnsignedInt;
+    gltfDoc.accessors.push_back(curAcc);
+    
+	return curAccIndex;
+}
+
+int32_t
+LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
+{
+    const uint32_t uvDataSize = static_cast<uint32_t>(chunk.body.vertexPositions.size()) * (sizeof(uint16_t) * 2);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + uvDataSize;
     buffer.data.resize(newSize);
     buffer.byteLength = newSize;
 
-    uint32_t maxU = 0;
-    uint32_t maxV = 0;
-    for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
+    for (size_t i = 0; i < chunk.body.vertexPositions.size(); i++)
     {
-        if (mesh.vertexPositions[i][0] > maxU)
-            maxU = mesh.vertexPositions[i][0];
-        if (mesh.vertexPositions[i][2] > maxV)
-            maxV = mesh.vertexPositions[i][2];
+        const uint16_t v = (chunk.body.vertexPositions[i][2] / chunk.scale.x) * UINT16_MAX;
+        const uint16_t u = (1.0F - chunk.body.vertexPositions[i][0] / chunk.scale.z) * UINT16_MAX;
+        memcpy(buffer.data.data() + curSize + (i * 2 * 2), &v, 2);
+        memcpy(buffer.data.data() + curSize + (i * 2 * 2) + 2, &u, 2);
     }
 
-    for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
-    {
-        const float v = mesh.vertexPositions[i][2] / (float)maxV;
-        const float u = 1.0F - mesh.vertexPositions[i][0] / (float)maxU;
-        memcpy(buffer.data.data() + curSize + (i * 2 * 4), &v, 4);
-        memcpy(buffer.data.data() + curSize + (i * 2 * 4) + 4, &u, 4);
-    }
-    
     BufferView bufView;
 	int32_t bufViewIndex = (int32_t)gltfDoc.bufferViews.size();
 	bufView.buffer = gltfDoc.buffers.size() - 1;
 	bufView.byteOffset = curSize;
 	bufView.byteLength = uvDataSize;
-	bufView.byteStride = sizeof(float) * 2;
+	bufView.byteStride = sizeof(uint16_t) * 2;
 	bufView.target = BufferView::TargetType::ArrayBuffer;
 	gltfDoc.bufferViews.push_back(bufView);
 
@@ -128,28 +161,29 @@ LandscapeExporterGltf::_generateAndAddUVs(Document& gltfDoc, const Physx::Height
 	int32_t uvAccIndex = (int32_t)gltfDoc.accessors.size();
 	uvAcc.bufferView = bufViewIndex;
 	uvAcc.byteOffset = 0;
-	uvAcc.count = static_cast<uint32_t>(mesh.vertexPositions.size());
+	uvAcc.count = static_cast<uint32_t>(chunk.body.vertexPositions.size());
 	uvAcc.type = Accessor::Type::Vec2;
-	uvAcc.componentType = Accessor::ComponentType::Float;
+	uvAcc.componentType = Accessor::ComponentType::UnsignedShort;
+    uvAcc.normalized = true;
+    uvAcc.max = {UINT16_MAX, UINT16_MAX, UINT16_MAX};
+    uvAcc.min = {0, 0, 0};
 	gltfDoc.accessors.push_back(uvAcc);
 
     return uvAccIndex;
 }
 
 int32_t
-LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const Physx::HeightFieldMesh& mesh, Buffer& buffer)
+LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const LandscapeChunkInternal& chunk, Buffer& buffer)
 {
-    // * 3 for vertices
-    // * 3 for Vec3
-    const uint32_t colorDataSize = static_cast<uint32_t>(mesh.materials.size()) * 3 * 3;
+    const uint32_t colorDataSize = static_cast<uint32_t>(chunk.body.materials.size() * 3);
     uint32_t curSize = static_cast<uint32_t>(buffer.data.size());
     uint32_t newSize = curSize + colorDataSize;
     buffer.data.resize(newSize);
     buffer.byteLength = newSize;
 
-    for (size_t i = 0; i < mesh.materials.size(); i++)
+    for (size_t i = 0; i < chunk.body.materials.size(); i++)
     {
-        std::fill_n(buffer.data.data() + curSize + (i * 9), 9, mesh.materials[i]);
+        std::fill_n(buffer.data.data() + curSize + (i * 3), 3, chunk.body.materials[i]);
     }
 
     BufferView bufView;
@@ -165,7 +199,7 @@ LandscapeExporterGltf::_addVertexColors(Document& gltfDoc, const Physx::HeightFi
 	int32_t colAccIndex = (int32_t)gltfDoc.accessors.size();
 	colAcc.bufferView = bufViewIndex;
 	colAcc.byteOffset = 0;
-	colAcc.count = static_cast<uint32_t>(mesh.materials.size() * 3);
+	colAcc.count = static_cast<uint32_t>(chunk.body.materials.size());
 	colAcc.type = Accessor::Type::Vec3;
     colAcc.normalized = true;
 	colAcc.componentType = Accessor::ComponentType::UnsignedByte;

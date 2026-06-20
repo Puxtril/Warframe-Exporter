@@ -247,7 +247,7 @@ CLIDebug::printEnumCounts(LotusLib::Package& pkg, const std::string& internalPat
 		}
 		catch (LotusLib::DecompressionException&)
 		{
-			WarframeExporter::Logger::getInstance().warn("Decompress error: " + internalPath);
+			WarframeExporter::Logger::getInstance().warn("Decompress error: " + (*iter).name);
 			continue;
 		}
 		catch (LotusLib::CommonHeaderError&)
@@ -261,12 +261,12 @@ CLIDebug::printEnumCounts(LotusLib::Package& pkg, const std::string& internalPat
 		}
 		catch (BinaryReader::LimitException& ex)
 		{
-			WarframeExporter::Logger::getInstance().warn(std::string(ex.what()) + internalPath);
+			WarframeExporter::Logger::getInstance().warn(std::string(ex.what()) + (*iter).name);
 			continue;
 		}
 		catch (std::exception& ex)
 		{
-			WarframeExporter::Logger::getInstance().error(std::string(ex.what()) + ": " + internalPath);
+			WarframeExporter::Logger::getInstance().error(std::string(ex.what()) + ": " + (*iter).name);
 			continue;
 		}
 	}

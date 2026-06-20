@@ -233,28 +233,19 @@ ModelConverter::getModelScale(const std::vector<MeshInfoExternal>& meshInfos, gl
     outScale.z = 0.0;
     outScale.w = 0.0;
 
-    for (int i = 0; i < 4; i++)
+    if (scaleType == ScaleType::XYZ)
     {
-        for (MeshInfoExternal curMeshInfo : meshInfos)
-        {
-            if (scaleType == ScaleType::XYZ)
-            {
-                float largerOf2 = std::max(std::abs(ensmall1[i]), std::abs(ensmall2[i]));
-                outScale[i] = std::max(outScale[i], largerOf2);
-            }
-            else if (scaleType == ScaleType::XZ)
-            {
-                // Skip Y axis
-                if (i == 1)
-                {
-                    outScale[i] = 1.0;
-                    continue;
-                }
-
-                float largerOf2 = std::max(std::abs(curMeshInfo.vector1[i]), std::abs(curMeshInfo.vector2[i]));
-                outScale[i] = largerOf2 * 2;
-            }
-        }
+        outScale.x = std::max(outScale.x, std::max(std::abs(ensmall1.x), std::abs(ensmall2.x)));
+        outScale.y = std::max(outScale.y, std::max(std::abs(ensmall1.y), std::abs(ensmall2.y)));
+        outScale.z = std::max(outScale.z, std::max(std::abs(ensmall1.z), std::abs(ensmall2.z)));
+        outScale.w = std::max(outScale.w, std::max(std::abs(ensmall1.w), std::abs(ensmall2.w)));
+    }
+    else if (scaleType == ScaleType::XZ)
+    {
+        outScale.x = std::max(outScale.z, std::max(std::abs(ensmall1.z), std::abs(ensmall2.z)));
+        outScale.y = 1;
+        outScale.z = std::max(outScale.w, std::max(std::abs(ensmall1.w), std::abs(ensmall2.w)));
+        outScale.w = 1;
     }
 	
 	// Because the scale might be 0...

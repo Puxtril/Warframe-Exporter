@@ -24,10 +24,14 @@ void
 LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader, const std::vector<LandscapeBodyChunkExternal>& externalChunks, LandscapeInternal& internal)
 {
     std::tuple<int, int> grid = fixGridCount(externalHeader);
+    internal.chunkCountY = std::get<0>(grid);
+    internal.chunkCountX = std::get<1>(grid);
+    internal.srcChunkCountX = externalHeader.rowCount;
+    internal.srcChunkCountY = externalHeader.columnCount;
 
-    for (int iRow = 0; iRow < std::get<0>(grid); iRow++)
+    for (int iRow = 0; iRow < internal.chunkCountY; iRow++)
     {
-        for (int iColumn = 0; iColumn < std::get<1>(grid); iColumn++)
+        for (int iColumn = 0; iColumn < internal.chunkCountX; iColumn++)
         {
             int chunkIndex = iRow + iColumn;
             const glm::vec3& scale = externalHeader.chunks[chunkIndex].scale;
@@ -37,7 +41,7 @@ LandscapeConverter::positionChunks(const LandscapeHeaderExternal& externalHeader
 }
 
 void
-LandscapeConverter::scaleChunks(Physx::HeightFieldMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk)
+LandscapeConverter::scaleChunks(Physx::HeightFieldIndexedMesh& mesh, const LandscapeHeaderChunkExternal& extHeaderChunk, const LandscapeBodyChunkExternal& extBodyChunk)
 {
     for (size_t i = 0; i < mesh.vertexPositions.size(); i++)
     {
@@ -45,22 +49,95 @@ LandscapeConverter::scaleChunks(Physx::HeightFieldMesh& mesh, const LandscapeHea
 
         // Bring into 0.0 - 1.0 range using Physx data
         curVert[0] = (curVert[0] - extBodyChunk.header.minBounds[0]) / (extBodyChunk.header.maxBounds[0] - extBodyChunk.header.minBounds[0]);
-        curVert[1] /= 256;
         curVert[2] = (curVert[2] - extBodyChunk.header.minBounds[2]) / (extBodyChunk.header.maxBounds[2] - extBodyChunk.header.minBounds[2]);
-
+        
         // Bring into Warframe's scale
         curVert[0] *= extHeaderChunk.scale.x;
+        curVert[1] = (curVert[1] * (extHeaderChunk.scale.y / 128.0) / 256.0);
         curVert[2] *= extHeaderChunk.scale.z;
     }
 }
 
 void
-LandscapeConverter::addTransforms(LandscapeInternal& landscape)
+LandscapeConverter::addTransforms(LandscapeInternal& landscape, const LandscapeHeaderExternal& externalHeader)
 {
     for (size_t i = 0; i < landscape.chunks.size(); i++)
     {
-        glm::mat4 translate = glm::translate(glm::mat4(1.0F), glm::vec3(landscape.positions[i][0], 0.0, landscape.positions[i][2]));
+        // Landscapes have this concept of "bouandry" chunks that are present in the external header, but fixed in the internal header.
+        // And the Position of the landscape includes the bouandry chunks.
+        float positionOffsetX = (externalHeader.columnCount - landscape.chunkCountX) * externalHeader.chunks[i].scale.x / 2.0;
+        float positionOffsetY = (externalHeader.rowCount - landscape.chunkCountY) * externalHeader.chunks[i].scale.z / 2.0;
+
+        glm::mat4 translate = glm::translate(glm::mat4(1.0F), glm::vec3(landscape.positions[i][0] + positionOffsetX, 0.0, landscape.positions[i][2] + positionOffsetY));
         glm::mat4 rotate = glm::rotate(glm::mat4(1.0F), glm::radians(90.0F), glm::vec3(0.0F, 1.0F, 0.0F));
         landscape.transforms.push_back(rotate * translate);
     }
+}
+
+std::vector<LandscapeChunkInternal>
+LandscapeConverter::convertToInternalMultithread(const LandscapeHeaderExternal& landscapeHeader, const std::vector<LandscapeBodyChunkExternal>& landscapeBody)
+{
+    const size_t chunkCount = landscapeBody.size();
+    std::vector<LandscapeChunkInternal> outputChunks(chunkCount);
+
+    const size_t threadCount = std::min(std::max((size_t)8, (size_t)std::thread::hardware_concurrency()), chunkCount);
+    size_t runningThreadCount = 0;
+    size_t remainingChunkCount = chunkCount;
+
+    std::vector<bool> inputQueue(chunkCount, false);
+    std::vector<std::thread> runningQueue(chunkCount);
+
+    // Populate the output queue
+    for (size_t i = 0; i < threadCount; i++)
+    {
+        runningQueue[i] = std::thread(LandscapeConverter::convertLandscapeTask, &landscapeBody[i], &landscapeHeader.chunks[i], &outputChunks, i);
+        inputQueue[i] = true;
+        runningThreadCount++;
+        remainingChunkCount--;
+    }
+
+    // Parse output queue
+    while (true)
+    {
+        // Join completed threads
+        for (size_t i = 0; i < chunkCount; i++)
+        {
+            if (runningQueue[i].joinable() && outputChunks[i].header.sampleCount == landscapeBody[i].samples.size())
+            {
+                runningQueue[i].join();
+                runningThreadCount--;
+            }
+        }
+
+        // Create new threads
+        for (size_t i = 0; i < chunkCount; i++)
+        {
+            if (runningThreadCount < threadCount)
+            {
+                if (!runningQueue[i].joinable() && !inputQueue[i])
+                {
+                    runningQueue[i] = std::thread(LandscapeConverter::convertLandscapeTask, &landscapeBody[i], &landscapeHeader.chunks[i], &outputChunks, i);
+                    inputQueue[i] = true;
+                    runningThreadCount++;
+                    remainingChunkCount--;
+                }
+            }
+        }
+
+        // Done
+        if (runningThreadCount == 0 && remainingChunkCount == 0)
+            break;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    return outputChunks;
+}
+
+void
+LandscapeConverter::convertLandscapeTask(const LandscapeBodyChunkExternal* chunk, const LandscapeHeaderChunkExternal* eeChunkHeader, std::vector<LandscapeChunkInternal>* outputChunks, size_t outputChunkIndex)
+{
+    Physx::HeightFieldIndexedMesh mesh = Physx::HeightFieldReader::convertToIndexedMesh(chunk->header, chunk->samples);
+    LandscapeConverter::scaleChunks(mesh, *eeChunkHeader, *chunk);
+    (*outputChunks)[outputChunkIndex] = {chunk->header, mesh, eeChunkHeader->scale };
 }

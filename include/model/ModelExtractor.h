@@ -52,7 +52,7 @@ namespace WarframeExporter::Model
 		{
 			std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelStaticType::MODEL_STATIC_86 },
-				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelStaticType::MODEL_STATIC_96 },
+				// { LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelStaticType::MODEL_STATIC_96 }, // Update 43 added dialogues that clash with this: /Lotus/Types/Gameplay/1999Wf/Dialogue
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelLevel1Type::MODEL_LEVEL1_99 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)ModelDCMType::MODEL_DCM_101 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, 102 }, // Shared by DCM/HLOD/Model

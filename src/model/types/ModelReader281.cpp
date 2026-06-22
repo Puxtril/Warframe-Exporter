@@ -121,6 +121,10 @@ ModelReader281::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buf
         faceBCache = extHeader.faceCount;
     }
 
+    // Patchwork check to prevent segfault
+    if ((vertexBCache * 32)  + bodyReaderB->tell() > bodyReaderB->getLength())
+        throw unknown_format_error("Will read beyond B cache (verts) " + std::to_string((int64_t)bodyReaderB->getLength() - (int64_t)bodyReaderB->tell()) + " bytes from end");
+
     outBody.positions.resize(extHeader.vertexCount);
     outBody.normals.resize(extHeader.vertexCount);
     outBody.tangents.resize(extHeader.vertexCount);
@@ -174,6 +178,10 @@ ModelReader281::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buf
     }
 
     bodyReaderB->seek(extHeader.bodySkipLen2 * 8U, std::ios_base::cur);
+
+    // Patchwork check to prevent segfault
+    if (faceBCache * 2 + bodyReaderB->tell() != bodyReaderB->getLength())
+        throw unknown_format_error("Will read beyond B cache " + std::to_string((int64_t)bodyReaderB->getLength() - (int64_t)bodyReaderB->tell()) + " bytes from end");
 
     outBody.indices.resize(extHeader.faceCount);
     bodyReaderB->readUInt16Array(outBody.indices.data(), faceBCache);

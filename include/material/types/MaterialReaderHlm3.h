@@ -19,7 +19,8 @@ namespace WarframeExporter::Material
             std::vector<int> extTypes = {
                 (int)MaterialHLMType::MATERIAL_HLM_214,
                 (int)MaterialHLMType::MATERIAL_HLM_216,
-                (int)MaterialHLMType::MATERIAL_HLM_217
+                (int)MaterialHLMType::MATERIAL_HLM_217,
+                (int)MaterialHLMType::MATERIAL_HLM_218,
             };
 			return extTypes;
         }

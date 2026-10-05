@@ -52,6 +52,7 @@ namespace WarframeExporter::LevelStatic
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelStaticType::LEVELSTATIC_29 },
 				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelStaticType::LEVELSTATIC_30 },
 				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelStaticType::LEVELSTATIC_34 },
+				{ LotusLib::Game::SOULFRAME, LotusLib::PackageCategory::ANIM_RETARGET, (int)LevelStaticType::LEVELSTATIC_36 },
 			};
 			return extTypes;
 		}

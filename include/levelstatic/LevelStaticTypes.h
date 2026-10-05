@@ -8,5 +8,6 @@ namespace WarframeExporter::LevelStatic
 		LEVELSTATIC_29 = 29,
 		LEVELSTATIC_30 = 30,
 		LEVELSTATIC_34 = 34,
+		LEVELSTATIC_36 = 36,
 	};
 };

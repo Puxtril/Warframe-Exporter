@@ -225,8 +225,14 @@ CLIExtract::dumpPkgsBin(const std::filesystem::path& cacheDirPath, const std::fi
 	}
 	catch (LotusLib::LotusException& ex)
 	{
-		logger.error("Error reading Packages.bin, cannot continue");
+		logger.error("Error reading Packages.bin");
 		logger.error(ex.what());
+		return false;
+	}
+
+	if (!pkgsBin.isInitSuccess())
+	{
+		logger.error("Error initilizing Packages.bin, cannot dump data");
 		return false;
 	}
 

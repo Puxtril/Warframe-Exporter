@@ -250,7 +250,6 @@ FormatPreview::setupAudio(std::stringstream& outStr, LotusLib::FileEntry& fileEn
     }
     
     outStr << "Compression: " << (int)compression << " (" << compressionName << ")" << std::endl;
-    outStr << "Stream Serial: " << audioHeader.streamSerialNumber << std::endl;
     outStr << "Channels: " << audioHeader.channelCount << std::endl;
     outStr << "Samples per second: " << audioHeader.samplesPerSec << std::endl;
     outStr << "Bits per sample: " << audioHeader.bitsPerSample << std::endl;

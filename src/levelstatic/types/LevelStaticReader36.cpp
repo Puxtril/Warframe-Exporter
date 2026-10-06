@@ -129,7 +129,6 @@ LevelStaticReader36::readBody(BinaryReader::Buffered* bodyReader, const LevelSta
     bodyReader->seek(extHeader.unk4Count * 44, std::ios::cur);
     bodyReader->seek(extHeader.unk5Count * 4, std::ios::cur);
 
-    WarframeExporter::Logger::getInstance().info("Index start: " + std::to_string(bodyReader->tell()));
     for (uint32_t i = 0; i < extHeader.vertexCount; i++)
     {
         outBody.objects[i].modelIndex = bodyReader->readUInt16(0, extHeader.modelPaths.size(), "Model index");

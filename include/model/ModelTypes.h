@@ -59,6 +59,7 @@ namespace WarframeExporter::Model
         MODEL_PACKED_314 = 314,
         MODEL_PACKED_315 = 315,
         MODEL_PACKED_316 = 316,
+        MODEL_PACKED_317 = 317,
     };
 
     // Overlaps with other types.

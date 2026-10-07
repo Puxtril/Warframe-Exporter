@@ -2,6 +2,7 @@
 
 CLIDebug::CLIDebug()
 {
+	m_printType = std::make_shared<TCLAP::ValueArg<int>>("", "print-files-of-type", "Prints file paths of enumeration type", false, 0, "Print file paths of type");
 	m_printEnums = std::make_shared<TCLAP::SwitchArg>("", "print-enums", "Print file enums", false);
 	m_writeRaw = std::make_shared<TCLAP::SwitchArg>("", "write-raw", "Write unprocessed decompressed file(s)", false);
 	m_dryRun = std::make_shared<TCLAP::SwitchArg>("", "dry-run", "Extract without writing files to disk", false);
@@ -26,6 +27,7 @@ void
 CLIDebug::addMainCmds(TCLAP::OneOf& oneOfCmd)
 {
 	oneOfCmd
+		.add(m_printType.get())
 		.add(m_printEnums.get())
 		.add(m_writeRaw.get())
 		.add(m_ls.get());
@@ -40,6 +42,15 @@ CLIDebug::addMiscCmds(TCLAP::CmdLine& cmdLine)
 void
 CLIDebug::processCmd(const std::filesystem::path& outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game)
 {
+	if (m_printType->getValue())
+	{
+		if (pkgName.empty())
+		{
+			WarframeExporter::Logger::getInstance().error("Must use --package with --print-files-of-type");
+			return;
+		}
+		printPathsOfType(cacheDirPath, pkgName, internalPath, game, m_printType->getValue());
+	}
 	if (m_printEnums->getValue())
 	{
 		if (pkgName.empty())
@@ -84,22 +95,38 @@ CLIDebug::processCmd(const std::filesystem::path& outPath, const std::string& in
 }
 
 void
+CLIDebug::printPathsOfType(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game, int searchType)
+{
+	LotusLib::PackageCollection pkgs(cacheDirPath, game);
+	if (!pkgs.hasPackage(pkgName))
+		throw std::runtime_error("Package does not exist: " + pkgName);
+	LotusLib::Package pkg = pkgs.getPackage(pkgName);
+
+	std::cout << "Files of type " << searchType << " inside " << pkgName << ":" << std::endl;
+	for (auto iter = pkg.getIter(internalPath); iter != pkg.getIter(); iter++)
+	{
+		try
+		{
+			uint32_t type = pkg.readCommonHeaderFormat(*iter);
+			if (type == searchType)
+				std::cout << LotusLib::getFullPath(*iter) << std::endl;
+		}
+		catch (std::exception& ex)
+		{
+			continue;
+		}
+	}
+}
+
+void
 CLIDebug::printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game)
 {
-	if (m_printEnums->getValue())
-	{
-		if (pkgName.empty())
-		{
-			WarframeExporter::Logger::getInstance().error("Must use --package with --print-enums");
-			return;
-		}
-		LotusLib::PackageCollection pkgs(cacheDirPath, game);
-		std::optional<LotusLib::Package> pkg = pkgs.getPackage(pkgName);
-		if (!pkg)
-			throw std::runtime_error("Package does not exist: " + pkgName);
+	LotusLib::PackageCollection pkgs(cacheDirPath, game);
+	if (!pkgs.hasPackage(pkgName))
+		throw std::runtime_error("Package does not exist: " + pkgName);
+	LotusLib::Package pkg = pkgs.getPackage(pkgName);
 
-		printEnumCounts(pkg.value(), internalPath);
-	}
+	printEnumCounts(pkg, internalPath);
 }
 
 void

@@ -64,9 +64,9 @@ ModelReader159::readBody(const ModelHeaderExternal& extHeader, BinaryReader::Buf
         outBody.positions[x][2] = bodyReaderB->readHalf() - 0.5F;
         
         bodyReaderB->seek(6, std::ios::cur);
-        outBody.colors[0][x][0] = bodyReaderB->readUInt8();
-        outBody.colors[0][x][1] = bodyReaderB->readUInt8();
         outBody.colors[0][x][2] = bodyReaderB->readUInt8();
+        outBody.colors[0][x][1] = bodyReaderB->readUInt8();
+        outBody.colors[0][x][0] = bodyReaderB->readUInt8();
         outBody.colors[0][x][3] = bodyReaderB->readUInt8();
     }
 

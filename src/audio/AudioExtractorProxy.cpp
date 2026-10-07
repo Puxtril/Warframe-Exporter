@@ -30,5 +30,14 @@ AudioExtractorProxy::peekCompressionFormat(BinaryReader::Buffered* headerReader)
 {
 	int compressionFormat = headerReader->readUInt32();
 	headerReader->seek(-4, std::ios::cur);
-	return (AudioCompression)compressionFormat;
+	AudioCompression format = (AudioCompression)compressionFormat;
+	switch(format)
+	{
+		case AudioCompression::PCM:
+		case AudioCompression::ADPCM:
+		case AudioCompression::OPUS:
+			return format;
+		default:
+			throw unknown_format_error("Unknown audio compression: " + std::to_string(compressionFormat));
+	}
 }

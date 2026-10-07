@@ -17,6 +17,7 @@
 
 class CLIDebug : public CLIFeature
 {
+	std::shared_ptr<TCLAP::ValueArg<int>> m_printType;
 	std::shared_ptr<TCLAP::SwitchArg> m_printEnums;
 	std::shared_ptr<TCLAP::SwitchArg> m_writeRaw;
 	std::shared_ptr<TCLAP::SwitchArg> m_dryRun;
@@ -35,6 +36,7 @@ public:
 	void processCmd(const std::filesystem::path& outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game) override;
 
 private:
+	void printPathsOfType(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game, int searchType);
 	void printEnums(const std::filesystem::path& cacheDirPath, const std::string& pkgName, const std::string& internalPath, LotusLib::Game game);
 	void writeRaw(const std::filesystem::path outPath, const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game);
 	void ls(const std::string& internalPath, const std::string& pkgName, const std::filesystem::path& cacheDirPath, LotusLib::Game game);

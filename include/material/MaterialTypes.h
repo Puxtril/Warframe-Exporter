@@ -17,5 +17,6 @@ namespace WarframeExporter::Material
 		MATERIAL_HLM_214 = 214,
 		MATERIAL_HLM_216 = 216,
 		MATERIAL_HLM_217 = 217,
+		MATERIAL_HLM_218 = 218,
 	};
 };

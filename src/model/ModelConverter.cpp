@@ -108,7 +108,7 @@ ModelConverter::convertInternalHeaderStaticOrRigged(ModelHeaderExternal& extHead
 
         std::string matName = x < materialNames.size() ? materialNames[x] : "None";
         if (matName[0] != '/' && matName != "None")
-            newMeshInfo.matName = (std::filesystem::path(internalPath).parent_path() / matName).string();
+            newMeshInfo.matName = internalPath.substr(0, internalPath.find_last_of('/')) + '/' + matName;
         else
             newMeshInfo.matName = matName;
 

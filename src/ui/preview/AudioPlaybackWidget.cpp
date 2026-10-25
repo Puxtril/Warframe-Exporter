@@ -52,6 +52,10 @@ AudioPlaybackWidget::loadAudio(LotusLib::FileEntry& fileEntry, const LotusLib::P
             break;
         case (WarframeExporter::Audio::AudioCompression::OPUS):
             WarframeExporter::Audio::AudioOpusExtractor::getInstance()->extract(fileEntry, pkgs, pkgsBin, extractedFile, {});
+            break;
+        case (WarframeExporter::Audio::AudioCompression::VORBIS):
+            WarframeExporter::Audio::AudioVorbisExtractor::getInstance()->extract(fileEntry, pkgs, pkgsBin, extractedFile, {});
+            break;
     }
 
     m_audioData = std::make_unique<QByteArray>((char*)memoryBuffer.get_memptr(), memoryBuffer.get_size());

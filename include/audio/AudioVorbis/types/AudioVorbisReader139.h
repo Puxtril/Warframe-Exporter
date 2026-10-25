@@ -2,6 +2,8 @@
 
 #include "audio/types/AudioReader139.h"
 
+#include "ExporterExceptions.h"
+
 namespace WarframeExporter::Audio
 {
     class AudioVorbisReader139 : public AudioReader139

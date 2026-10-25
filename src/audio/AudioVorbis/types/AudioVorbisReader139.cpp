@@ -1,7 +1,4 @@
 #include "audio/AudioVorbis/types/AudioVorbisReader139.h"
-#include "ExporterExceptions.h"
-
-#include <cstring>
 
 using namespace WarframeExporter::Audio;
 

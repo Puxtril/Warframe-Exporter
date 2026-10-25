@@ -5,6 +5,8 @@
 #include "audio/AudioOpus/AudioOpusExporterOggStructs.h"
 #include "audio/AudioVorbis/VorbisSetupHeaders.h"
 
+#include "ExporterExceptions.h"
+
 #include <ostream>
 #include <vector>
 #include <cstdint>

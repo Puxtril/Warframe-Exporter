@@ -1,5 +1,4 @@
 #include "audio/AudioVorbis/AudioVorbisExtractor.h"
-#include "ExporterExceptions.h"
 
 using namespace WarframeExporter::Audio;
 

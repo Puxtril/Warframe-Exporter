@@ -3,6 +3,7 @@
 #include "ui/preview/Preview.h"
 #include "audio/AudioExtractorProxy.h"
 #include "audio/AudioPCM/AudioPCMExtractor.h"
+#include "audio/AudioVorbis/AudioVorbisExtractor.h"
 #include "ExporterExceptions.h"
 #include "membuf.hpp"
 #include "ui/Settings.h"

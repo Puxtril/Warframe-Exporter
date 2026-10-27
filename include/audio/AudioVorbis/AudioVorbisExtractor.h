@@ -1,0 +1,53 @@
+#pragma once
+
+#include "Extractor.h"
+#include "audio/AudioVorbis/AudioVorbisExporterOGG.h"
+#include "audio/AudioStructs.h"
+#include "audio/AudioVorbis/EnumMapAudioVorbisReader.h"
+
+namespace WarframeExporter::Audio {
+	class AudioVorbisExtractor : public Extractor
+	{
+		AudioVorbisExtractor() : Extractor() {}
+
+	public:
+		AudioVorbisExtractor(const AudioVorbisExtractor&) = delete;
+		AudioVorbisExtractor operator=(const AudioVorbisExtractor&) = delete;
+
+		inline const std::string& getFriendlyName() const override
+		{
+			const static std::string friendlyName = "Audio";
+			return friendlyName;
+		}
+
+		inline ExtractorType getExtractorType() const override
+		{
+			static ExtractorType type = ExtractorType::Audio;
+			return type;
+		}
+
+		inline bool isMultiExport() const override
+		{
+			return false;
+		}
+
+		inline const std::string& getOutputExtension(const LotusLib::CommonHeader& commonHeader, BinaryReader::Buffered* hReader, WarframeExporter::ExtractOptions options) const override
+		{
+			const static std::string outFileExt = "ogg";
+			return outFileExt;
+		}
+
+		inline std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> getEnumMapKeys() const override
+		{
+			const static std::vector<std::tuple<LotusLib::Game, LotusLib::PackageCategory, int>> extTypes = {
+				{ LotusLib::Game::WARFRAME, LotusLib::PackageCategory::MISC, (int)AudioCompression::VORBIS }
+			};
+			return extTypes;
+		}
+
+		static AudioVorbisExtractor* getInstance();
+
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options) override;
+		void extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, std::ostream& outStream, ExtractOptions options);
+    };
+}

@@ -13,7 +13,7 @@ void
 AudioOpusExtractor::extract(LotusLib::FileEntry& fileEntry, const LotusLib::PackageCollection& pkgs, const LotusLib::PackagesBin& pkgsBin, const std::filesystem::path& outputPath, const ExtractOptions options)
 {
 	AudioReader* reader = g_enumMapAudioOpusReader[fileEntry.commonHeader.type];
-	
+
 	AudioHeader audioHeader;
 	reader->readHeader(&fileEntry.header, fileEntry.commonHeader, audioHeader);
 

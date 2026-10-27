@@ -244,6 +244,13 @@ FormatPreview::setupAudio(std::stringstream& outStr, LotusLib::FileEntry& fileEn
             reader->readHeader(&fileEntry.header, fileEntry.commonHeader, audioHeader);
             break;
         }
+        case WarframeExporter::Audio::AudioCompression::VORBIS:
+        {
+            compressionName = "Vorbis";
+            WarframeExporter::Audio::AudioReader* reader = WarframeExporter::Audio::g_enumMapAudioVorbisReader[fileEntry.commonHeader.type];
+            reader->readHeader(&fileEntry.header, fileEntry.commonHeader, audioHeader);
+            break;
+        }
         default:
             compressionName = "Unknown";
             break;
